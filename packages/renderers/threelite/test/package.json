@@ -1,0 +1,12 @@
+{
+	"name": "test-deps-intaller",
+	"version": "0.3.79",
+	"private": true,
+	"description": "This package hiding test dependincies from main repo because puppeteer is pretty big.",
+	"scripts": {},
+	"license": "MIT",
+	"publishConfig": {
+		"access": "public"
+	},
+	"bundledDependencies": {}
+}
