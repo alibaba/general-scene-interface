@@ -5,6 +5,9 @@
 	"main": "src/index.js",
 	"types": "src/index.d.ts",
 	"license": "MIT",
+	"publishConfig": {
+		"access": "public"
+	},
 	"files": [
 		"README.md",
 		"src/*"

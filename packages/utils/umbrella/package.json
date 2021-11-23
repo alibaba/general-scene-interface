@@ -4,6 +4,9 @@
 	"description": "",
 	"main": "index.js",
 	"license": "MIT",
+	"publishConfig": {
+		"access": "public"
+	},
 	"files": [
 		"README.md",
 		"index.js"
