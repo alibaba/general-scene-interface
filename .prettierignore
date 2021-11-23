@@ -1,2 +1,3 @@
 packages/utils/math
-packages/backend/gl2-renderer
+packages/renderers/gl2
+packages/renderers/threelite
