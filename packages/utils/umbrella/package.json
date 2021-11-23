@@ -31,6 +31,5 @@
 		"@gs.i/utils-optimize": "^0.0.0-beta",
 		"@gs.i/utils-raycast": "^0.0.0-beta",
 		"@gs.i/utils-transform": "^0.0.0-beta"
-	},
-	"gitHead": "736f68fea4f78ba5424a37c46a453bda68aa0b32"
+	}
 }
