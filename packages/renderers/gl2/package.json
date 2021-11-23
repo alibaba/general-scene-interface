@@ -1,6 +1,6 @@
 {
 	"name": "gl2",
-	"version": "0.0.3",
+	"version": "0.0.4",
 	"description": "GL2 Renderer",
 	"main": "GL2.js",
 	"types": "index.d.ts",
@@ -10,7 +10,7 @@
 		"Three.js",
 		"GL2"
 	],
-	"peerDependencies": {
+	"dependencies": {
 		"three": "0.94.0"
 	},
 	"devDependencies": {
