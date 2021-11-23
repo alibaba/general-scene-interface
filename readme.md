@@ -130,8 +130,6 @@ OpenGL is a registered trademark and the OpenGL ES logo is a trademark of Hewlet
 
 
 
-
-
 本项目包含的 three.js 的部分源码，版权归 three.js 的作者所有。
 
 本项目的 scene graph 部分的接口语义，借鉴了 threejs, glTF 2.0 和 BabylonJS 的命名思路，未使用 BabylonJS 的源码。
