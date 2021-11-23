@@ -1,0 +1,49 @@
+{
+	"name": "@gs.i/root",
+	"_name": "@gs.i/root",
+	"private": true,
+	"workspaces": {
+		"packages": [
+			"packages/**",
+			"examples"
+		],
+		"nohoist": [
+			"**/@gs.i/gl2-renderer/**",
+			"**/@gs.i/three-lite-renderer/**",
+			"**/@gs.i/examples/**",
+			"**/@types/**"
+		]
+	},
+	"scripts": {
+		"setup": "node scripts/setup.mjs",
+		"setupRenderers": "./scripts/setupRenderers.sh",
+		"setupExamples": "./scripts/setupExamples.sh",
+		"start": "cd ./examples && npm start",
+		"build": "lerna run --no-private --stream build",
+		"rebuild": "lerna run --no-private --stream rebuild",
+		"build:GL2Renderer": "lerna exec  --scope @gs.i/gl2-renderer -- npm run dist",
+		"build:threeLite": "lerna exec  --scope @gs.i/three-lite-renderer -- npm run dist",
+		"clean": "rm -rf ./yarn.lock && rm -rf ./node_modules && lerna clean -y && lerna run --no-private --stream --parallel clean",
+		"watch": "echo TODO",
+		"start:watch": "echo TODO || run-p watch start",
+		"startIE": "echo TODO || node --max-old-space-size=8192 examples-ie11/server.js",
+		"lint": "echo TODO",
+		"publicToLocal": "echo TODO || lerna publish from-package --registry http://localhost:4873/ --no-verify-access --no-git-reset"
+	},
+	"pre-commit": [],
+	"devDependencies": {
+		"@typescript-eslint/eslint-plugin": "4.31.2",
+		"@typescript-eslint/parser": "4.31.2",
+		"eslint": "7.32.0",
+		"eslint-config-prettier": "^8.3.0",
+		"husky": "^7.0.2",
+		"lerna": "^4.0.0",
+		"pre-commit": "^1.2.2",
+		"rimraf": "^3.0.2",
+		"typescript": "^4.5.2"
+	},
+	"optionalDependencies": {
+		"shelljs": "^0.8.4",
+		"jsonc-parser": "^3.0.0"
+	}
+}

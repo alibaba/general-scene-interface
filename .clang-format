@@ -1,0 +1,11 @@
+IndentWidth: 4
+UseTab: Never
+ColumnLimit: 120
+AllowShortBlocksOnASingleLine: true 
+AllowShortIfStatementsOnASingleLine: true 
+AlignConsecutiveAssignments: true
+AlignConsecutiveDeclarations: true
+MaxEmptyLinesToKeep: 1
+BreakConstructorInitializersBeforeComma: true
+AllowShortFunctionsOnASingleLine: Empty
+BreakConstructorInitializers: BeforeComma
