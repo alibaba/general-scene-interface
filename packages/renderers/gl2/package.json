@@ -1,6 +1,6 @@
 {
 	"name": "gl2",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"description": "GL2 Renderer",
 	"main": "GL2.js",
 	"types": "index.d.ts",
