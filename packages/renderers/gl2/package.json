@@ -1,0 +1,54 @@
+{
+	"name": "gl2",
+	"version": "0.0.2",
+	"description": "GL2 Renderer",
+	"main": "GL2.js",
+	"types": "index.d.ts",
+	"author": "Simon<https://github.com/gaomeng1900>",
+	"keywords": [
+		"webGL2",
+		"Three.js",
+		"GL2"
+	],
+	"peerDependencies": {
+		"three": "0.94.0"
+	},
+	"devDependencies": {
+		"@babel/core": "^7.3.4",
+		"@babel/plugin-proposal-async-generator-functions": "^7.2.0",
+		"@babel/plugin-proposal-class-properties": "^7.3.4",
+		"@babel/plugin-proposal-decorators": "^7.3.0",
+		"@babel/plugin-proposal-function-bind": "^7.2.0",
+		"@babel/plugin-transform-async-to-generator": "^7.3.4",
+		"@babel/plugin-transform-runtime": "^7.3.4",
+		"@babel/preset-env": "^7.3.4",
+		"@babel/runtime": "^7.3.4",
+		"babel-cli": "^6.26.0",
+		"babel-loader": "^8.0.5",
+		"chalk": "^2.4.1",
+		"css-loader": "^2.1.1",
+		"express": "^4.16.4",
+		"file-loader": "^3.0.1",
+		"open": "^0.0.5",
+		"pug": "^2.0.3",
+		"pug-loader": "^2.4.0",
+		"style-loader": "^0.23.1",
+		"terser-webpack-plugin": "^1.2.3",
+		"three-orbit-controls": "^82.1.0",
+		"uuid": "^3.3.2",
+		"webpack": "^4.29.6",
+		"webpack-bundle-analyzer": "^3.1.0",
+		"webpack-cli": "^3.2.3",
+		"webpack-dev-middleware": "^3.6.1",
+		"webpack-dev-server": "^3.2.1",
+		"webpack-glsl-loader": "^1.0.1",
+		"webpack-hot-middleware": "^2.24.3",
+		"worker-loader": "^2.0.0"
+	},
+	"scripts": {
+		"start": "node server.js",
+		"dist": "NODE_ENV=production webpack --progress --colors",
+		"watch": "NODE_ENV=debug webpack --progress --colors --display minimal --watch",
+		"v": "webpack -v"
+	}
+}
