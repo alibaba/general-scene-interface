@@ -1,0 +1,23 @@
+{
+	"extends": "./tsconfig.base.json",
+	"compilerOptions": {
+		"rootDir": "src",
+		"outDir": "dist"
+	},
+	"include": ["src", "typings"],
+	"exclude": ["dist"],
+	"references": [
+		{
+			"path": "../../schema/core"
+		},
+		{
+			"path": "../geometry"
+		},
+		{
+			"path": "../math"
+		},
+		{
+			"path": "../transform"
+		}
+	]
+}

@@ -1,0 +1,23 @@
+{
+	"name": "@gs.i/utils-math",
+	"version": "0.0.0-beta",
+	"description": "",
+	"main": "src/index.js",
+	"types": "src/index.d.ts",
+	"license": "MIT",
+	"files": [
+		"README.md",
+		"src/*"
+	],
+	"scripts": {
+		"build": "echo \"NO NEED\"",
+		"clean": "echo \"NO NEED\"",
+		"rebuild": "echo \"NO NEED\"",
+		"watch": "echo \"NO NEED\"",
+		"v": "node -v && tsc -v"
+	},
+	"devDependencies": {
+		"typescript": ">4.4.0"
+	},
+	"gitHead": "736f68fea4f78ba5424a37c46a453bda68aa0b32"
+}
