@@ -1,0 +1,95 @@
+# processor
+
+3D 渲染工具集
+
+This is not another render engine. Make Your Own Engine from it.
+
+---
+
+<!-- ## meta
+
+输入 GSI scene，输出 info -->
+
+### validate
+
+校验数据格式
+
+### sample
+
+随机、均匀地取出 scene graph 中的一部分
+
+---
+
+<!-- ## pass -->
+
+### simplify
+
+简化模型
+
+https://github.com/cnr-isti-vclab/vcglib
+
+- offline
+
+### standardize
+
+标准化所有属性，填补所有默认值
+
+- runtime
+
+### refine
+
+预处理整个场景，包含标准化、优化等
+
+- runtime
+
+### generate-uv
+
+unwrap UV0
+
+实时渲染理论上，有多种生成 UV 的方式和用途。
+
+通常会有两个 UV，一个是建模环节生成的，用于贴材质参数等，会对应多个 texture
+
+另一个是 渲染引擎生成的，用于保存 light map 之类的烘焙（cook）结果。
+
+@TODO 需要确定 UE4 的逻辑，能不能直接用 uv0，不用 uv1
+
+### update-boundings
+
+更新 bounding
+
+### update-vbh
+
+更新 VBH
+
+### update-normal
+
+更新法向量
+
+### filter-static
+
+### filter-transparent
+
+### update-topology
+
+### merge-static
+
+### flatten
+
+### breakup-vertex
+
+### merge-vertex
+
+---
+
+<!-- ## optimizer -->
+
+<!-- ## filter / separator -->
+
+---
+
+considering
+
+### diff
+
+对比两个 scenegraph
