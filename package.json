@@ -21,14 +21,7 @@
 		"start": "cd ./examples && npm start",
 		"build": "lerna run --no-private --stream build",
 		"rebuild": "lerna run --no-private --stream rebuild",
-		"build:GL2Renderer": "lerna exec  --scope @gs.i/gl2-renderer -- npm run dist",
-		"build:threeLite": "lerna exec  --scope @gs.i/three-lite-renderer -- npm run dist",
-		"clean": "rm -rf ./yarn.lock && rm -rf ./node_modules && lerna clean -y && lerna run --no-private --stream --parallel clean",
-		"watch": "echo TODO",
-		"start:watch": "echo TODO || run-p watch start",
-		"startIE": "echo TODO || node --max-old-space-size=8192 examples-ie11/server.js",
-		"lint": "echo TODO",
-		"publicToLocal": "echo TODO || lerna publish from-package --registry http://localhost:4873/ --no-verify-access --no-git-reset"
+		"clean": "rm -rf ./yarn.lock && rm -rf ./node_modules && lerna clean -y && lerna run --no-private --stream --parallel clean"
 	},
 	"pre-commit": [],
 	"devDependencies": {
