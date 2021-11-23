@@ -26,7 +26,7 @@
 		"build": "lerna run --no-private --stream build",
 		"rebuild": "lerna run --no-private --stream rebuild",
 		"clean": "rm -rf ./yarn.lock && rm -rf ./node_modules && lerna clean -y && lerna run --no-private --stream --parallel clean",
-		"publish": "npx lerna publish from-package"
+		"publish": "npx lerna publish"
 	},
 	"pre-commit": [],
 	"devDependencies": {
