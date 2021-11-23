@@ -22,11 +22,11 @@
 		"v": "node -v && tsc -v"
 	},
 	"dependencies": {
-		"gl2": "0.0.4",
 		"@gs.i/schema": "^0.0.0-beta",
 		"@gs.i/utils-geometry": "^0.0.0-beta",
 		"@gs.i/utils-math": "^0.0.0-beta",
 		"@gs.i/utils-transform": "^0.0.0-beta",
+		"gl2": "0.0.4",
 		"uuid": "^8.3.0"
 	},
 	"devDependencies": {
@@ -34,5 +34,6 @@
 		"@types/uuid": "^8.3.0",
 		"@types/webvr-api": "latest",
 		"typescript": ">4.4.0"
-	}
+	},
+	"gitHead": "96bfbb9138a5242a3c460a9210058c14bcf9b03a"
 }

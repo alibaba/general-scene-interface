@@ -32,5 +32,6 @@
 		"@types/offscreencanvas": "latest",
 		"@types/webvr-api": "latest",
 		"typescript": ">4.4.0"
-	}
+	},
+	"gitHead": "96bfbb9138a5242a3c460a9210058c14bcf9b03a"
 }
