@@ -10,8 +10,11 @@
 		],
 		"nohoist": [
 			"**/gl2/**",
+			"**/gl2",
 			"**/@gs.i/gl2-renderer/**",
+			"**/@gs.i/gl2-renderer",
 			"**/@gs.i/three-lite-renderer/**",
+			"**/@gs.i/three-lite-renderer",
 			"**/@gs.i/examples/**",
 			"**/@types/**"
 		]
