@@ -1,0 +1,30 @@
+{
+	"name": "@gs.i/frontend-sdk",
+	"version": "0.0.0-beta",
+	"description": "",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"license": "MIT",
+	"files": [
+		"README.md",
+		"dist/*"
+	],
+	"scripts": {
+		"build": "./scripts/build.sh",
+		"clean": "./scripts/clean.sh",
+		"rebuild": "./scripts/rebuild.sh",
+		"watch": "./scripts/watch.sh",
+		"v": "node -v && tsc -v"
+	},
+	"dependencies": {
+		"@gs.i/schema": "^0.0.0-beta",
+		"@gs.i/utils-geom-builders": "^0.0.0-beta",
+		"@gs.i/utils-math": "^0.0.0-beta",
+		"@gs.i/utils-transform": "^0.0.0-beta",
+		"uuid": "^8.3.0"
+	},
+	"devDependencies": {
+		"typescript": ">4.4.0"
+	},
+	"gitHead": "736f68fea4f78ba5424a37c46a453bda68aa0b32"
+}
