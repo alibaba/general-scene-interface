@@ -1,3 +1,3 @@
-const LIST = ['backend/gl2-renderer', 'backend/threelite-renderer']
+const LIST = ['renderers/gl2', 'renderers/threelite']
 
 export default LIST

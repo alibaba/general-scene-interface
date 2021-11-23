@@ -80,7 +80,7 @@ try {
 	execSync(`lerna link --force-local`, { stdio: 'inherit' })
 
 	// # should not hoist local packages
-	execSync(`mv ./node_modules/@gs.i ./node_modules/@gs.i-no-hoist`, { stdio: 'inherit' })
+	execSync(`rm -rf ./node_modules/@gs.i`, { stdio: 'inherit' })
 
 	for (const changedFile of changedFiles) {
 		const [pjsonPath, pjsonBacPath] = changedFile

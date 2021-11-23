@@ -17,7 +17,6 @@
 	},
 	"scripts": {
 		"setup": "node scripts/setup.mjs",
-		"setupRenderers": "./scripts/setupRenderers.sh",
 		"setupExamples": "./scripts/setupExamples.sh",
 		"start": "cd ./examples && npm start",
 		"build": "lerna run --no-private --stream build",
