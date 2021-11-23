@@ -1,6 +1,7 @@
 {
 	"name": "@gs.i/root",
 	"_name": "@gs.i/root",
+	"description": "General Scene Interface Project",
 	"private": true,
 	"workspaces": {
 		"packages": [
