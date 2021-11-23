@@ -1,0 +1,39 @@
+{
+	"typescript.validate.enable": true,
+	"editor.formatOnPaste": false,
+	"editor.defaultFormatter": "esbenp.prettier-vscode",
+	"[json]": {
+		"editor.defaultFormatter": "vscode.json-language-features"
+	},
+	"[javascript]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[typescript]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[glsl]": {
+		"editor.defaultFormatter": "xaver.clang-format"
+	},
+	"files.exclude": {
+		"**/*.back": true,
+		"**/*.old": true
+		// "**/*.tsbuildinfo": true
+		// "packages/**/node_modules": true
+		// "**/!package.json": true
+		// "**/package.json": false,
+	},
+	"typescript.tsdk": "./node_modules/typescript/lib",
+	"eslint.nodePath": "node_modules",
+	"editor.formatOnSave": true,
+	"workbench.colorCustomizations": {
+		"statusBar.background": "#000000",
+		"statusBar.noFolderBackground": "#000000",
+		"statusBar.debuggingBackground": "#002c49"
+	},
+	"workbench.tree.indent": 24,
+	"typescript.suggest.paths": false,
+	"editor.smoothScrolling": true,
+	"files.associations": {
+		"**/README": "markdown"
+	}
+}

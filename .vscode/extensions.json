@@ -1,0 +1,8 @@
+{
+	"recommendations": [
+		"christian-kohler.path-intellisense",
+		"esbenp.prettier-vscode",
+		"dbaeumer.vscode-eslint",
+		"xaver.clang-format"
+	]
+}
