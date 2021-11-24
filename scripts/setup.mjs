@@ -40,7 +40,7 @@ const packagesJSON = execSync('npx lerna ls --json --all').toString()
 const packageALL = JSON.parse(packagesJSON)
 
 // 黑名单过滤掉
-const packages = packageALL.filter((pac) => {
+const ignoredPackages = packageALL.filter((pac) => {
 	let inBL = false
 	packageBlacklist.forEach((rule) => {
 		inBL = inBL || pac.location.includes(rule)
@@ -48,32 +48,54 @@ const packages = packageALL.filter((pac) => {
 
 	return inBL
 })
-console.log(packages)
+console.log('ignoredPackages', ignoredPackages)
 
-for (const pkg of packages) {
-	console.log('ignore package: ', pkg.name)
-	const pjsonPath = path.resolve(pkg.location, 'package.json')
+await Promise.all(
+	ignoredPackages.map(async (pkg) => {
+		console.log('ignore package: ', pkg.name)
+		const pjsonPath = path.resolve(pkg.location, 'package.json')
 
-	const pjson = await readFile(pjsonPath)
-	const originalJson = JSON.parse(pjson)
+		const pjson = await readFile(pjsonPath)
+		const originalJson = JSON.parse(pjson)
 
-	// NOTE can not be {} or yarn will throw
-	delete originalJson.scripts
-	delete originalJson.dependencies
-	delete originalJson.devDependencies
-	delete originalJson.peerDependencies
-	delete originalJson.bundledDependencies
-	delete originalJson.optionalDependencies
+		// NOTE can not be {} or yarn will throw
+		delete originalJson.scripts
+		delete originalJson.dependencies
+		delete originalJson.devDependencies
+		delete originalJson.peerDependencies
+		delete originalJson.bundledDependencies
+		delete originalJson.optionalDependencies
 
-	// backup
+		try {
+			await writeFile(pjsonPath, JSON.stringify(originalJson))
+		} catch (error) {
+			console.error(pkg.name, tsconfigPath, error)
+		}
+	})
+)
 
-	try {
-		await writeFile(pjsonPath, JSON.stringify(originalJson))
-	} catch (error) {
-		console.error(error)
-		console.log(pkg.name, tsconfigPath)
-	}
-}
+// remove optinal dependents from package.json
+await Promise.all(
+	packageALL.map(async (pkg) => {
+		const pjsonPath = path.resolve(pkg.location, 'package.json')
+
+		const pjson = await readFile(pjsonPath)
+		const originalJson = JSON.parse(pjson)
+
+		if (originalJson.optionalDependencies) {
+			console.log('fix package optinal dep: ', pkg.name)
+
+			// NOTE can not be {} or yarn will throw
+			delete originalJson.optionalDependencies
+
+			try {
+				await writeFile(pjsonPath, JSON.stringify(originalJson))
+			} catch (error) {
+				console.error(pkg.name, tsconfigPath, error)
+			}
+		}
+	})
+)
 
 try {
 	execSync(`lerna bootstrap -- --force-local`, { stdio: 'inherit' })
