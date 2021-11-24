@@ -10,9 +10,7 @@
 		"declaration": true,
 		"declarationMap": true,
 		"sourceMap": true,
-		// "inlineSources": true,
 		"strict": true,
-		"composite": true,
 		"esModuleInterop": true, // import React from 'react'
 		"strictPropertyInitialization": false,
 		"noImplicitAny": false, // TODO 改成 true，所有 any 必须显式
