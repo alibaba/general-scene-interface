@@ -2,8 +2,6 @@
 
 **This Project Is Still In Uploading Process.**
 
----
-
 > 抛砖引玉
 >
 > Build Your Web3D Programs With a Paradigm.
@@ -46,4 +44,4 @@ OpenGL is a registered trademark and the OpenGL ES logo is a trademark of Hewlet
 
 对于本项目的使用者或标准实现者，如果需要 khronos 的认证，可自行向 khronos 提交认证申请。
 
-详见 ./disclaimer.txt
+详见 [./disclaimer.txt](./disclaimer.txt)
