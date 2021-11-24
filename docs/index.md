@@ -97,7 +97,7 @@ Partial setup 等功能需要使用脚本自己实现。
 
 #### 开发环境依赖
 
-example 需要的依赖应该安装在 example 目录中；开发环境用到的依赖因为只能放在 root，因此必须最小化，管理员用到的依赖应该 mark as optional，用户安装时应该默认使用 `--no-optional`(npm) 或 `--ignore-optional`(yarn) 参数。
+example 需要的依赖应该安装在 example 目录中；开发环境用到的依赖因为只能放在 root，因此必须最小化。
 
 ts 应使用升级最新版，但是 package 应该避免使用最新特性。
 
