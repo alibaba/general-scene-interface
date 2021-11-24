@@ -25,7 +25,7 @@ execSync(`node ${path.resolve(__dirname, './packageJsonBackup.mjs')} --id=${id}`
 	stdio: 'inherit',
 })
 
-import blist from './blacklist.mjs'
+import blist from './ignore.mjs'
 
 // 不处理的package
 const packageBlacklist = [...blist]
