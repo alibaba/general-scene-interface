@@ -1,0 +1,11 @@
+# 使用场景：
+
+Most common.
+
+# 运行环境：
+
+- Chrome 最新版
+- webgl2 only
+- macOS/win10/win7(up to date) 桌面端 only
+
+不需要考虑其他环境的兼容性。
