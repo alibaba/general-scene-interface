@@ -1,0 +1,13 @@
+// '所有reference的尽头'
+{
+	"extends": "./tsconfig.base.json",
+	"compilerOptions": {
+		"rootDir": "src",
+		"outDir": "dist"
+	},
+	"include": ["src", "typings"],
+	"exclude": [
+		"dist"
+	],
+	"references": []
+}

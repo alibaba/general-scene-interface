@@ -1,0 +1,56 @@
+{
+	"extends": "./tsconfig.base.json",
+	"compilerOptions": {
+		"rootDir": "src",
+		"outDir": "dist"
+	},
+	"include": ["src", "typings"],
+	"exclude": ["dist"],
+	"references": [
+		{
+			"path": "../../backend/gl2"
+		},
+		{
+			"path": "../../backend/gltf2"
+		},
+		{
+			"path": "../../backend/threelite"
+		},
+		{
+			"path": "../../frontend/gltf2"
+		},
+		{
+			"path": "../../frontend/ts"
+		},
+		{
+			"path": "../../schema/core"
+		},
+		{
+			"path": "../../schema/ext-scene"
+		},
+		{
+			"path": "../geomBuilders"
+		},
+		{
+			"path": "../geometry"
+		},
+		{
+			"path": "../gline"
+		},
+		{
+			"path": "../gltf2"
+		},
+		{
+			"path": "../math"
+		},
+		{
+			"path": "../optimize"
+		},
+		{
+			"path": "../raycast"
+		},
+		{
+			"path": "../transform"
+		}
+	]
+}
