@@ -8,11 +8,6 @@ import { execSync, spawn, exec, execFileSync } from 'child_process'
 console.log(argv)
 console.log(process.env.PWD)
 
-/**
- * 是否安装全部依赖，包括 examples 和 renderers
- */
-// const INSTALL_ALL = argv.includes('--all')
-
 // # https://github.com/lerna/lerna/issues/1421
 // # ⬆️ bad bad design
 // # lerna 的 --ignore 和 --no-private 并不会生效
@@ -21,7 +16,13 @@ console.log(process.env.PWD)
 import blist from './blacklist.mjs'
 
 // 不处理的package
-const packageBlacklist = [...blist, 'examples']
+const packageBlacklist = [...blist]
+
+const NO_EXAMPLES = argv.includes('--no-examples')
+
+if (NO_EXAMPLES) {
+	packageBlacklist.push('examples')
+}
 
 const packagesJSON = execSync('npx lerna ls --json --all').toString()
 const packageALL = JSON.parse(packagesJSON)

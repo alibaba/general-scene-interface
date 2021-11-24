@@ -21,7 +21,8 @@
 	},
 	"scripts": {
 		"setup": "node scripts/setup.mjs",
-		"setupExamples": "./scripts/setupExamples.sh",
+		"setup:core": "node scripts/setup.mjs --no-examples",
+		"setup:examples": "./scripts/setupExamples.sh",
 		"start": "cd ./examples && npm start",
 		"build": "lerna run --no-private --stream build",
 		"rebuild": "lerna run --no-private --stream rebuild",
