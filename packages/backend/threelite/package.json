@@ -1,0 +1,37 @@
+{
+	"name": "@gs.i/backend-threelite",
+	"version": "0.0.0-beta",
+	"description": "",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"license": "MIT",
+	"publishConfig": {
+		"access": "public"
+	},
+	"files": [
+		"README.md",
+		"dist/*"
+	],
+	"scripts": {
+		"build": "./scripts/build.sh",
+		"clean": "./scripts/clean.sh",
+		"rebuild": "./scripts/rebuild.sh",
+		"watch": "echo \"NO IMPLEMENT. TODO: WATCH GLSL\"",
+		"postbuild": "node ./bin/glsl-processor.js",
+		"postrebuild": "node ./bin/glsl-processor.js",
+		"v": "node -v && tsc -v"
+	},
+	"dependencies": {
+		"@gs.i/schema": "^0.0.0-beta",
+		"@gs.i/three-lite-renderer": "0.0.2",
+		"@gs.i/utils-geometry": "^0.0.0-beta",
+		"@gs.i/utils-math": "^0.0.0-beta",
+		"@gs.i/utils-transform": "^0.0.0-beta"
+	},
+	"devDependencies": {
+		"@types/offscreencanvas": "latest",
+		"@types/webvr-api": "latest",
+		"typescript": ">4.4.0"
+	},
+	"gitHead": "96bfbb9138a5242a3c460a9210058c14bcf9b03a"
+}

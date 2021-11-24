@@ -10,8 +10,11 @@
 		],
 		"nohoist": [
 			"**/gl2/**",
+			"**/gl2",
 			"**/@gs.i/gl2-renderer/**",
+			"**/@gs.i/gl2-renderer",
 			"**/@gs.i/three-lite-renderer/**",
+			"**/@gs.i/three-lite-renderer",
 			"**/@gs.i/examples/**",
 			"**/@types/**"
 		]
@@ -22,7 +25,8 @@
 		"start": "cd ./examples && npm start",
 		"build": "lerna run --no-private --stream build",
 		"rebuild": "lerna run --no-private --stream rebuild",
-		"clean": "rm -rf ./yarn.lock && rm -rf ./node_modules && lerna clean -y && lerna run --no-private --stream --parallel clean"
+		"clean": "rm -rf ./yarn.lock && rm -rf ./node_modules && lerna clean -y && lerna run --no-private --stream --parallel clean",
+		"publish": "npx lerna publish"
 	},
 	"pre-commit": [],
 	"devDependencies": {

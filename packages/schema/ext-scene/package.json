@@ -5,6 +5,9 @@
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"license": "MIT",
+	"publishConfig": {
+		"access": "public"
+	},
 	"files": [
 		"README.md",
 		"dist/*"
@@ -22,5 +25,5 @@
 	"devDependencies": {
 		"typescript": ">4.4.0"
 	},
-	"gitHead": "736f68fea4f78ba5424a37c46a453bda68aa0b32"
+	"gitHead": "96bfbb9138a5242a3c460a9210058c14bcf9b03a"
 }
