@@ -8,10 +8,10 @@
 	"exclude": ["dist"],
 	"references": [
 		{
-			"path": "../../schema/core"
+			"path": "../../frontend/ts"
 		},
 		{
-			"path": "../../frontend/ts"
+			"path": "../../schema/core"
 		},
 		{
 			"path": "../math"

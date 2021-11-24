@@ -6,9 +6,5 @@
 	},
 	"include": ["./", "typings"],
 	"exclude": ["dist", "node_modules", "packages"],
-	"references": [
-		{
-			"path": "../packages/utils/umbrella"
-		}
-	]
+	"references": []
 }
