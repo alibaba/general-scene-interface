@@ -50,6 +50,11 @@
   resolved "https://registry.npm.alibaba-inc.com/@gar/promisify/download/@gar/promisify-1.1.2.tgz#30aa825f11d438671d585bd44e7fd564535fc210"
   integrity sha1-MKqCXxHUOGcdWFvUTn/VZFNfwhA=
 
+"@gs.i/three-lite-renderer@0.0.2":
+  version "0.0.2"
+  resolved "https://registry.npm.alibaba-inc.com/@gs.i/three-lite-renderer/download/@gs.i/three-lite-renderer-0.0.2.tgz#14ddcf7db896d275afb22aa63d13833f7424150f"
+  integrity sha512-KUScK1+q9ohnUVkrxyx/ILJx5d7bbowQVTcf6mYAdTdsx+G4xRlvgztTAxgBEYzI56meLpdSHsOdqgQd+zXFIg==
+
 "@humanwhocodes/config-array@^0.5.0":
   version "0.5.0"
   resolved "https://registry.npm.alibaba-inc.com/@humanwhocodes/config-array/download/@humanwhocodes/config-array-0.5.0.tgz#1407967d4c6eecd7388f83acf1eaf4d0c6e58ef9"
@@ -957,10 +962,25 @@
   resolved "https://registry.npm.alibaba-inc.com/@types/normalize-package-data/download/@types/normalize-package-data-2.4.1.tgz#d3357479a0fdfdd5907fe67e17e0a85c906e1301"
   integrity sha1-0zV0eaD9/dWQf+Z+F+CoXJBuEwE=
 
+"@types/offscreencanvas@latest":
+  version "2019.6.4"
+  resolved "https://registry.npm.alibaba-inc.com/@types/offscreencanvas/download/@types/offscreencanvas-2019.6.4.tgz#64f6d120b53925028299c744fcdd32d2cd525963"
+  integrity sha1-ZPbRILU5JQKCmcdE/N0y0s1SWWM=
+
 "@types/parse-json@^4.0.0":
   version "4.0.0"
   resolved "https://registry.npm.alibaba-inc.com/@types/parse-json/download/@types/parse-json-4.0.0.tgz#2f8bb441434d163b35fb8ffdccd7138927ffb8c0"
   integrity sha1-L4u0QUNNFjs1+4/9zNcTiSf/uMA=
+
+"@types/uuid@^8.3.0":
+  version "8.3.3"
+  resolved "https://registry.npm.alibaba-inc.com/@types/uuid/download/@types/uuid-8.3.3.tgz#c6a60686d953dbd1b1d45e66f4ecdbd5d471b4d0"
+  integrity sha1-xqYGhtlT29Gx1F5m9Ozb1dRxtNA=
+
+"@types/webvr-api@latest":
+  version "0.0.36"
+  resolved "https://registry.npm.alibaba-inc.com/@types/webvr-api/download/@types/webvr-api-0.0.36.tgz#39d2694cb40d816805a285c7ed3c7ceb488b371a"
+  integrity sha1-OdJpTLQNgWgFooXH7Tx860iLNxo=
 
 "@typescript-eslint/eslint-plugin@4.31.2":
   version "4.31.2"
@@ -2296,6 +2316,13 @@ gitconfiglocal@^1.0.0:
   integrity sha1-QdBF84UaXqiPA/JMocYXgRRGS5s=
   dependencies:
     ini "^1.3.2"
+
+gl2@0.0.4:
+  version "0.0.4"
+  resolved "https://registry.npm.alibaba-inc.com/gl2/download/gl2-0.0.4.tgz#85276408f10a39d152d90dc3e2ff634d675782af"
+  integrity sha512-MtM7EELsKZKiPfiTqBkcqPPbsK2Nw2OwVpVAE+DzEd+q5Abdp9tEJ0efpF72L3izx4bOu4ksqVYXHtsPLUuuGw==
+  dependencies:
+    three "0.94.0"
 
 glob-parent@^5.1.1, glob-parent@^5.1.2:
   version "5.1.2"
@@ -4615,6 +4642,11 @@ text-table@^0.2.0:
   resolved "https://registry.npm.alibaba-inc.com/text-table/download/text-table-0.2.0.tgz#7f5ee823ae805207c00af2df4a84ec3fcfa570b4"
   integrity sha1-f17oI66AUgfACvLfSoTsP8+lcLQ=
 
+three@0.94.0:
+  version "0.94.0"
+  resolved "https://registry.npm.alibaba-inc.com/three/download/three-0.94.0.tgz#4ce6db7f2bfbf79c2d73444aa6e3cfc08a32d762"
+  integrity sha1-TObbfyv795wtc0RKpuPPwIoy12I=
+
 through2@^2.0.0:
   version "2.0.5"
   resolved "https://registry.npm.alibaba-inc.com/through2/download/through2-2.0.5.tgz#01c1e39eb31d07cb7d03a96a70823260b23132cd"
@@ -4747,7 +4779,7 @@ typedarray@^0.0.6:
   resolved "https://registry.npm.alibaba-inc.com/typedarray/download/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
 
-typescript@^4.5.2:
+typescript@>4.4.0, typescript@^4.5.2:
   version "4.5.2"
   resolved "https://registry.npm.alibaba-inc.com/typescript/download/typescript-4.5.2.tgz#8ac1fba9f52256fdb06fb89e4122fa6a346c2998"
   integrity sha1-isH7qfUiVv2wb7ieQSL6ajRsKZg=
@@ -4829,6 +4861,11 @@ uuid@^3.3.2:
   version "3.4.0"
   resolved "https://registry.npm.alibaba-inc.com/uuid/download/uuid-3.4.0.tgz#b23e4358afa8a202fe7a100af1f5f883f02007ee"
   integrity sha1-sj5DWK+oogL+ehAK8fX4g/AgB+4=
+
+uuid@^8.3.0:
+  version "8.3.2"
+  resolved "https://registry.npm.alibaba-inc.com/uuid/download/uuid-8.3.2.tgz#80d5b5ced271bb9af6c445f21a1a04c606cefbe2"
+  integrity sha1-gNW1ztJxu5r2xEXyGhoExgbO++I=
 
 v8-compile-cache@^2.0.3:
   version "2.3.0"

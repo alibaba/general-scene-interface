@@ -1,0 +1,25 @@
+{
+	"name": "@gs.i/examples",
+	"_name": "@gs.i/examples",
+	"version": "0.0.0-beta",
+	"private": true,
+	"scripts": {
+		"prestart": "yarn install",
+		"start": "node --max-old-space-size=8192 server.js"
+	},
+	"devDependencies": {
+		"compression": "^1.7.4",
+		"express": "^4.17.1",
+		"progress-bar-webpack-plugin": "^2.1.0",
+		"pug": "^3.0.2",
+		"source-map-loader": "^3.0.0",
+		"ts-loader": "9.2.6",
+		"typescript": ">4.4.0",
+		"webpack": "^5.64.2",
+		"webpack-cli": "^4.9.1",
+		"webpack-dev-middleware": "^5.2.2",
+		"ani-timeline": "1.2.19-m",
+		"camera-proxy": "0.1.24",
+		"@gs.i/all": "^0.0.0-beta"
+	}
+}
