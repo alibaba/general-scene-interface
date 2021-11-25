@@ -18,7 +18,7 @@ export function matrix4Equals(m1: number[], m2: number[]): boolean {
 
 	return true
 }
-
+//
 export function transformEquals(t1: TransformDataType, t2: TransformDataType): boolean {
 	if (!t1.position || !t2.position || !t1.rotation || !t2.rotation || !t1.scale || !t2.scale) {
 		return matrix4Equals(t1.matrix, t2.matrix)
