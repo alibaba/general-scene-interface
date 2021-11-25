@@ -6,6 +6,14 @@ import { execSync, spawn, exec, execFileSync } from 'child_process'
 
 import colors from 'colors/safe.js'
 
+function yellow() {
+	console.log(colors.bgBlue.yellow.bold('\n', ...arguments))
+}
+function green() {
+	console.log(colors.bgBlue.green.bold('\n', ...arguments))
+}
+
+console.log(colors.green.bold.underline.bgBlue('read local packages...'))
 const packagesJSON = execSync('npx lerna ls --json --all').toString()
 const packageALL = JSON.parse(packagesJSON)
 // console.log(packageALL)
@@ -31,9 +39,12 @@ function getLocalPackageByPath(path) {
 	return pkg
 }
 
+console.log(colors.green.bold.underline.bgBlue('read packages dependents...'))
 const dependentGraphJSON = execSync('npx lerna list --graph').toString()
 const dependentGraph = JSON.parse(dependentGraphJSON)
 // console.log(dependentGraph)
+
+green('analyzing impact-graph...')
 
 const impactGraph = {}
 
@@ -44,7 +55,7 @@ const impactGraph = {}
 		const pkg = getLocalPackageByName(key)
 
 		if (!pkg) {
-			console.log(key, '不是monorepo本地package，或者在ignore名单中，将忽略')
+			console.log(colors.yellow('\t', key, '不是monorepo本地package，或者在ignore名单中，将忽略'))
 			return
 		}
 
@@ -52,7 +63,9 @@ const impactGraph = {}
 		deps.forEach((depName) => {
 			const pkg = getLocalPackageByName(depName)
 			if (!pkg) {
-				console.log(depName, '不是monorepo本地package，或者在ignore名单中，将忽略')
+				console.log(
+					colors.yellow('\t', depName, '不是monorepo本地package，或者在ignore名单中，将忽略')
+				)
 				return
 			}
 
@@ -65,7 +78,14 @@ const impactGraph = {}
 	})
 }
 
-console.log('impactGraph', impactGraph)
+// console.log('impactGraph', impactGraph)
+{
+	for (const name of Object.keys(impactGraph)) {
+		console.log(
+			colors.cyan(name.slice(6), '=> [', impactGraph[name].map((a) => a.slice(6)).join(', '), ']')
+		)
+	}
+}
 
 function findAllDirtPkgs(pkg) {
 	// const dirtList = []
@@ -101,7 +121,7 @@ let building = false
  * @param {Set<string>} dirtList
  */
 async function rebuildDirt(dirtList) {
-	console.log('building...', dirtList.values())
+	yellow('start building these packages', [...dirtList.values()].join(' '))
 
 	const command = `npx`
 	const args = ['lerna', 'run', '--no-private', '--stream', 'build']
@@ -114,10 +134,10 @@ async function rebuildDirt(dirtList) {
 
 	sub.on('close', (code) => {
 		building = false
-		console.log('building done')
+		green('building done')
 
 		if (waitlist.size > 0) {
-			console.log('waitlist not empty. start another building...')
+			yellow('waitlist not empty. start another building...')
 			const newDirtlist = new Set(waitlist)
 			waitlist.clear()
 			building = true
@@ -128,10 +148,10 @@ async function rebuildDirt(dirtList) {
 
 function fireDirtList(dirtList) {
 	if (building) {
-		console.log('another building runing... join wait list')
+		yellow('another building runing... join wait list')
 		dirtList.forEach((pkgName) => waitlist.add(pkgName))
 	} else {
-		console.log('available. start building...')
+		yellow('builder available. start building...')
 		building = true
 		rebuildDirt(dirtList)
 	}
@@ -144,15 +164,18 @@ const watcher = chokidar.watch([path.resolve(process.env.PWD, './packages')], {
 	atomic: 500,
 })
 
+green('started watching....')
+
 watcher.on('all', (eventName, _path, stats) => {
 	const pkg = getLocalPackageByPath(_path)
 	// console.log(pkg)
 
 	if (!pkg) {
-		console.log(depName, '不是monorepo本地package，或者在ignore名单中，将忽略')
+		// '不是monorepo本地package，或者在ignore名单中，将忽略'
+		info('detected change but ignoring...', depName)
 		return
 	}
-	console.log(eventName, pkg.name, _path)
+	yellow('change detected. type:', eventName, pkg.name, _path)
 
 	// buildPkgRecursively(pkg)
 
