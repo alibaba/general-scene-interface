@@ -120,7 +120,7 @@ function getDemoEntries() {
 		const fileStat = fs.statSync(filePath)
 		const filename = path.basename(filePath)
 
-		if (filename === 'node_modules' || filename === 'typings') {
+		if (filename === 'node_modules' || filename === 'typings' || filename === 'proxy') {
 			continue
 		}
 
