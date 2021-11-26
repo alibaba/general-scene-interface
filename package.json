@@ -23,10 +23,10 @@
 		"setup": "node scripts/setup.mjs",
 		"setup:core": "node scripts/setup.mjs --no-examples",
 		"setup:examples": "./scripts/setupExamples.sh",
-		"start": "cd ./examples && npm start",
+		"start": "npx concurrently --kill-others --names \"watch,examples\" \"npm run watch\" \"cd ./examples && npm start\" ",
 		"build": "lerna run --no-private --stream build",
 		"rebuild": "lerna run --no-private --stream rebuild",
-		"watch": "node scripts/watch.mjs",
+		"watch": "node scripts/watch.mjs --fast",
 		"clean": "rm -rf ./yarn.lock && rm -rf ./node_modules && lerna clean -y && lerna run --no-private --stream --parallel clean",
 		"publish": "npx lerna publish"
 	},
@@ -44,6 +44,7 @@
 		"shelljs": "^0.8.4",
 		"jsonc-parser": "^3.0.0",
 		"colors": "^1.4.0",
+		"concurrently": "^6.4.0",
 		"chokidar": "^3.5.2"
 	}
 }
