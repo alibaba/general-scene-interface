@@ -16,7 +16,6 @@
 		"build": "./scripts/build.sh",
 		"clean": "./scripts/clean.sh",
 		"rebuild": "./scripts/rebuild.sh",
-		"watch": "echo \"NO IMPLEMENT. TODO: WATCH GLSL\"",
 		"postbuild": "node ./bin/glsl-processor.js",
 		"postrebuild": "node ./bin/glsl-processor.js",
 		"v": "node -v && tsc -v"

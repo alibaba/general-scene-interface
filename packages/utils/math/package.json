@@ -16,7 +16,6 @@
 		"build": "echo \"NO NEED\"",
 		"clean": "echo \"NO NEED\"",
 		"rebuild": "echo \"NO NEED\"",
-		"watch": "echo \"NO NEED\"",
 		"v": "node -v && tsc -v"
 	},
 	"devDependencies": {
