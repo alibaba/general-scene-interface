@@ -3,13 +3,7 @@
  * All rights reserved.
  */
 
-import {
-	MeshBasicMaterial,
-	UniformsUtils,
-	Color,
-	Matrix3,
-	Vector2,
-} from '@gs.i/three-lite-renderer'
+import { MeshBasicMaterial, UniformsUtils, Color, Matrix3, Vector2 } from 'three-lite'
 import { MatrSpriteDataType } from '@gs.i/schema'
 import { genPreShaderCode } from './utils'
 import vs from './PrgSpriteMatr.vs.glsl'

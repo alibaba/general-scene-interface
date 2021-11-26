@@ -29,7 +29,7 @@ import {
 	__defaultMeshInternalProp,
 } from '@gs.i/schema'
 import { Transform3, matrix4Equals } from '@gs.i/utils-transform'
-// import * as THREE from '@gs.i/three-lite-renderer'
+// import * as THREE from 'three-lite'
 import {
 	Object3D,
 	Vector2,
@@ -66,7 +66,7 @@ import {
 	Vector4,
 	Matrix3,
 	Matrix4,
-} from '@gs.i/three-lite-renderer'
+} from 'three-lite'
 import { generateGsiSpriteInfo } from '@gs.i/utils-geometry'
 import { box3Equals, convDefines, elementsEquals, sphereEquals, SupportedExtensions } from './utils'
 import { Euler, Vector3 as Vec3 } from '@gs.i/utils-math'

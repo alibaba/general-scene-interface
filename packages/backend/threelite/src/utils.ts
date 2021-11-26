@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-import { Box3, Sphere } from '@gs.i/three-lite-renderer'
+import { Box3, Sphere } from 'three-lite'
 import { BBox, BSphere, PrgBaseDataType } from '@gs.i/schema'
 
 export function box3Equals(b1: Box3 | BBox, b2: Box3 | BBox): boolean {

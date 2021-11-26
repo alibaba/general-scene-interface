@@ -2,7 +2,7 @@
  * 不在标准里的内容
  */
 
-import * as THREE from '@gs.i/three-lite-renderer'
+import * as THREE from 'three-lite'
 
 /**
  * 场景

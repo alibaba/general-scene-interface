@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-import { PointsMaterial, UniformsUtils, ShaderLib } from '@gs.i/three-lite-renderer'
+import { PointsMaterial, UniformsUtils, ShaderLib } from 'three-lite'
 import { MatrPointDataType } from '@gs.i/schema'
 import { genPreShaderCode } from './utils'
 import vs from './PrgPointMatr.vs.glsl'
