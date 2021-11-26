@@ -18,3 +18,5 @@ addCopyright.mjs
 tsconfig.build.tsbuildinfo
 *.tsbuildinfo
 **/*.tsbuildinfo
+
+yarn.lock
