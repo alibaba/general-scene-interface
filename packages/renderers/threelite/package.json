@@ -1,6 +1,6 @@
 {
-  "name": "@gs.i/three-lite-renderer",
-  "_name": "@gs.i/three-lite-renderer",
+  "name": "three-lite",
+  "_name": "three-lite",
   "version": "0.0.2",
   "description": "A lite version of three.js",
   "main": "build/three.min.js",
