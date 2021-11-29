@@ -91,7 +91,7 @@ As an important tool, Lerna&yarn1 sure looks like out of maintenance.
 
 开发者需要对 Lerna 有个正确的预期：Lerna 设计用来维护结构简单的 monorepo 工程。不兼容 multi-monorepo 等复杂的工程结构。没有插件系统和丰富的配置项。Hacking lerna means ditching lerna.
 
-Lerna 的许多 filter 并不会如期望中工作。[官方表示][link-lerna-bootstrap-filter]不支持 partial bootstrap，导致 lerna 项目不能单独处理部分 package, 对于有大量外部依赖的大型项目会造成性能问题。
+Lerna 的许多 filter 并不会如期望中工作。[官方表示][link-lerna-bootstrap-filter] 不支持 partial bootstrap，导致 lerna 项目不能单独处理部分 package, 对于有大量外部依赖的大型项目会造成性能问题。
 
 yarn 不能 ignore optional dependents（有接口但不生效）。
 yarn.lock 与 symlink 同时使用会造成非常多的问题，每次修改 dependents 或者创建 symlink，都需要删掉 yarn.lock，还不如不要。
@@ -182,7 +182,7 @@ https://github.com/lerna/lerna/blob/a47fc294393a3e9507a8207a5a2f07648a524722/uti
 
 注意：如果一个 package 的 build 过程只涉及 语法转译，而不涉及“将依赖代码打包”，那其实完全不受上游依赖变化的影响。watch 的时候不需要考虑 dirty tree ，只 build 每个 dirty 包即可。
 
-参考 (scripts/watch)[../scripts/watch.mjs]
+参考 [scripts/watch](../scripts/watch.mjs)
 
 ---
 
