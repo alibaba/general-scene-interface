@@ -102,7 +102,7 @@ Partial setup 和 multi repo link 等功能需要使用脚本自己实现。
 
 example 需要的依赖应该安装在 example 目录中；开发环境用到的依赖因为只能放在 root，因此必须最小化。
 
-ts 应使用升级最新版，但是 package 应该避免使用最新特性。
+**ts 应永远升级最新版，但是编码应该避免使用新特性。**
 
 ### Shared Stuff
 
