@@ -52,7 +52,7 @@ This is the document for GSI Project.
 
 > 项目管理员的操作文档和操作规范
 
-#### 复用的最小粒度
+### 复用的最小粒度
 
 JS 的语法、模块、包管理机制，虽然简单却复杂多变，提高了 JS 代码的维护和复用成本，长远来看制约了该领域知识的健康迭代，解决问题的钥匙也许不是设计更先进的机制，也许是在更细的粒度上、共享复用价值更高的知识，因为黑盒的维护者总有一天会停止维护，无力再去迎合瞬息万变的“机制”，在 JS 社区中这一天来得格外早。
 
@@ -60,7 +60,7 @@ JS 的语法、模块、包管理机制，虽然简单却复杂多变，提高�
 
 理想的代码复用粒度应该是 any code fragments 而不是 a package with all it's dependents。
 
-#### Why yarn+lerna
+### Why yarn+lerna
 
 Yarn、lerna、boltpkg，对我们来说只是维护 monorepo 的脚本库，最终得到的依然是 humble old npm packages。
 
@@ -70,7 +70,7 @@ pnpm/pnp 和集成方案 nx 等，与 npm 不完全兼容，要求下游项目�
 
 尽量不使用任何高级的管理工具，去掉所有能去掉的开发依赖，帮助用户可以按照任意粒度复用我们开源出来的知识。
 
-#### 规避 hoist 的问题
+### 规避 hoist 的问题
 
 尽可能的避免 hoist 带来的风险。
 
@@ -85,7 +85,7 @@ pnpm/pnp 和集成方案 nx 等，与 npm 不完全兼容，要求下游项目�
 - 尽可能的自动删除 root/node_modules 中不必要的内容
   - 主动删除 lerna link 过的 package
 
-#### Lerna 和 yarn 的问题
+### Lerna 和 yarn 的问题
 
 As an important tool, Lerna&yarn1 sure looks like out of maintenance.
 
@@ -98,23 +98,25 @@ yarn.lock 与 symlink 同时使用会造成非常多的问题，每次修改 dep
 
 Partial setup 和 multi repo link 等功能需要使用脚本自己实现。
 
-#### 开发环境依赖
+### 开发环境依赖
 
 example 需要的依赖应该安装在 example 目录中；开发环境用到的依赖因为只能放在 root，因此必须最小化。
 
 ts 应使用升级最新版，但是 package 应该避免使用最新特性。
 
-#### Shared Stuff
+### Shared Stuff
 
 共享代码修改的风险比较高，不应该留出文档交给用户操作。必须在共享内容中明确注释“不可修改”，以免修改后被直接覆盖。
 
 可以设置一个 hook 来检查 共享内容和 root 是否一致，如果有用户修改要 reject 掉。
 
-#### 避免依赖 typescript 的 project 机制
+宁可每次把 shared code 复制到每个 package中造成重复代码，也不要在 package 里依赖 ../../../ 这种上游目录，导致 package 无法拿出 monorepo 使用。
+
+### 避免依赖 typescript 的 project 机制
 
 tsc 提供的 project/references/compose 机制，解决了 monorepo 的增量更新和编辑器 go-to-define 等问题，但是存在严重的缺陷：
 
-##### 问题
+#### 问题
 
 - 存在多种语言、多种编译器或打包工具的项目无法使用
 
@@ -131,7 +133,7 @@ reference 的正常工作要求 package 目录之间的相对路径稳定不变�
 - reference 编写繁琐且容易出错
 - 语义上与 package.json 的 dependents 略微重复
 
-##### 方案
+#### 方案
 
 - 区分编译和 vscode 使用的 tsconfig
 - project 仅用于改进 vscode 的代码提示，编译阶段则完全不使用。
@@ -139,7 +141,7 @@ reference 的正常工作要求 package 目录之间的相对路径稳定不变�
 - 编译阶段使用 monorepo 通用的方案：依赖拓扑分析后按顺序编译。
 - 单独复用 package 的时候可以主动删除 references
 
-#### 如何保证 monorepo 的 packages 可以脱离 monorepo 工作
+### 如何保证 monorepo 的 packages 可以脱离 monorepo 工作
 
 可以将 monorepo 的 package 同步成独立的 repo （https://github.com/splitsh/lite），独立repo将必须是只读的，所有对这些 package 的开发工作必须在 monorepo 中进行（这也是 monorepo 的意义所在）。
 
@@ -149,38 +151,40 @@ reference 的正常工作要求 package 目录之间的相对路径稳定不变�
 
 由于 alibaba 开源管理方案不允许我们创建任意多个 repo，因此目前无法使用拆分 repo 的方案，至少无法放在官方 org 里。
 
-#### multi monorepo 如何联调
+### multi monorepo 如何联调
 
-##### 方案 A
+#### 方案 A
 
 如果 root 开发环境相同，可以合并两个 monorepo 的 packages。得到一个新的 repo。但是这个新的 repo 会非常奇怪。
 
-##### 方案 B
+#### 方案 B
 
 如果 root 开发环境相同，可以把上游 monorepo 的代码放进来。缺点是，下游 repo 会变得非常大。
 
-##### 方案 C
+#### 方案 C
 
 上游开发好，发布到本地 register，作为普通依赖安装。需要一个稳定的本地 register 或者更简单的中转方案。
 
-##### 方案 D
+#### 方案 D
 
 symlink，通过脚本识别上游 monorepo 为本地项目，然后用类似 lerna 的 dependents link 的方案，把上游项目 link 到下游项目。实质上是跨 monorepo 的 monorepo link。
 
 https://github.com/lerna/lerna/blob/a47fc294393a3e9507a8207a5a2f07648a524722/utils/symlink-dependencies/symlink-dependencies.js#L22
 
-##### 不可取的方案
+##### 不建议的方案
 
 - 将上游 repo 的调试代码发布到公开 register 中。
-- 使用 yarn 或者 npm 的全局 link，不是为 monorepo 设计的，后患无穷。
+- 使用 yarn 或者 npm 的全局 link，不是为 monorepo 设计的。
 
 #### monorepo 如何 watch
 
-不太可能依赖编译器或者打包工具的 watch 机制。可能需要脚本实现。
+不太可能依赖编译器或者打包工具的 watch 机制。需要脚本实现。
+
+注意：如果一个 package 的 build 过程只涉及 语法转译，而不涉及“将依赖代码打包”，那其实完全不受上游依赖变化的影响。watch 的时候不需要考虑 dirty tree ，只 build 每个 dirty 包即可。
+
+参考 (scripts/watch)[../scripts/watch.mjs]
 
 ---
-
-** TODO ** 该机制疑似造成 vscode ts server 崩溃。考虑完全移除该机制的方案。
 
 [a][link-a]
 
