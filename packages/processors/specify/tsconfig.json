@@ -10,9 +10,6 @@
 	"exclude": ["dist"],
 	"references": [
 		{
-			"path": "../../schema/processor"
-		},
-		{
 			"path": "../base"
 		},
 		{

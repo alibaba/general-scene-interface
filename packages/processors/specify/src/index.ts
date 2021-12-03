@@ -27,8 +27,7 @@ import {
 	// LooseRenderableMesh,
 	LooseMeshDataType,
 } from '@gs.i/schema-scene'
-import { Processor } from '@gs.i/processor-base'
-import { TraverseType } from '@gs.i/schema-processor'
+import { Processor, TraverseType } from '@gs.i/processor-base'
 
 /**
  * specify all the optional properties of an interface or a scene graph
@@ -41,11 +40,15 @@ export class Specifier extends Processor {
 	canEditNode = true
 	canEditTree = false
 
+	processNode(node: LooseMeshDataType, parent?: LooseMeshDataType) {
+		this.specifyNode(node, parent)
+	}
+
 	/**
 	 * specify a mesh's members
 	 * @param LooseMesh
 	 */
-	processNode(node: LooseMeshDataType, parent?: LooseMeshDataType): MeshDataType {
+	specifyNode(node: LooseMeshDataType, parent?: LooseMeshDataType): MeshDataType {
 		// const cached = this.cache.get(node)
 		// if (cached) return cached
 
@@ -60,14 +63,14 @@ export class Specifier extends Processor {
 		if (node.extras === undefined) node.extras = {}
 
 		if (isRenderableMesh(node)) {
-			this.processMaterial(node.material)
-			this.processGeometry(node.geometry)
+			this.specifyMaterial(node.material)
+			this.specifyGeometry(node.geometry)
 		}
 
 		return node as MeshDataType
 	}
 
-	processMaterial(matr: LooseMatrBase): MatrBaseDataType {
+	specifyMaterial(matr: LooseMatrBase): MatrBaseDataType {
 		/**
 		 * common
 		 */
@@ -103,11 +106,11 @@ export class Specifier extends Processor {
 			if (matr.metallicFactor === undefined) matr.metallicFactor = 0.5
 			if (matr.roughnessFactor === undefined) matr.roughnessFactor = 0.5
 
-			if (matr.baseColorTexture) this.processTexture(matr.baseColorTexture)
-			if (matr.metallicRoughnessTexture) this.processTexture(matr.metallicRoughnessTexture)
-			if (matr.emissiveTexture) this.processTexture(matr.emissiveTexture)
-			if (matr.normalTexture) this.processTexture(matr.normalTexture)
-			if (matr.occlusionTexture) this.processTexture(matr.occlusionTexture)
+			if (matr.baseColorTexture) this.specifyTexture(matr.baseColorTexture)
+			if (matr.metallicRoughnessTexture) this.specifyTexture(matr.metallicRoughnessTexture)
+			if (matr.emissiveTexture) this.specifyTexture(matr.emissiveTexture)
+			if (matr.normalTexture) this.specifyTexture(matr.normalTexture)
+			if (matr.occlusionTexture) this.specifyTexture(matr.occlusionTexture)
 
 			// return matr as MatrBaseDataType
 		}
@@ -115,7 +118,7 @@ export class Specifier extends Processor {
 		if (isMatrUnlitDataType(matr)) {
 			if (matr.baseColorFactor === undefined) matr.baseColorFactor = { r: 1, g: 1, b: 1 }
 
-			if (matr.baseColorTexture) this.processTexture(matr.baseColorTexture)
+			if (matr.baseColorTexture) this.specifyTexture(matr.baseColorTexture)
 
 			// return matr as MatrBaseDataType
 		}
@@ -125,7 +128,7 @@ export class Specifier extends Processor {
 			if (matr.size === undefined) matr.size = 10
 			if (matr.sizeAttenuation === undefined) matr.sizeAttenuation = false
 
-			if (matr.baseColorTexture) this.processTexture(matr.baseColorTexture)
+			if (matr.baseColorTexture) this.specifyTexture(matr.baseColorTexture)
 
 			// return matr as MatrBaseDataType
 		}
@@ -136,7 +139,7 @@ export class Specifier extends Processor {
 			if (matr.sizeAttenuation === undefined) matr.sizeAttenuation = false
 			if (matr.transform === undefined) matr.transform = genDefaultTransform2()
 
-			if (matr.baseColorTexture) this.processTexture(matr.baseColorTexture)
+			if (matr.baseColorTexture) this.specifyTexture(matr.baseColorTexture)
 
 			// return matr as MatrBaseDataType
 		}
@@ -146,7 +149,7 @@ export class Specifier extends Processor {
 		return matr as MatrBaseDataType
 	}
 
-	processGeometry(geom: LooseGeomDataType): GeomDataType {
+	specifyGeometry(geom: LooseGeomDataType): GeomDataType {
 		if (geom.mode === undefined) geom.mode = 'TRIANGLES'
 		if (geom.extensions === undefined) geom.extensions = {}
 
@@ -187,7 +190,7 @@ export class Specifier extends Processor {
 		return geom as GeomDataType
 	}
 
-	processTexture(t: LooseTextureType): TextureType {
+	specifyTexture(t: LooseTextureType): TextureType {
 		if (t.image === undefined) throw new SchemaNotValid(`texture.image can not be undefined`)
 
 		const i = t.image
