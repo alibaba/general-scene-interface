@@ -1,9 +1,9 @@
 import { MeshDataType } from '@gs.i/schema-scene'
-import { Processor as IProcessor, TraverseOrder } from '@gs.i/schema-processor'
+import { Processor as IProcessor, TraverseType } from '@gs.i/schema-processor'
 import { traverse } from '@gs.i/utils-traverse'
 
 export class Processor implements IProcessor {
-	traverseOrder = TraverseOrder.ANY
+	traverseType = TraverseType.ANY
 	type = 'Processor'
 	canEditNode = false
 	canEditTree = false
@@ -13,13 +13,12 @@ export class Processor implements IProcessor {
 	constructor() {}
 
 	process(mesh: MeshDataType) {
-		if (
-			this.traverseOrder === TraverseOrder.PRE_ORDER ||
-			this.traverseOrder === TraverseOrder.ANY
-		) {
+		if (this.traverseType === TraverseType.PRE_ORDER || this.traverseType === TraverseType.ANY) {
 			traverse(mesh, this.processNode.bind(this))
+		} else if (this.traverseType === TraverseType.NONE) {
+			console.warn(`This processor (${this.type}) does not traverse, skipped`)
 		} else {
-			throw 'NOT IMPLEMENTED traverseOrder: ' + this.traverseOrder
+			throw 'NOT IMPLEMENTED traverseType: ' + this.traverseType
 		}
 	}
 

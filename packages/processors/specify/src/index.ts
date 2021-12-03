@@ -28,7 +28,7 @@ import {
 	LooseMeshDataType,
 } from '@gs.i/schema-scene'
 import { Processor } from '@gs.i/processor-base'
-import { TraverseOrder } from '@gs.i/schema-processor'
+import { TraverseType } from '@gs.i/schema-processor'
 
 /**
  * specify all the optional properties of an interface or a scene graph
@@ -36,7 +36,7 @@ import { TraverseOrder } from '@gs.i/schema-processor'
  * @note this process will edit the original object you input
  */
 export class Specifier extends Processor {
-	traverseOrder = TraverseOrder.ANY
+	traverseType = TraverseType.ANY
 	type = 'Specifier'
 	canEditNode = true
 	canEditTree = false

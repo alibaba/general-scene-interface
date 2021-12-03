@@ -16,10 +16,10 @@ export interface Processor {
 	 */
 
 	/**
-	 * traverse order
+	 * traverse setting
 	 * @default 'PRE_ORDER'
 	 */
-	readonly traverseOrder: TraverseOrder
+	readonly traverseType: TraverseType
 
 	/**
 	 * indicate if this processor can edit node members
@@ -59,7 +59,12 @@ export interface Processor {
 /**
  * Traverse Order
  */
-export enum TraverseOrder {
+export enum TraverseType {
+	/**
+	 * do not traverse
+	 * this processor will not traverse the scene graph.
+	 */
+	NONE = 'NONE',
 	/**
 	 * Any Order is ok
 	 * Every node is handled independently
