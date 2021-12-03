@@ -3,7 +3,8 @@
 	"compilerOptions": {
 		"rootDir": ".",
 		"baseUrl": ".",
-		"composite": true
+		"composite": true,
+		"incremental": true
 	},
 	"include": ["./", "typings"],
 	"exclude": ["dist", "node_modules", "packages"],
