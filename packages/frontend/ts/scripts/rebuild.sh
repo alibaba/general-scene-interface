@@ -3,8 +3,12 @@
 # DO NOT EDIT
 # AUTO COPIED FROM ROOT/shared
 
-pwd
+# pwd
 
-npx tsc -v
+# npx tsc -v
 
-tsc --project tsconfig.build.json --incremental false
+# rm -rf tsconfig.build.tsbuildinfo
+
+# tsc --project tsconfig.build.json --incremental
+
+npx tsc --project tsconfig.build.json

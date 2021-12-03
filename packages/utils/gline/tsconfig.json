@@ -2,16 +2,18 @@
 	"extends": "./tsconfig.base.json",
 	"compilerOptions": {
 		"rootDir": "src",
-		"outDir": "dist"
+		"outDir": "dist",
+		"composite": true,
+		"incremental": true
 	},
 	"include": ["src", "typings"],
 	"exclude": ["dist"],
 	"references": [
 		{
-			"path": "../../schema/core"
+			"path": "../../frontend/ts"
 		},
 		{
-			"path": "../../frontend/ts"
+			"path": "../../schema/core"
 		},
 		{
 			"path": "../math"

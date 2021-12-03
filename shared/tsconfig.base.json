@@ -10,14 +10,12 @@
 		"declaration": true,
 		"declarationMap": true,
 		"sourceMap": true,
-		// "inlineSources": true,
 		"strict": true,
-		"composite": true,
 		"esModuleInterop": true, // import React from 'react'
 		"strictPropertyInitialization": false,
 		"noImplicitAny": false, // TODO 改成 true，所有 any 必须显式
 		"experimentalDecorators": true,
-		"incremental": true,
+		"incremental": false,
 		// "skipLibCheck": true,
 		"typeRoots": ["./node_modules/@types/"] // 这样来避免所有 上级目录的 @types 都被包含进去
 	},

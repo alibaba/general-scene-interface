@@ -6,7 +6,7 @@ import { execSync } from 'child_process'
 console.log(argv)
 console.log(process.env.PWD)
 
-import blacklist from './blacklist.mjs'
+import blacklist from './ignore.mjs'
 
 const packages = execSync('npx lerna ls -p')
 	.toString()

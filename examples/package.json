@@ -4,7 +4,6 @@
 	"version": "0.0.0-beta",
 	"private": true,
 	"scripts": {
-		"prestart": "yarn install",
 		"start": "node --max-old-space-size=8192 server.js"
 	},
 	"devDependencies": {

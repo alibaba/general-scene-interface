@@ -2,13 +2,11 @@
 	"extends": "./tsconfig.base.json",
 	"compilerOptions": {
 		"rootDir": ".",
-		"baseUrl": "."
+		"baseUrl": ".",
+		"composite": true,
+		"incremental": true
 	},
 	"include": ["./", "typings"],
 	"exclude": ["dist", "node_modules", "packages"],
-	"references": [
-		{
-			"path": "../packages/utils/umbrella"
-		}
-	]
+	"references": []
 }

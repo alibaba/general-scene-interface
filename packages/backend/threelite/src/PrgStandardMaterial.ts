@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-import { MeshStandardMaterial, UniformsUtils, ShaderLib } from '@gs.i/three-lite-renderer'
+import { MeshStandardMaterial, UniformsUtils, ShaderLib } from 'three-lite'
 import { MatrPbrDataType } from '@gs.i/schema'
 import { genPreShaderCode } from './utils'
 import vs from './PrgPbrMatr.vs.glsl'

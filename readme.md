@@ -10,6 +10,34 @@ GSI 是一个 Web 3D 实时渲染领域的伞项目，包含一套标准化的�
 
 本项目不是一个新的渲染引擎，恰恰相反，本项目可以与 Web 和桌面端的渲染引擎、建模软件协同工作。
 
+## Development
+
+- Make sure you have `nodejs`, `yarn` and `lerna` installed
+
+```sh
+node -v # v14 or higher
+
+npx yarn -v # v1.x
+
+npx lerna -v # v4.x recommended
+```
+
+- setup
+
+`npm run setup`
+
+Should not see any error. If something goes wrong (probably caused by a registry). Run `npm run clean` and try it again.
+
+- build packages
+
+`npm run build`
+
+If something goes wrong. You should try `npm run rebuild` which will clean up all the build caches.
+
+- watch files and serve examples
+
+Good old fashioned `npm start`
+
 ## Code of Conduct
 
 Alibaba has adopted a Code of Conduct that we expect project participants to adhere to.
