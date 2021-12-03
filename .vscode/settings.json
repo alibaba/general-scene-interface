@@ -14,6 +14,12 @@
 	"[glsl]": {
 		"editor.defaultFormatter": "xaver.clang-format"
 	},
+	"[c]": {
+		"editor.defaultFormatter": "xaver.clang-format"
+	},
+	"[cpp]": {
+		"editor.defaultFormatter": "xaver.clang-format"
+	},
 	"files.exclude": {
 		"**/*.back": true,
 		"**/*.old": true
