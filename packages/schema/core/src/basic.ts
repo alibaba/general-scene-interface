@@ -3,113 +3,92 @@
  * All rights reserved.
  */
 
-import { CubeTextureType, TextureType } from './Texture'
-
 /**
- * @fileoverview 基础类型定义
+ * 53 bit integer
+ * This is the only integer JS supports except BigInt
  */
-
+export type Int = number
 /**
- * Used for store any GSI private props for internal mesh processing
- *
- * @type {*}
+ * 32 bit float
  */
-export const __GSI_MESH_INTERNAL_PROP_KEY_0__ = Symbol()
-
-export type __GSI_MESH_INTERNAL_PROP_0__ = {
-	_frustumCulled: boolean
-	[key: string]: any
-}
-
-export function __defaultMeshInternalProp(): __GSI_MESH_INTERNAL_PROP_0__ {
-	return {
-		_frustumCulled: false,
-	}
-}
-
-// @note Symbol 更合适 ， 但是IE11 不支持 Symbol
-export const DISPOSED = '__DISPOSED__'
-export type DISPOSED = '__DISPOSED__'
-
-export function isDISPOSED(v: any): v is DISPOSED {
-	return v === '__DISPOSED__'
-}
+export type Float = number
+/**
+ * 64 bit float
+ */
+export type Double = number
 
 /**
- * 数据更新区域
- * dirty range
+ * matrix
+ */
+export type Matrix = number[]
+
+/**
+ * dirty range/ update range
  */
 export interface Range {
-	start: number
-	count: number
+	start: Double
+	count: Double
 }
 
 export type UpdateRanges = Range[]
 
 /**
- * 包围盒
+ * bounding box
  */
-export interface BBox {
+export interface AABBox3 {
 	max: Vec3
 	min: Vec3
-	[key: string]: any
 }
 
 /**
- * 包围球
+ * bounding sphere
  */
-export interface BSphere {
+export interface BSphere3 {
 	center: Vec3
-	radius: number
-	[key: string]: any
+	radius: Double
 }
 
 /**
- * 向量
+ * vector 4
  */
 export interface Vec4 {
-	x: number
-	y: number
-	z: number
-	w: number
-	[key: string]: any
-}
-
-export interface Vec3 {
-	x: number
-	y: number
-	z: number
-	[key: string]: any
-}
-
-export interface Vec2 {
-	x: number
-	y: number
-	[key: string]: any
+	x: Double
+	y: Double
+	z: Double
+	w: Double
 }
 
 /**
- * 矩阵
- * @QianXun 直接用Array吧
+ * vector 3
  */
-// export interface Mat3 extends Array<number> {
-// 	readonly length: number
-// }
+export interface Vec3 {
+	x: Double
+	y: Double
+	z: Double
+}
 
-// export interface Mat4 extends Array<number> {
-// 	readonly length: number
-// }
+/**
+ * vector 2
+ */
+export interface Vec2 {
+	x: Double
+	y: Double
+}
+
+export type EulerOrder3 = 'xyz' | 'xzy' | 'yxz' | 'yzx' | 'zxy' | 'zyx'
+
+/**
+ * Euler rotation
+ */
+export interface Euler3 extends Vec3 {
+	order: EulerOrder3
+}
 
 /**
  * 颜色
  */
-export type ColorLike = { r: number; g: number; b: number; [key: string]: any }
-export function isColorLike(a: any): a is ColorLike {
-	if (a && a.r !== undefined && a.g !== undefined && a.b !== undefined) {
-		return true
-	}
-	return false
-}
+export type ColorRGB = { r: Float; g: Float; b: Float }
+
 /**
  * typed array
  */
@@ -124,88 +103,25 @@ export type TypedArray =
 	| Float32Array
 	| Float64Array
 
-/**
- * @QianXun
- */
-export function isTypedArray(a: any): a is TypedArray {
-	if (
-		a instanceof Int8Array ||
-		a instanceof Uint8Array ||
-		a instanceof Uint8ClampedArray ||
-		a instanceof Int16Array ||
-		a instanceof Uint16Array ||
-		a instanceof Int32Array ||
-		a instanceof Uint32Array ||
-		a instanceof Float32Array ||
-		a instanceof Float64Array
-	) {
-		return true
-	}
-	return false
+export const DISPOSED = '__DISPOSED__'
+export type DISPOSED = '__DISPOSED__'
+
+export interface Transform3 {
+	position?: Vec3
+	rotation?: Euler3
+	scale?: Vec3
+	/**
+	 * @default [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1] // identity 4x4 matrix
+	 */
+	matrix: Matrix
 }
 
-/**
- * glsl code
- */
-// export type GLSL_CODE = string & { version?: number; moduleName?: string }
-
-/**
- * @todo
- * User-Defined Type Guards
- * 运行时检查 glsl code 语法
- * @param code
- */
-// export function isGLSL(code: string): code is GLSL_CODE {
-// 	return code.includes('vec3')
-// }
-
-// const a = ' '
-
-// if (isGLSL(a)) {
-// 	a
-// } else {
-// 	a
-// }
-
-/**
- * @example vec2 vec3 float sampler2D ...
- */
-export type ShaderType = string
-
-export type UniformDataType = {
+export interface Transform2 {
+	position?: Vec2
+	rotation?: Double
+	scale?: Vec2
 	/**
-	 * 数值、对象或Texture
-	 * 增加了数组对象
+	 * @default [1, 0, 0, 0, 1, 0, 0, 0, 1] // identity 3x3 matrix
 	 */
-	value:
-		| number
-		| Vec2
-		| Vec3
-		| Vec4
-		| ColorLike
-		| TextureType
-		| CubeTextureType
-		| number[]
-		| number[][]
-		| Vec2[]
-		| Vec3[]
-		| Vec4[]
-		| ColorLike[]
-		| TextureType[]
-
-	/**
-	 * 在shader language中的type
-	 */
-	type: ShaderType
-}
-
-/**
- * @Decorator readonly装饰器
- */
-export function readonly() {
-	return function (target: any, propertyKey: string, desc: PropertyDescriptor) {
-		// desc.writable = false // @QianXun 启用这句会报错
-		desc.enumerable = false
-		desc.configurable = false
-	}
+	matrix: Matrix
 }

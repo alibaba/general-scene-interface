@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-import { TypedArray } from './basic'
+import { TypedArray, Matrix } from './basic'
 
 /**
  * texture and sampler
@@ -21,58 +21,80 @@ import { TypedArray } from './basic'
 export interface TextureType {
 	sampler: SamplerDataType
 	image: ImageDataType
-	transform?: number[]
+	transform: Matrix
 	extensions?: { [key: string]: any }
-	extras?: any
+	extras: any
 }
 
 export interface CubeTextureType {
 	sampler: SamplerDataType
 	images: ImageDataType[]
 	extensions?: { [key: string]: any }
-	extras?: any
+	extras: any
 }
 
+/**
+ * @note glTF2 标准没有提及 format 和 innerFormat
+ * {@link https://github.com/KhronosGroup/glTF/issues/835}
+ * 考虑到用户从外部输入的image基本都是 rgba png 或者 rgb jpeg
+ * 复杂 format 基本只会在流水线内部和后期逻辑中出现
+ * 这里交给转换器和渲染引擎选择合理的配置
+ * format?: any
+ */
 export interface ImageDataType {
+	/**
+	 * 图片数据
+	 * Array or buffer as Image Data
+	 */
+	data?: TypedArray | DataView
+
+	/**
+	 * Image宽高
+	 * 如果使用 array 数据，则需要
+	 * If use array or buffer as Image Data
+	 * Width and height will be necessary
+	 */
+	width?: number
+	/**
+	 * Image宽高
+	 * 如果使用 array 数据，则需要
+	 * If use array or buffer as Image Data
+	 * Width and height will be necessary
+	 */
+	height?: number
+
 	/**
 	 * 图片 uri
 	 */
 	uri?: string
 
 	/**
-	 * 图片数据
-	 */
-	image?: HTMLImageElement | HTMLCanvasElement | HTMLVideoElement | TypedArray | DataView
-
-	/**
 	 * 当前数据版本
 	 * 如果需要更新，务必 主动 version ++
 	 */
-	version?: number
+	version: number
 
-	/**
-	 * Image宽高
-	 * 如果使用 array 数据，务必指定
-	 */
-	width?: number
-	height?: number
+	extensions?: {
+		EXT_image?: {
+			/**
+			 * 是否反转Y轴坐标
+			 * gl.UNPACK_FLIP_Y_WEBGL
+			 * gltf2 不需要反转
+			 * three 需要反转
+			 * @link https://github.com/KhronosGroup/glTF-Sample-Viewer/issues/16
+			 *
+			 * @default true
+			 */
+			flipY?: boolean
 
-	/**
-	 * @note glTF2 标准没有提及 format 和 innerFormat
-	 * {@link https://github.com/KhronosGroup/glTF/issues/835}
-	 * 考虑到用户从外部输入的image基本都是 rgba png 或者 rgb jpeg
-	 * 复杂 format 基本只会在流水线内部和后期逻辑中出现
-	 * 这里交给转换器和渲染引擎选择合理的配置
-	 */
-	format?: any
-
-	/**
-	 * 是否反转Y轴坐标
-	 * gl.UNPACK_FLIP_Y_WEBGL
-	 * gltf2 不需要反转
-	 * three 需要反转
-	 */
-	flipY?: boolean
+			/**
+			 * HTML图片数据
+			 */
+			HTMLImage?: HTMLImageElement | HTMLCanvasElement | HTMLVideoElement
+		}
+		[key: string]: any
+	}
+	extras: any
 }
 
 /**
@@ -84,13 +106,13 @@ export interface SamplerDataType {
 	 * @default 'NEAREST'
 	 * {@link https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#samplermagfilter}
 	 */
-	magFilter?: 'NEAREST' | 'LINEAR'
+	magFilter: 'NEAREST' | 'LINEAR'
 
 	/**
 	 * @default 'NEAREST'
 	 * {@link https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#samplerminfilter}
 	 */
-	minFilter?:
+	minFilter:
 		| 'NEAREST'
 		| 'LINEAR'
 		| 'NEAREST_MIPMAP_NEAREST'
@@ -102,12 +124,16 @@ export interface SamplerDataType {
 	 * @default 'CLAMP_TO_EDGE'
 	 * {@link https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#samplerwraps}
 	 */
-	wrapS?: 'CLAMP_TO_EDGE' | 'MIRRORED_REPEAT' | 'REPEAT'
-	wrapT?: 'CLAMP_TO_EDGE' | 'MIRRORED_REPEAT' | 'REPEAT'
+	wrapS: 'CLAMP_TO_EDGE' | 'MIRRORED_REPEAT' | 'REPEAT'
+	wrapT: 'CLAMP_TO_EDGE' | 'MIRRORED_REPEAT' | 'REPEAT'
 
 	/**
 	 * @default 1
+	 * 0 or 1 means close this feature
 	 * 各向异性过滤级数
 	 */
-	anisotropy?: 1 | 2 | 4 | 8 | 16
+	anisotropy: 0 | 1 | 2 | 4 | 8 | 16
+
+	extensions?: { [key: string]: any }
+	extras: any
 }

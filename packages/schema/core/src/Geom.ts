@@ -3,10 +3,10 @@
  * All rights reserved.
  */
 
-import { BBox, BSphere, UpdateRanges, TypedArray, DISPOSED } from './basic'
+import { UpdateRanges, TypedArray, AABBox3, BSphere3, DISPOSED } from './basic'
 
 /**
- * geometry 数据
+ * geometry data
  * @todo morph
  * {@link https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#primitive}
  */
@@ -19,11 +19,12 @@ export interface GeomDataType {
 	 * const GLenum TRIANGLES                      = 0x0004;
 	 * const GLenum TRIANGLE_STRIP                 = 0x0005;
 	 * const GLenum TRIANGLE_FAN                   = 0x0006;
+	 * @default TRIANGLES
 	 */
 	mode: 'TRIANGLES' | 'LINES' | 'POINTS' | 'SPRITE'
 
 	/**
-	 * 顶点数据
+	 * attributes data
 	 */
 	attributes: {
 		/**
@@ -92,29 +93,47 @@ export interface GeomDataType {
 	 */
 	indices?: AttributeDataType
 
-	/**
-	 * 绘制区域（索引）
-	 */
-	drawRange?: { start: number; count: number }
+	extensions?: {
+		/**
+		 * User specified bounding for this geometry
+		 * Not necessary because static geometry bounds are calculated when used.
+		 * Only use this if the geometry is dynamic.
+		 */
+		EXT_geometry_bounds?: {
+			/**
+			 * axes align bounding box
+			 * with min-vec3 and max-vec3
+			 */
+			aabb?: AABBox3
+			sphere?: BSphere3
+		}
 
-	/**
-	 * 包围盒或者包围球
-	 */
-	boundingBox?: BBox
-	/**
-	 * 包围盒或者包围球
-	 */
-	boundingSphere?: BSphere
+		/**
+		 * draw range of indexed geometry
+		 */
+		EXT_geometry_range?: {
+			/**
+			 * 绘制区域（索引）
+			 */
+			drawRange?: { start: number; count: number }
+		}
 
-	extensions?: { [key: string]: any }
-	extras?: any
+		/**
+		 * instanced geometry
+		 * @TODO
+		 */
+		EXT_geometry_instance?: {}
+
+		[key: string]: any
+	}
+	extras: any
 }
 
 /**
  * attribute 数据
  * @todo gltf offset
- * @todo stride (interlerp)
- * @todo instenced
+ * @todo stride (interpolation)
+ * @todo instanced
  */
 export interface AttributeDataType {
 	/**
@@ -137,7 +156,7 @@ export interface AttributeDataType {
 	/**
 	 * array.length / itemSize
 	 */
-	readonly count: number
+	count: number
 
 	/**
 	 * {@link https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/vertexAttribPointer}
@@ -162,14 +181,9 @@ export interface AttributeDataType {
 	 * 已经提交的数据版本
 	 * @todo 不要暴露在interface里，应该记录在 conv 内部
 	 * @note 保留该属性，外部使用者可据此判断update提交何时成功
+	 * @delete 外部使用者 不应该从 scene graph 上读取值来判断时机
 	 */
-	commitedVersion?: number
-
-	/**
-	 * 脏区域
-	 * @QianXun 保留数组形式，在convert时将多个ranges merge成一个
-	 */
-	updateRanges?: UpdateRanges
+	// committedVersion: number
 
 	/**
 	 * 一次性数据（用完丢弃）
@@ -177,5 +191,15 @@ export interface AttributeDataType {
 	 * @note 该值可以 runtime 修改，false -> true, 则在下次判断版本后执行回收，true -> false 则不再执行回收逻辑
 	 * @note @todo usage = DYNAMIC_DRAW 时，该值无效？ 始终不主动回收？
 	 */
-	disposable?: boolean
+	disposable: boolean
+
+	extensions?: {
+		EXT_buffer_partial_update?: {
+			/**
+			 * 脏区域
+			 * @QianXun 保留数组形式，在convert时将多个ranges merge成一个
+			 */
+			updateRanges?: UpdateRanges
+		}
+	}
 }

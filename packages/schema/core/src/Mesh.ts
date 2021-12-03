@@ -18,71 +18,53 @@
 
 import { MatrBaseDataType } from './Matr'
 import { GeomDataType } from './Geom'
-import { __GSI_MESH_INTERNAL_PROP_KEY_0__, __GSI_MESH_INTERNAL_PROP_0__ } from './basic'
+import { Int, Transform3 } from './basic'
 
 /**
  * Mesh object for scene tree construction
  * @limit 单 geometry，单 material
  */
 
-export interface MeshDataType {
-	/**
-	 * 物体名，调试使用
-	 * @see three.mesh
-	 */
-	name?: string
+export type MeshDataType = RenderableMesh | Node
 
-	/**
-	 * 内部ID，在一些情况下可能被用于判断相等性
-	 * @todo 删掉，不安全接口
-	 * @deprecated
-	 */
-	id?: string
-
-	/**
-	 * 可见性
-	 */
-	visible?: boolean
-
+export interface RenderableMesh extends Node {
 	// geometry / mesh
-	geometry?: GeomDataType
+	geometry: GeomDataType
 
 	// material
-	material?: MatrBaseDataType
+	material: MatrBaseDataType
+}
 
-	// render control
-	renderOrder: number
+export interface Node {
+	/**
+	 * 物体名，调试使用
+	 * For readability only
+	 */
+	name: string
 
 	/**
-	 * glTF2 中将 transform 定义在 node 中，和 mesh 节点分离
+	 * @default true
+	 */
+	visible: boolean
+
+	/**
+	 * 将 transform 定义在 node 中，和 mesh 节点分离
 	 * {@link https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#transformations}
 	 */
 	// transform
-	transform: TransformDataType
+	transform: Transform3
 
 	// sub
 	children: Set<MeshDataType>
 
 	parent?: MeshDataType
 
-	extras?: { [key: string]: any }
+	extensions?: {
+		EXT_render_order?: {
+			renderOrder?: Int
+		}
+		[key: string]: any
+	}
 
-	// interval props store
-	[__GSI_MESH_INTERNAL_PROP_KEY_0__]?: __GSI_MESH_INTERNAL_PROP_0__
-
-	/**
-	 * converter
-	 * @todo 响应式，主动通知 conv 更新数据
-	 * @note 如果没有实现响应式更新，就删掉这个接口
-	 * @deprecated
-	 */
-	// converter?: any
-}
-
-export interface TransformDataType {
-	position?: { x: number; y: number; z: number }
-	rotation?: { x: number; y: number; z: number; order: string }
-	scale?: { x: number; y: number; z: number }
-	matrix: number[]
-	worldMatrix?: number[]
+	extras: any
 }
