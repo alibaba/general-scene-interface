@@ -1,4 +1,3 @@
-// '所有reference的尽头'
 {
 	"extends": "./tsconfig.base.json",
 	"compilerOptions": {
@@ -14,7 +13,7 @@
 			"path": "../ts"
 		},
 		{
-			"path": "../../schema/core"
+			"path": "../../schema/core-old"
 		},
 		{
 			"path": "../../utils/gltf2"

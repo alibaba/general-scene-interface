@@ -13,7 +13,7 @@
 			"path": "../../frontend/ts"
 		},
 		{
-			"path": "../../schema/core"
+			"path": "../../schema/core-old"
 		},
 		{
 			"path": "../math"
