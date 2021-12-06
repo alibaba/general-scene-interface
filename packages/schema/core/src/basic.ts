@@ -5,7 +5,7 @@
 
 /**
  * 53 bit integer
- * This is the only integer JS supports except BigInt
+ * * This is the only integer JS supports except BigInt
  */
 export type Int = number
 /**
@@ -85,6 +85,15 @@ export interface Euler3 extends Vec3 {
 }
 
 /**
+ * quaternion
+ *
+ * "a unit quaternion value, XYZW, in the local coordinate system, where W is the scalar."
+ * @link https://www.khronos.org/registry/glTF/specs/2.0/glTF-2.0.html#:~:text=a%20unit%20quaternion%20value%2C%20XYZW%2C%20in%20the%20local%20coordinate%20system%2C%20where%20W%20is%20the%20scalar.
+ * @note w is 1 by default, not zero
+ */
+export type Quaternion = Vec4
+
+/**
  * 颜色
  */
 export type ColorRGB = { r: Float; g: Float; b: Float }
@@ -106,22 +115,64 @@ export type TypedArray =
 export const DISPOSED = '__DISPOSED__'
 export type DISPOSED = '__DISPOSED__'
 
-export interface Transform3 {
+export interface Versioned {
+	/**
+	 * # update version
+	 *
+	 * - If you changed this object. You should increase the version to mark it dirty.
+	 * - If you set version to -1. This object will be considered `always dirty`.
+	 *
+	 * 当前数据版本
+	 *
+	 * - 如果需要更新数据，务必主动将 version ++
+	 * - 或者设为 -1，将每次都更新
+	 *
+	 * @default -1
+	 */
+	version: Int
+}
+
+export interface Transform3TRS extends Versioned {
 	position?: Vec3
 	rotation?: Euler3
 	scale?: Vec3
+	quaternion?: Quaternion
+	//
+	matrix?: never
+}
+
+export interface Transform3Matrix extends Versioned {
+	position?: never
+	rotation?: never
+	scale?: never
+	quaternion?: never
 	/**
 	 * @default [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1] // identity 4x4 matrix
 	 */
 	matrix: Matrix
 }
 
-export interface Transform2 {
+export type Transform3 = Transform3TRS | Transform3Matrix
+
+// const test: Transform3 = {
+// 	matrix: [0],
+// 	position: { x: 0, y: 0, z: 0 },
+// }
+
+export interface Transform2TRS extends Versioned {
 	position?: Vec2
 	rotation?: Double
 	scale?: Vec2
+	//
+	matrix?: never
+}
+export interface Transform2Matrix extends Versioned {
+	position?: never
+	rotation?: never
+	scale?: never
 	/**
 	 * @default [1, 0, 0, 0, 1, 0, 0, 0, 1] // identity 3x3 matrix
 	 */
 	matrix: Matrix
 }
+export type Transform2 = Transform2TRS | Transform2Matrix
