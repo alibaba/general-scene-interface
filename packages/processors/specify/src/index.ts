@@ -32,7 +32,7 @@ import { Processor, TraverseType } from '@gs.i/processor-base'
 /**
  * specify all the optional properties of an interface or a scene graph
  * Input Loose types and output strict types
- * @note this process will edit the original object you input
+ * @note NOT PURE FUNCTIONS. this process will edit the object you input
  */
 export class Specifier extends Processor {
 	traverseType = TraverseType.ANY
@@ -45,7 +45,7 @@ export class Specifier extends Processor {
 	}
 
 	/**
-	 * specify a mesh's members
+	 * specify a mesh, including its material and geometry, not including its children.
 	 * @param LooseMesh
 	 */
 	specifyNode(node: LooseMeshDataType, parent?: LooseMeshDataType): MeshDataType {
@@ -70,6 +70,11 @@ export class Specifier extends Processor {
 		return node as MeshDataType
 	}
 
+	/**
+	 * specify a material, including its standard textures, not including custom textures in programable ext.
+	 * @param matr
+	 * @returns
+	 */
 	specifyMaterial(matr: LooseMatrBase): MatrBaseDataType {
 		/**
 		 * common
@@ -149,6 +154,11 @@ export class Specifier extends Processor {
 		return matr as MatrBaseDataType
 	}
 
+	/**
+	 * specify a geometry, including all the attributes.
+	 * @param geom
+	 * @returns
+	 */
 	specifyGeometry(geom: LooseGeomDataType): GeomDataType {
 		if (geom.mode === undefined) geom.mode = 'TRIANGLES'
 		if (geom.extensions === undefined) geom.extensions = {}
@@ -190,6 +200,11 @@ export class Specifier extends Processor {
 		return geom as GeomDataType
 	}
 
+	/**
+	 * specify a texture, including its image data and sampler.
+	 * @param t
+	 * @returns
+	 */
 	specifyTexture(t: LooseTextureType): TextureType {
 		if (t.image === undefined) throw new SchemaNotValid(`texture.image can not be undefined`)
 
