@@ -7,16 +7,18 @@ import { ColorRGB, Vec2, Vec3, Vec4 } from './basic'
 import { CubeTextureType, TextureType } from './Texture'
 
 /**
- * 可编程材质接口
- * 作为通用材质的可编程插槽接口定义
- * 提供插槽，在不需要重写材质或者copy代码的情况下扩展材质行为
+ * ### 可编程材质接口
+ * 作为通用材质的可编程插槽接口定义,
+ * 提供插槽，在不需要重写材质或者copy代码的情况下扩展材质行为.
+ *
  * 插槽编程是为了避免：
  * - 自定义材质无法在不同底层引擎中通用（不同引擎的材质代码结构完全不同）
  * - 自定义材质无法随引擎和底层库升级（three版本一直无法升级的原因之一）
+ *
  * 原则是：
  * - 不干涉引擎内置的光照过程
  *
- * 定位类似于 unity3D 的 shader language
+ * 定位类似于 unity3D 的 shader language,
  * 基于 glsl 和 three 作出简化
  */
 export interface Programable {

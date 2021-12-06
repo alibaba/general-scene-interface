@@ -2,7 +2,17 @@
  * TS Type Guards
  */
 
-import { TypedArray, DISPOSED, ColorRGB } from './basic'
+import {
+	TypedArray,
+	DISPOSED,
+	ColorRGB,
+	Transform3TRS,
+	Transform3Matrix,
+	Transform3,
+	Transform2TRS,
+	Transform2Matrix,
+	Transform2,
+} from './basic'
 import {
 	MatrSpriteDataType,
 	MatrPointDataType,
@@ -55,4 +65,17 @@ export function isMatrSpriteDataType(v: MatrBaseDataType): v is MatrSpriteDataTy
 }
 export function isRenderableMesh(v: MeshDataType): v is RenderableMesh {
 	return v['geometry'] && v['material']
+}
+
+export function isTransform3Matrix(v: Transform3): v is Transform3Matrix {
+	return v.matrix !== undefined
+}
+export function isTransform3TRS(v: Transform3): v is Transform3TRS {
+	return v.matrix === undefined
+}
+export function isTransform2Matrix(v: Transform2): v is Transform2Matrix {
+	return v.matrix !== undefined
+}
+export function isTransform2TRS(v: Transform2): v is Transform2TRS {
+	return v.matrix === undefined
 }

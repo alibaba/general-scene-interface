@@ -7,11 +7,10 @@ import { ColorRGB, Double, Transform2 } from './basic'
 import { TextureType } from './Texture'
 import { Programable, ProgramablePbr } from './Programable'
 /**
- * @important
  * billboard / sprite 材质
- * gltf 中没有相关定义
- * three 和 Babylon 中使用了完全不同的接口
- * pixijs 中的设计更完善
+ * - gltf 中没有相关定义
+ * - three 和 Babylon 中使用了完全不同的接口
+ * - pixijs 中的设计更完善
  * @todo
  * .useAttrRotation
  * .useAttrCenter
@@ -51,7 +50,7 @@ export interface MatrSpriteDataType extends MatrBaseDataType {
 }
 
 /**
- * point 材质
+ * ### point 材质
  * gltf 中没有相关定义
  * {@link https://threejs.org/docs/#api/zh/materials/PointsMaterial}
  */
@@ -88,7 +87,7 @@ export interface MatrPointDataType extends MatrBaseDataType {
 }
 
 /**
- * unlit 材质
+ * ### unlit 材质
  * @基于 glTF2 extension KHR_materials_unlit
  * @兼容 THREE.MeshBasicMaterial
  * 其实直接用 PBR 材质也能实现相同的效果，但是会浪费一些性能
@@ -106,7 +105,7 @@ export interface MatrUnlitDataType extends MatrBaseDataType {
 }
 
 /**
- * PBR 材质
+ * ### PBR 材质
  * @基于 glTF2 标准
  * @兼容 THREE.MeshStandardMaterial
  *
@@ -157,9 +156,6 @@ export interface MatrPbrDataType extends MatrBaseDataType {
 
 /**
  * 材质数据
- * 几乎不可能在不同引擎的材质定义中找到平衡
- * 因此只能以 gltf 的 pbr 和 ext 为基准 进行扩展
- * 并增加编程插槽，用于插入数据
  *
  * {@link https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#materials}
  * {@link https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#material}
@@ -184,13 +180,14 @@ export interface MatrBaseDataType {
 	side: 'front' | 'back' | 'double'
 
 	/**
-	 * transparent alpha blending depth
-	 * It's quite hard to set all those properly
-	 * De-dramatize it instead of exposing everything
-	 * 底层实现差距太大，不能全部暴漏出来给用户
-	 * 提供几种组合模式，来替代复杂的配置项,
-	 * 这里扩展 glTF2 的 alphaMode 来实现
-	 * @default OPAQUE
+	 * ### indicate the kind of transparency
+	 * - It's quite hard to set {transparent alpha blending depth} properly
+	 * * De-dramatize it instead of exposing everything
+	 * -
+	 * - 底层实现差距太大，不能全部暴漏出来给用户
+	 * - 提供几种组合模式，来替代复杂的配置项,
+	 * - 这里扩展 glTF2 的 alphaMode 来实现
+	 * @default 'OPAQUE'
 	 */
 	alphaMode:
 		| 'OPAQUE' // 不透明 & depth on
@@ -208,9 +205,9 @@ export interface MatrBaseDataType {
 	// alphaCutoff: number
 
 	/**
-	 * the degree of opaque
-	 * if alphaMode set to MASK. this will represent alphaCutoff
-	 * three 的 color 是 rgb，gltf 是 rgba，考虑到与 alphaCutoff 相似
+	 * ### the degree of opaque
+	 * - if alphaMode set to MASK. this will represent alphaCutoff.
+	 * - three 的 color 是 rgb，gltf 是 rgba，考虑到与 alphaCutoff 相似
 	 * @default 1
 	 */
 	opacity: Double
@@ -220,15 +217,13 @@ export interface MatrBaseDataType {
 	 */
 	extensions?: {
 		/**
-		 * advanced material render control
-		 * will override parameters set above
-		 * do not use unless you know what you are doinh
+		 * advanced material render control.
+		 * - **will override parameters set above.**
+		 * - **do not use unless you know what you are doing**
 		 */
 		EXT_matr_advanced?: {
 			/**
 			 * depth
-			 * 实际上并不能自由组合，而且容易出错
-			 * 应该合并成几种模式
 			 */
 			depthTest?: boolean
 			// depthFunc?: number

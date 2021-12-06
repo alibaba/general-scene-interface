@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-import { UpdateRanges, TypedArray, AABBox3, BSphere3, DISPOSED } from './basic'
+import { UpdateRanges, TypedArray, AABBox3, BSphere3, DISPOSED, Versioned } from './basic'
 
 /**
  * geometry data
@@ -12,13 +12,13 @@ import { UpdateRanges, TypedArray, AABBox3, BSphere3, DISPOSED } from './basic'
  */
 export interface GeomDataType {
 	/**
-	 * const GLenum POINTS                         = 0x0000;
-	 * const GLenum LINES                          = 0x0001;
-	 * const GLenum LINE_LOOP                      = 0x0002;
-	 * const GLenum LINE_STRIP                     = 0x0003;
-	 * const GLenum TRIANGLES                      = 0x0004;
-	 * const GLenum TRIANGLE_STRIP                 = 0x0005;
-	 * const GLenum TRIANGLE_FAN                   = 0x0006;
+	 * - const GLenum POINTS                         = 0x0000;
+	 * - const GLenum LINES                          = 0x0001;
+	 * - const GLenum LINE_LOOP                      = 0x0002;
+	 * - const GLenum LINE_STRIP                     = 0x0003;
+	 * - const GLenum TRIANGLES                      = 0x0004;
+	 * - const GLenum TRIANGLE_STRIP                 = 0x0005;
+	 * - const GLenum TRIANGLE_FAN                   = 0x0006;
 	 * @default TRIANGLES
 	 */
 	mode: 'TRIANGLES' | 'LINES' | 'POINTS' | 'SPRITE'
@@ -95,9 +95,9 @@ export interface GeomDataType {
 
 	extensions?: {
 		/**
-		 * User specified bounding for this geometry
-		 * Not necessary because static geometry bounds are calculated when used.
-		 * Only use this if the geometry is dynamic.
+		 * User specified bounding for this geometry.
+		 * - Not necessary because static geometry bounds are calculated when used.
+		 * - Only use this if the geometry is dynamic.
 		 */
 		EXT_geometry_bounds?: {
 			/**
@@ -135,7 +135,7 @@ export interface GeomDataType {
  * @todo stride (interpolation)
  * @todo instanced
  */
-export interface AttributeDataType {
+export interface AttributeDataType extends Versioned {
 	/**
 	 * attribute name
 	 */
@@ -165,17 +165,11 @@ export interface AttributeDataType {
 
 	/**
 	 * buffer是否需要动态更新（动态更新的buffer长度不可变）
-	 * 如果需要原地更新，则 DYNAMIC_DRAW
-	 * 如果上传一次则不再更新，或者更新需要重新上传一个新的buffer，则 STATIC_DRAW
+	 * - 如果需要原地更新，则 DYNAMIC_DRAW
+	 * - 如果上传一次则不再更新，或者更新需要重新上传一个新的buffer，则 STATIC_DRAW
 	 * {@link https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bufferData}
 	 */
 	usage: 'STATIC_DRAW' | 'DYNAMIC_DRAW' // Usage
-
-	/**
-	 * 当前数据版本
-	 * 如果需要更新数据，务必主动将 version ++
-	 */
-	version: number
 
 	/**
 	 * 已经提交的数据版本
@@ -187,7 +181,7 @@ export interface AttributeDataType {
 
 	/**
 	 * 一次性数据（用完丢弃）
-	 * 用于提示conv和renderer，数据是否需要在ram中保留，还是说上传vram之后应该从ram回收
+	 * - 用于提示conv和renderer，数据是否需要在ram中保留，还是说上传vram之后应该从ram回收
 	 * @note 该值可以 runtime 修改，false -> true, 则在下次判断版本后执行回收，true -> false 则不再执行回收逻辑
 	 * @note @todo usage = DYNAMIC_DRAW 时，该值无效？ 始终不主动回收？
 	 */

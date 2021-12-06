@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-import { TypedArray, Matrix } from './basic'
+import { TypedArray, Matrix, Versioned } from './basic'
 
 /**
  * texture and sampler
@@ -18,6 +18,9 @@ import { TypedArray, Matrix } from './basic'
  * @todo
  */
 
+/**
+ * Texture
+ */
 export interface TextureType {
 	sampler: SamplerDataType
 	image: ImageDataType
@@ -26,6 +29,9 @@ export interface TextureType {
 	extras: any
 }
 
+/**
+ * CubeTexture
+ */
 export interface CubeTextureType {
 	sampler: SamplerDataType
 	images: ImageDataType[]
@@ -35,30 +41,33 @@ export interface CubeTextureType {
 
 /**
  * @note glTF2 标准没有提及 format 和 innerFormat
- * {@link https://github.com/KhronosGroup/glTF/issues/835}
- * 考虑到用户从外部输入的image基本都是 rgba png 或者 rgb jpeg
- * 复杂 format 基本只会在流水线内部和后期逻辑中出现
- * 这里交给转换器和渲染引擎选择合理的配置
- * format?: any
+ * @link https://github.com/KhronosGroup/glTF/issues/835
+ *
+ * - 考虑到用户从外部输入的image基本都是 rgba png 或者 rgb jpeg
+ * - 复杂 format 基本只会在流水线内部和后期逻辑中出现
+ * - 这里交给转换器和渲染引擎选择合理的配置
  */
-export interface ImageDataType {
+export interface ImageDataType extends Versioned {
 	/**
 	 * 图片数据
+	 *
 	 * Array or buffer as Image Data
 	 */
 	data?: TypedArray | DataView
 
 	/**
-	 * Image宽高
+	 * Image宽高,
 	 * 如果使用 array 数据，则需要
-	 * If use array or buffer as Image Data
+	 *
+	 * If use array or buffer as Image Data.
 	 * Width and height will be necessary
 	 */
 	width?: number
 	/**
-	 * Image宽高
+	 * Image宽高.
 	 * 如果使用 array 数据，则需要
-	 * If use array or buffer as Image Data
+	 *
+	 * If use array or buffer as Image Data.
 	 * Width and height will be necessary
 	 */
 	height?: number
@@ -68,19 +77,13 @@ export interface ImageDataType {
 	 */
 	uri?: string
 
-	/**
-	 * 当前数据版本
-	 * 如果需要更新，务必 主动 version ++
-	 */
-	version: number
-
 	extensions?: {
 		EXT_image?: {
 			/**
 			 * 是否反转Y轴坐标
-			 * gl.UNPACK_FLIP_Y_WEBGL
-			 * gltf2 不需要反转
-			 * three 需要反转
+			 * - gl.UNPACK_FLIP_Y_WEBGL
+			 * - gltf2 不需要反转
+			 * - three 需要反转
 			 * @link https://github.com/KhronosGroup/glTF-Sample-Viewer/issues/16
 			 *
 			 * @default true
@@ -130,6 +133,7 @@ export interface SamplerDataType {
 	/**
 	 * @default 1
 	 * 0 or 1 means close this feature
+	 *
 	 * 各向异性过滤级数
 	 */
 	anisotropy: 0 | 1 | 2 | 4 | 8 | 16

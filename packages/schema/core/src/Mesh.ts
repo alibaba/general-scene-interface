@@ -38,7 +38,7 @@ export interface RenderableMesh extends Node {
 export interface Node {
 	/**
 	 * 物体名，调试使用
-	 * For readability only
+	 * - For readability only
 	 */
 	name: string
 
