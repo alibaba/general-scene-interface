@@ -42,7 +42,7 @@ export class Processor implements IProcessor {
 	 * traverse setting
 	 * @default 'PRE_ORDER'
 	 */
-	traverseType = TraverseType.ANY
+	traverseType = TraverseType.Any
 	/**
 	 * indicate if this processor can edit node members
 	 * @default false
@@ -62,9 +62,9 @@ export class Processor implements IProcessor {
 	 * process the node and all its children (the whole sub DAG)
 	 */
 	traverse(mesh: MeshDataType) {
-		if (this.traverseType === TraverseType.PRE_ORDER || this.traverseType === TraverseType.ANY) {
+		if ((this.traverseType & TraverseType.PreOrder) === TraverseType.PreOrder) {
 			traverse(mesh, this.handleNode.bind(this))
-		} else if (this.traverseType === TraverseType.NONE) {
+		} else if (this.traverseType === TraverseType.None) {
 			console.warn(`This processor (${this.type}) does not traverse, skipped`)
 		} else {
 			throw 'NOT IMPLEMENTED traverseType: ' + this.traverseType
@@ -106,18 +106,20 @@ export enum TraverseType {
 	 * do not traverse
 	 * this processor will not traverse the scene graph.
 	 */
-	NONE = 'NONE',
+	None = 0, // 0000
+
+	/**
+	 * depth-first + pre-order (NLR)
+	 */
+	PreOrder = 1 << 0, // 0001
+	/**
+	 * Breadth-first
+	 */
+	LevelOrder = 1 << 1, // 0010
+
 	/**
 	 * Any Order is ok
 	 * Every node is handled independently
 	 */
-	ANY = 'ANY',
-	/**
-	 * depth-first + pre-order (NLR)
-	 */
-	PRE_ORDER = 'PRE_ORDER',
-	/**
-	 * Breadth-first
-	 */
-	LEVEL_ORDER = 'LEVEL_ORDER',
+	Any = ~(~0 << 4), // 1111
 }
