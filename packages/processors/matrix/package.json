@@ -1,0 +1,32 @@
+{
+	"name": "@gs.i/processor-matrix",
+	"version": "0.1.0-alpha",
+	"description": "",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"license": "MIT",
+	"publishConfig": {
+		"access": "public"
+	},
+	"files": [
+		"README.md",
+		"dist/*"
+	],
+	"scripts": {
+		"build": "./scripts/build.sh",
+		"clean": "./scripts/clean.sh",
+		"rebuild": "./scripts/rebuild.sh",
+		"v": "node -v && tsc -v"
+	},
+	"dependencies": {
+		"@gs.i/utils-math": "^0.0.0-beta",
+		"@gs.i/processor-base": "^0.1.0-alpha",
+		"@gs.i/processor-specify": "^0.1.0-alpha",
+		"@gs.i/schema-scene": "^0.1.0-alpha"
+	},
+	"devDependencies": {
+		"typescript": ">4.4.0"
+	},
+	"gitHead": "96bfbb9138a5242a3c460a9210058c14bcf9b03a",
+	"type": "module"
+}
