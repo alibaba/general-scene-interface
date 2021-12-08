@@ -16,8 +16,8 @@
 		"build": "./scripts/build.sh",
 		"clean": "./scripts/clean.sh",
 		"rebuild": "./scripts/rebuild.sh",
-		"postbuild": "node ./scripts/glsl-processor.cjs",
-		"postrebuild": "node ./scripts/glsl-processor.cjs",
+		"prebuild": "node ./scripts/glsl-processor.cjs",
+		"prerebuild": "node ./scripts/glsl-processor.cjs",
 		"v": "node -v && tsc -v"
 	},
 	"dependencies": {

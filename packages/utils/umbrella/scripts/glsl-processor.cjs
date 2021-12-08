@@ -13,6 +13,11 @@ const ext = '.js'
 const srcPath = path.resolve(rootPath, '../src')
 const distPath = path.resolve(rootPath, '../dist')
 
+// create dist folder if necessary
+if (!fs.existsSync(distPath)) {
+	fs.mkdirSync(distPath)
+}
+
 const files = fs.readdirSync(srcPath)
 let count = 0
 files.forEach((file) => {
