@@ -10,6 +10,36 @@
 	"exclude": ["dist"],
 	"references": [
 		{
+			"path": "../../schema/core"
+		},
+		{
+			"path": "../../schema/ext-scene"
+		},
+		{
+			"path": "../gltf2"
+		},
+		{
+			"path": "../math"
+		},
+		{
+			"path": "../../schema/converter"
+		},
+		{
+			"path": "../geomBuilders"
+		},
+		{
+			"path": "../geometry"
+		},
+		{
+			"path": "../raycast"
+		},
+		{
+			"path": "../transform"
+		},
+		{
+			"path": "../traverse"
+		},
+		{
 			"path": "../../backend/gl2"
 		},
 		{
@@ -19,40 +49,28 @@
 			"path": "../../backend/threelite"
 		},
 		{
-			"path": "../../frontend/gltf2"
-		},
-		{
 			"path": "../../frontend/ts"
 		},
 		{
-			"path": "../../schema/core-old"
-		},
-		{
-			"path": "../../schema/ext-scene"
-		},
-		{
-			"path": "../geomBuilders"
-		},
-		{
-			"path": "../geometry"
-		},
-		{
-			"path": "../gline"
-		},
-		{
-			"path": "../gltf2"
-		},
-		{
-			"path": "../math"
+			"path": "../../processors/base"
 		},
 		{
 			"path": "../optimize"
 		},
 		{
-			"path": "../raycast"
+			"path": "../../frontend/gltf2"
 		},
 		{
-			"path": "../transform"
+			"path": "../../processors/specify"
+		},
+		{
+			"path": "../gline"
+		},
+		{
+			"path": "../../processors/matrix"
+		},
+		{
+			"path": ""
 		}
 	]
 }
