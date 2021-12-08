@@ -22,3 +22,5 @@ tsconfig.build.tsbuildinfo
 package.json.bac*
 
 yarn.lock
+
+ignore-*
