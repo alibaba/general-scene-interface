@@ -6,7 +6,8 @@
 	"workspaces": {
 		"packages": [
 			"packages/**",
-			"examples"
+			"examples",
+			"test"
 		],
 		"nohoist": [
 			"**/gl2/**",
@@ -18,6 +19,7 @@
 			"**/three-lite/**",
 			"**/three-lite",
 			"**/@gs.i/examples/**",
+			"**/@gs.i/test/**",
 			"**/@types/**"
 		]
 	},
@@ -30,6 +32,7 @@
 		"rebuild": "lerna run --no-private --stream rebuild",
 		"watch": "node scripts/watch.mjs --fast",
 		"clean": "rm -rf ./yarn.lock && rm -rf ./node_modules && lerna clean -y && lerna run --no-private --stream --parallel clean",
+		"test": "cd test && npm test",
 		"publish": "npx lerna publish"
 	},
 	"pre-commit": [],
@@ -45,6 +48,7 @@
 		"typescript": "^4.5.2",
 		"shelljs": "^0.8.4",
 		"jsonc-parser": "^3.0.0",
+		"glob": "^7.2.0",
 		"colors": "^1.4.0",
 		"concurrently": "^6.4.0",
 		"chokidar": "^3.5.2"
