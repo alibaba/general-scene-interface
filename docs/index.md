@@ -96,6 +96,8 @@ Lerna 的许多 filter 并不会如期望中工作。[官方表示][link-lerna-b
 yarn 不能 ignore optional dependents（有接口但不生效）。
 yarn.lock 与 symlink 同时使用会造成非常多的问题，每次修改 dependents 或者创建 symlink，都需要删掉 yarn.lock，还不如不要。
 
+在项目稳定之后，可以参照[微软的方案](https://github.com/angular/angular/blob/master/yarn.lock.readme.md)对 yarn.lock 做出规范.
+
 Partial setup 和 multi repo link 等功能需要使用脚本自己实现。
 
 ### 开发环境依赖
@@ -214,6 +216,127 @@ Scene Schema 作为整个工作流的 IR，需要将前置流程和后置流程�
 - 重复调用应该用缓存来解决
 - 缓存应该由具体的计算过程决定而不是依赖 “常见的渲染流程”
 - 应该允许用户假设 “何时何地调用计算” 得到的结果都是正确且 up-to-date 的
+
+### ts and es-module
+
+ts 可以通过 tsconfig 的配置生成 es modules 的语法，但是有两个语法错误：
+
+- es modules 语法被写在 .js 文件中
+- import 的文件没有 .js/.mjs 扩展名
+
+这两个问题在使用 webpack 的时候不会显现出来。因为 webpack 的语法判断逻辑比 node 要宽松的多。
+
+但是如果使用其他工具或者直接使用nodejs执行（包括jest等测试环境），这些错误就会显现出来。
+
+#### es modules 语法被写在 .js 文件中
+
+.js 文件默认被判断为 commonjs 语法，因此包含 es module 的 import export 语法属于语法错误。
+
+ts 不支持将 .ts 文件的 output 写入到 .mjs 文件中（在 ts 4.5 之后，可以将原文件改命为 .mts 来生成 .mjs）
+
+nodejs 支持通过修改 package.json 中的 type 字段来指定目录中所有 .js 文件的语法。
+如果在 package.json 中增加 `"type": "module"`，该文件夹下的所有 .js 都会被识别为 es module 语法。
+
+可以通过这种方式在不修改代码的情况下。快速修复该问题。但是要注意副作用：
+
+- 该文件夹下的所有 .js 文件都会变成 es module 语法，包括 build script、dev server 等
+
+如果不想重写这些 commonjs 代码，则需要把这些文件名改成 .cjs 来覆盖掉 package.json 中的规则。
+
+nodejs 规定 .cjs .mjs 这两个文件扩展名的优先级高于 package.json 中的 type 字段。
+
+- es module 语法的文件中，不能使用 __dirname,   __filename 等 commonjs 才有的全局变量
+
+可以自行添加 polyfill 计算得到
+
+#### import 的文件没有 .js/.mjs 扩展名
+
+在 commonjs 中 `require('./X')` 这种语法是正确的，nodejs 会[按照顺序查找这些文件](https://nodejs.org/api/modules.html#all-together)
+
+```
+1. If X is a file, load X as its file extension format. STOP
+2. If X.js is a file, load X.js as JavaScript text. STOP
+3. If X.json is a file, parse X.json to a JavaScript Object. STOP
+4. If X.node is a file, load X.node as binary addon. STOP
+```
+
+但是在 es module 中，`import './X'` 是不合法的, 
+
+> [**Mandatory file extensions**](https://nodejs.org/api/esm.html#mandatory-file-extensions)
+> A file extension must be provided when using the import keyword to resolve relative or absolute specifiers. Directory indexes (e.g. './startup/index.js') must also be fully specified.
+> 
+> This behavior matches how import behaves in browser environments, assuming a typically configured server.
+
+该问题在社区中有 [非常非常长的争论](https://github.com/microsoft/TypeScript/issues/16577)。结论是 `won't fix`。
+
+官方回复中，某个版本之后的 ts 允许用户这样写来生成正确的 es module 代码:
+
+```typescript
+// file b.ts
+import a from './a.js' // use `./a.js` instead of `./a` or `./a.ts`
+
+// file a.ts
+export const a = 1
+```
+
+这样做的问题是，你明知道 `./a.js` 是个不存在的文件，旁边的文件明明叫 `a.ts` 
+
+#### webpack 为什么没有问题
+
+也许由于历史原因，测试发现，webpack 对很多混乱的写法都做了兼容。
+
+https://webpack.js.org/api/module-methods/
+
+在 .js 文件中：
+
+- 使用 import export 这些 es module 语法是合法的
+- 使用 require 这种 commonjs 语法也是合法的
+- **import 和 require 都不需要后文件缀名**
+
+在 .mjs 文件中，或者被 package.json 标注了 `"type": "module"` 的 .js 文件中:
+
+- 使用 import export 这些 es module 语法是合法的
+- **使用 require 这种 commonjs 语法也是合法的, 但是会被原样保留，被 require 的包不会被打包（与 webpack 文档冲突）**
+- require 语法由于不会打包，也不需要后缀名
+- import 的语法需要后缀名
+
+在 .cjs 文件，或者被 package.json 标注了 `"type": "commonjs"` 的 .js 文件中：
+
+- 不能使用 import export 这些 es module 语法
+- require 不需要后缀名
+
+因此，错误的语法可以通过webpack编译。
+
+#### typescript 4.5 新增的方案
+
+[Announcing TypeScript 4.5 Beta](https://devblogs.microsoft.com/typescript/announcing-typescript-4-5-beta/#esm-nodejs)
+
+首先，应该避免重度依赖 ts 最新版本的特性。
+
+从文档来看， `module` 设为 `node12` ，将会和 `nodejs` 一样通过 `package.json->type` 来判断一个文件使用 es modules 还是 commonjs，
+而不是现在从 `tsconfig.json->compilerOptions->module` 来判断。
+
+更新文档多个地方存在描述混乱，4.5.2 仍不支持文档中提到的字段，所以目前不是很清楚会带来多少影响。
+
+typescript 事到如今已经积累了大量的历史遗留问题和设计缺陷，我们倾向于不要使用核心功能以外的特性。
+
+#### 怎么办
+
+对于文件后缀名，如果不想大动干戈，可以在所有 package.json 中标注 type=module, 然后把老的 commonjs 文件后缀改为 .cjs.
+
+对于 import 路径的后缀名，没有完美的方案：
+
+- 将错就错，忠于一套能用的打包工具，不支持脱离 webpack 运行
+
+不考虑，还是要想方设法生成正确的语法，而不是要求所有环节的工具都支持错误的语法
+
+- 在 build 脚本中，把生成的 js 代码中，所有的 `import 'x'` 改写成 `import 'x.js'`
+
+社区方案
+
+- 把所有ts源码中的 `import 'x'` 改写成 `import 'x.js'`
+
+ts 官方推荐的方案， 写出来不合逻辑，但是生成的代码是正确的（前提是你生成的一定是.js后缀名）
 
 ---
 

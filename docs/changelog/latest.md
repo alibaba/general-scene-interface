@@ -2,6 +2,17 @@
 
 ---
 
+## 2021-12-06 Simon
+
+Refine transformation definition.
+
+- separate `Transform3` into `Transform3TRS` and `Transform3Matrix` (follow gltf spec)
+- separate `Transform2` (follow `Transform3`)
+- add `version` to `Transform3` and `Transform2` to make matrix cache easier, default `-1` means `never cache`
+- add `versioned` interface. version `-1` means `always dirty`
+
+---
+
 ## 2021-12-02 Simon
 
 Refine scene schema & add processor logic.
@@ -10,7 +21,7 @@ Refine scene schema & add processor logic.
   move old codes into `core-old` folder
 - bump some versions to `0.1.0-alpha`
 - add `@gs.i/schema-converter`
-- add `@gs.i/schema-processor`
+- add `@gs.i/schema-processor`  
 - add `@gs.i/processor-specify`
 - add `@gs.i/utils-traverse`
 
