@@ -41,7 +41,7 @@ class Line3 {
 
 		if ( target === undefined ) {
 
-			console.warn( 'THREE.Line3: .getCenter() target is now required' );
+			console.warn( 'Line3: .getCenter() target is now required' );
 			target = new Vector3();
 
 		}
@@ -54,7 +54,7 @@ class Line3 {
 
 		if ( target === undefined ) {
 
-			console.warn( 'THREE.Line3: .delta() target is now required' );
+			console.warn( 'Line3: .delta() target is now required' );
 			target = new Vector3();
 
 		}
@@ -79,7 +79,7 @@ class Line3 {
 
 		if ( target === undefined ) {
 
-			console.warn( 'THREE.Line3: .at() target is now required' );
+			console.warn( 'Line3: .at() target is now required' );
 			target = new Vector3();
 
 		}
@@ -114,7 +114,7 @@ class Line3 {
 
 		if ( target === undefined ) {
 
-			console.warn( 'THREE.Line3: .closestPointToPoint() target is now required' );
+			console.warn( 'Line3: .closestPointToPoint() target is now required' );
 			target = new Vector3();
 
 		}

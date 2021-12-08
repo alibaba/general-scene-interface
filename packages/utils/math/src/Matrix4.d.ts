@@ -15,10 +15,10 @@ type Matrix4Tuple = [
  *
  * @example
  * // Simple rig for rotating around 3 axes
- * const m = new THREE.Matrix4();
- * const m1 = new THREE.Matrix4();
- * const m2 = new THREE.Matrix4();
- * const m3 = new THREE.Matrix4();
+ * const m = new Matrix4();
+ * const m1 = new Matrix4();
+ * const m2 = new Matrix4();
+ * const m3 = new Matrix4();
  * const alpha = 0;
  * const beta = Math.PI;
  * const gamma = Math.PI/2;

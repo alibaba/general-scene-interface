@@ -27,7 +27,7 @@ class Triangle {
 
 		if ( target === undefined ) {
 
-			console.warn( 'THREE.Triangle: .getNormal() target is now required' );
+			console.warn( 'Triangle: .getNormal() target is now required' );
 			target = new Vector3();
 
 		}
@@ -65,7 +65,7 @@ class Triangle {
 
 		if ( target === undefined ) {
 
-			console.warn( 'THREE.Triangle: .getBarycoord() target is now required' );
+			console.warn( 'Triangle: .getBarycoord() target is now required' );
 			target = new Vector3();
 
 		}
@@ -168,7 +168,7 @@ class Triangle {
 
 		if ( target === undefined ) {
 
-			console.warn( 'THREE.Triangle: .getMidpoint() target is now required' );
+			console.warn( 'Triangle: .getMidpoint() target is now required' );
 			target = new Vector3();
 
 		}
@@ -187,7 +187,7 @@ class Triangle {
 
 		if ( target === undefined ) {
 
-			console.warn( 'THREE.Triangle: .getPlane() target is now required' );
+			console.warn( 'Triangle: .getPlane() target is now required' );
 			target = new Plane();
 
 		}
@@ -230,7 +230,7 @@ class Triangle {
 
 		if ( target === undefined ) {
 
-			console.warn( 'THREE.Triangle: .closestPointToPoint() target is now required' );
+			console.warn( 'Triangle: .closestPointToPoint() target is now required' );
 			target = new Vector3();
 
 		}

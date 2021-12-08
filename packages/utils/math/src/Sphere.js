@@ -117,7 +117,7 @@ class Sphere {
 
 		if ( target === undefined ) {
 
-			console.warn( 'THREE.Sphere: .clampPoint() target is now required' );
+			console.warn( 'Sphere: .clampPoint() target is now required' );
 			target = new Vector3();
 
 		}
@@ -139,7 +139,7 @@ class Sphere {
 
 		if ( target === undefined ) {
 
-			console.warn( 'THREE.Sphere: .getBoundingBox() target is now required' );
+			console.warn( 'Sphere: .getBoundingBox() target is now required' );
 			target = new Box3();
 
 		}

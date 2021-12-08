@@ -6,12 +6,12 @@ export class Line3 {
 	constructor( start?: Vector3, end?: Vector3 );
 
 	/**
-	 * @default new THREE.Vector3()
+	 * @default new Vector3()
 	 */
 	start: Vector3;
 
 	/**
-	 * @default new THREE.Vector3()
+	 * @default new Vector3()
 	 */
 	end: Vector3;
 

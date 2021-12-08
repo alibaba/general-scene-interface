@@ -109,7 +109,7 @@ class Plane {
 
 		if ( target === undefined ) {
 
-			console.warn( 'THREE.Plane: .projectPoint() target is now required' );
+			console.warn( 'Plane: .projectPoint() target is now required' );
 			target = new Vector3();
 
 		}
@@ -122,7 +122,7 @@ class Plane {
 
 		if ( target === undefined ) {
 
-			console.warn( 'THREE.Plane: .intersectLine() target is now required' );
+			console.warn( 'Plane: .intersectLine() target is now required' );
 			target = new Vector3();
 
 		}
@@ -184,7 +184,7 @@ class Plane {
 
 		if ( target === undefined ) {
 
-			console.warn( 'THREE.Plane: .coplanarPoint() target is now required' );
+			console.warn( 'Plane: .coplanarPoint() target is now required' );
 			target = new Vector3();
 
 		}

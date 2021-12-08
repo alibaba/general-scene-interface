@@ -8,17 +8,17 @@ export class Triangle {
 	constructor( a?: Vector3, b?: Vector3, c?: Vector3 );
 
 	/**
-	 * @default new THREE.Vector3()
+	 * @default new Vector3()
 	 */
 	a: Vector3;
 
 	/**
-	 * @default new THREE.Vector3()
+	 * @default new Vector3()
 	 */
 	b: Vector3;
 
 	/**
-	 * @default new THREE.Vector3()
+	 * @default new Vector3()
 	 */
 	c: Vector3;
 

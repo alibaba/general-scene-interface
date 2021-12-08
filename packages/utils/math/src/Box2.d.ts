@@ -7,12 +7,12 @@ export class Box2 {
 	constructor( min?: Vector2, max?: Vector2 );
 
 	/**
-	 * @default new THREE.Vector2( + Infinity, + Infinity )
+	 * @default new Vector2( + Infinity, + Infinity )
 	 */
 	min: Vector2;
 
 	/**
-	 * @default new THREE.Vector2( - Infinity, - Infinity )
+	 * @default new Vector2( - Infinity, - Infinity )
 	 */
 	max: Vector2;
 

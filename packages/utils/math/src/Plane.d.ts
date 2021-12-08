@@ -10,7 +10,7 @@ export class Plane {
 	constructor( normal?: Vector3, constant?: number );
 
 	/**
-	 * @default new THREE.Vector3( 1, 0, 0 )
+	 * @default new Vector3( 1, 0, 0 )
 	 */
 	normal: Vector3;
 

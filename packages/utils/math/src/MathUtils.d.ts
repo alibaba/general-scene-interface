@@ -1,7 +1,7 @@
 import { Quaternion } from './Quaternion';
 
 /**
- * @see {@link https://github.com/mrdoob/three.js/blob/master/src/math/MathUtils.js|src/math/MathUtils.js}
+ * @see {@link https://github.com/mrdoob/js/blob/master/src/math/MathUtils.js|src/math/MathUtils.js}
  */
 export namespace MathUtils {
 	export const DEG2RAD: number;

@@ -46,7 +46,7 @@ class Ray {
 
 		if ( target === undefined ) {
 
-			console.warn( 'THREE.Ray: .at() target is now required' );
+			console.warn( 'Ray: .at() target is now required' );
 			target = new Vector3();
 
 		}
@@ -75,7 +75,7 @@ class Ray {
 
 		if ( target === undefined ) {
 
-			console.warn( 'THREE.Ray: .closestPointToPoint() target is now required' );
+			console.warn( 'Ray: .closestPointToPoint() target is now required' );
 			target = new Vector3();
 
 		}

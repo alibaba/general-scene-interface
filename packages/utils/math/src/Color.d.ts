@@ -10,9 +10,9 @@ export interface HSL {
  * Represents a color. See also {@link ColorUtils}.
  *
  * @example
- * const color = new THREE.Color( 0xff0000 );
+ * const color = new Color( 0xff0000 );
  *
- * @see {@link https://github.com/mrdoob/three.js/blob/master/src/math/Color.js|src/math/Color.js}
+ * @see {@link https://github.com/mrdoob/js/blob/master/src/math/Color.js|src/math/Color.js}
  */
 export class Color {
 	constructor(color?: Color | string | number)

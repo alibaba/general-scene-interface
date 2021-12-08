@@ -22,7 +22,7 @@ export class Euler {
 	z: number
 
 	/**
-	 * @default THREE.Euler.DefaultOrder
+	 * @default Euler.DefaultOrder
 	 */
 	order: string
 	readonly isEuler: true

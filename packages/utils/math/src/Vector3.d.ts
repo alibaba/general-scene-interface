@@ -15,12 +15,12 @@ type Vector3Tuple = [number, number, number];
  * 3D vector.
  *
  * @example
- * const a = new THREE.Vector3( 1, 0, 0 );
- * const b = new THREE.Vector3( 0, 1, 0 );
- * const c = new THREE.Vector3();
+ * const a = new Vector3( 1, 0, 0 );
+ * const b = new Vector3( 0, 1, 0 );
+ * const c = new Vector3();
  * c.crossVectors( a, b );
  *
- * @see {@link https://github.com/mrdoob/three.js/blob/master/src/math/Vector3.js|src/math/Vector3.js}
+ * @see {@link https://github.com/mrdoob/js/blob/master/src/math/Vector3.js|src/math/Vector3.js}
  *
  * ( class Vector3 implements Vector<Vector3> )
  */

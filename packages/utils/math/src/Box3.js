@@ -155,7 +155,7 @@ class Box3 {
 
 		if ( target === undefined ) {
 
-			console.warn( 'THREE.Box3: .getCenter() target is now required' );
+			console.warn( 'Box3: .getCenter() target is now required' );
 			target = new Vector3();
 
 		}
@@ -168,7 +168,7 @@ class Box3 {
 
 		if ( target === undefined ) {
 
-			console.warn( 'THREE.Box3: .getSize() target is now required' );
+			console.warn( 'Box3: .getSize() target is now required' );
 			target = new Vector3();
 
 		}
@@ -263,7 +263,7 @@ class Box3 {
 
 		if ( target === undefined ) {
 
-			console.warn( 'THREE.Box3: .getParameter() target is now required' );
+			console.warn( 'Box3: .getParameter() target is now required' );
 			target = new Vector3();
 
 		}
@@ -399,7 +399,7 @@ class Box3 {
 
 		if ( target === undefined ) {
 
-			console.warn( 'THREE.Box3: .clampPoint() target is now required' );
+			console.warn( 'Box3: .clampPoint() target is now required' );
 			target = new Vector3();
 
 		}
@@ -420,7 +420,7 @@ class Box3 {
 
 		if ( target === undefined ) {
 
-			console.error( 'THREE.Box3: .getBoundingSphere() target is now required' );
+			console.error( 'Box3: .getBoundingSphere() target is now required' );
 			//target = new Sphere(); // removed to avoid cyclic dependency
 
 		}

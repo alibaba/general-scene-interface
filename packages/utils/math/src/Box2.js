@@ -82,7 +82,7 @@ class Box2 {
 
 		if ( target === undefined ) {
 
-			console.warn( 'THREE.Box2: .getCenter() target is now required' );
+			console.warn( 'Box2: .getCenter() target is now required' );
 			target = new Vector2();
 
 		}
@@ -95,7 +95,7 @@ class Box2 {
 
 		if ( target === undefined ) {
 
-			console.warn( 'THREE.Box2: .getSize() target is now required' );
+			console.warn( 'Box2: .getSize() target is now required' );
 			target = new Vector2();
 
 		}
@@ -152,7 +152,7 @@ class Box2 {
 
 		if ( target === undefined ) {
 
-			console.warn( 'THREE.Box2: .getParameter() target is now required' );
+			console.warn( 'Box2: .getParameter() target is now required' );
 			target = new Vector2();
 
 		}
@@ -177,7 +177,7 @@ class Box2 {
 
 		if ( target === undefined ) {
 
-			console.warn( 'THREE.Box2: .clampPoint() target is now required' );
+			console.warn( 'Box2: .clampPoint() target is now required' );
 			target = new Vector2();
 
 		}

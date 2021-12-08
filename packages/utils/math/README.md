@@ -2,7 +2,7 @@
 
 Port from three@0.123.0 . 删掉 three 内部依赖（删掉 BufferGeometry Object3D Camera 相关接口）。
 
-Do not update unless nessesary.
+Do not update unless necessary.
 
 并不需要编译。
 
@@ -21,3 +21,5 @@ conv 使用 类有很多不方便之处以及性能损失。 conv 里的数学�
 ## disclaimer
 
 本模块修改自 three.js 的代码，three.js 代码的版权归 three.js 作者所有。
+
+Visit [three.js](https://github.com/mrdoob/three.js) and [three.js license](https://github.com/mrdoob/three.js/blob/dev/LICENSE) for more information.

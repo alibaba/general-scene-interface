@@ -5,7 +5,7 @@ export class SphericalHarmonics3 {
 	constructor();
 
 	/**
-	 * @default [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()]
+	 * @default [new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3()]
 	 */
 	coefficients: Vector3[];
 	readonly isSphericalHarmonics3: true;
