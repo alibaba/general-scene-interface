@@ -13,7 +13,15 @@
 		"strict": true,
 		"esModuleInterop": true, // import React from 'react'
 		"strictPropertyInitialization": false,
+		//
 		"noImplicitAny": false, // TODO 改成 true，所有 any 必须显式
+		"noImplicitThis": true,
+		"noImplicitReturns": true, // TODO 改成 true，
+		"noFallthroughCasesInSwitch": true,
+		"exactOptionalPropertyTypes": false, // TODO 改成 true，
+		"alwaysStrict": true,
+		"noImplicitOverride": false, // TODO 改成 true，
+		//
 		"experimentalDecorators": true,
 		"incremental": false,
 		// "skipLibCheck": true,
