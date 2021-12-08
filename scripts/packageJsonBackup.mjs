@@ -51,7 +51,12 @@ try {
 		packageALL.map(async (pkg) => {
 			const pjsonPath = path.resolve(pkg.location, 'package.json')
 			const pjsonBacPath = path.resolve(pkg.location, getBackupName())
-			console.log('backup package.json: ', pjsonPath, '->', pjsonBacPath)
+			console.log(
+				'backup package.json: ',
+				path.relative(process.env.PWD, pjsonPath),
+				'->',
+				path.relative(process.env.PWD, pjsonBacPath)
+			)
 
 			await copyFile(pjsonPath, pjsonBacPath, constants.COPYFILE_FICLONE)
 		})

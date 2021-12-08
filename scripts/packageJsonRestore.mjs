@@ -51,7 +51,12 @@ try {
 		packageALL.map(async (pkg) => {
 			const pjsonPath = path.resolve(pkg.location, 'package.json')
 			const pjsonBacPath = path.resolve(pkg.location, getBackupName())
-			console.log('restore package.json: ', pjsonBacPath, '->', pjsonPath)
+			console.log(
+				'restore package.json: ',
+				path.relative(process.env.PWD, pjsonBacPath),
+				'->',
+				path.relative(process.env.PWD, pjsonPath)
+			)
 
 			try {
 				await access(pjsonBacPath, constants.F_OK)
