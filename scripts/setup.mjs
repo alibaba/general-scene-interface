@@ -98,11 +98,11 @@ await Promise.all(
 )
 
 try {
-	execSync(`lerna bootstrap --force-local`, { stdio: 'inherit' })
+	execSync(`lerna bootstrap `, { stdio: 'inherit' })
 
 	// # https://github.com/lerna/lerna/issues/2352
 	// # lerna link is needed
-	execSync(`lerna link --force-local`, { stdio: 'inherit' })
+	execSync(`lerna link `, { stdio: 'inherit' })
 
 	// # should not hoist local packages
 	execSync(`rm -rf ./node_modules/@gs.i`, { stdio: 'inherit' })
