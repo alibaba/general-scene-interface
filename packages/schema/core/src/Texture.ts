@@ -26,7 +26,7 @@ export interface TextureType {
 	image: ImageDataType
 	transform: Matrix
 	extensions?: { [key: string]: any }
-	extras: any
+	extras?: any
 }
 
 /**
@@ -36,7 +36,7 @@ export interface CubeTextureType {
 	sampler: SamplerDataType
 	images: ImageDataType[]
 	extensions?: { [key: string]: any }
-	extras: any
+	extras?: any
 }
 
 /**
@@ -97,7 +97,7 @@ export interface ImageDataType extends Versioned {
 		}
 		[key: string]: any
 	}
-	extras: any
+	extras?: any
 }
 
 /**
@@ -139,5 +139,5 @@ export interface SamplerDataType {
 	anisotropy: 0 | 1 | 2 | 4 | 8 | 16
 
 	extensions?: { [key: string]: any }
-	extras: any
+	extras?: any
 }

@@ -33,9 +33,18 @@ export interface Range {
 export type UpdateRanges = Range[]
 
 /**
- * bounding box
+ * bounding box (AABB)
+ *
+ * - a 2d box should be called a rectangle @see https://en.wikipedia.org/wiki/Minimum_bounding_box
+ * - three.js `boundingBox` and `Box3` refer to AABB @see https://threejs.org/docs/?q=geome#api/en/math/Box3
+ * - 3d-tiles `boundingVolume.box` refers to oriented minimum bounding box @see https://github.com/CesiumGS/3d-tiles/tree/main/specification#box
+ * - Unity3D `Bounds` refers to AABB, the only other choice is `BoundingSphere` @see https://docs.unity3d.com/ScriptReference/Bounds.html
+ * - Unreal `BoundingBox` refers to AABB @see https://docs.unrealengine.com/4.27/en-US/API/Runtime/Core/Math/FBox/
+ * - Babylon.js `boundingInfo.boundingBox` refers to AABB
+ *
+ * 3d-tiles is the only special design. ignored.
  */
-export interface AABBox3 {
+export interface BBox {
 	max: Vec3
 	min: Vec3
 }
@@ -43,7 +52,7 @@ export interface AABBox3 {
 /**
  * bounding sphere
  */
-export interface BSphere3 {
+export interface BSphere {
 	center: Vec3
 	radius: Double
 }

@@ -304,5 +304,5 @@ export interface MatrBaseDataType {
 	/**
 	 * @default {}
 	 */
-	extras: any
+	extras?: any
 }

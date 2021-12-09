@@ -66,5 +66,5 @@ export interface Node {
 		[key: string]: any
 	}
 
-	extras: any
+	extras?: any
 }

@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-import { UpdateRanges, TypedArray, AABBox3, BSphere3, DISPOSED, Versioned } from './basic'
+import { UpdateRanges, TypedArray, BBox, BSphere, DISPOSED, Versioned } from './basic'
 
 /**
  * geometry data
@@ -104,8 +104,8 @@ export interface GeomDataType {
 			 * axes align bounding box
 			 * with min-vec3 and max-vec3
 			 */
-			aabb?: AABBox3
-			sphere?: BSphere3
+			box?: BBox
+			sphere?: BSphere
 		}
 
 		/**
@@ -126,7 +126,7 @@ export interface GeomDataType {
 
 		[key: string]: any
 	}
-	extras: any
+	extras?: any
 }
 
 /**
