@@ -34,10 +34,16 @@
 			"path": "../raycast"
 		},
 		{
+			"path": "../sprite"
+		},
+		{
 			"path": "../transform"
 		},
 		{
 			"path": "../traverse"
+		},
+		{
+			"path": "../wireframe"
 		},
 		{
 			"path": "../../backend/gl2"
@@ -67,10 +73,10 @@
 			"path": "../gline"
 		},
 		{
-			"path": "../../processors/matrix"
+			"path": "../../processors/bound"
 		},
 		{
-			"path": ""
+			"path": "../../processors/matrix"
 		}
 	]
 }
