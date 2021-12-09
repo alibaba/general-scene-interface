@@ -10,7 +10,7 @@
 	"exclude": ["dist"],
 	"references": [
 		{
-			"path": "../../schema/core-old"
+			"path": "../../schema/core"
 		},
 		{
 			"path": "../math"
