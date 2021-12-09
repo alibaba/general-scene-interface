@@ -51,7 +51,7 @@ export class MatProcessor extends Processor {
 	 * 所有 id 都从 WeakMap 得到，一个 key 在一个实例中的 id 是唯一的
 	 */
 	private _counter = 0
-	private _ids = new WeakMap<MeshDataType, Int>()
+	private _ids = new WeakMap<any, Int>()
 
 	private _cacheLocalMatrix = new WeakMap<Transform3, LocalMatrixCache>()
 	private _cacheWorldMatrix = new WeakMap<Transform3, WorldMatrixCache>()
@@ -153,7 +153,7 @@ export class MatProcessor extends Processor {
 
 	// getID(node: MeshDataType | undefined): Int | undefined {
 	// 	if (node === undefined) return undefined
-	getID(node: MeshDataType): Int {
+	getID(node: object): Int {
 		let id = this._ids.get(node)
 		if (id === undefined) {
 			id = this._counter++
