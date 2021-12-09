@@ -63,7 +63,7 @@ export class Processor implements IProcessor {
 	 */
 	traverse(mesh: MeshDataType) {
 		if ((this.traverseType & TraverseType.PreOrder) === TraverseType.PreOrder) {
-			traverse(mesh, this.handleNode.bind(this))
+			traverse(mesh, this.processNode.bind(this))
 		} else if (this.traverseType === TraverseType.None) {
 			console.warn(`This processor (${this.type}) does not traverse, skipped`)
 		} else {
@@ -74,8 +74,8 @@ export class Processor implements IProcessor {
 	/**
 	 * process the node only. ignore it's children
 	 */
-	handleNode(mesh: MeshDataType, parent?: MeshDataType) {
-		console.warn(`processor (${this.type}) .handleNode is not implemented.`)
+	processNode(mesh: MeshDataType, parent?: MeshDataType) {
+		console.warn(`processor (${this.type}) .processNode is not implemented.`)
 	}
 
 	/**
