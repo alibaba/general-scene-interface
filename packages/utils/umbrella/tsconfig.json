@@ -25,7 +25,7 @@
 			"path": "../../schema/converter"
 		},
 		{
-			"path": "../geomBuilders"
+			"path": "../geom-builders"
 		},
 		{
 			"path": "../geometry"

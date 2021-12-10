@@ -13,7 +13,7 @@
 			"path": "../../schema/core-old"
 		},
 		{
-			"path": "../../utils/geomBuilders"
+			"path": "../../utils/geom-builders"
 		},
 		{
 			"path": "../../utils/math"
