@@ -54,6 +54,14 @@ export class Processor implements IProcessor {
 	 */
 	canEditTree = false
 
+	/**
+	 * an option to disable this processor manually.
+	 *
+	 * - only affects combined processors.
+	 * - will not affect methods
+	 */
+	disable = false
+
 	protected cache = new WeakMap()
 
 	constructor() {}
