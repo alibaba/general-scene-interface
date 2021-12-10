@@ -67,16 +67,19 @@
 			"path": "../../frontend/gltf2"
 		},
 		{
+			"path": "../../processors/bound"
+		},
+		{
 			"path": "../../processors/specify"
 		},
 		{
 			"path": "../gline"
 		},
 		{
-			"path": "../../processors/bound"
+			"path": "../../processors/matrix"
 		},
 		{
-			"path": "../../processors/matrix"
+			"path": "../../processors/culling"
 		}
 	]
 }
