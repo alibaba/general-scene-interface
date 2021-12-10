@@ -19,7 +19,6 @@
 		"v": "node -v && tsc -v"
 	},
 	"dependencies": {
-		"@gs.i/utils-math": "^0.0.0-beta",
 		"@gs.i/processor-base": "^0.1.0-alpha",
 		"@gs.i/schema-scene": "^0.1.0-alpha"
 	},

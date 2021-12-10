@@ -70,13 +70,13 @@
 			"path": "../../processors/bound"
 		},
 		{
+			"path": "../../processors/matrix"
+		},
+		{
 			"path": "../../processors/specify"
 		},
 		{
 			"path": "../gline"
-		},
-		{
-			"path": "../../processors/matrix"
 		},
 		{
 			"path": "../../processors/culling"
