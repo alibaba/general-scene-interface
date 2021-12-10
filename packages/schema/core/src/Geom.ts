@@ -97,7 +97,7 @@ export interface GeomDataType {
 		/**
 		 * User specified bounding for this geometry.
 		 * - Not necessary because static geometry bounds are calculated when used.
-		 * - Only use this if the geometry is dynamic.
+		 * - Only use this if the geometry is dynamic or should have padding when culling.
 		 */
 		EXT_geometry_bounds?: {
 			/**
