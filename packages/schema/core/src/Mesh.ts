@@ -60,8 +60,40 @@ export interface Node {
 	parent?: MeshDataType
 
 	extensions?: {
-		EXT_render_order?: {
+		/**
+		 * User intervened render-order.
+		 * @description
+		 * Not Yet Well Designed. May Change In The Future.
+		 *
+		 * It is very hard to specify the 'order' of a 3d object.
+		 * Since there is already a natural order by it's position in 3d space.
+		 * And an internal order for the renderer to implement transparent or ray-tracing.
+		 *
+		 * To make it harder. Every render engine has its own definition for this.
+		 * - three.js has `renderOrder`
+		 * - Unreal has `Render Priority` and `Translucent Sort Priority`
+		 * - Babylon has `renderingGroupId` and extra control for sort functions
+		 * - Inheriting is not specified in most engines.
+		 */
+		EXT_mesh_order?: {
+			/**
+			 * three.js mesh.renderOrder
+			 * - do not inherit from parent node
+			 * @note only works for three.js compatibility backends.
+			 * @see https://threejs.org/docs/#api/en/core/Object3D.renderOrder
+			 */
 			renderOrder?: Int
+		}
+		EXT_mesh_advanced?: {
+			/**
+			 * Whether to enable camera frustum culling.
+			 *
+			 * set this to false to disable frustum culling for this renderable object.
+			 *
+			 * - do not inherit from parent node
+			 * @default true
+			 */
+			frustumCulling?: boolean
 		}
 		[key: string]: any
 	}
