@@ -24,8 +24,8 @@
 		"editor.defaultFormatter": "xaver.clang-format"
 	},
 	"files.exclude": {
-		"**/*.back": true,
-		"**/*.old": true
+		// "**/*.back": true,
+		// "**/*.old": true
 		// "**/*.tsbuildinfo": true
 		// "packages/**/node_modules": true
 		// "**/!package.json": true
