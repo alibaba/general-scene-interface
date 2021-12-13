@@ -57,7 +57,11 @@ export class Specifier extends Processor {
 }
 
 /**
- * specify a mesh, including its material and geometry, not including its children.
+ * specify a mesh node
+ * - includes its material and geometry,
+ * - **not** includes its children.
+ * - **not** includes its children.
+ * - **not** includes its children.
  * @param LooseMesh
  */
 export function specifyMesh(node: LooseMeshDataType, parent?: LooseMeshDataType): MeshDataType {

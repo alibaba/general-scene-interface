@@ -1,5 +1,5 @@
 {
-	"name": "@gs.i/schema-convertor",
+	"name": "@gs.i/schema-converter",
 	"version": "0.1.0-alpha",
 	"description": "",
 	"main": "dist/index.js",

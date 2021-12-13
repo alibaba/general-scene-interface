@@ -9,7 +9,7 @@ export interface Converter {
 	/**
 	 * type
 	 */
-	readonly type: string
+	type: string
 
 	/**
 	 * 将gsiMesh转变为指定类型的场景树

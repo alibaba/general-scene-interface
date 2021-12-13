@@ -49,7 +49,7 @@
 			"path": "../../backend/gl2"
 		},
 		{
-			"path": "../../backend/gltf2"
+			"path": "../../backend/ignore-threelite"
 		},
 		{
 			"path": "../../backend/threelite"
@@ -80,6 +80,9 @@
 		},
 		{
 			"path": "../gline"
+		},
+		{
+			"path": "../../backend/gltf2"
 		},
 		{
 			"path": "../../processors/culling"

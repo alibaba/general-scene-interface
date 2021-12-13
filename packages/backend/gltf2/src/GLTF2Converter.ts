@@ -3,19 +3,28 @@
  * All rights reserved.
  */
 
-import {
-	Converter,
+import type {
 	MeshDataType,
 	MatrBaseDataType,
 	AttributeDataType,
+	ColorRGB,
+	TypedArray,
+	LooseMeshDataType,
+} from '@gs.i/schema-scene'
+
+import {
 	isMatrPbrDataType,
 	isMatrUnlitDataType,
-	ColorLike,
-	isColorLike,
-	TypedArray,
+	isColorRGB,
 	isTypedArray,
-} from '@gs.i/schema'
+	isRenderableMesh,
+} from '@gs.i/schema-scene'
+
+import type { Converter } from '@gs.i/schema-converter'
 import { Color } from '@gs.i/utils-math'
+
+import { MatProcessor } from '@gs.i/processor-matrix'
+import { specifyMesh } from '@gs.i/processor-specify'
 
 import {
 	GLTF,
@@ -40,21 +49,39 @@ import {
 	getMinMax,
 } from '@gs.i/utils-gltf2'
 
-export interface ConvConfig {
+/**
+ * @note Be careful these values may be share universally if they are reference types
+ * @note If you want to use reference types, make sure it's safe
+ */
+export const DefaultConfig = {
 	/**
-	 * 是否为 posiiton 生成 accessor.min accessor.max
+	 * 是否为 position 生成 accessor.min accessor.max
 	 * gltf2 标准中不要求生成 min max 实际渲染中也不经常用到
 	 * 但是 有些渲染器（包括 gltf validator）要求 position 必须带 min max
 	 */
-	genBoundsForPosition?: boolean
+	genBoundsForPosition: true,
 	/**
 	 * 是否生成所有 accessor.min accessor.max
 	 * gltf2 标准中不要求生成 min max 实际渲染中也不经常用到
 	 * 但是 有些渲染器（包括 gltf validator）要求 position 必须带 min max
 	 */
-	genBoundsForAll?: boolean
-	extras?: any
+	genBoundsForAll: false,
+
+	/**
+	 * @note It is safe to use a matrix processor universally
+	 */
+	matrixProcessor: new MatProcessor(),
+	/**
+	 * @note It is safe to use a specifier processor universally
+	 */
+	// specifier: new Specifier(),
+	/**
+	 *
+	 */
+	extras: undefined as any,
 }
+
+export type ConvConfig = Partial<typeof DefaultConfig>
 
 /**
  * GSI 到 GLTF2 的（runtime）实时转换
@@ -71,16 +98,38 @@ export class GLTF2Convertor implements Converter {
 	 */
 	readonly type = 'GLTF2'
 
-	_meshsCache = new WeakMap<MeshDataType, number>()
+	_meshesCache = new WeakMap<MeshDataType, number>()
 	_materialsCache = new WeakMap<MatrBaseDataType, number>()
 	_accessorsCache = new WeakMap<AttributeDataType, number>()
 	_nodesCache = new WeakMap<MeshDataType, number>()
 	_texturesCache = new WeakMap()
 
+	private config: typeof DefaultConfig
+
+	constructor(config: ConvConfig = {}) {
+		this.config = {
+			...DefaultConfig,
+			...config,
+		}
+	}
+
+	/**
+	 * specify a loose scene graph and convert it
+	 * @param root
+	 * @returns
+	 */
+	convertLoose(root: LooseMeshDataType): GLM {
+		traverse(root as MeshDataType, (gsiMesh: MeshDataType) => {
+			specifyMesh(gsiMesh)
+		})
+
+		return this.convert(root as MeshDataType)
+	}
+
 	/**
 	 * 转换成 gltf2 内存格式
 	 */
-	convert(gsiMesh: MeshDataType, convConfig: ConvConfig = { genBoundsForPosition: true }): GLM {
+	convert(root: MeshDataType): GLM {
 		// 初始化
 
 		const result = new GLM()
@@ -101,13 +150,13 @@ export class GLTF2Convertor implements Converter {
 		]
 
 		result.extras = {
-			...(convConfig.extras ?? {}),
+			...(this.config.extras ?? {}),
 		}
 
 		// 用于记录资源编号
 		// resource -> index
 
-		this._meshsCache = new WeakMap()
+		this._meshesCache = new WeakMap()
 		this._materialsCache = new WeakMap()
 		this._accessorsCache = new WeakMap()
 		this._nodesCache = new WeakMap()
@@ -118,9 +167,9 @@ export class GLTF2Convertor implements Converter {
 		// 第二遍生成 node 树（添加 children）
 		// 之所以要分两遍是因为第一次遍历的时候不知道 children 的 index
 		// TODO 通过广度优先来简化成一次
-		traverse(gsiMesh, (gsiMesh: MeshDataType) => {
+		traverse(root, (gsiMesh: MeshDataType) => {
 			const node: GLTF.Node = {
-				matrix: gsiMesh.transform.matrix,
+				matrix: this.config.matrixProcessor.getLocalMatrix(gsiMesh),
 				// children: [],
 			}
 
@@ -128,7 +177,7 @@ export class GLTF2Convertor implements Converter {
 			this._nodesCache.set(gsiMesh, nodeIndex)
 			result.nodes.push(node)
 
-			if (gsiMesh.geometry && gsiMesh.material) {
+			if (isRenderableMesh(gsiMesh)) {
 				const matr = gsiMesh.material
 				const geom = gsiMesh.geometry
 
@@ -148,7 +197,7 @@ export class GLTF2Convertor implements Converter {
 
 				const meshIndex = result.meshes.length
 				result.meshes.push(mesh)
-				this._meshsCache.set(gsiMesh, meshIndex)
+				this._meshesCache.set(gsiMesh, meshIndex)
 
 				node.mesh = meshIndex
 
@@ -247,7 +296,7 @@ export class GLTF2Convertor implements Converter {
 							// but may cause problems for some dumb renderers if empty
 							byteOffset: 0,
 
-							...(convConfig.genBoundsForAll ? getMinMax(attributeData) : {}),
+							...(this.config.genBoundsForAll ? getMinMax(attributeData) : {}),
 						})
 
 						// https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#bufferview
@@ -305,8 +354,8 @@ export class GLTF2Convertor implements Converter {
 								// optional,
 								// but may cause problems for some dumb renderers if empty
 								byteOffset: 0,
-								...(convConfig.genBoundsForAll ||
-								(convConfig.genBoundsForPosition && name === 'position')
+								...(this.config.genBoundsForAll ||
+								(this.config.genBoundsForPosition && name === 'position')
 									? getMinMax(attributeData)
 									: {}),
 								// ...getMinMax(attributeData),
@@ -333,7 +382,7 @@ export class GLTF2Convertor implements Converter {
 				}
 			}
 		})
-		traverse(gsiMesh, (gsiMesh: MeshDataType) => {
+		traverse(root, (gsiMesh: MeshDataType) => {
 			const nodeIndex = this._nodesCache.get(gsiMesh) as number
 			const node = result.nodes[nodeIndex]
 
@@ -380,7 +429,7 @@ export class GLTF2Convertor implements Converter {
 		const typedArrays: TypedArray[] = []
 		const byteOffsets: number[] = []
 
-		// 计算 容量 和 bufferview 的 byteOffset
+		// 计算 容量 和 bufferView 的 byteOffset
 		glm.bufferViews.forEach((bufferView) => {
 			const bufferIndex = bufferView.buffer
 			const buffer = glm.buffers[bufferIndex]
@@ -530,7 +579,7 @@ export class GLTF2Convertor implements Converter {
 	 * 转换为 GLB 二进制格式 (加速版本)
 	 * one-copy only version
 	 */
-	glmToGLBTubor(glm: GLM): ArrayBuffer {
+	glmToGLBTurbo(glm: GLM): ArrayBuffer {
 		/**
 		 * 思路
 		 * 标准要求buffer必须合并成一个
@@ -630,8 +679,8 @@ export class GLTF2Convertor implements Converter {
 	}
 }
 
-function convColor(gsiColor: ColorLike | string): number[] {
-	if (isColorLike(gsiColor)) {
+function convColor(gsiColor: ColorRGB | string): number[] {
+	if (isColorRGB(gsiColor)) {
 		return [gsiColor.r, gsiColor.g, gsiColor.b]
 	} else {
 		return new Color(gsiColor).toArray()
