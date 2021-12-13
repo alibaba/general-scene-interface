@@ -32,7 +32,6 @@
 		"@gs.i/utils-wireframe": "^0.1.0-alpha",
 		"@gs.i/backend-gl2": "^0.0.0-beta",
 		"@gs.i/backend-threelite-old": "^0.0.0-beta",
-		"@gs.i/backend-threelite": "^0.0.0-beta",
 		"@gs.i/frontend-sdk": "^0.0.0-beta",
 		"@gs.i/processor-base": "^0.1.0-alpha",
 		"@gs.i/utils-optimize": "^0.0.0-beta",
@@ -43,6 +42,7 @@
 		"@gs.i/processor-specify": "^0.1.0-alpha",
 		"@gs.i/utils-gline": "^0.0.0-beta",
 		"@gs.i/backend-gltf2": "^0.0.0-beta",
+		"@gs.i/backend-threelite": "^0.1.0-alpha",
 		"@gs.i/processor-culling": "^0.1.0-alpha"
 	},
 	"gitHead": "96bfbb9138a5242a3c460a9210058c14bcf9b03a",

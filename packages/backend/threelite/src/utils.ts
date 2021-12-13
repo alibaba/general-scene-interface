@@ -4,7 +4,7 @@
  */
 
 import { Box3, Sphere } from 'three-lite'
-import { BBox, BSphere, PrgBaseDataType } from '@gs.i/schema'
+import { BBox, BSphere, PrgBaseDataType } from '@gs.i/schema-scene'
 
 export function box3Equals(b1: Box3 | BBox, b2: Box3 | BBox): boolean {
 	return (

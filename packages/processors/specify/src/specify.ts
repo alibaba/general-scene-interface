@@ -57,7 +57,7 @@ export class Specifier extends Processor {
 }
 
 /**
- * specify a mesh node
+ * specify a mesh node by filling all the default values, transform a loose mesh into strict mesh
  * - includes its material and geometry,
  * - **not** includes its children.
  * - **not** includes its children.

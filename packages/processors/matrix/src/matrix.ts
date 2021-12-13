@@ -159,7 +159,7 @@ export class MatProcessor extends Processor {
 			id = this._counter++
 			this._ids.set(node, id)
 		}
-
+		if (id >= 9007199254740990) throw 'ID exceeds MAX_SAFE_INTEGER'
 		return id
 	}
 

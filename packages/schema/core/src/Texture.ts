@@ -21,7 +21,7 @@ import { TypedArray, Matrix, Versioned } from './basic'
 /**
  * Texture
  */
-export interface TextureType {
+export interface Texture {
 	sampler: SamplerDataType
 	image: ImageDataType
 	transform: Matrix
@@ -32,7 +32,7 @@ export interface TextureType {
 /**
  * CubeTexture
  */
-export interface CubeTextureType {
+export interface CubeTexture {
 	sampler: SamplerDataType
 	images: ImageDataType[]
 	extensions?: { [key: string]: any }

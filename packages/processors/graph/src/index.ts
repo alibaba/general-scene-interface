@@ -40,7 +40,7 @@ export class GraphProcessor extends Processor {
 			id = this._counter++
 			this._ids.set(o, id)
 		}
-
+		if (id >= 9007199254740990) throw 'ID exceeds MAX_SAFE_INTEGER'
 		return id
 	}
 
@@ -150,6 +150,7 @@ function diffTrees(a: FlattenedTree, b: FlattenedTree): ChangeList {
 	return {
 		added,
 		removed,
+		kept: intersection,
 		moved,
 	}
 }
@@ -163,8 +164,21 @@ export interface SnapShot extends FlattenedTree {}
  *
  */
 export interface ChangeList<ValueType = number> {
+	/**
+	 * b - a
+	 */
 	added: Set<ValueType>
+	/**
+	 * a - b
+	 */
 	removed: Set<ValueType>
+	/**
+	 * insect(a,b)
+	 */
+	kept: Set<ValueType>
+	/**
+	 * insect(a,b).filter(positionChanged)
+	 */
 	moved: Set<ValueType>
 }
 

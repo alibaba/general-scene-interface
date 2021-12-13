@@ -4,7 +4,7 @@
  */
 
 import { MeshBasicMaterial, UniformsUtils, Color, Matrix3, Vector2 } from 'three-lite'
-import { MatrSpriteDataType } from '@gs.i/schema'
+import { MatrSpriteDataType } from '@gs.i/schema-scene'
 import { genPreShaderCode } from './utils'
 import vs from './PrgSpriteMatr.vs.glsl'
 import fs from './PrgSpriteMatr.fs.glsl'

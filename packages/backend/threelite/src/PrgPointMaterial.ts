@@ -4,7 +4,7 @@
  */
 
 import { PointsMaterial, UniformsUtils, ShaderLib } from 'three-lite'
-import { MatrPointDataType } from '@gs.i/schema'
+import { MatrPointDataType } from '@gs.i/schema-scene'
 import { genPreShaderCode } from './utils'
 import vs from './PrgPointMatr.vs.glsl'
 import fs from './PrgPointMatr.fs.glsl'
