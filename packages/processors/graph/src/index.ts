@@ -1,18 +1,4 @@
-import {
-	MeshDataType,
-	RenderableMesh,
-	MatrBaseDataType,
-	// MatrUnlitDataType,
-	// MatrPbrDataType,
-	// MatrPointDataType,
-	// MatrSpriteDataType,
-	TextureType,
-	GeomDataType,
-	Transform3,
-	Transform2,
-	DISPOSED,
-	Int,
-} from '@gs.i/schema-scene'
+import { MeshDataType, Int } from '@gs.i/schema-scene'
 import { Processor, TraverseType } from '@gs.i/processor-base'
 import { traverse, flatten } from '@gs.i/utils-traverse'
 
@@ -41,7 +27,7 @@ export class GraphProcessor extends Processor {
 	canEditTree = false
 
 	/**
-	 * 这个计数器配合 WeakMap 一起使用作为 **局部**唯一ID，可以避免多个 MatProcessor 实例存在时的撞表问题。
+	 * 这个计数器配合 WeakMap 一起使用作为 **局部**唯一ID，可以避免多个实例存在时的撞表问题。
 	 *
 	 * 所有 id 都从 WeakMap 得到，一个 key 在一个实例中的 id 是唯一的
 	 */
@@ -58,8 +44,12 @@ export class GraphProcessor extends Processor {
 		return id
 	}
 
+	/**
+	 * hash the sub tree of the given node
+	 * - used for checking if the tree structure changed
+	 */
 	hash(root: MeshDataType): TreeHash {
-		let result = 'v0:'
+		let result = ''
 		let currParent: MeshDataType | undefined = undefined
 		traverse(root, (node, parent) => {
 			if (parent === currParent) {
@@ -77,15 +67,48 @@ export class GraphProcessor extends Processor {
 		return result
 	}
 
+	/**
+	 * hash the position of the given node
+	 * - used for checking if the node position changed
+	 */
 	hashPosition(node: MeshDataType): PositionHash {
-		let result = 'v0:' + this.getID(node) + ','
+		const upstreamPath = [this.getID(node)]
 
 		let curr: MeshDataType = node
 		while (curr.parent) {
-			result += this.getID(curr.parent) + ','
+			upstreamPath.push(this.getID(curr.parent))
 		}
 
+		let result = upstreamPath.reverse().join(',')
 		return result
+	}
+
+	/**
+	 * take a snapshot of the tree structure
+	 * - used to find out which parts of the tree changed
+	 */
+	snapshot(root: MeshDataType, keepRef = false): SnapShot {
+		const result: SnapShot = {
+			values: new Set(),
+			references: new Map(),
+			positions: new Map(),
+		}
+
+		traverse(root, (node, parent) => {
+			const id = this.getID(node)
+			result.values.add(id)
+			result.positions.set(id, this.hashPosition(node))
+
+			if (keepRef) {
+				result.references.set(id, node)
+			}
+		})
+
+		return result
+	}
+
+	diff(a: SnapShot, b: SnapShot): ChangeList {
+		return diffTrees(a, b)
 	}
 
 	/**
@@ -94,4 +117,74 @@ export class GraphProcessor extends Processor {
 	flatten(root: MeshDataType): MeshDataType[] {
 		return flatten(root)
 	}
+}
+
+/**
+ *
+ */
+export interface FlattenedTree<ValueType = number> {
+	/**
+	 * flattened nodes
+	 */
+	values: Set<ValueType>
+	references: Map<ValueType, any>
+	// parent: Map<ValueType, ValueType>
+	positions: Map<ValueType, PositionHash>
+}
+
+/**
+ *
+ */
+function diffTrees(a: FlattenedTree, b: FlattenedTree): ChangeList {
+	const added = diffSets(b.values, a.values)
+	const removed = diffSets(a.values, b.values)
+
+	const intersection = intersect(a.values, b.values)
+	const moved = new Set() as typeof a.values // not my fault
+	intersection.forEach((valueA, valueB) => {
+		if (a.positions.get(valueA) !== b.positions.get(valueB)) {
+			moved.add(valueA)
+		}
+	})
+
+	return {
+		added,
+		removed,
+		moved,
+	}
+}
+
+/**
+ *
+ */
+export interface SnapShot extends FlattenedTree {}
+
+/**
+ *
+ */
+export interface ChangeList<ValueType = number> {
+	added: Set<ValueType>
+	removed: Set<ValueType>
+	moved: Set<ValueType>
+}
+
+/**
+ * a - b
+ */
+function diffSets<T>(a: Set<T>, b: Set<T>): Set<T> {
+	const difference = new Set(a)
+	for (const elem of b) {
+		difference.delete(elem)
+	}
+	return difference
+}
+
+function intersect<T>(a: Set<T>, b: Set<T>): Set<T> {
+	const intersection = new Set<T>()
+	for (const elem of b) {
+		if (a.has(elem)) {
+			intersection.add(elem)
+		}
+	}
+	return intersection
 }
