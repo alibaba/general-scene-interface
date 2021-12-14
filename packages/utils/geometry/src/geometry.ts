@@ -65,12 +65,15 @@ export function computeBBox(geometry: GeomDataType): BBox {
 }
 
 /**
- * @FIXME @浅寻 looks not right
+ * AN EFFICIENT BOUNDING SPHERE - Jack Ritter
+ * @link http://inis.jinr.ru/sl/vol1/CMC/Graphics_Gems_1,ed_A.Glassner.pdf - Page 301
+ *
  * @param geometry
  * @returns
  */
 function computeBSphere(geometry: GeomDataType): BSphere {
 	throw 'NOT IMPLEMENTED'
+
 	// const sphere = new Sphere()
 	// const center = sphere.center
 	// const v = new Vector3()
@@ -80,7 +83,7 @@ function computeBSphere(geometry: GeomDataType): BSphere {
 	// 	const box = geometry.boundingBox as Box3
 	// 	center.copy(v.addVectors(box.min, box.max).multiplyScalar(0.5))
 
-	// 	// Compatability for InfinityBox
+	// 	// Compatibility for InfinityBox
 	// 	if (!isNaN(center.x) && !isNaN(center.y) && !isNaN(center.z)) {
 	// 		// Try to find sphere radius less than BBox diagonal
 	// 		let maxRadiusSq = 0
@@ -255,4 +258,17 @@ function getTypedArrayConstructor(typedArray: TypedArray) {
 		return Int8Array
 	}
 	throw new Error('不支持的 TypedArray 类型')
+}
+
+export function infinityBox3() {
+	const box = new Box3()
+	box.min.set(-Infinity, -Infinity, -Infinity)
+	box.max.set(Infinity, Infinity, Infinity)
+	return box
+}
+
+export function infinitySphere() {
+	const sphere = new Sphere()
+	sphere.radius = Infinity
+	return sphere
 }
