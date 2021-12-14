@@ -17,14 +17,26 @@ export function traverse(
 
 	handler(node, parent)
 
-	if (!node.children) return
-
-	if (node.children.size > 0) {
+	if (node.children && node.children.size > 0) {
 		node.children.forEach((child) => traverse(child, handler, node))
 	}
 }
 
 export const traversePreOrder = traverse
+
+export function traversePostOrder(
+	node: MeshDataType,
+	handler: (node: MeshDataType, parent?: MeshDataType) => any,
+	parent?: MeshDataType
+) {
+	if (node === undefined || node === null) return
+
+	if (node.children && node.children.size > 0) {
+		node.children.forEach((child) => traverse(child, handler, node))
+	}
+
+	handler(node, parent)
+}
 
 /**
  * flatten a DAG in to array

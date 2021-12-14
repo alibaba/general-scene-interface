@@ -327,8 +327,11 @@ export class ThreeLiteConverter implements Converter {
 		}
 
 		// assemble the tree
-		// - handle all the nodes separately and add its children
+		// - handle all the nodes separately and add their children
 		// - use post-order traversal to make sure all the children are created before added
+		// or
+		// - handle all the nodes separately and add them to their parent
+		// - use pre-order traversal to make sure all the parents are created before added to
 	}
 
 	convMesh() {}
