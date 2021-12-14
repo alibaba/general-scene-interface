@@ -87,22 +87,24 @@ export class GraphProcessor extends Processor {
 	 * take a snapshot of the tree structure
 	 * - used to find out which parts of the tree changed
 	 */
-	snapshot(root: MeshDataType, keepRef = false): SnapShot {
+	snapshot(root?: MeshDataType, keepRef = false): SnapShot {
 		const result: SnapShot = {
 			values: new Set(),
 			references: new Map(),
 			positions: new Map(),
 		}
 
-		traverse(root, (node, parent) => {
-			const id = this.getID(node)
-			result.values.add(id)
-			result.positions.set(id, this.hashPosition(node))
+		if (root) {
+			traverse(root, (node, parent) => {
+				const id = this.getID(node)
+				result.values.add(id)
+				result.positions.set(id, this.hashPosition(node))
 
-			if (keepRef) {
-				result.references.set(id, node)
-			}
-		})
+				if (keepRef) {
+					result.references.set(id, node)
+				}
+			})
+		}
 
 		return result
 	}
@@ -185,7 +187,7 @@ export interface ChangeList<ValueType = number> {
 /**
  * a - b
  */
-function diffSets<T>(a: Set<T>, b: Set<T>): Set<T> {
+export function diffSets<T>(a: Set<T> | Array<T>, b: Set<T> | Array<T>): Set<T> {
 	const difference = new Set(a)
 	for (const elem of b) {
 		difference.delete(elem)
@@ -193,7 +195,17 @@ function diffSets<T>(a: Set<T>, b: Set<T>): Set<T> {
 	return difference
 }
 
-function intersect<T>(a: Set<T>, b: Set<T>): Set<T> {
+export function diffWeakSets<T extends object>(a: Set<T> | Array<T>, b: WeakSet<T>): Set<T> {
+	const difference = new Set(a)
+	for (const elem of a) {
+		if (b.has(elem)) {
+			difference.delete(elem)
+		}
+	}
+	return difference
+}
+
+export function intersect<T>(a: Set<T>, b: Set<T>): Set<T> {
 	const intersection = new Set<T>()
 	for (const elem of b) {
 		if (a.has(elem)) {

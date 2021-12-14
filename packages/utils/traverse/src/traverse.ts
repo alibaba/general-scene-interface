@@ -31,13 +31,15 @@ export const traversePreOrder = traverse
  * @param node
  * @returns
  */
-export function flatten(node: MeshDataType) {
+export function flatten(node?: MeshDataType) {
 	const result = [] as MeshDataType[]
 
-	traverse(node, (_node, parent) => {
-		_node.parent = parent
-		result.push(_node)
-	})
+	if (node) {
+		traverse(node, (_node, parent) => {
+			_node.parent = parent
+			result.push(_node)
+		})
+	}
 
 	return result
 }

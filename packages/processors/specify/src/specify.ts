@@ -6,7 +6,7 @@ import {
 	// MatrPbrDataType,
 	// MatrPointDataType,
 	// MatrSpriteDataType,
-	TextureType,
+	Texture,
 	GeomDataType,
 	Transform3,
 	Transform2,
@@ -221,7 +221,7 @@ export function specifyGeometry(geom: LooseGeomDataType): GeomDataType {
  * @param t
  * @returns
  */
-export function specifyTexture(t: LooseTextureType): TextureType {
+export function specifyTexture(t: LooseTextureType): Texture {
 	if (t.image === undefined) throw new SchemaNotValid(`texture.image can not be undefined`)
 
 	const i = t.image
@@ -297,7 +297,7 @@ export function specifyTexture(t: LooseTextureType): TextureType {
 	if (t.extensions === undefined) t.extensions = {}
 	if (t.extras === undefined) t.extras = {}
 
-	return t as TextureType
+	return t as Texture
 }
 
 /**

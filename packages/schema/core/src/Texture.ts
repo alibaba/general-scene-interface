@@ -28,6 +28,16 @@ export interface Texture {
 	extensions?: { [key: string]: any }
 	extras?: any
 }
+/**
+ * @deprecated use Texture instead
+ * @alias Texture
+ */
+export type TextureData = Texture
+/**
+ * @deprecated use Texture instead
+ * @alias Texture
+ */
+export type TextureType = Texture
 
 /**
  * CubeTexture
@@ -38,6 +48,11 @@ export interface CubeTexture {
 	extensions?: { [key: string]: any }
 	extras?: any
 }
+/**
+ * @deprecated use CubeTexture instead
+ * @alias CubeTexture
+ */
+export type CubeTextureType = CubeTexture
 
 /**
  * @note glTF2 标准没有提及 format 和 innerFormat

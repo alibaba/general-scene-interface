@@ -52,9 +52,6 @@
 			"path": "../../backend/ignore-threelite"
 		},
 		{
-			"path": "../../backend/threelite"
-		},
-		{
 			"path": "../../frontend/ts"
 		},
 		{
@@ -83,6 +80,9 @@
 		},
 		{
 			"path": "../../backend/gltf2"
+		},
+		{
+			"path": "../../backend/threelite"
 		},
 		{
 			"path": "../../processors/culling"

@@ -25,6 +25,9 @@
 			"path": "../../processors/specify"
 		},
 		{
+			"path": "../../processors/graph"
+		},
+		{
 			"path": "../../processors/matrix"
 		},
 		{

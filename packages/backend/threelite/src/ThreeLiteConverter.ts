@@ -7,12 +7,13 @@ import { PrgStandardMaterial } from './PrgStandardMaterial'
 import { PrgBasicMaterial } from './PrgBasicMaterial'
 import { PrgPointMaterial } from './PrgPointMaterial'
 
-import type {
+import {
 	TypedArray,
 	MeshDataType,
 	MatrBaseDataType,
 	GeomDataType,
 	Texture,
+	CubeTexture,
 	AttributeDataType,
 	MatrPbrDataType,
 	MatrUnlitDataType,
@@ -23,10 +24,10 @@ import type {
 	GL_DYNAMIC_DRAW,
 	UniformDataType,
 	Int,
-} from '@gs.i/schema-scene'
-
-import {
+	//
 	DISPOSED,
+	isTexture,
+	isCubeTexture,
 	isMatrPbrDataType,
 	isMatrUnlitDataType,
 	isColorRGB,
@@ -37,8 +38,9 @@ import {
 import type { Converter } from '@gs.i/schema-converter'
 import { MatProcessor } from '@gs.i/processor-matrix'
 import { BoundingProcessor } from '@gs.i/processor-bound'
+import { diffSets, diffWeakSets, intersect, GraphProcessor, SnapShot } from '@gs.i/processor-graph'
 import { specifyMesh } from '@gs.i/processor-specify'
-import { traverse } from '@gs.i/utils-traverse'
+import { traverse, flatten } from '@gs.i/utils-traverse'
 
 import { Transform3, matrix4Equals } from '@gs.i/utils-transform'
 // import * as THREE from 'three-lite'
@@ -131,13 +133,20 @@ export const DefaultConfig = {
 	overrideFrustumCulling: false,
 
 	/**
-	 * automatic dispose three.js-baked objects
+	 * automatic dispose three.js objects if the GSI counterpart is removed from the tree
+	 *
+	 * @TODO @FIXME this is not right
 	 *
 	 * #### if enabled
-	 * - every time you convert a mesh-tree, converter will find out resources you removed from that tree.
-	 * - and automatically call the `.dispose()` method of the converted object.
+	 * - the converter will assume you always convert the same scene-graph (with the same root node)
+	 * - every time you convert the tree, converter will find out resources you removed from that tree.
+	 * - and call the `.dispose()` method of the converted object.
+	 *
+	 * #### if disabled: @TODO not implemented
+	 * - you can pass any mesh, tree, sub-tree to `.convert` anytime. old resources won't be affected
+	 * - you should dispose the converted three.js object manually if it's not used anymore
 	 */
-	autoDispose: true,
+	autoDisposeThreeObject: true,
 
 	/**
 	 * @note safe to share globally @simon
@@ -147,9 +156,13 @@ export const DefaultConfig = {
 	 * @note safe to share globally @simon
 	 */
 	boundingProcessor: new BoundingProcessor(),
+	/**
+	 * @note safe to share globally @simon
+	 */
+	graphProcessor: new GraphProcessor(),
 }
 
-export type DefaultConverterConfig = Partial<typeof DefaultConfig>
+export type ConverterConfig = Partial<typeof DefaultConfig>
 
 /**
  * 把 three 的 Mesh Points Lines 合并到 父类 Object3D 上，来和 glTF2 保持一致
@@ -206,7 +219,7 @@ export class ThreeLiteConverter implements Converter {
 	/**
 	 * config
 	 */
-	config: Partial<DefaultConverterConfig>
+	config: Required<ConverterConfig>
 
 	/**
 	 * Scene info
@@ -242,10 +255,80 @@ export class ThreeLiteConverter implements Converter {
 		return id
 	}
 
-	convert(node: MeshDataType): Object3D {
-		if (isRenderableMesh(node)) {
-		} else {
+	/**
+	 * handled resources (GSI side) from last convert call
+	 *
+	 * @note refresh every `convert`
+	 */
+	private _cachedResources = getResources() // init with a empty node
+	// private _cachedSnapshot: SnapShot
+	// private _cachedNodes = new WeakSet<MeshDataType>()
+	private _threeObjects = new WeakMap<any, any>()
+
+	constructor(config: ConverterConfig) {
+		this.config = {
+			...config,
+			...DefaultConfig,
 		}
+
+		// this._cachedSnapshot = this.config.graphProcessor.snapshot() // init with a empty node
+	}
+
+	convert(node: MeshDataType): Object3D {
+		// check resources that require special handling
+
+		{
+			const resources = getResources(node)
+
+			const added = {
+				materials: diffSets(resources.materials, this._cachedResources.materials),
+				geometries: diffSets(resources.geometries, this._cachedResources.geometries),
+				attributes: diffSets(resources.attributes, this._cachedResources.attributes),
+				textures: diffSets(resources.textures, this._cachedResources.textures),
+			}
+
+			const removed = {
+				materials: diffSets(this._cachedResources.materials, resources.materials),
+				geometries: diffSets(this._cachedResources.geometries, resources.geometries),
+				attributes: diffSets(this._cachedResources.attributes, resources.attributes),
+				textures: diffSets(this._cachedResources.textures, resources.textures),
+			}
+
+			// create newly added resources
+
+			// auto dispose
+
+			// update cache
+
+			this._cachedResources = resources
+		}
+
+		// check the tree
+		// @note it seems unnecessary to handle any nodes change before assemble it
+		// 		 since we don't need to take care of any changed stuff here
+
+		{
+			//
+			// const snapshot = this.config.graphProcessor.snapshot(node, true)
+			// const changed = this.config.graphProcessor.diff(this._cachedSnapshot, snapshot)
+			//
+			// const nodes = flatten(node) // array
+			// const added = diffWeakSets(nodes, this._cachedNodes)
+			//
+			//
+			// create newly added Object3D
+			// ignore removed objects (no needs to recovery)
+			// ignore moved objects
+			// copy all the matrix? maybe check transform version first?
+			// if moved or transform changed, set matrixWorldNeedsUpdate to true?
+			// or maybe just let matrixProcessor handle it.
+			// reset all the matrix worldMatrix visible extensions
+			// update cache (delete reference)
+		}
+
+		// assemble the tree
+		// - handle all the nodes separately and add its children
+		// - use post-order traversal to make sure all the children are created before added
 	}
 
 	convMesh() {}
@@ -254,6 +337,8 @@ export class ThreeLiteConverter implements Converter {
 	convMatr() {}
 	convTexture() {}
 	convColor() {}
+
+	recovery(node: MeshDataType) {}
 }
 
 /**
@@ -263,14 +348,59 @@ export class ThreeLiteConverter implements Converter {
  *
  * also it's better to modify remote resources pre-frame than mid-frame to avoid stalling.
  */
-export function getResources(root: MeshDataType) {
+export function getResources(root?: MeshDataType) {
 	// programs
-	const materials = [] as MatrBaseDataType[]
+	const materials = new Set<MatrBaseDataType>()
 	// vao
-	const geometries = [] as GeomDataType[]
+	const geometries = new Set<GeomDataType>()
 	// buffers
-	const attributes = [] as AttributeDataType[]
-	// texture / framebuffer
-	const textures = [] as Texture[]
-	traverse(root, (gsiMesh: MeshDataType) => {})
+	const attributes = new Set<AttributeDataType>()
+	// texture / framebuffer / samplers
+	const textures = new Set<Texture | CubeTexture>()
+
+	// @TODO uniform buffers
+
+	if (root) {
+		traverse(root, (mesh: MeshDataType) => {
+			if (isRenderableMesh(mesh)) {
+				materials.add(mesh.material)
+				geometries.add(mesh.geometry)
+
+				// textures
+
+				// standard textures
+				if (mesh.material['baseColorTexture']) textures.add(mesh.material['baseColorTexture'])
+				if (mesh.material['metallicRoughnessTexture'])
+					textures.add(mesh.material['metallicRoughnessTexture'])
+				if (mesh.material['emissiveTexture']) textures.add(mesh.material['emissiveTexture'])
+				if (mesh.material['normalTexture']) textures.add(mesh.material['normalTexture'])
+				if (mesh.material['occlusionTexture']) textures.add(mesh.material['occlusionTexture'])
+
+				// custom textures
+				if (mesh.material.extensions?.EXT_matr_programmable?.uniforms) {
+					const uniforms = mesh.material.extensions.EXT_matr_programmable.uniforms
+
+					Object.keys(uniforms).forEach((key) => {
+						const uniformValue = uniforms[key].value
+						if (isTexture(uniformValue) || isCubeTexture(uniformValue)) {
+							textures.add(uniformValue)
+						}
+					})
+				}
+
+				// attributes
+
+				Object.keys(mesh.geometry.attributes).forEach((key) => {
+					attributes.add(mesh.geometry.attributes[key])
+				})
+			}
+		})
+	}
+
+	return {
+		materials,
+		geometries,
+		attributes,
+		textures,
+	}
 }

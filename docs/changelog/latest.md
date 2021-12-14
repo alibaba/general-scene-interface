@@ -1,5 +1,33 @@
 # changelog
 
+## 2021-12-14
+
+Only schema-scene changes are listed.
+
+
+### drop the idea of generating glsl from programable material
+
+user should write their own definition code (uniforms, attributes, varying in out)
+
+it's not very useful if generated code can only handle the difference between webgl1 & 2 because that can be archived by simple pre-processors
+
+until we find a solution for cross-language compatibility, better not promise anything
+
+- rm `Programable::UniformDataType.type`
+- rm `Programable.attributes`
+- rm `Programable.varyings`
+- add `Programable.global` for shared global code
+
+### potential naming pattern
+
+> **VERY LIKELY TO CHANGE IN THE FUTURE**
+
+naming pattern not settled yet.
+
+- rename `TextureType` -> `Texture`, `CubeTextureType` ->`CubeTexture`, 
+
+likely to be conflict with other engines' naming.
+
 ---
 
 ## 2021-12-06 Simon

@@ -63,13 +63,20 @@ export interface Programable {
 	 * attributes declaration
 	 * @glsl attribute TYPE name;
 	 */
-	attributes: { [name: string]: ShaderType }
+	// attributes: { [name: string]: ShaderType }
 
 	/**
 	 * varying declaration
 	 * @glsl varying TYPE name;
 	 */
-	varyings: { [name: string]: ShaderType }
+	// varyings: { [name: string]: ShaderType }
+
+	/**
+	 * global scope shader codes (out side of main function)
+	 * - for vert and frag shaders
+	 * - usually for global functions or static values.
+	 */
+	global?: string
 
 	/**
 	 * @section vertex shader 通用代码
@@ -77,7 +84,8 @@ export interface Programable {
 
 	/**
 	 * global scope shader codes (out side of main function)
-	 * usually for global functions or static values.
+	 * - for vertex shader
+	 * - usually for global functions or static values.
 	 */
 	vertGlobal?: string
 
@@ -108,7 +116,8 @@ export interface Programable {
 	 */
 	/**
 	 * fragment shader main 函数前 插入的 glsl 代码
-	 * 用于声明或实现全局变量、全局函数
+	 * - for fragment shader
+	 * - 用于声明或实现全局变量、全局函数
 	 */
 	fragGlobal?: string
 
@@ -160,9 +169,4 @@ export type UniformDataType = {
 	 * 增加了数组对象
 	 */
 	value: number | Vec2 | Vec3 | Vec4 | ColorRGB | TextureType | CubeTextureType | number[]
-
-	/**
-	 * 在shader language中的type
-	 */
-	type: ShaderType
 }
