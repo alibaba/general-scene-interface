@@ -115,8 +115,8 @@ export function specifyMaterial(matr: LooseMatrBase): MatrBaseDataType {
 		if (p.extension === undefined) p.extension = ''
 		if (p.defines === undefined) p.defines = {}
 		if (p.uniforms === undefined) p.uniforms = {}
-		if (p.attributes === undefined) p.attributes = {}
-		if (p.varyings === undefined) p.varyings = {}
+		// if (p.attributes === undefined) p.attributes = {}
+		// if (p.varyings === undefined) p.varyings = {}
 	}
 
 	/**

@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-import { ColorRGB, Double, Transform2 } from './basic'
+import { ColorRGB, Double, Transform2, Versioned } from './basic'
 import { TextureType } from './Texture'
 import { Programable, ProgramablePbr } from './Programable'
 /**
@@ -160,7 +160,7 @@ export interface MatrPbrDataType extends MatrBaseDataType {
  * {@link https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#materials}
  * {@link https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#material}
  */
-export interface MatrBaseDataType {
+export interface MatrBaseDataType extends Versioned {
 	readonly type: string
 
 	/**
@@ -226,11 +226,11 @@ export interface MatrBaseDataType {
 			 * depth
 			 */
 			depthTest?: boolean
-			// depthFunc?: number
 			depthWrite?: boolean
-			// polygonOffset?: boolean
-			// polygonOffsetFactor?: number
-			// polygonOffsetUnits?: number
+			depthFunc?: number
+			polygonOffset?: boolean
+			polygonOffsetFactor?: number
+			polygonOffsetUnits?: number
 
 			/**
 			 * blending

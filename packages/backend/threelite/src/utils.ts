@@ -4,7 +4,7 @@
  */
 
 import { Box3, Sphere } from 'three-lite'
-import { BBox, BSphere, PrgBaseDataType } from '@gs.i/schema-scene'
+import { BBox, BSphere } from '@gs.i/schema-scene'
 
 export function box3Equals(b1: Box3 | BBox, b2: Box3 | BBox): boolean {
 	return (
@@ -38,8 +38,8 @@ export function elementsEquals(e1: number[], e2: number[]): boolean {
 	return true
 }
 
-export function convDefines(gl2Defines, defines) {
-	const d = gl2Defines || {}
+export function convDefines(gl2Defines = {}, defines = {}) {
+	const d = gl2Defines
 	for (const key in defines) {
 		if (defines[key] !== undefined && defines[key] !== null && defines[key] !== false) {
 			defines[key] !== d[key] && (d[key] = defines[key])
@@ -68,6 +68,8 @@ void main() {
     gl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );
 }`
 
+/** not necessary any more
+ * 
 export type PreShaderCodes = {
 	attributes: string
 	varyingsVert: string
@@ -76,7 +78,7 @@ export type PreShaderCodes = {
 }
 // 自动过滤掉three自带的几个attr名称
 const DEFAULT_ATTR_NAMES = ['position', 'normal', 'uv']
-export function genPreShaderCode(matr: PrgBaseDataType): PreShaderCodes {
+export function genPreShaderCode(matr: MatrBaseDataType): PreShaderCodes {
 	const codes: PreShaderCodes = {
 		attributes: '',
 		varyingsVert: '',
@@ -129,6 +131,8 @@ export function genPreShaderCode(matr: PrgBaseDataType): PreShaderCodes {
 	}
 	return codes
 }
+
+ */
 
 export const SupportedExtensions = (function checkExts() {
 	const flags = {
