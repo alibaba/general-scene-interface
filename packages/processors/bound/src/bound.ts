@@ -1,17 +1,27 @@
-import { MeshDataType, GeomDataType, Int, BBox } from '@gs.i/schema-scene'
+import { MeshDataType, GeomDataType, Int, BBox, BSphere } from '@gs.i/schema-scene'
 import { Processor, TraverseType } from '@gs.i/processor-base'
 
-import { computeBBox } from '@gs.i/utils-geometry'
+import { computeBBox, computeBSphere } from '@gs.i/utils-geometry'
 
 interface BBoxCache {
 	/**
-	 * cached version of position attribute
+	 * cached version
 	 */
 	version: Int
 	/**
-	 * cached local matrix
+	 * cached
 	 */
 	bbox: BBox
+}
+interface BSphereCache {
+	/**
+	 * cached version
+	 */
+	version: Int
+	/**
+	 * cached
+	 */
+	bsphere: BSphere
 }
 
 /**
@@ -33,6 +43,7 @@ export class BoundingProcessor extends Processor {
 	private _ids = new WeakMap<object, Int>()
 
 	private _cacheGeomBBox = new WeakMap<GeomDataType, BBoxCache>()
+	private _cacheGeomBSphere = new WeakMap<GeomDataType, BSphereCache>()
 
 	override processNode(node: MeshDataType, parent?: MeshDataType) {
 		// this.getWorldMatrixShallow(node, parent)
@@ -76,7 +87,26 @@ export class BoundingProcessor extends Processor {
 	 * @unfinished @TODO
 	 * @param geom
 	 */
-	getGeomBoundingSphere(geom: GeomDataType) {}
+	getGeomBoundingSphere(geom: GeomDataType): BSphere {
+		const cache = this._cacheGeomBSphere.get(geom)
+		if (!cache) {
+			// 未缓存
+			const bsphere = computeBSphere(geom)
+			this._cacheGeomBSphere.set(geom, {
+				version: geom.attributes.position?.version ?? -1,
+				bsphere,
+			})
+			return bsphere
+		} else {
+			// 命中缓存
+			if (cache.version !== (geom.attributes.position?.version ?? -1)) {
+				// 更新缓存版本
+				cache.bsphere = computeBSphere(geom)
+				cache.version = geom.attributes.position?.version ?? -1
+			}
+			return cache.bsphere
+		}
+	}
 
 	/**
 	 * @unfinished @TODO

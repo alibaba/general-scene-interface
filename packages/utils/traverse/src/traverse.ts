@@ -32,7 +32,7 @@ export function traversePostOrder(
 	if (node === undefined || node === null) return
 
 	if (node.children && node.children.size > 0) {
-		node.children.forEach((child) => traverse(child, handler, node))
+		node.children.forEach((child) => traversePostOrder(child, handler, node))
 	}
 
 	handler(node, parent)

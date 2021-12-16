@@ -8,9 +8,7 @@ import { PrgBasicMaterial } from './PrgBasicMaterial'
 import { PrgPointMaterial } from './PrgPointMaterial'
 
 import {
-	TypedArray,
 	MeshDataType,
-	MatrBaseDataType,
 	GeomDataType,
 	Texture,
 	CubeTexture,
@@ -22,14 +20,11 @@ import {
 	ColorRGB,
 	GL_STATIC_DRAW,
 	GL_DYNAMIC_DRAW,
-	UniformDataType,
 	Int,
-	BSphere,
 	//
 	DISPOSED,
 	isTexture,
 	isCubeTexture,
-	isColorRGB,
 	isTypedArray,
 	isRenderableMesh,
 	isDISPOSED,
@@ -45,15 +40,11 @@ import { traverse, flatten } from '@gs.i/utils-traverse'
 import { syncMaterial } from './syncMaterial'
 import { syncTexture } from './syncTexture'
 
-import { Transform3, matrix4Equals } from '@gs.i/utils-transform'
 // import * as THREE from 'three-lite'
 import {
 	Object3D,
-	Vector2,
-	Vector3,
 	BufferGeometry,
 	Material,
-	ShaderMaterial,
 	TextureLoader,
 	Box3,
 	Sphere,
@@ -66,8 +57,6 @@ import {
 	CanvasTexture,
 	DataTexture,
 } from 'three-lite'
-import { box3Equals, convDefines, elementsEquals, sphereEquals, SupportedExtensions } from './utils'
-import { Euler, Vector3 as Vec3 } from '@gs.i/utils-math'
 import { PrgSpriteMaterial } from './PrgSpriteMaterial'
 
 export const DefaultConfig = {
@@ -242,7 +231,7 @@ export class ThreeLiteConverter implements Converter {
 		// this._cachedSnapshot = this.config.graphProcessor.snapshot() // init with a empty node
 	}
 
-	convert(node: MeshDataType): Object3D {
+	convert(root: MeshDataType): Object3D {
 		/**
 		 * @note It is not the most efficient way to get all the changed components and pre-handle them
 		 * 		 It is quicker to just handle everything during one traversal
@@ -254,14 +243,17 @@ export class ThreeLiteConverter implements Converter {
 		// #resource-stage
 
 		{
-			const resources = getResources(node)
+			const resources = getResources(root)
 
-			const added = {
-				materials: diffSets(resources.materials, this._cachedResources.materials),
-				geometries: diffSets(resources.geometries, this._cachedResources.geometries),
-				attributes: diffSets(resources.attributes, this._cachedResources.attributes),
-				textures: diffSets(resources.textures, this._cachedResources.textures),
-			}
+			// @note not necessary to check added resources,
+			// 		 because it's not practical to separate the creation and updating of resources
+
+			// const added = {
+			// 	materials: diffSets(resources.materials, this._cachedResources.materials),
+			// 	geometries: diffSets(resources.geometries, this._cachedResources.geometries),
+			// 	attributes: diffSets(resources.attributes, this._cachedResources.attributes),
+			// 	textures: diffSets(resources.textures, this._cachedResources.textures),
+			// }
 
 			const removed = {
 				materials: diffSets(this._cachedResources.materials, resources.materials),
@@ -271,13 +263,42 @@ export class ThreeLiteConverter implements Converter {
 			}
 
 			// create newly added resources
+			// update resources
 
-			added.textures.forEach((texture) => {})
+			resources.textures.forEach((texture) => {
+				if (isCubeTexture(texture)) throw 'CubeTexture not implemented yet'
+				this.convTexture(texture)
+			})
+			resources.attributes.forEach((attribute) => {
+				this.convAttr(attribute)
+			})
+			resources.geometries.forEach((geometry) => {
+				this.convGeom(geometry)
+			})
+			resources.materials.forEach((material) => {
+				this.convMatr(material)
+			})
 
 			// auto dispose
 
-			// update cache
+			if (this.config.autoDisposeThreeObject) {
+				removed.textures.forEach((texture) => {
+					this._threeObjects.get(texture)?.dispose()
+				})
+				removed.attributes.forEach((attribute) => {
+					this._threeObjects.get(attribute)?.dispose()
+				})
+				removed.geometries.forEach((geometry) => {
+					this._threeObjects.get(geometry)?.dispose()
+				})
+				removed.materials.forEach((material) => {
+					this._threeObjects.get(material)?.dispose()
+				})
+			} else {
+				throw 'autoDisposeThreeObject=false is not implemented yet, set it true for now'
+			}
 
+			// update cache
 			this._cachedResources = resources
 		}
 
@@ -287,10 +308,10 @@ export class ThreeLiteConverter implements Converter {
 
 		{
 			//
-			// const snapshot = this.config.graphProcessor.snapshot(node, true)
+			// const snapshot = this.config.graphProcessor.snapshot(root, true)
 			// const changed = this.config.graphProcessor.diff(this._cachedSnapshot, snapshot)
 			//
-			// const nodes = flatten(node) // array
+			// const nodes = flatten(root) // array
 			// const added = diffWeakSets(nodes, this._cachedNodes)
 			//
 			// create newly added Object3D
@@ -309,23 +330,134 @@ export class ThreeLiteConverter implements Converter {
 		// or
 		// - handle all the nodes separately and add them to their parent
 		// - use pre-order traversal to make sure all the parents are created before added to
+
+		{
+			const rootThree = this.convMesh(root)
+			// pre-order traversal, parents are handled before children
+			traverse(root, (node, parent) => {
+				// skip root node
+				if (parent) {
+					// @note parent is cached before
+					const parentThree = this._threeObjects.get(parent)
+					const currentThree = this.convMesh(node)
+					// clear current children to handle removed nodes
+					currentThree.children = []
+					parentThree.children.parent(currentThree)
+				}
+			})
+
+			return rootThree
+		}
 	}
 
 	// #region object converters
 
-	convMesh(gsiMesh: MeshDataType): Object3D {
-		let threeMesh = this._threeObjects.get(gsiMesh) as Object3D
+	/**
+	 * @note run after all the geometries and materials are cached
+	 */
+	convMesh(gsiMesh: MeshDataType): RenderableObject3D | Object3D {
+		let threeMesh = this._threeObjects.get(gsiMesh) as RenderableObject3D | Object3D
 
 		// create
 		if (!threeMesh) {
 			if (isRenderableMesh(gsiMesh)) {
+				threeMesh = new RenderableObject3D()
+
+				// Assign mode
+				// TODO disallow changing these values
+				switch (gsiMesh.geometry.mode) {
+					case 'TRIANGLES':
+						threeMesh['isMesh'] = true
+						threeMesh['drawMode'] = TrianglesDrawMode
+						break
+
+					case 'SPRITE':
+						threeMesh['isMesh'] = true
+						threeMesh['drawMode'] = TrianglesDrawMode
+						break
+
+					case 'POINTS':
+						threeMesh['isPoints'] = true
+						break
+
+					case 'LINES':
+						threeMesh['isLine'] = true
+						threeMesh['isLineSegments'] = true
+						break
+
+					default:
+						throw 'Invalid value for GSIGeom.mode: ' + gsiMesh.geometry.mode
+				}
+				this.info.renderableCount++
 			} else {
-				threeMesh = new Group()
+				threeMesh = new Object3D()
 			}
+
+			// @note avoid user error
+			// if matrix is handled by gsi processor, three matrix methods should be disabled
+			if (!this.config.decomposeMatrix) {
+				// threeMesh.matrixAutoUpdate = false
+				Object.defineProperty(threeMesh, 'matrixAutoUpdate', {
+					value: false,
+					configurable: false,
+					writable: false,
+				})
+				// threeMesh.matrixWorldNeedsUpdate = false
+				Object.defineProperty(threeMesh, 'matrixWorldNeedsUpdate', {
+					value: false,
+					// configurable: false,
+					// writable: false,
+					get: () => {
+						return false
+					},
+					set: (v) => {
+						if (v)
+							console.error(
+								`matrixWorldNeedsUpdate can not be set to true, because this object3D's matrix is managed by gsi processor`
+							)
+					},
+				})
+
+				threeMesh.updateMatrix = () =>
+					console.error(
+						`updateMatrix will not work, because this object3D's matrix is managed by gsi processor`
+					)
+				threeMesh.updateMatrixWorld = () =>
+					console.error(
+						`updateMatrixWorld will not work, because this object3D's matrix is managed by gsi processor`
+					)
+			}
+
+			// update cache
+			this._threeObjects.set(gsiMesh, threeMesh)
 		}
 		// sync
+		{
+			if (isRenderableMesh(gsiMesh)) {
+				// threeMesh is a RenderableObject3D
+
+				const geometry = this._threeObjects.get(gsiMesh.geometry) as BufferGeometry
+				const material = this._threeObjects.get(gsiMesh.material) as Material
+
+				threeMesh['material'] = material
+				threeMesh['geometry'] = geometry
+
+				if (gsiMesh.geometry.attributes.uv) {
+					// @note it's safe to assume `defines` was created above
+					;(material['defines'] as any).GSI_USE_UV = true
+				}
+			}
+
+			threeMesh.matrix.elements = this.config.matrixProcessor.getLocalMatrix(gsiMesh)
+			threeMesh.matrixWorld.elements = this.config.matrixProcessor.getWorldMatrix(gsiMesh)
+		}
+
+		return threeMesh
 	}
 
+	/**
+	 * @note run after all the attributes are cached
+	 */
 	convGeom(gsiGeom: GeomDataType): BufferGeometry {
 		let threeGeometry = this._threeObjects.get(gsiGeom) as BufferGeometry
 
@@ -340,6 +472,9 @@ export class ThreeLiteConverter implements Converter {
 			threeGeometry.boundingSphere = new Sphere()
 
 			// TODO sprite, maybe only accept generated geom here. move generation out?
+
+			// update cache
+			this._threeObjects.set(gsiGeom, threeGeometry)
 		}
 		// sync
 		{
@@ -400,10 +535,7 @@ export class ThreeLiteConverter implements Converter {
 				threeBsphere.radius = bsphere.radius
 			} else {
 				// @note three will use bsphere but may not use bbox so...
-				// TODO implement getGeomBoundingSphere
-				const bsphere = this.config.boundingProcessor.getGeomBoundingSphere(
-					gsiGeom
-				) as unknown as BSphere
+				const bsphere = this.config.boundingProcessor.getGeomBoundingSphere(gsiGeom)
 				const threeBsphere = threeGeometry.boundingSphere as Sphere
 				threeBsphere.center.x = bsphere.center.x
 				threeBsphere.center.y = bsphere.center.y
@@ -522,6 +654,9 @@ export class ThreeLiteConverter implements Converter {
 		return threeAttribute
 	}
 
+	/**
+	 * @note run after all the textures are cached
+	 */
 	convMatr(gsiMatr: GsiMatr) {
 		let threeMatr = this._threeObjects.get(gsiMatr) as Material
 		let committedVersion = this._committedVersions.get(gsiMatr) as Int
@@ -747,7 +882,14 @@ export class ThreeLiteConverter implements Converter {
 
 	// #endregion
 
-	recovery(node: MeshDataType) {}
+	// recovery(node: MeshDataType) {}
+
+	dispose() {
+		this._cachedResources = getResources() // init with a empty node
+		this._threeObjects = new WeakMap<any, any>()
+		this._committedVersions = new WeakMap<any, number>()
+		this._colorMap = new WeakMap<ColorRGB, Color>()
+	}
 }
 
 /**
@@ -759,7 +901,7 @@ export class ThreeLiteConverter implements Converter {
  */
 export function getResources(root?: MeshDataType) {
 	// programs
-	const materials = new Set<MatrBaseDataType>()
+	const materials = new Set<GsiMatr>()
 	// vao
 	const geometries = new Set<GeomDataType>()
 	// buffers
@@ -772,7 +914,7 @@ export function getResources(root?: MeshDataType) {
 	if (root) {
 		traverse(root, (mesh: MeshDataType) => {
 			if (isRenderableMesh(mesh)) {
-				materials.add(mesh.material)
+				materials.add(mesh.material as GsiMatr)
 				geometries.add(mesh.geometry)
 
 				// textures
@@ -823,16 +965,12 @@ export class RenderableObject3D extends Object3D {
 	isPoints?: boolean
 	isLine?: boolean
 	isLineSegments?: boolean
-	isSprite?: boolean
-
-	// Sprite需要这个属性
-	center?: Vector2
 
 	// TrianglesDrawMode / TriangleStripDrawMode / TriangleFanDrawMode
-	drawMode?: number
+	drawMode: number
 
-	geometry?: BufferGeometry
-	material?: Material
+	geometry: BufferGeometry
+	material: Material
 
 	constructor(params: Partial<RenderableObject3D> = {}) {
 		super()

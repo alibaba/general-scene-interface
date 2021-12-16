@@ -14,13 +14,13 @@ import {
 } from '@gs.i/schema-scene'
 import { Box3, Sphere, Vector3 } from '@gs.i/utils-math'
 
-export function BBoxToBox3(bbox: BBox): Box3 {
+export function convBBoxToBox3(bbox: BBox): Box3 {
 	const min = new Vector3(bbox.min.x, bbox.min.y, bbox.min.z)
 	const max = new Vector3(bbox.max.x, bbox.max.y, bbox.max.z)
 	return new Box3(min, max)
 }
 
-export function Box3ToBBox(box: Box3): BBox {
+export function convBox3ToBBox(box: Box3): BBox {
 	return {
 		min: {
 			x: box.min.x,
@@ -35,12 +35,12 @@ export function Box3ToBBox(box: Box3): BBox {
 	}
 }
 
-export function BSphereToSphere(bsphere: BSphere): Sphere {
+export function convBSphereToSphere(bsphere: BSphere): Sphere {
 	const center = new Vector3(bsphere.center.x, bsphere.center.y, bsphere.center.z)
 	return new Sphere(center, bsphere.radius)
 }
 
-export function SphereToBSphere(sphere: Sphere): BSphere {
+export function convSphereToBSphere(sphere: Sphere): BSphere {
 	return {
 		center: {
 			x: sphere.center.x,
@@ -73,7 +73,7 @@ export function computeBBox(geometry: GeomDataType): BBox {
 		)
 	}
 
-	return Box3ToBBox(box)
+	return convBox3ToBBox(box)
 }
 
 /**
@@ -82,10 +82,10 @@ export function computeBBox(geometry: GeomDataType): BBox {
  * @param geometry
  * @returns
  */
-function computeBSphere(geometry: GeomDataType): BSphere {
+export function computeBSphere(geometry: GeomDataType): BSphere {
 	if (!geometry.attributes.position || isDISPOSED(geometry.attributes.position.array)) {
 		console.warn('Geometry does not have position attribute, generating an infinity sphere')
-		return SphereToBSphere(infinitySphere())
+		return convSphereToBSphere(infinitySphere())
 	}
 
 	const minX = new Vector3(Infinity, 0, 0)
@@ -145,7 +145,7 @@ function computeBSphere(geometry: GeomDataType): BSphere {
 		}
 	}
 
-	return SphereToBSphere(sphere)
+	return convSphereToBSphere(sphere)
 }
 
 export function mergeGeometries(geometries: GeomDataType[]): GeomDataType | undefined {
