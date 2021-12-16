@@ -1,6 +1,6 @@
 {
 	"name": "@gs.i/backend-gltf2",
-	"version": "0.0.0-beta",
+	"version": "0.1.0-alpha",
 	"description": "",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
@@ -26,8 +26,7 @@
 		"@gs.i/processor-specify": "^0.1.0-alpha",
 		"@gs.i/processor-matrix": "^0.1.0-alpha",
 		"@gs.i/utils-gltf2": "^0.0.0-beta",
-		"@gs.i/utils-math": "^0.0.0-beta",
-		"@gs.i/utils-transform": "^0.0.0-beta"
+		"@gs.i/utils-math": "^0.0.0-beta"
 	},
 	"devDependencies": {
 		"typescript": ">4.4.0"

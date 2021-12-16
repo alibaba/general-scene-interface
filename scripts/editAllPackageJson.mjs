@@ -40,8 +40,36 @@ packages.forEach(async (pkg) => {
 	 * edit #start
 	 */
 
+	// re order json
+	const license = pjson.license
+	const publishConfig = pjson.publishConfig
+	const files = pjson.files
+	const scripts = pjson.scripts
+	const dependencies = pjson.dependencies
+	const devDependencies = pjson.devDependencies
+	const type = pjson.type
+
+	delete pjson.license
+	delete pjson.publishConfig
+	delete pjson.files
+	delete pjson.scripts
+	delete pjson.dependencies
+	delete pjson.devDependencies
+	delete pjson.type
+
+	// insert here
 	pjson.type = 'module'
+
+	pjson.license = license
+	pjson.publishConfig = publishConfig
+	pjson.files = files
+	pjson.scripts = scripts
+	pjson.dependencies = dependencies
+	pjson.devDependencies = devDependencies
+	pjson.type = type
+
 	// delete pjson.type
+	delete pjson.gitHead
 
 	/**
 	 * edit #end

@@ -94,7 +94,9 @@ cameraProxy.setPitch(0.5)
 cameraProxy.setRotation(0)
 
 function isTouchDevice() {
-	return 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0
+	return (
+		'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator['msMaxTouchPoints'] > 0
+	)
 }
 
 let cameraControl
