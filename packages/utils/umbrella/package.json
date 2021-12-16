@@ -3,6 +3,7 @@
 	"version": "0.0.0-beta",
 	"description": "",
 	"main": "index.js",
+	"type": "module",
 	"license": "MIT",
 	"publishConfig": {
 		"access": "public"
@@ -44,7 +45,5 @@
 		"@gs.i/backend-gltf2": "^0.1.0-alpha",
 		"@gs.i/backend-threelite": "^0.1.0-alpha",
 		"@gs.i/processor-culling": "^0.1.0-alpha"
-	},
-	"gitHead": "96bfbb9138a5242a3c460a9210058c14bcf9b03a",
-	"type": "module"
+	}
 }
