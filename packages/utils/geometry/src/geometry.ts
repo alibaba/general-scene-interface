@@ -19,6 +19,7 @@ export function BBoxToBox3(bbox: BBox): Box3 {
 	const max = new Vector3(bbox.max.x, bbox.max.y, bbox.max.z)
 	return new Box3(min, max)
 }
+
 export function Box3ToBBox(box: Box3): BBox {
 	return {
 		min: {
@@ -37,6 +38,17 @@ export function Box3ToBBox(box: Box3): BBox {
 export function BSphereToSphere(bsphere: BSphere): Sphere {
 	const center = new Vector3(bsphere.center.x, bsphere.center.y, bsphere.center.z)
 	return new Sphere(center, bsphere.radius)
+}
+
+export function SphereToBSphere(sphere: Sphere): BSphere {
+	return {
+		center: {
+			x: sphere.center.x,
+			y: sphere.center.y,
+			z: sphere.center.z,
+		},
+		radius: sphere.radius,
+	}
 }
 
 export function computeBBox(geometry: GeomDataType): BBox {
@@ -65,49 +77,75 @@ export function computeBBox(geometry: GeomDataType): BBox {
 }
 
 /**
- * @FIXME @浅寻 looks not right
+ * AN EFFICIENT BOUNDING SPHERE by Jack Ritter
+ * @link http://inis.jinr.ru/sl/vol1/CMC/Graphics_Gems_1,ed_A.Glassner.pdf - Page 301
  * @param geometry
  * @returns
  */
 function computeBSphere(geometry: GeomDataType): BSphere {
-	throw 'NOT IMPLEMENTED'
-	// const sphere = new Sphere()
-	// const center = sphere.center
-	// const v = new Vector3()
-	// if (geometry.attributes.position && !isDISPOSED(geometry.attributes.position.array)) {
-	// 	if (!geometry.boundingBox) computeBBox(geometry)
+	if (!geometry.attributes.position || isDISPOSED(geometry.attributes.position.array)) {
+		console.warn('Geometry does not have position attribute, generating an infinity sphere')
+		return SphereToBSphere(infinitySphere())
+	}
 
-	// 	const box = geometry.boundingBox as Box3
-	// 	center.copy(v.addVectors(box.min, box.max).multiplyScalar(0.5))
+	const minX = new Vector3(Infinity, 0, 0)
+	const maxX = new Vector3(-Infinity, 0, 0)
+	const minY = new Vector3(0, Infinity, 0)
+	const maxY = new Vector3(0, -Infinity, 0)
+	const minZ = new Vector3(0, 0, Infinity)
+	const maxZ = new Vector3(0, 0, -Infinity)
 
-	// 	// Compatability for InfinityBox
-	// 	if (!isNaN(center.x) && !isNaN(center.y) && !isNaN(center.z)) {
-	// 		// Try to find sphere radius less than BBox diagonal
-	// 		let maxRadiusSq = 0
-	// 		const positions = geometry.attributes.position.array
-	// 		for (let i = 0, il = positions.length; i < il; i += 3) {
-	// 			v.fromArray(positions, i)
-	// 			maxRadiusSq = Math.max(maxRadiusSq, center.distanceToSquared(v))
-	// 		}
-	// 		const min = new Vector3().copy(box.min as Vector3)
-	// 		const max = new Vector3().copy(box.max as Vector3)
-	// 		const boxDiag = min.distanceTo(max) * 0.5
+	const v = new Vector3()
 
-	// 		// Choose the smaller one: box diagonal, or sphere radius
-	// 		sphere.radius = Math.min(Math.sqrt(maxRadiusSq), boxDiag)
+	// first pass
+	const positions = geometry.attributes.position.array
+	const itemSize = geometry.attributes.position.itemSize
+	for (let i = 0, l = positions.length; i < l; i += itemSize) {
+		v.fromArray(positions, i)
+		if (v.x < minX.x) minX.copy(v)
+		if (v.x > maxX.x) maxX.copy(v)
+		if (v.y < minX.y) minY.copy(v)
+		if (v.y > maxX.y) maxY.copy(v)
+		if (v.z < minX.z) minZ.copy(v)
+		if (v.z > maxX.z) maxZ.copy(v)
+	}
 
-	// 		geometry.boundingSphere = sphere
-	// 		return sphere
-	// 	}
-	// }
+	const distSqX = minX.distanceToSquared(maxX)
+	const distSqY = minY.distanceToSquared(maxY)
+	const distSqZ = minZ.distanceToSquared(maxZ)
+	const maxDistSq = Math.max(distSqX, distSqY, distSqZ)
 
-	// // console.warn('Geometry does not have position attribute, generating an infinity sphere')
-	// // sphere.copy(InfinitySphere)
-	// sphere.center.set(0, 0, 0)
-	// sphere.radius = Infinity
+	let farthestPair: [Vector3, Vector3]
+	if (maxDistSq === distSqX) {
+		farthestPair = [minX, maxX]
+	} else if (maxDistSq === distSqY) {
+		farthestPair = [minY, maxY]
+	} else {
+		farthestPair = [minZ, maxZ]
+	}
 
-	// geometry.boundingSphere = sphere
-	// return sphere
+	const initCenter = new Vector3().addVectors(farthestPair[0], farthestPair[1]).multiplyScalar(0.5)
+	const initRadius = farthestPair[0].distanceTo(farthestPair[1]) * 0.5
+	const sphere = new Sphere(initCenter, initRadius)
+
+	// second pass
+	const dir = new Vector3()
+	let radiusSq = sphere.radius * sphere.radius
+	for (let i = 0, l = positions.length; i < l; i += itemSize) {
+		v.fromArray(positions, i)
+		if (v.distanceToSquared(sphere.center) > radiusSq) {
+			// expand sphere by outside point
+			dir.subVectors(sphere.center, v)
+			const diameter = dir.length() + sphere.radius
+			const radius = diameter * 0.5
+			dir.normalize()
+			sphere.center.addVectors(v, dir.multiplyScalar(radius))
+			sphere.radius = radius
+			radiusSq = radius * radius
+		}
+	}
+
+	return SphereToBSphere(sphere)
 }
 
 export function mergeGeometries(geometries: GeomDataType[]): GeomDataType | undefined {
@@ -255,4 +293,18 @@ function getTypedArrayConstructor(typedArray: TypedArray) {
 		return Int8Array
 	}
 	throw new Error('不支持的 TypedArray 类型')
+}
+
+export function infinityBox3() {
+	const box = new Box3()
+	box.min.set(-Infinity, -Infinity, -Infinity)
+	box.max.set(Infinity, Infinity, Infinity)
+	return box
+}
+
+export function infinitySphere() {
+	const sphere = new Sphere()
+	sphere.center.set(0, 0, 0)
+	sphere.radius = Infinity
+	return sphere
 }
