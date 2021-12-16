@@ -147,7 +147,7 @@ export class ThreeLiteConverter implements Converter {
 	/**
 	 * type
 	 */
-	readonly type = 'ThreeLite'
+	readonly type = 'ThreeLiteConverter'
 
 	/**
 	 * config
@@ -159,7 +159,6 @@ export class ThreeLiteConverter implements Converter {
 	 */
 	info = {
 		renderableCount: 0,
-		visibleCount: 0,
 	}
 
 	// #region id generator
@@ -201,24 +200,8 @@ export class ThreeLiteConverter implements Converter {
 	 */
 	private _cachedResources = getResources() // init with a empty node
 	// private _cachedSnapshot: SnapShot
-	// private _cachedNodes = new WeakSet<MeshDataType>()
 	private _threeObjects = new WeakMap<any, any>()
 	private _committedVersions = new WeakMap<any, number>()
-
-	/**
-	 * cached textures
-	 */
-	// private _cachedTexture = new WeakMap<
-	// 	Texture,
-	// 	{ threeTexture: ThreeTexture; committedVersion: Int }
-	// >()
-	private _colorMap = new WeakMap<ColorRGB, Color>()
-	// private _materialMap = new WeakMap<MeshDataType, Material>()
-	// private _geometryMap = new WeakMap<GeomDataType, BufferGeometry>()
-	// private _cachedAttributes = new WeakMap<
-	// 	AttributeDataType,
-	// 	{ threeAttribute: BufferAttribute; committedVersion: Int }
-	// >()
 
 	// #endregion
 
@@ -246,7 +229,7 @@ export class ThreeLiteConverter implements Converter {
 			const resources = getResources(root)
 
 			// @note not necessary to check added resources,
-			// 		 because it's not practical to separate the creation and updating of resources
+			// 		 because it's not practical to separate the creating and updating of resources
 
 			// const added = {
 			// 	materials: diffSets(resources.materials, this._cachedResources.materials),
@@ -263,7 +246,10 @@ export class ThreeLiteConverter implements Converter {
 			}
 
 			// create newly added resources
+			// &
 			// update resources
+			// &
+			// put everything in cache
 
 			resources.textures.forEach((texture) => {
 				if (isCubeTexture(texture)) throw 'CubeTexture not implemented yet'
@@ -295,7 +281,9 @@ export class ThreeLiteConverter implements Converter {
 					this._threeObjects.get(material)?.dispose()
 				})
 			} else {
-				throw 'autoDisposeThreeObject=false is not implemented yet, set it true for now'
+				console.warn(
+					'autoDisposeThreeObject=false is not tested yet, may cause memory overflow, set it true for now'
+				)
 			}
 
 			// update cache
@@ -355,7 +343,7 @@ export class ThreeLiteConverter implements Converter {
 	/**
 	 * @note run after all the geometries and materials are cached
 	 */
-	convMesh(gsiMesh: MeshDataType): RenderableObject3D | Object3D {
+	private convMesh(gsiMesh: MeshDataType): RenderableObject3D | Object3D {
 		let threeMesh = this._threeObjects.get(gsiMesh) as RenderableObject3D | Object3D
 
 		// create
@@ -393,8 +381,7 @@ export class ThreeLiteConverter implements Converter {
 				threeMesh = new Object3D()
 			}
 
-			// @note avoid user error
-			// if matrix is handled by gsi processor, three matrix methods should be disabled
+			// @note avoid user mistakes, if matrix is handled by gsi processor, three methods should be disabled
 			if (!this.config.decomposeMatrix) {
 				// threeMesh.matrixAutoUpdate = false
 				Object.defineProperty(threeMesh, 'matrixAutoUpdate', {
@@ -413,18 +400,21 @@ export class ThreeLiteConverter implements Converter {
 					set: (v) => {
 						if (v)
 							console.error(
-								`matrixWorldNeedsUpdate can not be set to true, because this object3D's matrix is managed by gsi processor`
+								`matrixWorldNeedsUpdate can not be set to true,` +
+									`because this object3D's matrix is managed by gsi processor`
 							)
 					},
 				})
 
 				threeMesh.updateMatrix = () =>
 					console.error(
-						`updateMatrix will not work, because this object3D's matrix is managed by gsi processor`
+						`updateMatrix will not work, ` +
+							`because this object3D's matrix is managed by gsi processor`
 					)
 				threeMesh.updateMatrixWorld = () =>
 					console.error(
-						`updateMatrixWorld will not work, because this object3D's matrix is managed by gsi processor`
+						`updateMatrixWorld will not work, ` +
+							`because this object3D's matrix is managed by gsi processor`
 					)
 			}
 
@@ -458,7 +448,7 @@ export class ThreeLiteConverter implements Converter {
 	/**
 	 * @note run after all the attributes are cached
 	 */
-	convGeom(gsiGeom: GeomDataType): BufferGeometry {
+	private convGeom(gsiGeom: GeomDataType): BufferGeometry {
 		let threeGeometry = this._threeObjects.get(gsiGeom) as BufferGeometry
 
 		// create
@@ -549,7 +539,7 @@ export class ThreeLiteConverter implements Converter {
 		return threeGeometry
 	}
 
-	convAttr(gsiAttr: AttributeDataType): BufferAttribute {
+	private convAttr(gsiAttr: AttributeDataType): BufferAttribute {
 		let threeAttribute = this._threeObjects.get(gsiAttr) as BufferAttribute
 		let committedVersion = this._committedVersions.get(gsiAttr) as Int
 
@@ -605,7 +595,7 @@ export class ThreeLiteConverter implements Converter {
 				// Overwrite array
 				threeAttribute.array = gsiAttr.array
 			} else if (gsiAttr.usage === 'DYNAMIC_DRAW') {
-				// @note its okay to use a different array?
+				// TODO: it should be okay to use a different array ?
 				// if (threeAttribute.array !== gsiAttr.array) {
 				// 	throw new Error(
 				// 		'GSI::Attribute.array: changing array itself is not permitted when attribute usage is `DYNAMIC_DRAW`'
@@ -657,7 +647,7 @@ export class ThreeLiteConverter implements Converter {
 	/**
 	 * @note run after all the textures are cached
 	 */
-	convMatr(gsiMatr: GsiMatr) {
+	private convMatr(gsiMatr: GsiMatr) {
 		let threeMatr = this._threeObjects.get(gsiMatr) as Material
 		let committedVersion = this._committedVersions.get(gsiMatr) as Int
 
@@ -745,12 +735,13 @@ export class ThreeLiteConverter implements Converter {
 				const threeM = threeMatr as PrgSpriteMaterial
 				const matr = gsiMatr as MatrSpriteDataType
 				threeM.uniforms.opacity.value = matr.opacity
-				// @TODO @FIXME redesigned sprite transform
+				// TODO @FIXME redesigned sprite transform
 				// threeM.uniforms['uCenter'].value.copy(matr.center as Vector2)
 				// threeM.uniforms['uSize'].value.copy(matr.size as Vector2)
 				// threeM.uniforms['uRotation'].value = matr.rotation
 				threeM.uniforms['diffuse'].value = this.convColor(matr.baseColorFactor)
 				threeM.map = this.convTexture(matr.baseColorTexture)
+				// TODO @浅寻 bad naming
 				threeM.defines['USE_SIZEATTENUATION'] = !!matr.sizeAttenuation
 				break
 			}
@@ -780,17 +771,8 @@ export class ThreeLiteConverter implements Converter {
 		return threeMatr
 	}
 
-	convTexture(gsiTexture: undefined): null
-	convTexture(gsiTexture: Texture): ThreeTexture
-	convTexture(gsiTexture: Texture | undefined): ThreeTexture | null
-	convTexture(gsiTexture: Texture | undefined): ThreeTexture | null {
+	private convTexture(gsiTexture: Texture | undefined): ThreeTexture | null {
 		if (!gsiTexture) return null
-
-		// let threeTextureCache = this._cachedTexture.get(gsiTexture) as Exclude<
-		// 	ReturnType<typeof this._cachedTexture.get>,
-		// 	undefined
-		// >
-		// let threeTexture = threeTextureCache.threeTexture
 
 		let threeTexture = this._threeObjects.get(gsiTexture) as ThreeTexture
 		let committedVersion = this._committedVersions.get(gsiTexture) as Int
@@ -839,15 +821,6 @@ export class ThreeLiteConverter implements Converter {
 		}
 
 		// version bump
-
-		// if (threeTextureCache.committedVersion !== gsiTexture.image.version) {
-		// 	// @note new texture will always be uploaded by three,
-		// 	// 		 no needs to set needsUpdate for newly created texture
-
-		// 	threeTexture.needsUpdate = true
-
-		// 	threeTextureCache.committedVersion = gsiTexture.image.version
-		// }
 		if (committedVersion !== gsiTexture.image.version || gsiTexture.image.version === -1) {
 			// @note new texture will always be uploaded by three,
 			// 		 no needs to set needsUpdate for newly created texture
@@ -865,8 +838,8 @@ export class ThreeLiteConverter implements Converter {
 		return threeTexture
 	}
 
-	convColor(gsiColor: ColorRGB): Color {
-		let color = this._colorMap.get(gsiColor)
+	private convColor(gsiColor: ColorRGB): Color {
+		let color = this._threeObjects.get(gsiColor)
 
 		if (color) {
 			color.r = gsiColor.r
@@ -874,7 +847,7 @@ export class ThreeLiteConverter implements Converter {
 			color.b = gsiColor.b
 		} else {
 			color = new Color(gsiColor.r, gsiColor.g, gsiColor.b)
-			this._colorMap.set(gsiColor, color)
+			this._threeObjects.set(gsiColor, color)
 		}
 
 		return color
@@ -888,7 +861,7 @@ export class ThreeLiteConverter implements Converter {
 		this._cachedResources = getResources() // init with a empty node
 		this._threeObjects = new WeakMap<any, any>()
 		this._committedVersions = new WeakMap<any, number>()
-		this._colorMap = new WeakMap<ColorRGB, Color>()
+		this._threeObjects = new WeakMap<ColorRGB, Color>()
 	}
 }
 
