@@ -318,7 +318,10 @@ export class ThreeLiteConverter implements Converter {
 
 		// create
 		if (!threeMesh) {
-			threeMesh = new Object3D()
+			if (isRenderableMesh(gsiMesh)) {
+			} else {
+				threeMesh = new Group()
+			}
 		}
 		// sync
 	}
@@ -353,7 +356,7 @@ export class ThreeLiteConverter implements Converter {
 				// @note it is safe to assume that attributes were handled during #resource-stage
 				const threeAttribute = this._threeObjects.get(gsiAttr) as BufferAttribute
 
-				threeGeometry.addAttribute[key] = threeAttribute
+				threeGeometry.attributes[key] = threeAttribute
 			}
 
 			if (gsiGeom.indices) {
