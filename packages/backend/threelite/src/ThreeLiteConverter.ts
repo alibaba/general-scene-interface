@@ -834,11 +834,6 @@ export class RenderableObject3D extends Object3D {
 	geometry?: BufferGeometry
 	material?: Material
 
-	// // transform缓存，用来和gsi2Mesh做比对
-	// _tfPos?: Vec3
-	// _tfRot?: Euler
-	// _tfScl?: Vec3
-
 	constructor(params: Partial<RenderableObject3D> = {}) {
 		super()
 		for (const key of Object.keys(params)) {
