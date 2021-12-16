@@ -21,7 +21,7 @@ const packages = execSync('npx lerna ls -p')
 		// return !line.startsWith('lerna ') && line.trim() !== '' && !inBL
 		return line.trim() !== '' && !inBL
 	})
-console.log(packages)
+// console.log(packages)
 
 const COPY_TS_CONFIG = true
 

@@ -7,7 +7,10 @@ import {
 	// MatrPointDataType,
 	// MatrSpriteDataType,
 	Texture,
+	ImageDataType,
+	SamplerDataType,
 	GeomDataType,
+	AttributeDataType,
 	Transform3,
 	Transform2,
 	DISPOSED,
@@ -18,10 +21,10 @@ import {
 	LooseMatrUnlitDataType,
 	LooseMatrPointDataType,
 	LooseMatrSpriteDataType,
-	// LooseAttribute,
+	LooseAttribute,
 	LooseGeomDataType,
-	// LooseSamplerDataType,
-	// LooseImageDataType,
+	LooseSamplerDataType,
+	LooseImageDataType,
 	LooseTextureType,
 	// LooseNode,
 	// LooseRenderableMesh,
@@ -157,7 +160,7 @@ export function specifyMaterial(matr: LooseMatrBase): MatrBaseDataType {
 
 	if (isMatrSpriteDataType(matr)) {
 		if (matr.baseColorFactor === undefined) matr.baseColorFactor = { r: 1, g: 1, b: 1 }
-		if (matr.size === undefined) matr.size = 10
+		// if (matr.size === undefined) matr.size = 10
 		if (matr.sizeAttenuation === undefined) matr.sizeAttenuation = false
 		if (matr.transform === undefined) matr.transform = genDefaultTransform2()
 
@@ -183,39 +186,45 @@ export function specifyGeometry(geom: LooseGeomDataType): GeomDataType {
 	if (geom.attributes === undefined)
 		throw new SchemaNotValid(`geom.attributes can not be undefined`)
 
-	const keys = Object.keys(geom.attributes)
+	const keys = Object.keys(geom.attributes) // @note Object.keys throw if undefined
 
-	if (keys.length === 0) throw new SchemaNotValid(`geom.attributes needs at least one attribute`)
+	// @note Alow user to use this before adding any attributes
+	// if (keys.length === 0) throw new SchemaNotValid(`geom.attributes needs at least one attribute`)
 
 	for (let i = 0; i < keys.length; i++) {
 		const key = keys[i]
 		const attribute = geom.attributes[key]
 
-		if (attribute.array === undefined)
-			throw new SchemaNotValid(`attribute[${key}] .array can not be undefined`)
-
-		if (attribute.itemSize === undefined)
-			throw new SchemaNotValid(`attribute[${key}] .itemSize can not be undefined`)
-
-		if (attribute.count === undefined) {
-			if (attribute.array === DISPOSED)
-				throw new SchemaNotValid(
-					`attribute[${key}] .array shall not be DISPOSED before actually used`
-				)
-
-			attribute.count = attribute.array.length / attribute.itemSize
-		}
-
-		if (attribute.normalized === undefined) attribute.normalized = false
-		if (attribute.usage === undefined) attribute.usage = 'STATIC_DRAW'
-		if (attribute.version === undefined) attribute.version = 0
-		if (attribute.disposable === undefined) attribute.disposable = true
-
-		if (attribute.extensions === undefined) attribute.extensions = {}
+		specifyAttribute(attribute, key)
 	}
 
 	return geom as GeomDataType
 }
+
+export function specifyAttribute(attribute: LooseAttribute, name = ''): AttributeDataType {
+	if (attribute.array === undefined)
+		throw new SchemaNotValid(`attribute[${name}] .array can not be undefined`)
+
+	if (attribute.itemSize === undefined)
+		throw new SchemaNotValid(`attribute[${name}] .itemSize can not be undefined`)
+
+	if (attribute.count === undefined) {
+		if (attribute.array === DISPOSED)
+			throw new SchemaNotValid(`attribute[${name}] .array can not be DISPOSED before actually used`)
+
+		attribute.count = attribute.array.length / attribute.itemSize
+	}
+
+	if (attribute.normalized === undefined) attribute.normalized = false
+	if (attribute.usage === undefined) attribute.usage = 'STATIC_DRAW'
+	if (attribute.version === undefined) attribute.version = 0
+	if (attribute.disposable === undefined) attribute.disposable = true
+
+	if (attribute.extensions === undefined) attribute.extensions = {}
+
+	return attribute as AttributeDataType
+}
+
 /**
  * specify a texture, including its image data and sampler.
  * @param t
@@ -224,8 +233,20 @@ export function specifyGeometry(geom: LooseGeomDataType): GeomDataType {
 export function specifyTexture(t: LooseTextureType): Texture {
 	if (t.image === undefined) throw new SchemaNotValid(`texture.image can not be undefined`)
 
-	const i = t.image
+	specifyImage(t.image)
 
+	if (t.sampler === undefined) t.sampler = {}
+
+	specifySampler(t.sampler)
+
+	if (t.transform === undefined) t.transform = [1, 0, 0, 0, 1, 0, 0, 0, 1]
+	if (t.extensions === undefined) t.extensions = {}
+	if (t.extras === undefined) t.extras = {}
+
+	return t as Texture
+}
+
+export function specifyImage(i: LooseImageDataType): ImageDataType {
 	if (i.version === undefined) i.version = 0
 
 	// verify image data source
@@ -272,32 +293,18 @@ export function specifyTexture(t: LooseTextureType): Texture {
 		throw new SchemaNotValid(`texture.image doesn't have any image data source`)
 	}
 
-	if (t.sampler === undefined) {
-		t.sampler = {
-			magFilter: 'NEAREST',
-			minFilter: 'NEAREST',
-			wrapS: 'CLAMP_TO_EDGE',
-			wrapT: 'CLAMP_TO_EDGE',
-			anisotropy: 0,
-			extensions: {},
-			extras: {},
-		}
-	} else {
-		const s = t.sampler
-		if (s.magFilter === undefined) s.magFilter = 'NEAREST'
-		if (s.minFilter === undefined) s.minFilter = 'NEAREST'
-		if (s.wrapS === undefined) s.wrapS = 'CLAMP_TO_EDGE'
-		if (s.wrapT === undefined) s.wrapT = 'CLAMP_TO_EDGE'
-		if (s.anisotropy === undefined) s.anisotropy = 0
-		if (s.extensions === undefined) s.extensions = {}
-		if (s.extras === undefined) s.extras = {}
-	}
+	return i as ImageDataType
+}
 
-	if (t.transform === undefined) t.transform = [1, 0, 0, 0, 1, 0, 0, 0, 1]
-	if (t.extensions === undefined) t.extensions = {}
-	if (t.extras === undefined) t.extras = {}
-
-	return t as Texture
+export function specifySampler(s: LooseSamplerDataType): SamplerDataType {
+	if (s.magFilter === undefined) s.magFilter = 'NEAREST'
+	if (s.minFilter === undefined) s.minFilter = 'NEAREST'
+	if (s.wrapS === undefined) s.wrapS = 'CLAMP_TO_EDGE'
+	if (s.wrapT === undefined) s.wrapT = 'CLAMP_TO_EDGE'
+	if (s.anisotropy === undefined) s.anisotropy = 0
+	if (s.extensions === undefined) s.extensions = {}
+	if (s.extras === undefined) s.extras = {}
+	return s as SamplerDataType
 }
 
 /**

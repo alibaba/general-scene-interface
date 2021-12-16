@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-import { Box3, Sphere } from 'three-lite'
+import { Box3, Sphere, Object3D, Vector3, Euler, Quaternion } from 'three-lite'
 import { BBox, BSphere } from '@gs.i/schema-scene'
 
 export function box3Equals(b1: Box3 | BBox, b2: Box3 | BBox): boolean {
@@ -185,3 +185,88 @@ export const SupportedExtensions = (function checkExts() {
 
 	return flags
 })()
+
+/**
+ * - prevent user from using three.js Object3D's transformation and matrix-calculation
+ * - prevent three.js renderer from updating matrix automatically
+ */
+export function sealTransform(threeMesh: Object3D) {
+	Object.defineProperty(threeMesh, 'matrixAutoUpdate', {
+		value: false,
+		// writable: false,
+		get: () => {
+			return false
+		},
+		set: (v) => {
+			if (v)
+				console.error(
+					`matrixAutoUpdate can not be set to true,` +
+						`because this object3D's matrix is managed by gsi processor`
+				)
+		},
+	})
+
+	Object.defineProperty(threeMesh, 'matrixWorldNeedsUpdate', {
+		value: false,
+		get: () => {
+			return false
+		},
+		set: (v) => {
+			if (v)
+				console.error(
+					`matrixWorldNeedsUpdate can not be set to true,` +
+						`because this object3D's matrix is managed by gsi processor`
+				)
+		},
+	})
+
+	Object.defineProperty(threeMesh, 'position', {
+		get: () => {
+			console.warn(
+				`position will always be 0,0,0` +
+					`because this object3D's matrix is managed by gsi processor`
+			)
+			return new Vector3()
+		},
+	})
+
+	Object.defineProperty(threeMesh, 'rotation', {
+		get: () => {
+			console.warn(
+				`rotation will always be 0,0,0` +
+					`because this object3D's matrix is managed by gsi processor`
+			)
+			return new Euler()
+		},
+	})
+
+	Object.defineProperty(threeMesh, 'quaternion', {
+		get: () => {
+			console.warn(
+				`quaternion will always be default value` +
+					`because this object3D's matrix is managed by gsi processor`
+			)
+			return new Quaternion()
+		},
+	})
+
+	Object.defineProperty(threeMesh, 'scale', {
+		get: () => {
+			console.warn(
+				`scale will always be 1` + `because this object3D's matrix is managed by gsi processor`
+			)
+			return new Vector3()
+		},
+	})
+
+	threeMesh.updateMatrix = () =>
+		console.error(
+			`updateMatrix will not work, ` + `because this object3D's matrix is managed by gsi processor`
+		)
+
+	threeMesh.updateMatrixWorld = () =>
+		console.error(
+			`updateMatrixWorld will not work, ` +
+				`because this object3D's matrix is managed by gsi processor`
+		)
+}

@@ -3,15 +3,7 @@
  * All rights reserved.
  */
 
-import {
-	MatrBaseDataType,
-	GeomDataType,
-	MeshDataType,
-	__GSI_MESH_INTERNAL_PROP_KEY_0__,
-	__GSI_MESH_INTERNAL_PROP_0__,
-	__defaultMeshInternalProp,
-} from '@gs.i/schema'
-import { Transform3 } from '@gs.i/utils-transform'
+import { MatrBaseDataType, GeomDataType, MeshDataType } from '@gs.i/schema-scene'
 import { Matrix4 } from '@gs.i/utils-math'
 
 export interface Mesh extends MeshDataType {}

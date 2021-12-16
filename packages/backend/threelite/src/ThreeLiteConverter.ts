@@ -58,6 +58,7 @@ import {
 	DataTexture,
 } from 'three-lite'
 import { PrgSpriteMaterial } from './PrgSpriteMaterial'
+import { sealTransform } from './utils'
 
 export const DefaultConfig = {
 	/**
@@ -381,41 +382,15 @@ export class ThreeLiteConverter implements Converter {
 				threeMesh = new Object3D()
 			}
 
-			// @note avoid user mistakes, if matrix is handled by gsi processor, three methods should be disabled
 			if (!this.config.decomposeMatrix) {
-				// threeMesh.matrixAutoUpdate = false
-				Object.defineProperty(threeMesh, 'matrixAutoUpdate', {
-					value: false,
-					configurable: false,
-					writable: false,
-				})
-				// threeMesh.matrixWorldNeedsUpdate = false
-				Object.defineProperty(threeMesh, 'matrixWorldNeedsUpdate', {
-					value: false,
-					// configurable: false,
-					// writable: false,
-					get: () => {
-						return false
-					},
-					set: (v) => {
-						if (v)
-							console.error(
-								`matrixWorldNeedsUpdate can not be set to true,` +
-									`because this object3D's matrix is managed by gsi processor`
-							)
-					},
-				})
-
-				threeMesh.updateMatrix = () =>
-					console.error(
-						`updateMatrix will not work, ` +
-							`because this object3D's matrix is managed by gsi processor`
-					)
-				threeMesh.updateMatrixWorld = () =>
-					console.error(
-						`updateMatrixWorld will not work, ` +
-							`because this object3D's matrix is managed by gsi processor`
-					)
+				// @note avoid user mistakes, if matrix is handled by gsi processor, three.js methods should be disabled
+				sealTransform(threeMesh)
+			} else {
+				// TODO implement this!
+				// decompose the matrix at creation, or just set TRS if given
+				// do not update matrix anymore, only async TRS if given
+				// let three.js do all the job
+				throw 'decomposeMatrix is not implemented yet'
 			}
 
 			// update cache
