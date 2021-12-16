@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-import { AttributeDataType, GeomDataType } from '@gs.i/schema'
+import { AttributeDataType, GeomDataType } from '@gs.i/schema-scene'
 
 export const DefaultParams = {
 	width: 1,
@@ -152,6 +152,7 @@ export function buildBox(
 		normalized: false,
 		usage: 'STATIC_DRAW',
 		version: 0,
+		disposable: true,
 	}
 
 	const indicesAttr: AttributeDataType = {
@@ -161,6 +162,7 @@ export function buildBox(
 		normalized: false,
 		usage: 'STATIC_DRAW',
 		version: 0,
+		disposable: true,
 	}
 
 	const geom: GeomDataType = {
@@ -169,13 +171,17 @@ export function buildBox(
 			position: position,
 		},
 		indices: indicesAttr,
-		boundingBox: {
-			min: { x: -width / 2, y: -height / 2, z: -depth / 2 },
-			max: { x: width / 2, y: height / 2, z: depth / 2 },
-		},
-		boundingSphere: {
-			center: { x: 0, y: 0, z: 0 },
-			radius: 0.5 * Math.sqrt(width * width + height * height + depth * depth),
+		extensions: {
+			EXT_geometry_bounds: {
+				box: {
+					min: { x: -width / 2, y: -height / 2, z: -depth / 2 },
+					max: { x: width / 2, y: height / 2, z: depth / 2 },
+				},
+				sphere: {
+					center: { x: 0, y: 0, z: 0 },
+					radius: 0.5 * Math.sqrt(width * width + height * height + depth * depth),
+				},
+			},
 		},
 	}
 
@@ -187,6 +193,7 @@ export function buildBox(
 			normalized: false,
 			usage: 'STATIC_DRAW',
 			version: 0,
+			disposable: true,
 		}
 	}
 
@@ -198,6 +205,7 @@ export function buildBox(
 			normalized: false,
 			usage: 'STATIC_DRAW',
 			version: 0,
+			disposable: true,
 		}
 	}
 

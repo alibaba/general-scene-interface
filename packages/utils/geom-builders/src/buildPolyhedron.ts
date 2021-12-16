@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-import { AttributeDataType, GeomDataType } from '@gs.i/schema'
+import { AttributeDataType, GeomDataType } from '@gs.i/schema-scene'
 import { Box3, Sphere, Vector2, Vector3 } from '@gs.i/utils-math'
 
 export const DefaultParams = {
@@ -265,6 +265,7 @@ export function buildPolyhedron(params: {
 		normalized: false,
 		usage: 'STATIC_DRAW',
 		version: 0,
+		disposable: true,
 	}
 
 	box.getBoundingSphere(sphere)
@@ -274,13 +275,17 @@ export function buildPolyhedron(params: {
 		attributes: {
 			position: position,
 		},
-		boundingBox: {
-			min: { ...box.min },
-			max: { ...box.max },
-		},
-		boundingSphere: {
-			center: { ...sphere.center },
-			radius: sphere.radius,
+		extensions: {
+			EXT_geometry_bounds: {
+				box: {
+					min: { ...box.min },
+					max: { ...box.max },
+				},
+				sphere: {
+					center: { ...sphere.center },
+					radius: sphere.radius,
+				},
+			},
 		},
 	}
 
@@ -304,6 +309,7 @@ export function buildPolyhedron(params: {
 			normalized: false,
 			usage: 'STATIC_DRAW',
 			version: 0,
+			disposable: true,
 		}
 	}
 
