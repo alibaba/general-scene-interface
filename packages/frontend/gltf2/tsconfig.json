@@ -13,16 +13,16 @@
 			"path": "../ts"
 		},
 		{
-			"path": "../../schema/core-old"
+			"path": "../../schema/core"
+		},
+		{
+			"path": "../../processors/specify"
 		},
 		{
 			"path": "../../utils/gltf2"
 		},
 		{
 			"path": "../../utils/math"
-		},
-		{
-			"path": "../../utils/transform"
 		}
 	]
 }

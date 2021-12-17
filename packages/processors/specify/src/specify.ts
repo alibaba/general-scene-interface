@@ -366,6 +366,6 @@ export function isMatrSpriteDataType(v: LooseMatrBase): v is LooseMatrSpriteData
 	return v.type === 'sprite'
 }
 
-export function isRenderableMesh(v: Partial<MeshDataType>): v is RenderableMesh {
+export function isRenderableMesh(v: LooseMeshDataType): v is RenderableMesh {
 	return v['geometry'] && v['material']
 }

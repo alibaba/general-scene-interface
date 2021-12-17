@@ -1,6 +1,6 @@
 {
 	"name": "@gs.i/all",
-	"version": "0.0.0-beta",
+	"version": "0.1.0-alpha",
 	"description": "",
 	"main": "index.js",
 	"type": "module",
@@ -21,11 +21,11 @@
 	"dependencies": {
 		"@gs.i/schema-scene": "^0.1.0-alpha",
 		"@gs.i/schema-ext-scene": "^0.0.0-beta",
-		"@gs.i/utils-gltf2": "^0.0.0-beta",
 		"@gs.i/utils-math": "^0.0.0-beta",
 		"@gs.i/schema-converter": "^0.1.0-alpha",
 		"@gs.i/utils-geom-builders": "^0.1.0-alpha",
 		"@gs.i/utils-geometry": "^0.1.0-alpha",
+		"@gs.i/utils-gltf2": "^0.1.0-alpha",
 		"@gs.i/utils-raycast": "^0.0.0-beta",
 		"@gs.i/utils-sprite": "^0.1.0-alpha",
 		"@gs.i/utils-transform": "^0.0.0-beta",
@@ -33,7 +33,6 @@
 		"@gs.i/utils-wireframe": "^0.1.0-alpha",
 		"@gs.i/backend-gl2": "^0.0.0-beta",
 		"@gs.i/backend-threelite-old": "^0.0.0-beta",
-		"@gs.i/frontend-gltf2": "^0.0.0-beta",
 		"@gs.i/processor-base": "^0.1.0-alpha",
 		"@gs.i/utils-gline": "^0.0.0-beta",
 		"@gs.i/utils-optimize": "^0.0.0-beta",
@@ -44,6 +43,7 @@
 		"@gs.i/backend-gltf2": "^0.1.0-alpha",
 		"@gs.i/backend-threelite": "^0.1.0-alpha",
 		"@gs.i/processor-culling": "^0.1.0-alpha",
-		"@gs.i/frontend-sdk": "^0.1.0-alpha"
+		"@gs.i/frontend-sdk": "^0.1.0-alpha",
+		"@gs.i/frontend-gltf2": "^0.1.0-alpha"
 	}
 }

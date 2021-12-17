@@ -16,9 +16,6 @@
 			"path": "../../schema/ext-scene"
 		},
 		{
-			"path": "../gltf2"
-		},
-		{
 			"path": "../math"
 		},
 		{
@@ -29,6 +26,9 @@
 		},
 		{
 			"path": "../geometry"
+		},
+		{
+			"path": "../gltf2"
 		},
 		{
 			"path": "../raycast"
@@ -50,9 +50,6 @@
 		},
 		{
 			"path": "../../backend/ignore-threelite"
-		},
-		{
-			"path": "../../frontend/gltf2"
 		},
 		{
 			"path": "../../processors/base"
@@ -86,6 +83,9 @@
 		},
 		{
 			"path": "../../frontend/ts"
+		},
+		{
+			"path": "../../frontend/gltf2"
 		}
 	]
 }
