@@ -84,7 +84,7 @@ export interface Vec2 {
 	y: Double
 }
 
-export type EulerOrder3 = 'xyz' | 'xzy' | 'yxz' | 'yzx' | 'zxy' | 'zyx'
+export type EulerOrder3 = 'xyz' | 'xzy' | 'yxz' | 'yzx' | 'zxy' | 'zyx' | string
 
 /**
  * Euler rotation

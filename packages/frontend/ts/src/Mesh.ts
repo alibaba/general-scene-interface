@@ -3,32 +3,39 @@
  * All rights reserved.
  */
 
-import { MatrBaseDataType, GeomDataType, MeshDataType } from '@gs.i/schema-scene'
-import { Matrix4 } from '@gs.i/utils-math'
+import {
+	MatrBaseDataType,
+	GeomDataType,
+	MeshDataType,
+	RenderableMesh,
+	Node,
+	Transform3TRS,
+} from '@gs.i/schema-scene'
+import { Vector3, Euler, Quaternion } from '@gs.i/utils-math'
 
-export interface Mesh extends MeshDataType {}
+import { specifyMesh } from '@gs.i/processor-specify'
+import { defaultMatrixProcessor } from './defaultProcessors'
+
+export interface Mesh extends RenderableMesh, Node {}
 export class Mesh {
-	name = 'RenderableMesh'
-
-	// visibility
-	visible = true
-
-	// render control
-	renderOrder = 0
+	name = 'Mesh'
 
 	/**
-	 * @todo Transformations
-	 * glTF2 中将 transform 定义在 node 中，和 mesh 节点分离
-	 * {@link https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#transformations}
+	 * @deprecated use {@link MatrBaseDataType.extensions EXT_mesh_order}
+	 * @deprecated rely on mechanism of renderers, may act very differently for different backends
+	 * @deprecated do not use if you want this to work with different renderers
 	 */
-	// transform
-	transform = new Transform3()
+	get renderOrder() {
+		return this.extensions?.EXT_mesh_order?.renderOrder
+	}
+	set renderOrder(v) {
+		if (!this.extensions) this.extensions = {}
+		if (!this.extensions.EXT_mesh_order) this.extensions.EXT_mesh_order = {}
 
-	// sub
-	children = new Set<MeshDataType>()
+		this.extensions.EXT_mesh_order.renderOrder = v
+	}
 
-	// extra
-	extras: { [key: string]: any } = {}
+	transform = new AutoVersionTransform3()
 
 	constructor(params: Partial<Omit<MeshDataType, 'transform'>> = {}) {
 		for (const key of Object.keys(params)) {
@@ -37,8 +44,8 @@ export class Mesh {
 				this[key] = v
 			}
 		}
-		// internal props
-		this[__GSI_MESH_INTERNAL_PROP_KEY_0__] = __defaultMeshInternalProp()
+
+		specifyMesh(this)
 	}
 
 	add(child: MeshDataType) {
@@ -55,46 +62,60 @@ export class Mesh {
 
 	/**
 	 * Calculate and return the mesh worldMatrix immediately
-	 * @note parent's worldMatrix will also be calculated
-	 * @note The worldMatrix calculated will be cached in mesh.transform.worldMatrix array
-	 * @param {boolean} [forceRecalcParents=false] Force recalculate all parents' worldMatrix
-	 * @return {*}  {number[]}
-	 * @memberof Mesh
+	 * @note you can always assume this matrix is latest. no matter when did you changed any part of the tree
+	 * @deprecated use processor-matrix for better performance
 	 */
-	getWorldMatrix(forceRecalcParents = false): number[] {
-		const tf = this.transform
-		const internal = this[__GSI_MESH_INTERNAL_PROP_KEY_0__] as __GSI_MESH_INTERNAL_PROP_0__
+	getWorldMatrix(): number[] {
+		return defaultMatrixProcessor.getWorldMatrix(this)
+	}
+}
 
-		if (!internal._selfMat) {
-			internal._selfMat = new Matrix4()
-			internal._parentMat = new Matrix4()
-			internal._worldMat = new Matrix4()
-		}
+/**
+ * A Transform3 that automatically marked as dirty when you changed any property
+ * @note it is recommended to increase `.version` manually when you change something
+ * @note this class is for folks who don't have the habit to mark something dirty explicitly
+ */
+export class AutoVersionTransform3 implements Transform3TRS {
+	version = 0
 
-		if (!tf.worldMatrix) {
-			tf.worldMatrix = Array.from(tf.matrix)
-		}
+	readonly rotation: Euler
+	readonly position: Vector3
+	readonly scale: Vector3
+	readonly quaternion: Quaternion
 
-		if (this.parent) {
-			// self matrix
-			internal._selfMat.fromArray(tf.matrix)
-			// parent's worldMatrix
-			if (this.parent instanceof Mesh && forceRecalcParents) {
-				internal._parentMat.fromArray(this.parent.getWorldMatrix(forceRecalcParents))
-			} else if (this.parent.transform.worldMatrix) {
-				// assume parent's worldMatrix is up to date
-				internal._parentMat.fromArray(this.parent.transform.worldMatrix)
-			} else {
-				// using parent's local matrix
-				internal._parentMat.fromArray(this.parent.transform.matrix)
-			}
-			// self matrix multiply parent's matrixWorld
-			internal._worldMat
-				.multiplyMatrices(internal._parentMat, internal._selfMat)
-				.toArray(tf.worldMatrix)
-		}
+	constructor() {
+		this.rotation = new Proxy(new Euler(), {
+			// @note this works when user called a method that set a value
+			set: (t, p, v, r) => {
+				if (p === 'x' || p === 'y' || p === 'z' || p === 'order') this.version++
+				t[p] = v
+				return true
+			},
+		})
 
-		return tf.worldMatrix
+		this.position = new Proxy(new Vector3(), {
+			set: (t, p, v, r) => {
+				if (p === 'x' || p === 'y' || p === 'z') this.version++
+				t[p] = v
+				return true
+			},
+		})
+
+		this.scale = new Proxy(new Vector3(), {
+			set: (t, p, v, r) => {
+				if (p === 'x' || p === 'y' || p === 'z') this.version++
+				t[p] = v
+				return true
+			},
+		})
+
+		this.quaternion = new Proxy(new Quaternion(), {
+			set: (t, p, v, r) => {
+				if (p === 'x' || p === 'y' || p === 'z' || p === 'w') this.version++
+				t[p] = v
+				return true
+			},
+		})
 	}
 }
 
@@ -104,20 +125,3 @@ export function isBufferGeometry(geom?: GeomDataType): boolean {
 export function isThreeMaterial(matr?: MatrBaseDataType): boolean {
 	return matr && matr['isMaterial']
 }
-
-// export interface ConvFromThree {
-// 	(input: Mesh): RenderableMesh
-// }
-// export interface ConvToThree {
-// 	(input: RenderableMesh, THREE: any): Mesh
-// }
-
-// export abstract class Converter {
-// 	setRenderable
-// }
-
-/**
- * 将整个数据结构打平，放到一个buffer里
- * 相当于一个带 自解释 IDL 的 gltf
- */
-// flatten: () => ArrayBuffer
