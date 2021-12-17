@@ -392,6 +392,9 @@ export class GLTF2Loader {
 			;(result.children as Set<IR.LooseMeshDataType>).add(mesh)
 		})
 
+		// specify the whole scene
+		specifier.traverse(result as IR.MeshDataType)
+
 		return result
 	}
 
