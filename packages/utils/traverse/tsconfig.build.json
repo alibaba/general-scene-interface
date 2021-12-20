@@ -11,5 +11,5 @@
 		"composite": false
 	},
 	"include": ["src", "typings"],
-	"exclude": ["dist", "node_modules"]
+	"exclude": ["dist", "**/node_modules", "**/.*/"]
 }
