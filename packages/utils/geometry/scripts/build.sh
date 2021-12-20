@@ -5,7 +5,25 @@
 
 # npx tsc --project tsconfig.build.json
 # ⬇️ much faster
-./node_modules/.bin/tsc --project tsconfig.build.json
+if [ -e .cached-built-head ]
+
+then
+	builtHead=$(<.cached-built-head)
+
+	if [ `git diff --quiet $builtHead -- ./ || echo "true"` ]
+	then
+		echo changed
+		# ./node_modules/.bin/tsc --project tsconfig.build.json
+		echo `git rev-parse --short HEAD` > .cached-built-head
+	else
+		echo not-changed
+	fi
+else
+	echo first-build
+	# ./node_modules/.bin/tsc --project tsconfig.build.json
+	echo `git rev-parse --short HEAD` > .cached-built-head
+fi
+
 
 # tsc output es module codes in .js files
 # which WILL NOT BREAK in nodejs env

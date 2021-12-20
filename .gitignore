@@ -24,3 +24,6 @@ package.json.bac*
 yarn.lock
 
 ignore-*
+
+# @simon local build cache
+.cached-built-head
