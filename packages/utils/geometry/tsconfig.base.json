@@ -33,6 +33,7 @@
 		"experimentalDecorators": true,
 		"incremental": false,
 		"isolatedModules": true,
+		"resolveJsonModule": true,
 		// "skipLibCheck": true,
 		"typeRoots": ["./node_modules/@types/"] // 这样来避免所有 上级目录的 @types 都被包含进去
 	},
