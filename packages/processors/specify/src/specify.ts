@@ -43,7 +43,7 @@ import { Processor, TraverseType } from '@gs.i/processor-base'
  * Input Loose types and output strict types
  * @note NOT PURE FUNCTIONS. this process will modify the object you input
  */
-export class Specifier extends Processor {
+export class Specifier extends Processor<LooseMeshDataType> {
 	traverseType = TraverseType.Any
 	type = 'Specifier'
 	canEditNode = true

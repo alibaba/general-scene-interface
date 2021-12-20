@@ -10,8 +10,8 @@ import path from 'path'
 
 import { execSync } from 'child_process'
 
-console.log(argv)
-console.log(process.env.PWD)
+// console.log(argv)
+// console.log(process.env.PWD)
 
 const packagesJSON = execSync('npx lerna ls --toposort --json').toString()
 const packageALL = JSON.parse(packagesJSON)

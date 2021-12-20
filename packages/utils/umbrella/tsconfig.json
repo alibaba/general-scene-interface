@@ -86,6 +86,9 @@
 		},
 		{
 			"path": "../../frontend/gltf2"
+		},
+		{
+			"path": "../random-scene"
 		}
 	]
 }

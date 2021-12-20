@@ -1,4 +1,4 @@
-import { MeshDataType } from '@gs.i/schema-scene'
+import { MeshDataType, LooseMeshDataType } from '@gs.i/schema-scene'
 import { traverse } from '@gs.i/utils-traverse'
 
 export interface IProcessor {
@@ -29,7 +29,7 @@ export interface IProcessor {
 	readonly canEditTree: boolean
 }
 
-export class Processor implements IProcessor {
+export class Processor<Input extends LooseMeshDataType = MeshDataType> implements IProcessor {
 	type = 'Processor'
 
 	/**
@@ -69,9 +69,9 @@ export class Processor implements IProcessor {
 	/**
 	 * process the node and all its children (the whole sub DAG)
 	 */
-	traverse(mesh: MeshDataType) {
+	traverse(mesh: Input) {
 		if ((this.traverseType & TraverseType.PreOrder) === TraverseType.PreOrder) {
-			traverse(mesh, this.processNode.bind(this))
+			traverse(mesh as MeshDataType, this.processNode.bind(this))
 		} else if (this.traverseType === TraverseType.None) {
 			console.warn(`This processor (${this.type}) does not traverse, skipped`)
 		} else {

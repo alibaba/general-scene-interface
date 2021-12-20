@@ -5,8 +5,8 @@ import path from 'path'
 
 import { execSync, spawn, exec, execFileSync } from 'child_process'
 
-console.log(argv)
-console.log(process.env.PWD)
+// console.log(argv)
+// console.log(process.env.PWD)
 
 import { fileURLToPath } from 'url'
 

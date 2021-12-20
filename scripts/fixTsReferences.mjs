@@ -14,8 +14,8 @@ import { execSync } from 'child_process'
 
 import colors from 'colors/safe.js'
 
-console.log(argv)
-console.log(process.env.PWD)
+// console.log(argv)
+// console.log(process.env.PWD)
 
 // 不处理的package
 import packageBlacklist from './ignore.mjs'
