@@ -1,0 +1,12 @@
+{
+	"extends": "./tsconfig.base.json",
+	"compilerOptions": {
+		"rootDir": ".",
+		"baseUrl": ".",
+		"composite": true,
+		"incremental": true
+	},
+	"include": ["./", "typings"],
+	"exclude": ["dist", "node_modules", "packages"],
+	"references": []
+}

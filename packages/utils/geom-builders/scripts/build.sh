@@ -3,7 +3,9 @@
 # DO NOT EDIT
 # AUTO COPIED FROM ROOT/shared
 
-npx tsc --project tsconfig.build.json
+# npx tsc --project tsconfig.build.json
+# ⬇️ much faster
+./node_modules/.bin/tsc --project tsconfig.build.json
 
 # tsc output es module codes in .js files
 # which WILL NOT BREAK in nodejs env
@@ -12,4 +14,6 @@ npx tsc --project tsconfig.build.json
 # but es modules require that `import` must have extension
 # so fix it here
 
-npx node ./scripts/fixTscExtension.mjs
+# npx node ./scripts/fixTscExtension.mjs
+# ⬇️ much faster
+node ./scripts/fixTscExtension.mjs
