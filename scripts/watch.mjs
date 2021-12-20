@@ -175,7 +175,7 @@ function fireDirtList(dirtList) {
 
 const watcher = chokidar.watch([path.resolve(process.env.PWD, './packages')], {
 	followSymlinks: false,
-	ignored: ['**/node_modules/**', '**/dist/**', '**/*.tsbuildinfo'],
+	ignored: ['**/node_modules/**', '**/dist/**', '**/*.tsbuildinfo', '**/.cached-built-head'],
 	ignoreInitial: true,
 	atomic: 500,
 })
