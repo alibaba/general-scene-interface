@@ -48,7 +48,7 @@ const builderAlias = [
 ]
 
 function getRandomBuilder() {
-	return builderAlias[Math.floor((builderAlias.length + 0.9) * Math.random())]
+	return builderAlias[Math.floor((builderAlias.length - 0.1) * Math.random())]
 }
 
 // @note this processor is safe to be put in global scope
@@ -103,7 +103,7 @@ export const defaultConfig = {
 }
 export type Config = Partial<typeof defaultConfig>
 
-export function generateScene(config: Config): MeshDataType {
+export function generateScene(config: Config = {}): MeshDataType {
 	const c = {
 		...config,
 		...defaultConfig,

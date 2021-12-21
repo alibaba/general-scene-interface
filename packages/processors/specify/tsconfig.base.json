@@ -29,6 +29,7 @@
 		"exactOptionalPropertyTypes": false, // TODO 改成 true，
 		"alwaysStrict": true,
 		"noImplicitOverride": false, // TODO 改成 true，
+		"strictNullChecks": true,
 		//
 		"experimentalDecorators": true,
 		"incremental": false,

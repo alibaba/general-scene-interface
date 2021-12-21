@@ -192,7 +192,7 @@ export const SupportedExtensions = (function checkExts() {
  */
 export function sealTransform(threeMesh: Object3D) {
 	Object.defineProperty(threeMesh, 'matrixAutoUpdate', {
-		value: false,
+		// value: false,
 		// writable: false,
 		get: () => {
 			return false
@@ -207,7 +207,7 @@ export function sealTransform(threeMesh: Object3D) {
 	})
 
 	Object.defineProperty(threeMesh, 'matrixWorldNeedsUpdate', {
-		value: false,
+		// value: false,
 		get: () => {
 			return false
 		},

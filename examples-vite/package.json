@@ -6,13 +6,7 @@
 	"scripts": {
 		"start": "vite"
 	},
-	"devDependencies": {
-		"vite": "2.7.4",
-		"pug": "^3.0.2",
-		"express": "^4.17.1",
-		"typescript": ">4.4.0",
-		"camera-proxy": "0.1.24",
-		"ani-timeline": "1.2.19-m",
+	"dependencies": {
 		"@gs.i/schema-scene": "^0.1.0-alpha",
 		"@gs.i/schema-ext-scene": "^0.0.0-beta",
 		"@gs.i/utils-math": "^0.0.0-beta",
@@ -34,5 +28,13 @@
 		"@gs.i/frontend-sdk": "^0.1.0-alpha",
 		"@gs.i/frontend-gltf2": "^0.1.0-alpha",
 		"@gs.i/utils-random-scene": "^0.1.0-alpha"
+	},
+	"devDependencies": {
+		"vite": "2.7.4",
+		"pug": "^3.0.2",
+		"express": "^4.17.1",
+		"typescript": ">4.4.0",
+		"camera-proxy": "0.1.24",
+		"ani-timeline": "1.2.19-m"
 	}
 }

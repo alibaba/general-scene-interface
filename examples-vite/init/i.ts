@@ -1,9 +1,16 @@
-console.log(123)
+import { generateScene } from '@gs.i/utils-random-scene'
+import { ThreeLiteConverter } from '@gs.i/backend-threelite'
 
-import * as SDK from '@gs.i/frontend-sdk'
+{
+	const scene = generateScene()
+	console.log(scene)
 
-console.log(SDK)
+	const conv = new ThreeLiteConverter()
+	console.log(conv)
 
-export function haha() {
-	console.log('haha')
+	// debugger
+	const threeMesh = conv.convert(scene)
+	console.log(threeMesh)
 }
+
+export {}

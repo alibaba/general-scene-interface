@@ -74,7 +74,7 @@ export class MatProcessor extends Processor {
 
 		while (curr) {
 			path.push(curr)
-			curr = node.parent
+			curr = curr.parent
 		}
 
 		// path from root to leaf
@@ -153,7 +153,13 @@ export class MatProcessor extends Processor {
 
 	// getID(node: MeshDataType | undefined): Int | undefined {
 	// 	if (node === undefined) return undefined
-	getID(node: object): Int {
+	/**
+	 *
+	 * @param node a reference type (Object)
+	 * @note typescript baned `object` so there is no proper type to use 😮‍💨
+	 * @returns
+	 */
+	getID(node: any): Int {
 		let id = this._ids.get(node)
 		if (id === undefined) {
 			id = this._counter++

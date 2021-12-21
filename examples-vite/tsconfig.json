@@ -7,5 +7,69 @@
 	},
 	"include": ["./", "typings"],
 	"exclude": ["dist", "node_modules", "packages"],
-	"references": []
+	"references": [
+		{
+			"path": "../packages/schema/core"
+		},
+		{
+			"path": "../packages/schema/ext-scene"
+		},
+		{
+			"path": "../packages/utils/math"
+		},
+		{
+			"path": "../packages/schema/converter"
+		},
+		{
+			"path": "../packages/utils/geom-builders"
+		},
+		{
+			"path": "../packages/utils/geometry"
+		},
+		{
+			"path": "../packages/utils/gltf2"
+		},
+		{
+			"path": "../packages/utils/sprite"
+		},
+		{
+			"path": "../packages/utils/traverse"
+		},
+		{
+			"path": "../packages/utils/wireframe"
+		},
+		{
+			"path": "../packages/processors/base"
+		},
+		{
+			"path": "../packages/processors/bound"
+		},
+		{
+			"path": "../packages/processors/graph"
+		},
+		{
+			"path": "../packages/processors/matrix"
+		},
+		{
+			"path": "../packages/processors/specify"
+		},
+		{
+			"path": "../packages/backend/gltf2"
+		},
+		{
+			"path": "../packages/backend/threelite"
+		},
+		{
+			"path": "../packages/processors/culling"
+		},
+		{
+			"path": "../packages/frontend/ts"
+		},
+		{
+			"path": "../packages/frontend/gltf2"
+		},
+		{
+			"path": "../packages/utils/random-scene"
+		}
+	]
 }
