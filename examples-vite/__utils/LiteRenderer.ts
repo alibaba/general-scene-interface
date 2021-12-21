@@ -74,7 +74,7 @@ camera.matrixAutoUpdate = false
  * 相机控制
  */
 
-const cameraProxy = new AnimatedCameraProxy({
+export const cameraProxy = new AnimatedCameraProxy({
 	cameraFOV: FOV,
 	timeline,
 	canvasWidth: WIDTH,
@@ -89,7 +89,7 @@ const cameraProxy = new AnimatedCameraProxy({
 })
 
 cameraProxy.setCenter([0, 0, 0])
-cameraProxy.setZoom(20)
+cameraProxy.setZoom(17)
 cameraProxy.setPitch(0.5)
 cameraProxy.setRotation(0)
 

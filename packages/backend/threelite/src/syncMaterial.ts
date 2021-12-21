@@ -6,6 +6,7 @@ import {
 	MatrUnlitDataType,
 	MatrPointDataType,
 	MatrSpriteDataType,
+	Texture,
 } from '@gs.i/schema-scene'
 import {
 	Material,
@@ -27,7 +28,7 @@ export function syncMaterial(
 	gsiMatr: MatrBaseDataType,
 	/** it's actually ShaderMaterial but three.js ShaderMaterial type declaration is kinda funky. won't rely on it anyway*/
 	threeMatr: Material,
-	cache: WeakMap<any, any>
+	cache: WeakMap<Texture, ThreeTexture>
 ): void {
 	threeMatr.name = threeMatr.name || gsiMatr.name || 'GSI-three-Matr'
 	threeMatr.visible = gsiMatr.visible

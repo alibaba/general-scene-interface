@@ -17,9 +17,15 @@ export function traverse(
 
 	handler(node, parent)
 
-	if (node.children && node.children.size > 0) {
-		node.children.forEach((child) => traverse(child, handler, node))
-	}
+	// if (node.children && node.children.size > 0) {
+	// 	node.children.forEach((child) => traverse(child, handler, node))
+	// }
+
+	// @note a little bit faster
+	if (node.children)
+		for (const child of node.children) {
+			traverse(child, handler, node)
+		}
 }
 
 export const traversePreOrder = traverse

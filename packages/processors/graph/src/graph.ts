@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import { MeshDataType, Int } from '@gs.i/schema-scene'
 import { Processor, TraverseType } from '@gs.i/processor-base'
 import { traverse, flatten } from '@gs.i/utils-traverse'
@@ -74,12 +75,12 @@ export class GraphProcessor extends Processor {
 	hashPosition(node: MeshDataType): PositionHash {
 		const upstreamPath = [this.getID(node)]
 
-		let curr: MeshDataType = node
+		const curr: MeshDataType = node
 		while (curr.parent) {
 			upstreamPath.push(this.getID(curr.parent))
 		}
 
-		let result = upstreamPath.reverse().join(',')
+		const result = upstreamPath.reverse().join(',')
 		return result
 	}
 
@@ -186,7 +187,15 @@ export interface ChangeList<ValueType = number> {
 
 /**
  * a - b
+ * @note this will modify a, use diffSets if you still need original a
  */
+export function diffSetsFast<T>(a: Set<T>, b: Set<T> | Array<T>): Set<T> {
+	const difference = a
+	for (const elem of b) {
+		difference.delete(elem)
+	}
+	return difference
+}
 export function diffSets<T>(a: Set<T> | Array<T>, b: Set<T> | Array<T>): Set<T> {
 	const difference = new Set(a)
 	for (const elem of b) {

@@ -105,8 +105,8 @@ export type Config = Partial<typeof defaultConfig>
 
 export function generateScene(config: Config = {}): MeshDataType {
 	const c = {
-		...config,
 		...defaultConfig,
+		...config,
 	}
 	const root = new Mesh()
 
@@ -118,6 +118,7 @@ export function generateScene(config: Config = {}): MeshDataType {
 
 	for (let i = 1; i < depth; i++) {
 		const branch = new Mesh()
+		trunk[trunk.length - 1].children.add(branch)
 		trunk.push(branch)
 	}
 
@@ -231,7 +232,7 @@ export function getTransform(
 	transform.position.y = y + (dither ? space * (Math.random() - 0.5) : 0) // make it overlay
 	transform.position.z = scale * 0.5 + (dither ? scale * (Math.random() - 0.5) : 0) // don't dither too much
 
-	transform.scale.set(scale, scale, scale)
+	transform.scale.set(1, 1, 1) // scale has affected geometry, do not scale again
 
 	return transform
 }

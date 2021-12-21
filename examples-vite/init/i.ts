@@ -1,12 +1,14 @@
 import { generateScene } from '@gs.i/utils-random-scene'
 import { ThreeLiteConverter } from '@gs.i/backend-threelite'
 
-import { renderer, timeline, camera, cameraControl } from '../__utils/LiteRenderer'
+import { renderer, timeline, camera, cameraControl, cameraProxy } from '../__utils/LiteRenderer'
 import { scene as threeScene } from '../__utils/LiteScene'
 
 {
 	const scene = generateScene({
-		scale: 10000,
+		// scale: 10000,
+		count: 1000,
+		depth: 100,
 	})
 	console.log(scene)
 
@@ -29,6 +31,8 @@ import { scene as threeScene } from '../__utils/LiteScene'
 	})
 
 	timeline.play()
+
+	window['cameraProxy'] = cameraProxy
 }
 
 export {}

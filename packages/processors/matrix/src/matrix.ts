@@ -51,7 +51,7 @@ export class MatProcessor extends Processor {
 	 * 所有 id 都从 WeakMap 得到，一个 key 在一个实例中的 id 是唯一的
 	 */
 	private _counter = 0
-	private _ids = new WeakMap<any, Int>()
+	private _ids = new WeakMap<MeshDataType, Int>()
 
 	private _cacheLocalMatrix = new WeakMap<Transform3, LocalMatrixCache>()
 	private _cacheWorldMatrix = new WeakMap<Transform3, WorldMatrixCache>()
@@ -60,6 +60,9 @@ export class MatProcessor extends Processor {
 		// this.getWorldMatrixShallow(node, parent)
 	}
 
+	/**
+	 * TODO this is slow
+	 */
 	getWorldMatrix(node: MeshDataType): number[] {
 		// root as a special case
 
@@ -72,10 +75,21 @@ export class MatProcessor extends Processor {
 		const path: MeshDataType[] = []
 		let curr: MeshDataType | undefined = node
 
-		while (curr) {
+		// while (curr) {
+		// 	path.push(curr)
+		// 	curr = curr.parent
+		// }
+
+		// @note for safety and perf
+		// @result a little bit better ?
+		const MAX_TREE_DEPTH = 2048
+		let i = 0
+		for (; i < MAX_TREE_DEPTH && curr !== undefined && curr !== null; i++) {
 			path.push(curr)
 			curr = curr.parent
 		}
+
+		if (i === MAX_TREE_DEPTH) console.warn('scene graph too deep, check for circular link')
 
 		// path from root to leaf
 		path.reverse()
@@ -159,7 +173,7 @@ export class MatProcessor extends Processor {
 	 * @note typescript baned `object` so there is no proper type to use 😮‍💨
 	 * @returns
 	 */
-	getID(node: any): Int {
+	getID(node: MeshDataType): Int {
 		let id = this._ids.get(node)
 		if (id === undefined) {
 			id = this._counter++

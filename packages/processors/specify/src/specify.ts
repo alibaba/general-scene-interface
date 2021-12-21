@@ -73,11 +73,11 @@ export function specifyMesh(node: LooseMeshDataType, parent?: LooseMeshDataType)
 
 	if (parent) node.parent = parent as MeshDataType | undefined
 
-	if (node.visible === undefined) node.visible = true
 	if (node.name === undefined) node.name = 'unnamed mesh'
-	if (node.children === undefined) node.children = new Set()
 	if (node.extensions === undefined) node.extensions = {}
 	if (node.extras === undefined) node.extras = {}
+	if (node.visible === undefined) node.visible = true
+	if (node.children === undefined) node.children = new Set()
 
 	if (node.transform === undefined) node.transform = genDefaultTransform3()
 	specifyTransform3(node.transform)
@@ -100,12 +100,12 @@ export function specifyMaterial(matr: LooseMatrBase): MatrBaseDataType {
 	 * common
 	 */
 	if (matr.name === undefined) matr.name = 'unnamed matr'
+	if (matr.extensions === undefined) matr.extensions = {}
+	if (matr.extras === undefined) matr.extras = {}
 	if (matr.visible === undefined) matr.visible = true
 	if (matr.side === undefined) matr.side = 'front'
 	if (matr.alphaMode === undefined) matr.alphaMode = 'OPAQUE'
 	if (matr.opacity === undefined) matr.opacity = 1
-	if (matr.extensions === undefined) matr.extensions = {}
-	if (matr.extras === undefined) matr.extras = {}
 
 	/**
 	 * Programable extension

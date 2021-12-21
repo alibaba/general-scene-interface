@@ -42,7 +42,9 @@ const prgProperties = [
  */
 function getObject(target: MatrBaseDataType, property) {
 	let o: any
-	if (prgProperties.indexOf(property) > -1) {
+	if (Reflect.has(target, property)) {
+		o = target
+	} else if (prgProperties.indexOf(property) > -1) {
 		if (!target.extensions) target.extensions = {}
 		if (!target.extensions.EXT_matr_programmable)
 			target.extensions.EXT_matr_programmable = {
@@ -129,10 +131,15 @@ class MatrBase implements MatrBaseDataType {
 		specifyMaterial(this)
 
 		return new Proxy(this, {
-			get: (target, property, receiver) => {
-				const o = getObject(target, property)
-				return o[property]
-			},
+			/**
+			 * @note this object should be considered as IR for backend
+			 * 		 get handler has performance issues
+			 * 		 these properties are deprecated and write only
+			 */
+			// get: (target, property, receiver) => {
+			// 	const o = getObject(target, property)
+			// 	return o[property]
+			// },
 			set: (target, property, value, receiver) => {
 				const o = getObject(target, property)
 				o[property] = value

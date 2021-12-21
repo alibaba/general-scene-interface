@@ -17,6 +17,7 @@ import {
 	MatrUnlitDataType,
 	MatrPointDataType,
 	MatrSpriteDataType,
+	MatrBaseDataType,
 	ColorRGB,
 	GL_STATIC_DRAW,
 	GL_DYNAMIC_DRAW,
@@ -33,7 +34,7 @@ import {
 import type { Converter } from '@gs.i/schema-converter'
 import { MatProcessor } from '@gs.i/processor-matrix'
 import { BoundingProcessor } from '@gs.i/processor-bound'
-import { diffSets, diffWeakSets, intersect, GraphProcessor, SnapShot } from '@gs.i/processor-graph'
+import { diffSetsFast, GraphProcessor } from '@gs.i/processor-graph'
 import { specifyMesh, specifyTexture } from '@gs.i/processor-specify'
 import { traverse, flatten } from '@gs.i/utils-traverse'
 
@@ -201,8 +202,29 @@ export class ThreeLiteConverter implements Converter {
 	 */
 	private _cachedResources = getResources() // init with a empty node
 	// private _cachedSnapshot: SnapShot
-	private _threeObjects = new WeakMap<any, any>()
-	private _committedVersions = new WeakMap<any, number>()
+
+	/**
+	 * @note
+	 * 		Separate type for better v8 performance.
+	 * 		although it looks no difference in test?
+	 * @todo test if this is necessary, maybe change to back to one single weakmap
+	 */
+	// @note optimize for hidden classes
+	// private _threeObjects = new WeakMap<any, any>()
+	// TODO separate renderable mesh and node for performance
+	// private _threeObject3ds = new WeakMap<MeshDataType, Object3D>()
+	private _threeMesh = new WeakMap<MeshDataType, RenderableObject3D | Object3D>()
+	private _threeGeom = new WeakMap<GeomDataType, BufferGeometry>()
+	private _threeAttr = new WeakMap<AttributeDataType, BufferAttribute>()
+	private _threeTex = new WeakMap<Texture | CubeTexture, ThreeTexture>()
+	// TODO use GsiMatr instead because MatrBaseDataType can not be used alone
+	private _threeMatr = new WeakMap<GsiMatr | MatrBaseDataType, Material>()
+	private _threeColor = new WeakMap<ColorRGB, Color>()
+
+	// private _committedVersions = new WeakMap<any, number>()
+	private _committedAttr = new WeakMap<AttributeDataType, Int>()
+	private _committedMatr = new WeakMap<GsiMatr | MatrBaseDataType, Int>()
+	private _committedTex = new WeakMap<Texture | CubeTexture, Int>()
 
 	// #endregion
 
@@ -233,17 +255,17 @@ export class ThreeLiteConverter implements Converter {
 			// 		 because it's not practical to separate the creating and updating of resources
 
 			// const added = {
-			// 	materials: diffSets(resources.materials, this._cachedResources.materials),
-			// 	geometries: diffSets(resources.geometries, this._cachedResources.geometries),
-			// 	attributes: diffSets(resources.attributes, this._cachedResources.attributes),
-			// 	textures: diffSets(resources.textures, this._cachedResources.textures),
+			// 	materials: diffSetsFast(resources.materials, this._cachedResources.materials),
+			// 	geometries: diffSetsFast(resources.geometries, this._cachedResources.geometries),
+			// 	attributes: diffSetsFast(resources.attributes, this._cachedResources.attributes),
+			// 	textures: diffSetsFast(resources.textures, this._cachedResources.textures),
 			// }
 
 			const removed = {
-				materials: diffSets(this._cachedResources.materials, resources.materials),
-				geometries: diffSets(this._cachedResources.geometries, resources.geometries),
-				attributes: diffSets(this._cachedResources.attributes, resources.attributes),
-				textures: diffSets(this._cachedResources.textures, resources.textures),
+				materials: diffSetsFast(this._cachedResources.materials, resources.materials),
+				geometries: diffSetsFast(this._cachedResources.geometries, resources.geometries),
+				attributes: diffSetsFast(this._cachedResources.attributes, resources.attributes),
+				textures: diffSetsFast(this._cachedResources.textures, resources.textures),
 			}
 
 			// create newly added resources
@@ -270,16 +292,17 @@ export class ThreeLiteConverter implements Converter {
 
 			if (this.config.autoDisposeThreeObject) {
 				removed.textures.forEach((texture) => {
-					this._threeObjects.get(texture)?.dispose()
+					this._threeTex.get(texture)?.dispose()
 				})
-				removed.attributes.forEach((attribute) => {
-					this._threeObjects.get(attribute)?.dispose()
-				})
+				// @note three only dispose geom
+				// removed.attributes.forEach((attribute) => {
+				// 	this._threeAttr.get(attribute)?.dispose()
+				// })
 				removed.geometries.forEach((geometry) => {
-					this._threeObjects.get(geometry)?.dispose()
+					this._threeGeom.get(geometry)?.dispose()
 				})
 				removed.materials.forEach((material) => {
-					this._threeObjects.get(material)?.dispose()
+					this._threeMatr.get(material)?.dispose()
 				})
 			} else {
 				console.warn(
@@ -329,7 +352,7 @@ export class ThreeLiteConverter implements Converter {
 				// skip root node
 				if (parent) {
 					// @note parent is cached before
-					const parentThree = this._threeObjects.get(parent)
+					const parentThree = this._threeMesh.get(parent) as Object3D
 					const currentThree = this.convMesh(node)
 					// clear current children to handle removed nodes
 					currentThree.children = []
@@ -347,7 +370,7 @@ export class ThreeLiteConverter implements Converter {
 	 * @note run after all the geometries and materials are cached
 	 */
 	private convMesh(gsiMesh: MeshDataType): RenderableObject3D | Object3D {
-		let threeMesh = this._threeObjects.get(gsiMesh) as RenderableObject3D | Object3D
+		let threeMesh = this._threeMesh.get(gsiMesh) as RenderableObject3D | Object3D
 
 		// create
 		if (!threeMesh) {
@@ -396,15 +419,15 @@ export class ThreeLiteConverter implements Converter {
 			}
 
 			// update cache
-			this._threeObjects.set(gsiMesh, threeMesh)
+			this._threeMesh.set(gsiMesh, threeMesh)
 		}
 		// sync
 		{
 			if (isRenderableMesh(gsiMesh)) {
 				// threeMesh is a RenderableObject3D
 
-				const geometry = this._threeObjects.get(gsiMesh.geometry) as BufferGeometry
-				const material = this._threeObjects.get(gsiMesh.material) as Material
+				const geometry = this._threeGeom.get(gsiMesh.geometry) as BufferGeometry
+				const material = this._threeMatr.get(gsiMesh.material) as Material
 
 				threeMesh['material'] = material
 				threeMesh['geometry'] = geometry
@@ -426,7 +449,7 @@ export class ThreeLiteConverter implements Converter {
 	 * @note run after all the attributes are cached
 	 */
 	private convGeom(gsiGeom: GeomDataType): BufferGeometry {
-		let threeGeometry = this._threeObjects.get(gsiGeom) as BufferGeometry
+		let threeGeometry = this._threeGeom.get(gsiGeom) as BufferGeometry
 
 		// create
 		if (!threeGeometry) {
@@ -441,7 +464,7 @@ export class ThreeLiteConverter implements Converter {
 			// TODO sprite, maybe only accept generated geom here. move generation out?
 
 			// update cache
-			this._threeObjects.set(gsiGeom, threeGeometry)
+			this._threeGeom.set(gsiGeom, threeGeometry)
 		}
 		// sync
 		{
@@ -456,13 +479,13 @@ export class ThreeLiteConverter implements Converter {
 			for (const key in gsiGeom.attributes) {
 				const gsiAttr = gsiGeom.attributes[key]
 				// @note it is safe to assume that attributes were handled during #resource-stage
-				const threeAttribute = this._threeObjects.get(gsiAttr) as BufferAttribute
+				const threeAttribute = this._threeAttr.get(gsiAttr) as BufferAttribute
 
 				threeGeometry.attributes[key] = threeAttribute
 			}
 
 			if (gsiGeom.indices) {
-				const threeAttribute = this._threeObjects.get(gsiGeom.indices) as BufferAttribute
+				const threeAttribute = this._threeAttr.get(gsiGeom.indices) as BufferAttribute
 				threeGeometry.index = threeAttribute
 			} else {
 				threeGeometry.index = null
@@ -519,8 +542,8 @@ export class ThreeLiteConverter implements Converter {
 	}
 
 	private convAttr(gsiAttr: AttributeDataType): BufferAttribute {
-		let threeAttribute = this._threeObjects.get(gsiAttr) as BufferAttribute
-		let committedVersion = this._committedVersions.get(gsiAttr) as Int
+		let threeAttribute = this._threeAttr.get(gsiAttr) as BufferAttribute
+		let committedVersion = this._committedAttr.get(gsiAttr) as Int
 
 		// create
 		if (!threeAttribute) {
@@ -535,8 +558,8 @@ export class ThreeLiteConverter implements Converter {
 			committedVersion = gsiAttr.version
 
 			// update cache
-			this._threeObjects.set(gsiAttr, threeAttribute)
-			this._committedVersions.set(gsiAttr, committedVersion)
+			this._threeAttr.set(gsiAttr, threeAttribute)
+			this._committedAttr.set(gsiAttr, committedVersion)
 		}
 
 		// sync
@@ -606,7 +629,7 @@ export class ThreeLiteConverter implements Converter {
 
 			// update cache
 			committedVersion = gsiAttr.version
-			this._committedVersions.set(gsiAttr, committedVersion)
+			this._committedAttr.set(gsiAttr, committedVersion)
 		}
 
 		// releaseOnUpload
@@ -627,8 +650,8 @@ export class ThreeLiteConverter implements Converter {
 	 * @note run after all the textures are cached
 	 */
 	private convMatr(gsiMatr: GsiMatr) {
-		let threeMatr = this._threeObjects.get(gsiMatr) as Material
-		let committedVersion = this._committedVersions.get(gsiMatr) as Int
+		let threeMatr = this._threeMatr.get(gsiMatr) as Material
+		let committedVersion = this._committedMatr.get(gsiMatr) as Int
 
 		// create
 		if (!threeMatr) {
@@ -658,12 +681,12 @@ export class ThreeLiteConverter implements Converter {
 			committedVersion = gsiMatr.version
 
 			// update cache
-			this._threeObjects.set(gsiMatr, threeMatr)
-			this._committedVersions.set(gsiMatr, committedVersion)
+			this._threeMatr.set(gsiMatr, threeMatr)
+			this._committedMatr.set(gsiMatr, committedVersion)
 		}
 
 		// sync
-		syncMaterial(gsiMatr, threeMatr, this._threeObjects)
+		syncMaterial(gsiMatr, threeMatr, this._threeTex)
 
 		// material type specified parameters
 		// @note the only reason to put them here rather than ./syncMatr is that
@@ -675,38 +698,44 @@ export class ThreeLiteConverter implements Converter {
 			// 	break
 
 			case 'pbr': {
-				threeMatr['color'] = this.convColor(gsiMatr.baseColorFactor)
-				threeMatr['emissive'] = this.convColor(gsiMatr.emissiveFactor)
-				threeMatr['metalness'] = gsiMatr.metallicFactor
-				threeMatr['roughness'] = gsiMatr.roughnessFactor
+				const pbrThreeMatr = threeMatr as PrgStandardMaterial
+
+				pbrThreeMatr.color = this.convColor(gsiMatr.baseColorFactor)
+				pbrThreeMatr.emissive = this.convColor(gsiMatr.emissiveFactor)
+				pbrThreeMatr.metalness = gsiMatr.metallicFactor
+				pbrThreeMatr.roughness = gsiMatr.roughnessFactor
 
 				/**
 				 * @todo metallicRoughnessTexture 需要对 three 的 PBR 做一些修改
 				 * @QianXun 根据three的gltf loader实现，暂时将这个texture同时附给两个属性
 				 * https://threejs.org/examples/?q=gltf#webgl_loader_gltf_extensions
 				 */
-				threeMatr['metalnessMap'] = this.convTexture(gsiMatr.metallicRoughnessTexture)
-				threeMatr['roughnessMap'] = this.convTexture(gsiMatr.metallicRoughnessTexture)
-				threeMatr['map'] = this.convTexture(gsiMatr.baseColorTexture)
-				threeMatr['emissiveMap'] = this.convTexture(gsiMatr.emissiveTexture)
-				threeMatr['normalMap'] = this.convTexture(gsiMatr.normalTexture)
-				threeMatr['aoMap'] = this.convTexture(gsiMatr.occlusionTexture)
+				pbrThreeMatr.metalnessMap = this.convTexture(gsiMatr.metallicRoughnessTexture)
+				pbrThreeMatr.roughnessMap = this.convTexture(gsiMatr.metallicRoughnessTexture)
+				pbrThreeMatr.map = this.convTexture(gsiMatr.baseColorTexture)
+				pbrThreeMatr.emissiveMap = this.convTexture(gsiMatr.emissiveTexture)
+				pbrThreeMatr.normalMap = this.convTexture(gsiMatr.normalTexture)
+				pbrThreeMatr.aoMap = this.convTexture(gsiMatr.occlusionTexture)
 				break
 			}
 
 			case 'unlit': {
+				const unlitThreeMatr = threeMatr as PrgBasicMaterial
 				const matr = gsiMatr as MatrUnlitDataType
-				threeMatr['color'] = this.convColor(matr.baseColorFactor)
-				threeMatr['map'] = this.convTexture(matr.baseColorTexture)
+
+				unlitThreeMatr.color = this.convColor(matr.baseColorFactor)
+				unlitThreeMatr.map = this.convTexture(matr.baseColorTexture)
 				break
 			}
 
 			case 'point': {
 				const matr = gsiMatr as MatrPointDataType
-				threeMatr['size'] = matr.size
-				threeMatr['sizeAttenuation'] = matr.sizeAttenuation
-				threeMatr['color'] = this.convColor(matr.baseColorFactor)
-				threeMatr['map'] = this.convTexture(matr.baseColorTexture)
+				const pointThreeMatr = threeMatr as PrgPointMaterial
+
+				pointThreeMatr.size = matr.size
+				pointThreeMatr.sizeAttenuation = matr.sizeAttenuation
+				pointThreeMatr.color = this.convColor(matr.baseColorFactor)
+				pointThreeMatr.map = this.convTexture(matr.baseColorTexture)
 				break
 			}
 
@@ -744,17 +773,17 @@ export class ThreeLiteConverter implements Converter {
 
 			// update cache
 			committedVersion = gsiMatr.version
-			this._committedVersions.set(gsiMatr, committedVersion)
+			this._committedMatr.set(gsiMatr, committedVersion)
 		}
 
 		return threeMatr
 	}
 
-	private convTexture(gsiTexture: Texture | undefined): ThreeTexture | null {
-		if (!gsiTexture) return null
+	private convTexture(gsiTexture: Texture | undefined | null): ThreeTexture | null {
+		if (gsiTexture === undefined || gsiTexture === null) return null
 
-		let threeTexture = this._threeObjects.get(gsiTexture) as ThreeTexture
-		let committedVersion = this._committedVersions.get(gsiTexture) as Int
+		let threeTexture = this._threeTex.get(gsiTexture) as ThreeTexture
+		let committedVersion = this._committedTex.get(gsiTexture) as Int
 
 		// create
 		if (!threeTexture) {
@@ -795,8 +824,8 @@ export class ThreeLiteConverter implements Converter {
 
 			committedVersion = gsiTexture.image.version
 
-			this._threeObjects.set(gsiTexture, threeTexture)
-			this._committedVersions.set(gsiTexture, committedVersion)
+			this._threeTex.set(gsiTexture, threeTexture)
+			this._committedTex.set(gsiTexture, committedVersion)
 		}
 
 		// version bump
@@ -807,7 +836,7 @@ export class ThreeLiteConverter implements Converter {
 			threeTexture.needsUpdate = true
 
 			committedVersion = gsiTexture.image.version
-			this._committedVersions.set(gsiTexture, committedVersion)
+			this._committedTex.set(gsiTexture, committedVersion)
 		}
 
 		// sync parameters
@@ -818,7 +847,7 @@ export class ThreeLiteConverter implements Converter {
 	}
 
 	private convColor(gsiColor: ColorRGB): Color {
-		let color = this._threeObjects.get(gsiColor)
+		let color = this._threeColor.get(gsiColor)
 
 		if (color) {
 			color.r = gsiColor.r
@@ -826,7 +855,7 @@ export class ThreeLiteConverter implements Converter {
 			color.b = gsiColor.b
 		} else {
 			color = new Color(gsiColor.r, gsiColor.g, gsiColor.b)
-			this._threeObjects.set(gsiColor, color)
+			this._threeColor.set(gsiColor, color)
 		}
 
 		return color
@@ -838,9 +867,20 @@ export class ThreeLiteConverter implements Converter {
 
 	dispose() {
 		this._cachedResources = getResources() // init with a empty node
-		this._threeObjects = new WeakMap<any, any>()
-		this._committedVersions = new WeakMap<any, number>()
-		this._threeObjects = new WeakMap<ColorRGB, Color>()
+		this._threeMesh = new WeakMap()
+		this._threeGeom = new WeakMap()
+		this._threeAttr = new WeakMap()
+		this._threeTex = new WeakMap()
+		// TODO use GsiMatr instead because MatrBaseDataType can not be used alone
+		this._threeMatr = new WeakMap()
+		this._threeColor = new WeakMap()
+
+		// this._committedVersions = new WeakMap<any, number>()
+		this._committedAttr = new WeakMap()
+		this._committedMatr = new WeakMap()
+		this._committedTex = new WeakMap()
+
+		// this._threeObjects = new WeakMap<ColorRGB, Color>()
 	}
 }
 
@@ -883,20 +923,35 @@ export function getResources(root?: MeshDataType) {
 				if (mesh.material.extensions?.EXT_matr_programmable?.uniforms) {
 					const uniforms = mesh.material.extensions.EXT_matr_programmable.uniforms
 
-					Object.keys(uniforms).forEach((key) => {
-						const uniformValue = uniforms[key].value
+					// @note this is a little bit slower than Object.values
+					// Object.keys(uniforms).forEach((key) => {
+					// 	const uniformValue = uniforms[key].value
+					// 	if (isTexture(uniformValue) || isCubeTexture(uniformValue)) {
+					// 		textures.add(uniformValue)
+					// 	}
+					// })
+
+					const values = Object.values(uniforms)
+					for (let i = 0; i < values.length; i++) {
+						const uniformValue = values[i].value
 						if (isTexture(uniformValue) || isCubeTexture(uniformValue)) {
 							textures.add(uniformValue)
 						}
-					})
+					}
 				}
 
 				// attributes
-
-				Object.keys(mesh.geometry.attributes).forEach((key) => {
-					attributes.add(mesh.geometry.attributes[key])
-				})
-				if (mesh.geometry.indices) attributes.add(mesh.geometry.indices)
+				{
+					// @note this is a little bit slower than Object.values
+					// Object.keys(mesh.geometry.attributes).forEach((key) => {
+					// 	attributes.add(mesh.geometry.attributes[key])
+					// })
+					const values = Object.values(mesh.geometry.attributes)
+					for (let i = 0; i < values.length; i++) {
+						attributes.add(values[i])
+					}
+					if (mesh.geometry.indices) attributes.add(mesh.geometry.indices)
+				}
 			}
 		})
 	}
