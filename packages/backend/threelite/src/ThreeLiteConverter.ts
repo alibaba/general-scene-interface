@@ -322,6 +322,7 @@ export class ThreeLiteConverter implements Converter {
 
 		{
 			const rootThree = this.convMesh(root)
+			rootThree.children = []
 			// pre-order traversal, parents are handled before children
 			traverse(root, (node, parent) => {
 				// console.log('handle node')
@@ -463,6 +464,8 @@ export class ThreeLiteConverter implements Converter {
 			if (gsiGeom.indices) {
 				const threeAttribute = this._threeObjects.get(gsiGeom.indices) as BufferAttribute
 				threeGeometry.index = threeAttribute
+			} else {
+				threeGeometry.index = null
 			}
 
 			// drawRange
@@ -893,6 +896,7 @@ export function getResources(root?: MeshDataType) {
 				Object.keys(mesh.geometry.attributes).forEach((key) => {
 					attributes.add(mesh.geometry.attributes[key])
 				})
+				if (mesh.geometry.indices) attributes.add(mesh.geometry.indices)
 			}
 		})
 	}

@@ -170,6 +170,7 @@ export class MatProcessor extends Processor {
 	}
 
 	getLocalMatrix(node: MeshDataType): number[] {
+		//
 		// if (!node) throw new SchemaNotValid(`MatProcessor: the node you input does not exist`)
 		// if (!node.transform)
 		// 	throw new SchemaNotValid(

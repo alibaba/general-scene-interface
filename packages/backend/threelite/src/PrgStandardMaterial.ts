@@ -83,7 +83,7 @@ export class PrgStandardMaterial extends MeshStandardMaterial {
 			.replace(/\$\$GSI_INSERT<Uniforms>/g, preCodes.uniforms || '') // remove
 			.replace(
 				/\$\$GSI_INSERT<PreVert>/g,
-				programable.global || '' + '\n' + programable.vertGlobal || ''
+				(programable.global || '') + '\n' + (programable.vertGlobal || '')
 			)
 			.replace(/\$\$GSI_INSERT<VertGeometry>/g, programable.vertGeometry || '')
 			.replace(/\$\$GSI_INSERT<VertOutput>/g, programable.vertOutput || '')
@@ -94,7 +94,7 @@ export class PrgStandardMaterial extends MeshStandardMaterial {
 			.replace(/\$\$GSI_INSERT<Uniforms>/g, preCodes.uniforms || '') // remove
 			.replace(
 				/\$\$GSI_INSERT<PreFrag>/g,
-				programable.global || '' + '\n' + programable.fragGlobal || ''
+				(programable.global || '') + '\n' + (programable.fragGlobal || '')
 			)
 			.replace(/\$\$GSI_INSERT<FragColor>/g, programable.fragOutput || '')
 			.replace(/\$\$GSI_INSERT<PreLighting>/g, programablePbr.fragPreLighting || '')

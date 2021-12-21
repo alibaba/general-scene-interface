@@ -101,7 +101,7 @@ export class AutoVersionTransform3 implements Transform3TRS {
 			},
 		})
 
-		this.scale = new Proxy(new Vector3(), {
+		this.scale = new Proxy(new Vector3(1, 1, 1), {
 			set: (t, p, v, r) => {
 				if (p === 'x' || p === 'y' || p === 'z') this.version++
 				t[p] = v

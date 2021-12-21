@@ -21,7 +21,14 @@ build () {
 	# ⬇️ much faster
 	node ./scripts/fixTscExtension.mjs
 
-	echo `git rev-parse --short HEAD` > .cached-built-head
+	# fix: clean build, dirt rebuild, clean again, should rebuild anyway
+	# if folder is dirty, should delete cache file
+	if [ -z `git status --porcelain -- ./` ] # True if the string is empty
+	then 
+		echo `git rev-parse --short HEAD` > .cached-built-head
+	else
+		rm -f .cached-built-head
+	fi
 }
 
 if [ -e .cached-built-head ]
