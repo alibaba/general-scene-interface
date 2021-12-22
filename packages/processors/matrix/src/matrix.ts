@@ -29,6 +29,12 @@ interface WorldMatrixCache {
 	 * * used to check if scene graph modified.
 	 */
 	parentID?: Int
+
+	/**
+	 * TODO kind of tricky
+	 */
+	version: Int
+	parentVersion?: Int
 	/**
 	 * cached world matrix
 	 */
@@ -132,9 +138,17 @@ export class MatProcessor extends Processor {
 		// @NOTE but may be should avoid weakMap reset the same value?
 		const rootMatrixCache = this._cacheMatrix.get(root.transform)
 		if (rootMatrixCache === undefined) {
-			this._cacheMatrix.set(root.transform, { world: { matrix: this.getLocalMatrix(root) } })
+			this._cacheMatrix.set(root.transform, {
+				world: { matrix: this.getLocalMatrix(root), version: root.transform.version },
+			})
+		} else if (rootMatrixCache.world === undefined) {
+			rootMatrixCache.world = {
+				matrix: this.getLocalMatrix(root, rootMatrixCache),
+				version: root.transform.version,
+			}
 		} else {
-			rootMatrixCache.world = { matrix: this.getLocalMatrix(root, rootMatrixCache) }
+			rootMatrixCache.world.matrix = this.getLocalMatrix(root, rootMatrixCache)
+			rootMatrixCache.world.version = root.transform.version
 		}
 
 		// loop from the second node (skip root)
@@ -148,6 +162,9 @@ export class MatProcessor extends Processor {
 			const currWorldMatrixCache = matrixCache?.world
 			const currLocalMatrixCache = matrixCache?.local
 
+			// @note safe to assume it exist
+			const parentMatrixCache = this._cacheMatrix.get(parent.transform) as MatrixCache
+
 			if (
 				// 如果处于脏子树中，则跳过后面的检查，直接为脏
 				isDirty === true ||
@@ -159,7 +176,9 @@ export class MatProcessor extends Processor {
 				// 如果这个节点的父节点引用改变，则子树为脏
 				currWorldMatrixCache.parentID !== this.getID(parent) ||
 				// 如果节点的 local transform 变化，则子树为脏
-				currLocalMatrixCache.version !== curr.transform.version
+				currLocalMatrixCache.version !== curr.transform.version ||
+				// 如果父节点的 world transform 变化，则子树为脏
+				currWorldMatrixCache.parentVersion !== parentMatrixCache.world?.version
 			) {
 				isDirty = true
 			}
@@ -168,8 +187,7 @@ export class MatProcessor extends Processor {
 				// 由于是从 root 后的第一个节点开始遍历，并提前对 root 做了处理，
 				// 所以 parent 的 localMatrixCache 和 worldMatrixCache 都是存在且最新的
 				// previous logic made sure that parent worldMatrix is updated
-				const parentWorldMatrixCache = this._cacheMatrix.get(parent.transform)
-					?.world as WorldMatrixCache
+				const parentWorldMatrixCache = parentMatrixCache.world as WorldMatrixCache
 
 				const currLocalMatrix = this.getLocalMatrix(curr, matrixCache)
 				const currWorldMatrix = multiplyMatrices(parentWorldMatrixCache.matrix, currLocalMatrix)
@@ -184,14 +202,23 @@ export class MatProcessor extends Processor {
 					this._cacheMatrix.set(curr.transform, {
 						world: {
 							parentID: this.getID(parent),
+							version: 0,
+							parentVersion: parentWorldMatrixCache.version,
 							matrix: currWorldMatrix,
 						},
 					})
-				} else {
+				} else if (matrixCache.world === undefined) {
 					matrixCache.world = {
 						parentID: this.getID(parent),
+						version: 0,
+						parentVersion: parentWorldMatrixCache.version,
 						matrix: currWorldMatrix,
 					}
+				} else {
+					matrixCache.world.parentID = this.getID(parent)
+					matrixCache.world.parentVersion = parentWorldMatrixCache.version
+					matrixCache.world.version++
+					matrixCache.world.matrix = currWorldMatrix
 				}
 			}
 		}
