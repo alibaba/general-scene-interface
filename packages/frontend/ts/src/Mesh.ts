@@ -81,7 +81,8 @@ export class AutoVersionTransform3 implements Transform3TRS {
 	readonly rotation: Euler
 	readonly position: Vector3
 	readonly scale: Vector3
-	readonly quaternion: Quaternion
+	// readonly quaternion: Quaternion
+	readonly quaternion: never
 
 	constructor() {
 		this.rotation = new Proxy(new Euler(), {
@@ -109,13 +110,13 @@ export class AutoVersionTransform3 implements Transform3TRS {
 			},
 		})
 
-		this.quaternion = new Proxy(new Quaternion(), {
-			set: (t, p, v, r) => {
-				if (p === 'x' || p === 'y' || p === 'z' || p === 'w') this.version++
-				t[p] = v
-				return true
-			},
-		})
+		// this.quaternion = new Proxy(new Quaternion(), {
+		// 	set: (t, p, v, r) => {
+		// 		if (p === 'x' || p === 'y' || p === 'z' || p === 'w') this.version++
+		// 		t[p] = v
+		// 		return true
+		// 	},
+		// })
 	}
 }
 
