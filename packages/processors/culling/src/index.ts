@@ -85,7 +85,7 @@ export class CullingProcessor extends Processor {
 			id = this._counter++
 			this._ids.set(o, id)
 		}
-
+		if (id >= 9007199254740990) throw 'ID exceeds MAX_SAFE_INTEGER'
 		return id
 	}
 
