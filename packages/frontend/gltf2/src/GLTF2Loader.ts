@@ -1,22 +1,15 @@
+import { specifyGeometry } from '@gs.i/processor-specify'
 /**
  * Copyright (C) 2021 Alibaba Group Holding Limited
  * All rights reserved.
  */
 
-import {
-	MeshDataType,
-	MatrBaseDataType,
-	AttributeDataType,
-	TypedArray,
-	MatrPbrDataType,
-	TextureType,
-	ImageDataType,
-	SamplerDataType,
-	MatrUnlitDataType,
-} from '@gs.i/schema'
-import { Matrix4, Quaternion } from '@gs.i/utils-math'
+import * as IR from '@gs.i/schema-scene' // type only, will be deleted after compiled
+import { Quaternion } from '@gs.i/utils-math'
 
-import * as SDK from '@gs.i/frontend-sdk'
+import { Specifier } from '@gs.i/processor-specify'
+
+// import * as SDK from '@gs.i/frontend-sdk'
 
 import {
 	GLTF,
@@ -43,16 +36,23 @@ import {
  */
 const quaternion = new Quaternion()
 
+/**
+ * 接口补全
+ * @note this processor only has pure functions
+ * 		 it's okay to be put in global scope
+ */
+const specifier = new Specifier()
+
 export class GLTF2Loader {
-	_meshsCache: MeshDataType[] = []
-	_materialsCache: MatrBaseDataType[] = []
-	_accessorsCache: AttributeDataType[] = []
-	_nodesCache: MeshDataType[] = []
+	private _meshesCache: IR.LooseMeshDataType[] = []
+	private _materialsCache: IR.LooseMatrBase[] = []
+	private _accessorsCache: IR.LooseAttribute[] = []
+	private _nodesCache: IR.LooseMeshDataType[] = []
 
-	_texturesCache: TextureType[] = []
+	private _texturesCache: IR.LooseTextureType[] = []
 
-	parse(glm: GLM): SDK.Mesh {
-		this._meshsCache = []
+	parse(glm: GLM): IR.LooseMeshDataType {
+		this._meshesCache = []
 		this._materialsCache = []
 		this._accessorsCache = []
 		this._nodesCache = []
@@ -69,7 +69,7 @@ export class GLTF2Loader {
 
 		// texture
 		glm.textures?.forEach((texture) => {
-			const gsiSampler: SamplerDataType = new SDK.Sampler()
+			const gsiSampler: IR.LooseSamplerDataType = {}
 			if (texture.sampler) {
 				const gltfSampler = glm.samplers[texture.sampler]
 				gsiSampler.magFilter = SamplerEnumToString[gltfSampler.magFilter || 9728]
@@ -78,8 +78,8 @@ export class GLTF2Loader {
 				gsiSampler.wrapT = SamplerEnumToString[gltfSampler.wrapT || 10497]
 			}
 
-			const gsiImage: ImageDataType = new SDK.ImageData()
-			gsiImage.flipY = false
+			const gsiImage: IR.LooseImageDataType = {}
+
 			if (texture.source !== undefined) {
 				const image: GLTF.Image = glm.images[texture.source]
 
@@ -109,10 +109,10 @@ export class GLTF2Loader {
 				throw new Error('texture 缺少 source(image 数据)')
 			}
 
-			const gsiTexture: TextureType = new SDK.TextureData({
+			const gsiTexture: IR.LooseTextureType = {
 				image: gsiImage,
 				sampler: gsiSampler,
-			})
+			}
 
 			this._texturesCache.push(gsiTexture)
 		})
@@ -135,14 +135,14 @@ export class GLTF2Loader {
 				}
 			}
 
-			const typedArray: TypedArray = new TypedArrayConstructor(
+			const typedArray: IR.TypedArray = new TypedArrayConstructor(
 				composedBuffer,
 				(bufferView.byteOffset || 0) + (accessor.byteOffset || 0),
 				// bufferView.byteLength / TypedArrayConstructor.BYTES_PER_ELEMENT
 				AccessorTypeToItemSize[accessor.type] * accessor.count
 			)
 
-			const attributeData: AttributeDataType = {
+			const attributeData: IR.LooseAttribute = {
 				array: typedArray,
 				count: accessor.count,
 				itemSize: AccessorTypeToItemSize[accessor.type],
@@ -156,7 +156,7 @@ export class GLTF2Loader {
 
 		// materials
 		glm.materials.forEach((material) => {
-			let matr: MatrBaseDataType
+			let matr: IR.LooseMatrBase
 			// unlit 材质
 			// TODO 其他 extension 材质
 			if (material.extensions && material.extensions.KHR_materials_unlit) {
@@ -171,7 +171,8 @@ export class GLTF2Loader {
 					console.warn('baseColorTexture.texCoord 必须为 0 或者 undefined，负责 uv 将会出现异常')
 				}
 
-				matr = new SDK.MatrUnlit({
+				matr = {
+					type: 'unlit',
 					baseColorFactor: {
 						r: baseColorFactor[0],
 						g: baseColorFactor[1],
@@ -179,7 +180,7 @@ export class GLTF2Loader {
 					},
 					opacity: baseColorFactor[3],
 					baseColorTexture,
-				})
+				} as IR.LooseMatrUnlitDataType
 			} else {
 				// PBR 材质
 				const baseColorFactor = material.pbrMetallicRoughness?.baseColorFactor || [1, 1, 1, 1]
@@ -231,7 +232,8 @@ export class GLTF2Loader {
 					console.warn('occlusionTexture.texCoord 必须为 1, uv 将会出现异常')
 				}
 
-				matr = new SDK.MatrPbr({
+				matr = {
+					type: 'pbr',
 					baseColorFactor: {
 						r: baseColorFactor[0],
 						g: baseColorFactor[1],
@@ -251,7 +253,7 @@ export class GLTF2Loader {
 					normalTexture,
 					emissiveTexture,
 					occlusionTexture,
-				})
+				} as IR.LooseMatrPbrDataType
 			}
 
 			if (material.name) {
@@ -267,19 +269,63 @@ export class GLTF2Loader {
 		// mesh/group
 		//第一遍，创建所有 gsiMesh
 		glm.nodes.forEach((node) => {
-			const gsiMesh = new SDK.Mesh()
+			const gsiMesh: IR.LooseMeshDataType = {
+				children: new Set(),
+			}
+
+			/**
+			 * 矩阵
+			 * 人可读的是 row-major order
+			 * SDK.Matrix(three.matrix) .set 接受的 是 row-major order
+			 * webgl 要求的是 column-major order
+			 * glsl matrix 是 column-major order
+			 * SDK.Matrix(three.matrix) 内部计算和 element 存储的是 column-major order
+			 * SDK.Matrix(three.matrix) .fromArray 接受的是 column-major order
+			 */
+
+			// gltf2 可以 使用 matrix 或者 可选的 translation/rotation/scale
+			if (node.matrix) {
+				gsiMesh.transform = { matrix: node.matrix, version: 0 }
+			} else {
+				gsiMesh.transform = {
+					version: 0,
+				}
+				if (node.translation)
+					gsiMesh.transform.position = {
+						x: node.translation[0],
+						y: node.translation[1],
+						z: node.translation[2],
+					}
+				// https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#node
+				// xyzw
+				if (node.rotation)
+					gsiMesh.transform.quaternion = {
+						x: node.rotation[0],
+						y: node.rotation[1],
+						z: node.rotation[2],
+						w: node.rotation[3],
+					}
+				if (node.scale)
+					gsiMesh.transform.scale = {
+						x: node.scale[0],
+						y: node.scale[1],
+						z: node.scale[2],
+					}
+			}
 
 			if (node.mesh !== undefined) {
 				// 这是个 GSI mesh
 
+				const gsiRenderableMesh = gsiMesh as IR.LooseRenderableMesh
+
 				const mesh = glm.meshes[node.mesh]
 				const primitive = mesh.primitives[0]
 
-				gsiMesh.geometry = new SDK.Geom()
-				gsiMesh.geometry.mode = MeshPrimitiveToGeomMode[primitive.mode as number]
+				gsiRenderableMesh.geometry = specifyGeometry({ attributes: {} })
+				gsiRenderableMesh.geometry.mode = MeshPrimitiveToGeomMode[primitive.mode as number]
 
 				if (primitive.indices !== undefined) {
-					gsiMesh.geometry.indices = this._accessorsCache[primitive.indices]
+					gsiRenderableMesh.geometry.indices = this._accessorsCache[primitive.indices]
 				}
 
 				for (const name in primitive.attributes) {
@@ -306,65 +352,48 @@ export class GLTF2Loader {
 						// gsiMesh.geometry.attributes[name] = this._accessorsCache[primitive.attributes[name]]
 
 						const threeAttrName = attrNameGltfToThree(name)
-						gsiMesh.geometry.attributes[threeAttrName] =
+						gsiRenderableMesh.geometry.attributes[threeAttrName] =
 							this._accessorsCache[primitive.attributes[name]]
 					}
 				}
 
 				if (primitive.material !== undefined) {
-					gsiMesh.material = this._materialsCache[primitive.material]
+					gsiRenderableMesh.material = this._materialsCache[primitive.material]
 				} else {
 					// gltf2: 如果没有分配，则使用 默认 material
 					// https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#default-material
-					gsiMesh.material = new SDK.MatrPbr()
+					gsiRenderableMesh.material = { type: 'unlit' } as IR.LooseMatrUnlitDataType
 				}
 			}
 
 			// 否则就是个普通的 group
 
-			/**
-			 * 矩阵
-			 * 人可读的是 row-major order
-			 * SDK.Matrix(three.matrix) .set 接受的 是 row-major order
-			 * webgl 要求的是 column-major order
-			 * glsl matrix 是 column-major order
-			 * SDK.Matrix(three.matrix) 内部计算和 element 存储的是 column-major order
-			 * SDK.Matrix(three.matrix) .fromArray 接受的是 column-major order
-			 */
-
-			// gltf2 可以 使用 matrix 或者 可选的 translation/rotation/scale
-			if (node.matrix) {
-				gsiMesh.transform.matrix = node.matrix
-			} else {
-				if (node.translation) gsiMesh.transform.position.fromArray(node.translation)
-				// https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#node
-				// xyzw
-				if (node.rotation)
-					gsiMesh.transform.rotation.setFromQuaternion(quaternion.fromArray(node.rotation))
-				if (node.scale) gsiMesh.transform.scale.fromArray(node.scale)
-			}
-
-			this._meshsCache.push(gsiMesh)
+			this._meshesCache.push(gsiMesh)
 		})
 
 		// 第二遍，建树
 		glm.nodes.forEach((node, nodeIndex) => {
-			const gsiMesh = this._meshsCache[nodeIndex]
+			const gsiMesh = this._meshesCache[nodeIndex]
 
 			if (node.children && node.children.length) {
 				node.children.forEach((childNodeIndex) => {
-					const child = this._meshsCache[childNodeIndex]
-					gsiMesh.children.add(child)
-					child.parent = gsiMesh
+					const child = this._meshesCache[childNodeIndex]
+
+					;(gsiMesh.children as Set<IR.LooseMeshDataType>).add(child)
+					// child.parent = gsiMesh // will be done by specifier
 				})
 			}
 		})
 
-		const result = new SDK.Mesh()
+		const result = { children: new Set() } as IR.LooseNode
 		glm.scenes[0].nodes?.forEach((nodeIndex) => {
-			const mesh = this._meshsCache[nodeIndex]
-			result.add(mesh)
+			const mesh = this._meshesCache[nodeIndex]
+
+			;(result.children as Set<IR.LooseMeshDataType>).add(mesh)
 		})
+
+		// specify the whole scene
+		specifier.traverse(result as IR.MeshDataType)
 
 		return result
 	}
