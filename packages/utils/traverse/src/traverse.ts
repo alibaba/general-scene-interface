@@ -17,27 +17,47 @@ export function traverse(
 
 	handler(node, parent)
 
-	if (!node.children) return
+	// if (node.children && node.children.size > 0) {
+	// 	node.children.forEach((child) => traverse(child, handler, node))
+	// }
 
-	if (node.children.size > 0) {
-		node.children.forEach((child) => traverse(child, handler, node))
-	}
+	// @note a little bit faster
+	if (node.children)
+		for (const child of node.children) {
+			traverse(child, handler, node)
+		}
 }
 
 export const traversePreOrder = traverse
+
+export function traversePostOrder(
+	node: MeshDataType,
+	handler: (node: MeshDataType, parent?: MeshDataType) => any,
+	parent?: MeshDataType
+) {
+	if (node === undefined || node === null) return
+
+	if (node.children && node.children.size > 0) {
+		node.children.forEach((child) => traversePostOrder(child, handler, node))
+	}
+
+	handler(node, parent)
+}
 
 /**
  * flatten a DAG in to array
  * @param node
  * @returns
  */
-export function flatten(node: MeshDataType) {
+export function flatten(node?: MeshDataType) {
 	const result = [] as MeshDataType[]
 
-	traverse(node, (_node, parent) => {
-		_node.parent = parent
-		result.push(_node)
-	})
+	if (node) {
+		traverse(node, (_node, parent) => {
+			_node.parent = parent
+			result.push(_node)
+		})
+	}
 
 	return result
 }
