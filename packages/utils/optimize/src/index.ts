@@ -4,4 +4,4 @@
  */
 
 export * from './OptimizePass'
-export * from './GSIRefiner'
+export * from './GsiRefiner'
