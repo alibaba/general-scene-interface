@@ -4,6 +4,7 @@
 	"description": "",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
+	"type": "module",
 	"license": "MIT",
 	"publishConfig": {
 		"access": "public"
@@ -27,7 +28,5 @@
 	},
 	"devDependencies": {
 		"typescript": ">4.4.0"
-	},
-	"gitHead": "96bfbb9138a5242a3c460a9210058c14bcf9b03a",
-	"type": "module"
+	}
 }
