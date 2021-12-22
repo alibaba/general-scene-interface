@@ -16,9 +16,6 @@
 			"path": "../../schema/ext-scene"
 		},
 		{
-			"path": "../gltf2"
-		},
-		{
 			"path": "../math"
 		},
 		{
@@ -29,6 +26,9 @@
 		},
 		{
 			"path": "../geometry"
+		},
+		{
+			"path": "../gltf2"
 		},
 		{
 			"path": "../raycast"
@@ -52,19 +52,13 @@
 			"path": "../../backend/ignore-threelite"
 		},
 		{
-			"path": "../../backend/threelite"
-		},
-		{
-			"path": "../../frontend/ts"
-		},
-		{
 			"path": "../../processors/base"
 		},
 		{
-			"path": "../optimize"
+			"path": "../gline"
 		},
 		{
-			"path": "../../frontend/gltf2"
+			"path": "../optimize"
 		},
 		{
 			"path": "../../processors/bound"
@@ -79,13 +73,25 @@
 			"path": "../../processors/specify"
 		},
 		{
-			"path": "../gline"
-		},
-		{
 			"path": "../../backend/gltf2"
 		},
 		{
+			"path": "../../backend/threelite"
+		},
+		{
 			"path": "../../processors/culling"
+		},
+		{
+			"path": "../../frontend/ts"
+		},
+		{
+			"path": "../../frontend/gltf2"
+		},
+		{
+			"path": "../../processors/indicator"
+		},
+		{
+			"path": "../random-scene"
 		}
 	]
 }
