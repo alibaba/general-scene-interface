@@ -1,0 +1,31 @@
+{
+	"extends": "./tsconfig.base.json",
+	"compilerOptions": {
+		"rootDir": "src",
+		"outDir": "dist",
+		"composite": true,
+		"incremental": true
+	},
+	"include": ["src", "typings"],
+	"exclude": ["dist"],
+	"references": [
+		{
+			"path": "../../utils/wireframe"
+		},
+		{
+			"path": "../../utils/geometry"
+		},
+		{
+			"path": "../../frontend/ts"
+		},
+		{
+			"path": "../base"
+		},
+		{
+			"path": "../bound"
+		},
+		{
+			"path": "../../schema/core"
+		}
+	]
+}
