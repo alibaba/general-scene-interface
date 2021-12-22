@@ -23,6 +23,7 @@ import { box3Equals, convDefines, elementsEquals, sphereEquals, SupportedExtensi
 
 /**
  * sync material parameters from gsi IR to three material
+ * @note these parameters only sync when the material needs update. NOT EVERY FRAME!
  */
 export function syncMaterial(
 	gsiMatr: MatrBaseDataType,
@@ -86,6 +87,8 @@ export function syncMaterial(
 	{
 		const extAdvanced = gsiMatr.extensions?.EXT_matr_advanced
 		if (extAdvanced) {
+			// TODO check which is better
+			// threeMatr.depthTest = extAdvanced.depthTest ?? threeMatr.depthTest
 			if (extAdvanced.depthTest !== undefined) threeMatr.depthTest = extAdvanced.depthTest
 
 			if (extAdvanced.depthWrite !== undefined) threeMatr.depthWrite = extAdvanced.depthWrite
@@ -107,7 +110,7 @@ export function syncMaterial(
 	const extProgramable = gsiMatr.extensions?.EXT_matr_programmable
 	{
 		if (extProgramable?.defines) {
-			threeMatr.defines = convDefines(threeMatr['defines'], extProgramable.defines)
+			threeMatr.defines = convDefines(threeMatr.defines, extProgramable.defines)
 		}
 	}
 
@@ -115,19 +118,20 @@ export function syncMaterial(
 	{
 		if (extProgramable?.uniforms) {
 			// it should be a shaderMaterial
-			threeMatr['uniforms'] = threeMatr['uniforms'] || {}
+			const threeUniforms = threeMatr['uniforms'] || {}
+			threeMatr['uniforms'] = threeUniforms
 
 			const uniforms = extProgramable.uniforms
 
 			Object.keys(uniforms).forEach((key) => {
 				const uniform = uniforms[key]
 
-				if (threeMatr['uniforms'][key] === undefined) threeMatr['uniforms'][key] = {}
+				if (threeUniforms[key] === undefined) threeUniforms[key] = {}
 
 				if (isTexture(uniform.value)) {
 					// it should be cached before
 					const threeTexture = cache.get(uniform.value) as ThreeTexture
-					threeMatr['uniforms'][key].value = threeTexture
+					threeUniforms[key].value = threeTexture
 				} else if (isCubeTexture(uniform.value)) {
 					// 👀
 					throw 'CUBE TEXTURE UNIFORM NOT IMPLEMENTED'
@@ -139,7 +143,7 @@ export function syncMaterial(
 					// 		as long as matrices are arrays, vectors are xyz\rgb\arrays,
 					// 		it will be fine.
 
-					threeMatr['uniforms'][key].value = uniforms.value
+					threeUniforms[key].value = uniforms.value
 				}
 			})
 		}

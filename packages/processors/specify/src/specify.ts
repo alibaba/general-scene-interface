@@ -198,6 +198,10 @@ export function specifyGeometry(geom: LooseGeomDataType): GeomDataType {
 		specifyAttribute(attribute, key)
 	}
 
+	if (geom.indices) {
+		specifyAttribute(geom.indices, 'indices')
+	}
+
 	return geom as GeomDataType
 }
 

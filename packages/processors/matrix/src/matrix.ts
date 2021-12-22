@@ -65,6 +65,8 @@ export class MatProcessor extends Processor {
 	// private _cacheWorldMatrix = new WeakMap<Transform3, WorldMatrixCache>()
 	private _cacheMatrix = new WeakMap<Transform3, MatrixCache>()
 
+	private _path = [] as MeshDataType[]
+
 	processNode(node: MeshDataType, parent?: MeshDataType) {
 		// this.getWorldMatrixShallow(node, parent)
 	}
@@ -81,7 +83,8 @@ export class MatProcessor extends Processor {
 
 		// path from leaf to root
 		// @note path.length >= 2
-		const path: MeshDataType[] = []
+		const path: MeshDataType[] = this._path
+		path.length = 0
 		let curr: MeshDataType | undefined = node
 
 		// while (curr) {
@@ -135,6 +138,8 @@ export class MatProcessor extends Processor {
 		}
 
 		// loop from the second node (skip root)
+		// @note this optimize is actually slower
+		// let parentWorldMatrixCache = rootMatrixCache?.world as WorldMatrixCache
 		for (let i = 1 /* !NOTICE */; i < path.length; i++) {
 			const curr = path[i]
 			const parent = path[i - 1] // not undefined

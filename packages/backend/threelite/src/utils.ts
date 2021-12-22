@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-import { Box3, Sphere, Object3D, Vector3, Euler, Quaternion } from 'three-lite'
+import { Box3, Sphere, Object3D, Vector3, Euler, Quaternion, Matrix4 } from 'three-lite'
 import { BBox, BSphere } from '@gs.i/schema-scene'
 
 export function box3Equals(b1: Box3 | BBox, b2: Box3 | BBox): boolean {
@@ -256,6 +256,16 @@ export function sealTransform(threeMesh: Object3D) {
 				`scale will always be 1` + `because this object3D's matrix is managed by gsi processor`
 			)
 			return new Vector3()
+		},
+	})
+
+	Object.defineProperty(threeMesh, 'matrix', {
+		get: () => {
+			console.warn(
+				`matrix will always be identical, use .worldMatrix instead.` +
+					`because this object3D's matrix is managed by gsi processor`
+			)
+			return new Matrix4()
 		},
 	})
 

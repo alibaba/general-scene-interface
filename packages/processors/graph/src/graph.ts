@@ -196,6 +196,18 @@ export function diffSetsFast<T>(a: Set<T>, b: Set<T> | Array<T>): Set<T> {
 	}
 	return difference
 }
+/**
+ * a - b
+ * @note this will modify a, use diffSets if you still need original a
+ */
+export function diffSetsFastAndToArray<T>(a: Set<T>, b: Set<T> | Array<T>, bAsArray: T[]): Set<T> {
+	const difference = a
+	for (const elem of b) {
+		bAsArray.push(elem)
+		difference.delete(elem)
+	}
+	return difference
+}
 export function diffSets<T>(a: Set<T> | Array<T>, b: Set<T> | Array<T>): Set<T> {
 	const difference = new Set(a)
 	for (const elem of b) {
