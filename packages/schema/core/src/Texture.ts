@@ -21,23 +21,38 @@ import { TypedArray, Matrix, Versioned } from './basic'
 /**
  * Texture
  */
-export interface TextureType {
+export interface Texture {
 	sampler: SamplerDataType
 	image: ImageDataType
 	transform: Matrix
 	extensions?: { [key: string]: any }
 	extras?: any
 }
+/**
+ * @deprecated use Texture instead
+ * @alias Texture
+ */
+export type TextureData = Texture
+/**
+ * @deprecated use Texture instead
+ * @alias Texture
+ */
+export type TextureType = Texture
 
 /**
  * CubeTexture
  */
-export interface CubeTextureType {
+export interface CubeTexture {
 	sampler: SamplerDataType
 	images: ImageDataType[]
 	extensions?: { [key: string]: any }
 	extras?: any
 }
+/**
+ * @deprecated use CubeTexture instead
+ * @alias CubeTexture
+ */
+export type CubeTextureType = CubeTexture
 
 /**
  * @note glTF2 标准没有提及 format 和 innerFormat
@@ -46,6 +61,10 @@ export interface CubeTextureType {
  * - 考虑到用户从外部输入的image基本都是 rgba png 或者 rgb jpeg
  * - 复杂 format 基本只会在流水线内部和后期逻辑中出现
  * - 这里交给转换器和渲染引擎选择合理的配置
+ *
+ * - if has `.data`, must not have `.uri` and `.extensions.EXT_image.HTMLImage`
+ * - else if has `.uri`, must not have `.extensions.EXT_image.HTMLImage`
+ * - else must have `.extensions.EXT_image.HTMLImage`
  */
 export interface ImageDataType extends Versioned {
 	/**
