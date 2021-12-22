@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-import { TypedArray, AttributeDataType } from '@gs.i/schema'
+import { TypedArray, AttributeDataType } from '@gs.i/schema-scene'
 
 export * as GLTF from './GLTF'
 export * from './GLTF2.memory'
@@ -100,7 +100,7 @@ export function componentTypeToTypedArray(componentType: number) {
 }
 
 /**
- * port from  three gjtf exporter
+ * port from  three gltf exporter
  */
 /**
  * Get the required size + padding for a buffer, rounded to the next 4-byte boundary.
@@ -191,19 +191,21 @@ export function decodeText(array: TypedArray): string {
 }
 
 export function parseImageFromBufferView(mimeType: string, uintBufferView: Uint8Array): string {
-	// let hasAlpha = true
+	/*
+	let hasAlpha = true
 
-	// if (mimeType === 'image/jpeg') hasAlpha = false
-	// if (mimeType === 'image/png') {
-	// 	// Inspect the PNG 'IHDR' chunk to determine whether the image could have an
-	// 	// alpha channel. This check is conservative — the image could have an alpha
-	// 	// channel with all values == 1, and the indexed type (colorType == 3) only
-	// 	// sometimes contains alpha.
-	// 	//
-	// 	// https://en.wikipedia.org/wiki/Portable_Network_Graphics#File_header
-	// 	const colorType = new DataView(uintBufferView, 25, 1).getUint8(0)
-	// 	hasAlpha = colorType === 6 || colorType === 4 || colorType === 3
-	// }
+	if (mimeType === 'image/jpeg') hasAlpha = false
+	if (mimeType === 'image/png') {
+		// Inspect the PNG 'IHDR' chunk to determine whether the image could have an
+		// alpha channel. This check is conservative — the image could have an alpha
+		// channel with all values == 1, and the indexed type (colorType == 3) only
+		// sometimes contains alpha.
+		//
+		// https://en.wikipedia.org/wiki/Portable_Network_Graphics#File_header
+		const colorType = new DataView(uintBufferView, 25, 1).getUint8(0)
+		hasAlpha = colorType === 6 || colorType === 4 || colorType === 3
+	}
+	*/
 
 	const blob = new Blob([uintBufferView], { type: mimeType })
 	const sourceURI = URL.createObjectURL(blob)
@@ -242,6 +244,7 @@ export function attrNameGltfToThree(name: string): string {
 	}
 }
 
+// TODO maybe move to utils-geometry or backend-gltf
 export function getMinMax(attributeData: AttributeDataType) {
 	if (attributeData.itemSize === 1) {
 		let min0 = Infinity

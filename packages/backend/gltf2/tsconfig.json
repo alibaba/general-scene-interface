@@ -32,9 +32,6 @@
 		},
 		{
 			"path": "../../utils/math"
-		},
-		{
-			"path": "../../utils/transform"
 		}
 	]
 }

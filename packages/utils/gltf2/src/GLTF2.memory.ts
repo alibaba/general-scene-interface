@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-import { TypedArray } from '@gs.i/schema'
+import { TypedArray } from '@gs.i/schema-scene'
 /**
  * GLTF2 的内存格式接口
  * gltf2 只提供了 json 格式，其中 uri 直接指向了 文件资源
