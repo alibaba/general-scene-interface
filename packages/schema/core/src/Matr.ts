@@ -18,7 +18,6 @@ import { Programable, ProgramablePbr } from './Programable'
 export interface MatrSpriteDataType extends MatrBaseDataType {
 	readonly type: 'sprite'
 
-	size: Double
 	sizeAttenuation: boolean
 
 	/**
@@ -33,6 +32,9 @@ export interface MatrSpriteDataType extends MatrBaseDataType {
 
 	/**
 	 * shape of the sprite
+	 * - size * scale
+	 * - rotation
+	 * - offset/position
 	 */
 	transform: Transform2
 
@@ -45,6 +47,32 @@ export interface MatrSpriteDataType extends MatrBaseDataType {
 	extensions?: {
 		EXT_matr_programmable_sprite?: {
 			vertSpriteGeometry?: string
+		}
+		/**
+		 * alias to standard per-sprite transformation attributes
+		 * - set all three of them if you want to specify transformation for each sprite
+		 * - follow the standard transformation order
+		 * 	- scale, then rotate, then offset
+		 * 	- matrix = offset * rotation * scale
+		 * - @see https://www.khronos.org/registry/glTF/specs/2.0/glTF-2.0.html#transformations
+		 */
+		EXT_sprite_attributes?: {
+			/**
+			 * name of the attribute that controls the offset of each sprite
+			 * - should be an attribute of `vec2`
+			 * - avoid using name `POSITION` which is actually the center of the sprite
+			 */
+			offset?: string
+			/**
+			 * name of the attribute that controls the scale of each sprite
+			 * - should be an attribute of `vec2`
+			 */
+			scale?: string
+			/**
+			 * name of the attribute that controls the rotation of each sprite
+			 * - should be an attribute of `float`
+			 */
+			rotation?: string
 		}
 	} & MatrBaseDataType['extensions']
 }
