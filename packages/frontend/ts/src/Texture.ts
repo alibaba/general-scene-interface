@@ -3,56 +3,77 @@
  * All rights reserved.
  */
 
-import { ImageDataType, SamplerDataType, TextureType } from '@gs.i/schema'
+import { ImageDataType, SamplerDataType, TextureType, Int } from '@gs.i/schema-scene'
+import { specifyTexture, specifyImage, specifySampler } from '@gs.i/processor-specify'
 
 export interface ImageData extends ImageDataType {}
 export class ImageData {
-	version = 0
+	/**
+	 * @deprecated Use {@link ImageDataType.extensions}
+	 */
+	public get flipY() {
+		return this.extensions?.EXT_image?.flipY
+	}
+	public set flipY(v) {
+		if (!this.extensions) this.extensions = {}
+		if (!this.extensions.EXT_image) this.extensions.EXT_image = {}
 
-	flipY = false
+		this.extensions.EXT_image.flipY = v
+	}
 
-	constructor(params: Partial<ImageDataType> = {}) {
-		for (const key of Object.keys(params)) {
-			const v = params[key]
-			if (v !== undefined) {
-				this[key] = v
-			}
+	constructor(
+		imageSource: Exclude<
+			| ImageDataType['data']
+			| ImageDataType['uri']
+			| HTMLImageElement
+			| HTMLCanvasElement
+			| HTMLVideoElement,
+			undefined
+		>,
+		width?: Int,
+		height?: Int
+	) {
+		if (typeof imageSource === 'string') {
+			this.uri = imageSource
+		} else if (imageSource instanceof HTMLElement) {
+			if (!this.extensions) this.extensions = {}
+			if (!this.extensions.EXT_image) this.extensions.EXT_image = {}
+
+			this.extensions.EXT_image.HTMLImage = imageSource
+		} else {
+			this.data = imageSource
 		}
-		// Check width & height of image data
-		if (this.image) {
-			if (this.image instanceof HTMLElement) {
-				this.width = this.image.width
-				this.height = this.image.height
-			} else if (!this.width || !this.height) {
-				throw new Error('width & height must be provided for image data: TypedArray | DataView . ')
-			}
-		}
+
+		this.width = width
+		this.height = height
+
+		specifyImage(this)
 	}
 }
 
 export interface Sampler extends SamplerDataType {}
 export class Sampler {
 	constructor(params: Partial<SamplerDataType> = {}) {
-		// https://mariusschulz.com/articles/string-literal-types-in-typescript
-		this.magFilter = 'LINEAR'
-		this.minFilter = 'LINEAR'
-		this.wrapS = 'REPEAT'
-		this.wrapT = 'REPEAT'
-		this.anisotropy = 1
 		for (const key of Object.keys(params)) {
 			const v = params[key]
 			if (v !== undefined) {
 				this[key] = v
 			}
 		}
+
+		specifySampler(this)
 	}
 }
 
 export interface TextureData extends TextureType {}
 export class TextureData {
-	constructor(params: Partial<TextureType>) {
-		this.sampler = new Sampler(params.sampler)
-		this.image = new ImageData(params.image)
-		this.transform = params.transform ? params.transform : [1, 0, 0, 0, 1, 0, 0, 0, 1]
+	constructor(
+		image: ConstructorParameters<typeof ImageData>[0],
+		sampler: ConstructorParameters<typeof Sampler>[0]
+	) {
+		this.sampler = new Sampler(sampler)
+		this.image = new ImageData(image)
+
+		specifyTexture(this)
 	}
 }

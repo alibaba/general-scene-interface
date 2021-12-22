@@ -10,16 +10,28 @@
 	"exclude": ["dist"],
 	"references": [
 		{
-			"path": "../../schema/core-old"
+			"path": "../../schema/core"
+		},
+		{
+			"path": "../../processors/specify"
+		},
+		{
+			"path": "../../processors/matrix"
+		},
+		{
+			"path": "../../processors/bound"
+		},
+		{
+			"path": "../../processors/culling"
+		},
+		{
+			"path": "../../processors/graph"
 		},
 		{
 			"path": "../../utils/geom-builders"
 		},
 		{
 			"path": "../../utils/math"
-		},
-		{
-			"path": "../../utils/transform"
 		}
 	]
 }

@@ -3,12 +3,55 @@
  * All rights reserved.
  */
 
-import { GeomDataType } from '@gs.i/schema'
+import { GeomDataType } from '@gs.i/schema-scene'
+import { specifyGeometry } from '@gs.i/processor-specify'
 
-export interface Geom extends GeomDataType {}
-export class Geom {
+export interface Geom extends GeomDataType {} // this do member declarations for you
+export class Geom implements GeomDataType {
+	/**
+	 * boundingBox
+	 * @deprecated use processor-bound to improve performance.
+	 */
+	get boundingBox() {
+		return this.extensions?.EXT_geometry_bounds?.box
+	}
+
+	set boundingBox(v) {
+		if (!this.extensions) this.extensions = {}
+		if (!this.extensions.EXT_geometry_bounds) this.extensions.EXT_geometry_bounds = {}
+
+		this.extensions.EXT_geometry_bounds.box = v
+	}
+
+	/**
+	 * boundingSphere
+	 * @deprecated use processor-bound to improve performance.
+	 */
+	get boundingSphere() {
+		return this.extensions?.EXT_geometry_bounds?.sphere
+	}
+	set boundingSphere(v) {
+		if (!this.extensions) this.extensions = {}
+		if (!this.extensions.EXT_geometry_bounds) this.extensions.EXT_geometry_bounds = {}
+
+		this.extensions.EXT_geometry_bounds.sphere = v
+	}
+
+	/**
+	 * drawRange
+	 * @deprecated use extensions.EXT_geometry_range.drawRange instead
+	 */
+	public get drawRange() {
+		return this.extensions?.EXT_geometry_range?.drawRange
+	}
+	public set drawRange(v) {
+		if (!this.extensions) this.extensions = {}
+		if (!this.extensions.EXT_geometry_range) this.extensions.EXT_geometry_range = {}
+
+		this.extensions.EXT_geometry_range.drawRange = v
+	}
+
 	constructor(params: Partial<GeomDataType> = {}) {
-		this.mode = 'TRIANGLES'
 		this.attributes = {}
 		for (const key of Object.keys(params)) {
 			const v = params[key]
@@ -16,5 +59,7 @@ export class Geom {
 				this[key] = v
 			}
 		}
+
+		specifyGeometry(this)
 	}
 }
