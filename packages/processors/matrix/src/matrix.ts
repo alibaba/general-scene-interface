@@ -36,6 +36,14 @@ interface WorldMatrixCache {
 }
 
 /**
+ * union cache of local and world matrices
+ */
+interface MatrixCache {
+	local?: LocalMatrixCache
+	world?: WorldMatrixCache
+}
+
+/**
  * @note PURE FUNCTIONS, will not modify your input
  * @note CACHED
  */
@@ -51,15 +59,21 @@ export class MatProcessor extends Processor {
 	 * 所有 id 都从 WeakMap 得到，一个 key 在一个实例中的 id 是唯一的
 	 */
 	private _counter = 0
-	private _ids = new WeakMap<any, Int>()
+	private _ids = new WeakMap<MeshDataType, Int>()
 
-	private _cacheLocalMatrix = new WeakMap<Transform3, LocalMatrixCache>()
-	private _cacheWorldMatrix = new WeakMap<Transform3, WorldMatrixCache>()
+	// private _cacheLocalMatrix = new WeakMap<Transform3, LocalMatrixCache>()
+	// private _cacheWorldMatrix = new WeakMap<Transform3, WorldMatrixCache>()
+	private _cacheMatrix = new WeakMap<Transform3, MatrixCache>()
+
+	private _path = [] as MeshDataType[]
 
 	processNode(node: MeshDataType, parent?: MeshDataType) {
 		// this.getWorldMatrixShallow(node, parent)
 	}
 
+	/**
+	 * TODO this is slow
+	 */
 	getWorldMatrix(node: MeshDataType): number[] {
 		// root as a special case
 
@@ -69,13 +83,25 @@ export class MatProcessor extends Processor {
 
 		// path from leaf to root
 		// @note path.length >= 2
-		const path: MeshDataType[] = []
+		const path: MeshDataType[] = this._path
+		path.length = 0
 		let curr: MeshDataType | undefined = node
 
-		while (curr) {
+		// while (curr) {
+		// 	path.push(curr)
+		// 	curr = curr.parent
+		// }
+
+		// @note for safety and perf
+		// @result a little bit better ?
+		const MAX_TREE_DEPTH = 2048
+		let i = 0
+		for (; i < MAX_TREE_DEPTH && curr !== undefined && curr !== null; i++) {
 			path.push(curr)
-			curr = node.parent
+			curr = curr.parent
 		}
+
+		if (i === MAX_TREE_DEPTH) console.warn('scene graph too deep, check for circular link')
 
 		// path from root to leaf
 		path.reverse()
@@ -95,7 +121,7 @@ export class MatProcessor extends Processor {
 			// 如果该节点禁用缓存，则子树永远为脏
 			root.transform.version === -1 ||
 			// 如果节点的 local transform 变化，则子树为脏
-			this._cacheLocalMatrix.get(root.transform)?.version !== root.transform.version
+			this._cacheMatrix.get(root.transform)?.local?.version !== root.transform.version
 		) {
 			isDirty = true
 		}
@@ -104,15 +130,23 @@ export class MatProcessor extends Processor {
 		// @TODO how to cache this ?
 		// @NOTE it's not necessary to cache the matrix because it's done by local matrix cache
 		// @NOTE but may be should avoid weakMap reset the same value?
-		this._cacheWorldMatrix.set(root.transform, { matrix: this.getLocalMatrix(root) })
+		const rootMatrixCache = this._cacheMatrix.get(root.transform)
+		if (rootMatrixCache === undefined) {
+			this._cacheMatrix.set(root.transform, { world: { matrix: this.getLocalMatrix(root) } })
+		} else {
+			rootMatrixCache.world = { matrix: this.getLocalMatrix(root, rootMatrixCache) }
+		}
 
 		// loop from the second node (skip root)
+		// @note this optimize is actually slower
+		// let parentWorldMatrixCache = rootMatrixCache?.world as WorldMatrixCache
 		for (let i = 1 /* !NOTICE */; i < path.length; i++) {
 			const curr = path[i]
 			const parent = path[i - 1] // not undefined
 
-			const currWorldMatrixCache = this._cacheWorldMatrix.get(curr.transform)
-			const currLocalMatrixCache = this._cacheLocalMatrix.get(curr.transform)
+			const matrixCache = this._cacheMatrix.get(curr.transform)
+			const currWorldMatrixCache = matrixCache?.world
+			const currLocalMatrixCache = matrixCache?.local
 
 			if (
 				// 如果处于脏子树中，则跳过后面的检查，直接为脏
@@ -134,36 +168,58 @@ export class MatProcessor extends Processor {
 				// 由于是从 root 后的第一个节点开始遍历，并提前对 root 做了处理，
 				// 所以 parent 的 localMatrixCache 和 worldMatrixCache 都是存在且最新的
 				// previous logic made sure that parent worldMatrix is updated
-				const parentWorldMatrixCache = this._cacheWorldMatrix.get(
-					parent.transform
-				) as WorldMatrixCache
+				const parentWorldMatrixCache = this._cacheMatrix.get(parent.transform)
+					?.world as WorldMatrixCache
 
-				const currLocalMatrix = this.getLocalMatrix(curr)
+				const currLocalMatrix = this.getLocalMatrix(curr, matrixCache)
 				const currWorldMatrix = multiplyMatrices(parentWorldMatrixCache.matrix, currLocalMatrix)
 
-				this._cacheWorldMatrix.set(curr.transform, {
-					parentID: this.getID(parent),
-					matrix: currWorldMatrix,
-				})
+				// this._cacheMatrix.set(curr.transform, {
+				// 	parentID: this.getID(parent),
+				// 	matrix: currWorldMatrix,
+				// })
+
+				// const matrixCache = this._cacheMatrix.get(curr.transform)
+				if (matrixCache === undefined) {
+					this._cacheMatrix.set(curr.transform, {
+						world: {
+							parentID: this.getID(parent),
+							matrix: currWorldMatrix,
+						},
+					})
+				} else {
+					matrixCache.world = {
+						parentID: this.getID(parent),
+						matrix: currWorldMatrix,
+					}
+				}
 			}
 		}
 
-		return this._cacheWorldMatrix.get(node.transform)?.matrix as number[]
+		// TODO this weakmap.get is redundant
+		return this._cacheMatrix.get(node.transform)?.world?.matrix as number[]
 	}
 
 	// getID(node: MeshDataType | undefined): Int | undefined {
 	// 	if (node === undefined) return undefined
-	getID(node: object): Int {
+	/**
+	 *
+	 * @param node a reference type (Object)
+	 * @note typescript baned `object` so there is no proper type to use 😮‍💨
+	 * @returns
+	 */
+	getID(node: MeshDataType): Int {
 		let id = this._ids.get(node)
 		if (id === undefined) {
 			id = this._counter++
 			this._ids.set(node, id)
 		}
-
+		if (id >= 9007199254740990) throw 'ID exceeds MAX_SAFE_INTEGER'
 		return id
 	}
 
-	getLocalMatrix(node: MeshDataType): number[] {
+	getLocalMatrix(node: MeshDataType, cache: MatrixCache | null | undefined = null): number[] {
+		//
 		// if (!node) throw new SchemaNotValid(`MatProcessor: the node you input does not exist`)
 		// if (!node.transform)
 		// 	throw new SchemaNotValid(
@@ -181,20 +237,27 @@ export class MatProcessor extends Processor {
 			// 不缓存
 			return getMatrix(transform)
 		} else {
-			const cache = this._cacheLocalMatrix.get(transform)
+			// if input a cache (including undefined), use it directly
+			// if input null (by default), fetch catch
+			cache = cache === null ? this._cacheMatrix.get(transform) : cache
 			if (!cache) {
 				// 未缓存
 				const matrix = getMatrix(transform)
-				this._cacheLocalMatrix.set(transform, { version: transform.version, matrix })
+				this._cacheMatrix.set(transform, { local: { version: transform.version, matrix } })
+				return matrix
+			} else if (cache.local === undefined) {
+				// 未缓存
+				const matrix = getMatrix(transform)
+				cache.local = { version: transform.version, matrix }
 				return matrix
 			} else {
 				// 命中缓存
-				if (cache.version !== transform.version) {
+				if (cache.local.version !== transform.version) {
 					// 更新缓存版本
-					getMatrix(transform, cache.matrix)
-					cache.version = transform.version
+					getMatrix(transform, cache.local.matrix)
+					cache.local.version = transform.version
 				}
-				return cache.matrix
+				return cache.local.matrix
 			}
 		}
 
