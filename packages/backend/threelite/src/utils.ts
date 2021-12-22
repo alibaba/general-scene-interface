@@ -3,8 +3,8 @@
  * All rights reserved.
  */
 
-import { Box3, Sphere } from 'three-lite'
-import { BBox, BSphere, PrgBaseDataType } from '@gs.i/schema'
+import { Box3, Sphere, Object3D, Vector3, Euler, Quaternion, Matrix4 } from 'three-lite'
+import { BBox, BSphere } from '@gs.i/schema-scene'
 
 export function box3Equals(b1: Box3 | BBox, b2: Box3 | BBox): boolean {
 	return (
@@ -38,8 +38,8 @@ export function elementsEquals(e1: number[], e2: number[]): boolean {
 	return true
 }
 
-export function convDefines(gl2Defines, defines) {
-	const d = gl2Defines || {}
+export function convDefines(gl2Defines = {}, defines = {}) {
+	const d = gl2Defines
 	for (const key in defines) {
 		if (defines[key] !== undefined && defines[key] !== null && defines[key] !== false) {
 			defines[key] !== d[key] && (d[key] = defines[key])
@@ -68,6 +68,8 @@ void main() {
     gl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );
 }`
 
+/** not necessary any more
+ * 
 export type PreShaderCodes = {
 	attributes: string
 	varyingsVert: string
@@ -76,7 +78,7 @@ export type PreShaderCodes = {
 }
 // 自动过滤掉three自带的几个attr名称
 const DEFAULT_ATTR_NAMES = ['position', 'normal', 'uv']
-export function genPreShaderCode(matr: PrgBaseDataType): PreShaderCodes {
+export function genPreShaderCode(matr: MatrBaseDataType): PreShaderCodes {
 	const codes: PreShaderCodes = {
 		attributes: '',
 		varyingsVert: '',
@@ -130,6 +132,8 @@ export function genPreShaderCode(matr: PrgBaseDataType): PreShaderCodes {
 	return codes
 }
 
+ */
+
 export const SupportedExtensions = (function checkExts() {
 	const flags = {
 		derivatives: true,
@@ -181,3 +185,98 @@ export const SupportedExtensions = (function checkExts() {
 
 	return flags
 })()
+
+/**
+ * - prevent user from using three.js Object3D's transformation and matrix-calculation
+ * - prevent three.js renderer from updating matrix automatically
+ */
+export function sealTransform(threeMesh: Object3D) {
+	Object.defineProperty(threeMesh, 'matrixAutoUpdate', {
+		// value: false,
+		// writable: false,
+		get: () => {
+			return false
+		},
+		set: (v) => {
+			if (v)
+				console.error(
+					`matrixAutoUpdate can not be set to true,` +
+						`because this object3D's matrix is managed by gsi processor`
+				)
+		},
+	})
+
+	Object.defineProperty(threeMesh, 'matrixWorldNeedsUpdate', {
+		// value: false,
+		get: () => {
+			return false
+		},
+		set: (v) => {
+			if (v)
+				console.error(
+					`matrixWorldNeedsUpdate can not be set to true,` +
+						`because this object3D's matrix is managed by gsi processor`
+				)
+		},
+	})
+
+	Object.defineProperty(threeMesh, 'position', {
+		get: () => {
+			console.warn(
+				`position will always be 0,0,0` +
+					`because this object3D's matrix is managed by gsi processor`
+			)
+			return new Vector3()
+		},
+	})
+
+	Object.defineProperty(threeMesh, 'rotation', {
+		get: () => {
+			console.warn(
+				`rotation will always be 0,0,0` +
+					`because this object3D's matrix is managed by gsi processor`
+			)
+			return new Euler()
+		},
+	})
+
+	Object.defineProperty(threeMesh, 'quaternion', {
+		get: () => {
+			console.warn(
+				`quaternion will always be default value` +
+					`because this object3D's matrix is managed by gsi processor`
+			)
+			return new Quaternion()
+		},
+	})
+
+	Object.defineProperty(threeMesh, 'scale', {
+		get: () => {
+			console.warn(
+				`scale will always be 1` + `because this object3D's matrix is managed by gsi processor`
+			)
+			return new Vector3()
+		},
+	})
+
+	Object.defineProperty(threeMesh, 'matrix', {
+		get: () => {
+			console.warn(
+				`matrix will always be identical, use .worldMatrix instead.` +
+					`because this object3D's matrix is managed by gsi processor`
+			)
+			return new Matrix4()
+		},
+	})
+
+	threeMesh.updateMatrix = () =>
+		console.error(
+			`updateMatrix will not work, ` + `because this object3D's matrix is managed by gsi processor`
+		)
+
+	threeMesh.updateMatrixWorld = () =>
+		console.error(
+			`updateMatrixWorld will not work, ` +
+				`because this object3D's matrix is managed by gsi processor`
+		)
+}

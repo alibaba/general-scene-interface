@@ -4,8 +4,8 @@
  */
 
 import { MeshStandardMaterial, UniformsUtils, ShaderLib } from 'three-lite'
-import { MatrPbrDataType } from '@gs.i/schema'
-import { genPreShaderCode } from './utils'
+import { MatrPbrDataType, Programable, ProgramablePbr } from '@gs.i/schema-scene'
+// import { genPreShaderCode } from './utils'
 import vs from './PrgPbrMatr.vs.glsl'
 import fs from './PrgPbrMatr.fs.glsl'
 
@@ -60,30 +60,45 @@ export class PrgStandardMaterial extends MeshStandardMaterial {
 		super()
 		// this.setValues(gsiMatr as any) // Set parent class parameters
 
-		if (!gsiMatr.language) {
-			gsiMatr.language = 'GLSL300'
-		} else if (gsiMatr.language !== 'GLSL100' && gsiMatr.language !== 'GLSL300') {
-			throw new Error(`GSI::Matr.language type '${gsiMatr.language}' is not supported`)
+		const programable: Programable =
+			gsiMatr.extensions?.EXT_matr_programmable || ({} as Programable)
+		const programablePbr: ProgramablePbr =
+			gsiMatr.extensions?.EXT_matr_programmable_pbr || ({} as ProgramablePbr)
+
+		if (!programable.language) {
+			programable.language = 'GLSL300'
+		} else if (programable.language !== 'GLSL100' && programable.language !== 'GLSL300') {
+			throw new Error(
+				`GSI::Matr.programable.language type '${programable.language}' is not supported`
+			)
 		}
 
 		// Set shader codes
-		const preCodes = genPreShaderCode(gsiMatr)
+		// const preCodes = genPreShaderCode(gsiMatr)
+		const preCodes = {} as any
 
 		this.vertexShader = vs
-			.replace(/\$\$GSI_INSERT<Attributes>/g, preCodes.attributes || '')
-			.replace(/\$\$GSI_INSERT<Varyings>/g, preCodes.varyingsVert || '')
-			.replace(/\$\$GSI_INSERT<Uniforms>/g, preCodes.uniforms || '')
-			.replace(/\$\$GSI_INSERT<PreVert>/g, gsiMatr.preVert || '')
-			.replace(/\$\$GSI_INSERT<VertGeometry>/g, gsiMatr.vertGeometry || '')
-			.replace(/\$\$GSI_INSERT<VertOutput>/g, gsiMatr.vertOutput || '')
-			.replace(/\$\$GSI_INSERT<PostVert>/g, gsiMatr.postVert || '')
+			.replace(/\$\$GSI_INSERT<Attributes>/g, preCodes.attributes || '') // remove
+			.replace(/\$\$GSI_INSERT<Varyings>/g, preCodes.varyingsVert || '') // remove
+			.replace(/\$\$GSI_INSERT<Uniforms>/g, preCodes.uniforms || '') // remove
+			.replace(
+				/\$\$GSI_INSERT<PreVert>/g,
+				(programable.global || '') + '\n' + (programable.vertGlobal || '')
+			)
+			.replace(/\$\$GSI_INSERT<VertGeometry>/g, programable.vertGeometry || '')
+			.replace(/\$\$GSI_INSERT<VertOutput>/g, programable.vertOutput || '')
+			.replace(/\$\$GSI_INSERT<PostVert>/g, /* programable.postVert || */ '') // remove
 
 		this.fragmentShader = fs
-			.replace(/\$\$GSI_INSERT<Varyings>/g, preCodes.varyingsFrag || '')
-			.replace(/\$\$GSI_INSERT<Uniforms>/g, preCodes.uniforms || '')
-			.replace(/\$\$GSI_INSERT<PreFrag>/g, gsiMatr.preFrag || '')
-			.replace(/\$\$GSI_INSERT<PreLighting>/g, gsiMatr.preLighting || '')
-			.replace(/\$\$GSI_INSERT<FragGeometry>/g, gsiMatr.fragGeometry || '')
+			.replace(/\$\$GSI_INSERT<Varyings>/g, preCodes.varyingsFrag || '') // remove
+			.replace(/\$\$GSI_INSERT<Uniforms>/g, preCodes.uniforms || '') // remove
+			.replace(
+				/\$\$GSI_INSERT<PreFrag>/g,
+				(programable.global || '') + '\n' + (programable.fragGlobal || '')
+			)
+			.replace(/\$\$GSI_INSERT<FragColor>/g, programable.fragOutput || '')
+			.replace(/\$\$GSI_INSERT<PreLighting>/g, programablePbr.fragPreLighting || '')
+			.replace(/\$\$GSI_INSERT<FragGeometry>/g, programablePbr.fragGeometry || '')
 
 		// this.onBeforeCompile = (shader) => {
 		// 	shader['extensionDerivatives'] = true

@@ -6,84 +6,1248 @@
 import { PrgStandardMaterial } from './PrgStandardMaterial'
 import { PrgBasicMaterial } from './PrgBasicMaterial'
 import { PrgPointMaterial } from './PrgPointMaterial'
+
 import {
-	TypedArray,
-	Converter,
 	MeshDataType,
-	MatrBaseDataType,
 	GeomDataType,
-	TextureType,
+	Texture,
+	CubeTexture,
 	AttributeDataType,
 	MatrPbrDataType,
 	MatrUnlitDataType,
 	MatrPointDataType,
 	MatrSpriteDataType,
-	ColorLike,
-	isTypedArray,
-	DISPOSED,
+	MatrBaseDataType,
+	ColorRGB,
 	GL_STATIC_DRAW,
 	GL_DYNAMIC_DRAW,
-	UniformDataType,
-	__GSI_MESH_INTERNAL_PROP_KEY_0__,
-	__GSI_MESH_INTERNAL_PROP_0__,
-	__defaultMeshInternalProp,
-} from '@gs.i/schema'
-import { Transform3, matrix4Equals } from '@gs.i/utils-transform'
+	Int,
+	//
+	DISPOSED,
+	isTexture,
+	isCubeTexture,
+	isTypedArray,
+	isRenderableMesh,
+	isDISPOSED,
+} from '@gs.i/schema-scene'
+
+import type { Converter } from '@gs.i/schema-converter'
+import { MatProcessor } from '@gs.i/processor-matrix'
+import { BoundingProcessor } from '@gs.i/processor-bound'
+import { diffSetsFast, diffSetsFastAndToArray, GraphProcessor } from '@gs.i/processor-graph'
+import { specifyMesh, specifyTexture } from '@gs.i/processor-specify'
+import { traverse, flatten } from '@gs.i/utils-traverse'
+
+import { syncMaterial } from './syncMaterial'
+import { syncTexture } from './syncTexture'
+
 // import * as THREE from 'three-lite'
 import {
 	Object3D,
-	Vector2,
-	Vector3,
 	BufferGeometry,
 	Material,
 	TextureLoader,
 	Box3,
 	Sphere,
-	Texture,
+	Texture as ThreeTexture,
 	BufferAttribute,
 	TrianglesDrawMode,
 	StaticDrawUsage,
 	DynamicDrawUsage,
-	FrontSide,
-	BackSide,
-	DoubleSide,
-	NoBlending,
-	NormalBlending,
-	AdditiveBlending,
 	Color,
 	CanvasTexture,
-	VideoTexture,
 	DataTexture,
-	NearestFilter,
-	LinearFilter,
-	NearestMipMapNearestFilter,
-	LinearMipMapNearestFilter,
-	NearestMipMapLinearFilter,
-	LinearMipMapLinearFilter,
-	ClampToEdgeWrapping,
-	MirroredRepeatWrapping,
-	RepeatWrapping,
-	Vector4,
-	Matrix3,
-	Matrix4,
 } from 'three-lite'
-import { generateGsiSpriteInfo } from '@gs.i/utils-geometry'
-import { box3Equals, convDefines, elementsEquals, sphereEquals, SupportedExtensions } from './utils'
-import { Euler, Vector3 as Vec3 } from '@gs.i/utils-math'
 import { PrgSpriteMaterial } from './PrgSpriteMaterial'
+import { sealTransform } from './utils'
 
-export interface DefaultConverterConfig {
+export const DefaultConfig = {
 	/**
 	 * 是否启用Mesh frustumCulled属性，以及隐藏被视锥体剔除的Mesh
+	 * @deprecated
+	 * @note should be done by render engine or upstream processors. not here
 	 */
-	meshFrustumCulling: boolean
+	// meshFrustumCulling: true,
+
+	/**
+	 * #### whether to decompose matrix into {position,quaternion,scale}
+	 * - if you don't transform the converted THREE.Object3D, you should leave this disabled
+	 *
+	 * #### if you keep this disabled (by default):
+	 * - Object3D.{position,quaternion,scale} will be initial values (0,0,0 or 1,1,1) and should not be used
+	 * - Object3D.matrix will be calculated from gsi-matrix-processor
+	 * - Object3D.matrixAutoUpdate will be set to `false`, so that three.js won't automatically update the matrix from initial values.
+	 * - if you use `Object3D.updateMatrixWorld(true)` (force update), all matrices will be wrong
+	 * - if you use `Object3D.updateMatrix()` (manual update), that matrix will be wrong
+	 *
+	 * #### if you enable this:
+	 * - Object3D.{position,quaternion,scale} will be set correctly
+	 * - Object3D.matrix will be left undefined
+	 * - everything else will be handled by three the usual way.
+	 *
+	 * #### so:
+	 * - if you want to transform the converted Object3D, you should enable this
+	 * - then three.js will compose the matrix again (backwards)
+	 * - it is more efficient to use the matrix directly without decompose-compose
+	 *
+	 * @default false
+	 */
+	decomposeMatrix: false,
+
+	/**
+	 * #### whether to use GSI frustum culling instead of three.js
+	 * - three.js uses BoundingSphere to do frustum culling
+	 * - but the generation of BoundingSphere is not efficient
+	 * - also you have to update the bounding sphere manually every time you changed the geometry
+	 *
+	 * #### if enabled:
+	 * - all converted `Object3D.frustumCulled` will be set to `false`, so that three.js will skip checking
+	 * - converter will use processor-culling to check every time `convert` is called
+	 * - if mesh culled, the converted `Object3D.visible` will be set to `false`
+	 */
+	overrideFrustumCulling: false,
+
+	/**
+	 * automatic dispose three.js objects if the GSI counterpart is removed from the tree
+	 *
+	 * @TODO @FIXME this is not right
+	 *
+	 * #### if enabled
+	 * - the converter will assume you always convert the same scene-graph (with the same root node)
+	 * - every time you convert the tree, converter will find out resources you removed from that tree.
+	 * - and call the `.dispose()` method of the converted object.
+	 *
+	 * #### if disabled: @TODO not implemented
+	 * - you can pass any mesh, tree, sub-tree to `.convert` anytime. old resources won't be affected
+	 * - you should dispose the converted three.js object manually if it's not used anymore
+	 * - all gsi objects will be store as weak reference because we only care about added ones not removed ones.
+	 */
+	autoDisposeThreeObject: true,
+
+	/**
+	 * @note safe to share globally @simon
+	 */
+	matrixProcessor: new MatProcessor(),
+	/**
+	 * @note safe to share globally @simon
+	 */
+	boundingProcessor: new BoundingProcessor(),
+	/**
+	 * @note safe to share globally @simon
+	 */
+	graphProcessor: new GraphProcessor(),
 }
 
-export const DefaultConfig: DefaultConverterConfig = {
-	meshFrustumCulling: true,
+export type ConverterConfig = Partial<typeof DefaultConfig>
+
+/**
+ * 生成Three Lite Scene的Converter
+ * @authors @Simon @QianXun
+ * @note 底层渲染器通常需要用户主动资源回收，单向数据流中，用户只看到数据变化不看到底层资源的增减，因此可以提供自动回收机制
+ */
+export class ThreeLiteConverter implements Converter {
+	/**
+	 * type
+	 */
+	readonly type = 'ThreeLiteConverter'
+
+	/**
+	 * config
+	 */
+	config: Required<ConverterConfig>
+
+	/**
+	 * Scene info
+	 */
+	info = {
+		renderableCount: 0,
+	}
+
+	// #region id generator
+
+	/**
+	 * 这个计数器配合 WeakMap 一起使用作为**局部**唯一ID，可以避免多个实例存在时的撞表问题。
+	 *
+	 * 所有 id 都从 WeakMap 得到，一个 key 在一个实例中的 id 是唯一的
+	 *
+	 * conv 需要保存上一次的输入结构，以及 conv 结果，但是不需要保存输入的对象
+	 */
+	private _counter = 0
+	private _ids = new WeakMap<any, Int>()
+
+	/**
+	 * get a local id for the given object
+	 * - this id is comparable **only** if generated by the same instance
+	 */
+	getID(o: Record<string, unknown>): Int {
+		let id = this._ids.get(o)
+		if (id === undefined) {
+			id = this._counter++
+			this._ids.set(o, id)
+		}
+
+		if (id >= 9007199254740990) throw 'ID exceeds MAX_SAFE_INTEGER'
+
+		return id
+	}
+
+	// #endregion
+
+	// #region local caches
+
+	/**
+	 * handled resources (GSI side) from last convert call
+	 *
+	 * @note refresh every `convert`
+	 */
+	private _cachedResources = getResourcesFlat([]) // init with a empty node
+	// private _ar0 = []
+	// private _ar1 = []
+	// private _ar2 = []
+	// private _ar3 = []
+	// private _cachedSnapshot: SnapShot
+
+	/**
+	 * @note
+	 * 		Separate type for better v8 performance.
+	 * 		although it looks no difference in test?
+	 * @todo test if this is necessary, maybe change to back to one single weakmap
+	 */
+	// @note optimize for hidden classes
+	// private _threeObjects = new WeakMap<any, any>()
+	// TODO separate renderable mesh and node for performance
+	// private _threeObject3ds = new WeakMap<MeshDataType, Object3D>()
+	private _threeMesh = new WeakMap<MeshDataType, RenderableObject3D | Object3D>()
+	private _threeGeom = new WeakMap<GeomDataType, BufferGeometry>()
+	private _threeAttr = new WeakMap<AttributeDataType, BufferAttribute>()
+	private _threeTex = new WeakMap<Texture | CubeTexture, ThreeTexture>()
+	// TODO use GsiMatr instead because MatrBaseDataType can not be used alone
+	private _threeMatr = new WeakMap<GsiMatr | MatrBaseDataType, Material>()
+	private _threeColor = new WeakMap<ColorRGB, Color>()
+
+	// private _committedVersions = new WeakMap<any, number>()
+	private _committedAttr = new WeakMap<AttributeDataType, Int>()
+	// private _committedMatr = new WeakMap<GsiMatr | MatrBaseDataType, Int>()
+	// private _committedTex = new WeakMap<Texture | CubeTexture, Int>()
+
+	// #endregion
+
+	constructor(config: ConverterConfig = {}) {
+		this.config = {
+			...DefaultConfig,
+			...config,
+		}
+
+		// this._cachedSnapshot = this.config.graphProcessor.snapshot() // init with a empty node
+	}
+
+	convert(root: MeshDataType): Object3D {
+		/**
+		 * @note It is not the most efficient way to get all the changed components and pre-handle them
+		 * 		 It is quicker to just handle everything during one traversal
+		 * 		 But that will make this process unlikely to be re-used to a different backend
+		 *		 Also worth to notice that these components can be used multiple times in a tree
+		 */
+
+		// @note
+		// 		optimize with flatten tree
+		// 		it's quite expensive to traverse a tree multiple times
+		const flatScene = flatten(root)
+
+		// check resources that require special handling
+		// #resource-stage
+
+		{
+			// const resources = getResources(root)
+			const resources = getResourcesFlat(flatScene)
+
+			// @note not necessary to check added resources,
+			// 		 because it's not practical to separate the creating and updating of resources
+
+			// const added = {
+			// 	materials: diffSetsFast(resources.materials, this._cachedResources.materials),
+			// 	geometries: diffSetsFast(resources.geometries, this._cachedResources.geometries),
+			// 	attributes: diffSetsFast(resources.attributes, this._cachedResources.attributes),
+			// 	textures: diffSetsFast(resources.textures, this._cachedResources.textures),
+			// }
+
+			// const removed = {
+			// 	materials: diffSetsFast(this._cachedResources.materials, resources.materials),
+			// 	geometries: diffSetsFast(this._cachedResources.geometries, resources.geometries),
+			// 	attributes: diffSetsFast(this._cachedResources.attributes, resources.attributes),
+			// 	textures: diffSetsFast(this._cachedResources.textures, resources.textures),
+			// }
+
+			// const materials = this._ar0
+			// const geometries = this._ar1
+			// const attributes = this._ar2
+			// const textures = this._ar3
+			// materials.length = 0
+			// geometries.length = 0
+			// attributes.length = 0
+			// textures.length = 0
+
+			// const removed = {
+			// 	materials: diffSetsFastAndToArray(
+			// 		this._cachedResources.materials,
+			// 		resources.materials,
+			// 		this._ar0
+			// 	),
+			// 	geometries: diffSetsFastAndToArray(
+			// 		this._cachedResources.geometries,
+			// 		resources.geometries,
+			// 		this._ar1
+			// 	),
+			// 	attributes: diffSetsFastAndToArray(
+			// 		this._cachedResources.attributes,
+			// 		resources.attributes,
+			// 		this._ar2
+			// 	),
+			// 	textures: diffSetsFastAndToArray(
+			// 		this._cachedResources.textures,
+			// 		resources.textures,
+			// 		this._ar3
+			// 	),
+			// }
+
+			const removed = {
+				materials: this._cachedResources.materials,
+				geometries: this._cachedResources.geometries,
+				attributes: this._cachedResources.attributes,
+				textures: this._cachedResources.textures,
+			}
+
+			// create newly added resources
+			// &
+			// update resources
+			// &
+			// put everything in cache
+
+			// for (let i = 0; i < textures.length; i++) {
+			// 	const texture = textures[i]
+			// 	if (isCubeTexture(texture)) throw 'CubeTexture not implemented yet'
+			// 	this.convTexture(texture)
+			// }
+			// for (let i = 0; i < attributes.length; i++) {
+			// 	this.convAttr(attributes[i])
+			// }
+			// for (let i = 0; i < geometries.length; i++) {
+			// 	this.convGeom(geometries[i])
+			// }
+			// for (let i = 0; i < materials.length; i++) {
+			// 	this.convMatr(materials[i])
+			// }
+
+			resources.textures.forEach((texture) => {
+				if (isCubeTexture(texture)) throw 'CubeTexture not implemented yet'
+				this.convTexture(texture)
+				removed.textures.delete(texture)
+			})
+			resources.attributes.forEach((attribute) => {
+				this.convAttr(attribute)
+				removed.attributes.delete(attribute)
+			})
+			resources.geometries.forEach((geometry) => {
+				this.convGeom(geometry)
+				removed.geometries.delete(geometry)
+			})
+			resources.materials.forEach((material) => {
+				this.convMatr(material)
+				removed.materials.delete(material)
+			})
+
+			// auto dispose
+
+			if (this.config.autoDisposeThreeObject) {
+				removed.textures.forEach((texture) => {
+					this._threeTex.get(texture)?.dispose()
+				})
+				// @note three only dispose geom
+				// removed.attributes.forEach((attribute) => {
+				// 	this._threeAttr.get(attribute)?.dispose()
+				// })
+				removed.geometries.forEach((geometry) => {
+					this._threeGeom.get(geometry)?.dispose()
+				})
+				removed.materials.forEach((material) => {
+					this._threeMatr.get(material)?.dispose()
+				})
+			} else {
+				console.warn(
+					'autoDisposeThreeObject=false is not tested yet, may cause memory overflow, set it true for now'
+				)
+			}
+
+			// update cache
+			this._cachedResources = resources
+		}
+
+		// check the tree
+		// @note it seems unnecessary to handle any nodes change before assemble it
+		// 		 since we don't need to take care of any changed stuff here
+
+		{
+			//
+			// const snapshot = this.config.graphProcessor.snapshot(root, true)
+			// const changed = this.config.graphProcessor.diff(this._cachedSnapshot, snapshot)
+			//
+			// const nodes = flatten(root) // array
+			// const added = diffWeakSets(nodes, this._cachedNodes)
+			//
+			// create newly added Object3D
+			// ignore removed objects (no needs to recovery)
+			// ignore moved objects
+			// copy all the matrix? maybe check transform version first?
+			// if moved or transform changed, set matrixWorldNeedsUpdate to true?
+			// or maybe just let matrixProcessor handle it.
+			// reset all the matrix worldMatrix visible extensions
+			// update cache (delete reference)
+		}
+
+		// assemble the tree
+		// - handle all the nodes separately and add their children
+		// - use post-order traversal to make sure all the children are created before added
+		// or
+		// - handle all the nodes separately and add them to their parent
+		// - use pre-order traversal to make sure all the parents are created before added to
+
+		{
+			const rootThree = this.convMesh(root)
+			rootThree.children = []
+			// pre-order traversal, parents are handled before children
+			// traverse(root, (node, parent) => {
+			// 	// console.log('handle node')
+			// 	// skip root node
+			// 	if (parent) {
+			// 		// @note parent is cached before
+			// 		const parentThree = this._threeMesh.get(parent) as Object3D
+			// 		const currentThree = this.convMesh(node)
+			// 		// clear current children to handle removed nodes
+			// 		currentThree.children = []
+			// 		parentThree.children.push(currentThree)
+			// 	}
+			// })
+
+			for (let i = 0; i < flatScene.length; i++) {
+				const node = flatScene[i]
+				const parent = node.parent
+				// skip root node
+				if (parent) {
+					// @note parent is cached before
+					const parentThree = this._threeMesh.get(parent) as Object3D
+					const currentThree = this.convMesh(node)
+					// clear current children to handle removed nodes
+					currentThree.children = []
+					parentThree.children.push(currentThree)
+				}
+			}
+
+			return rootThree
+		}
+	}
+
+	// #region object converters
+
+	/**
+	 * @note run after all the geometries and materials are cached
+	 */
+	private convMesh(gsiMesh: MeshDataType): RenderableObject3D | Object3D {
+		let threeMesh = this._threeMesh.get(gsiMesh) as RenderableObject3D | Object3D
+
+		// create
+		if (!threeMesh) {
+			if (isRenderableMesh(gsiMesh)) {
+				threeMesh = new RenderableObject3D()
+
+				// Assign mode
+				switch (gsiMesh.geometry.mode) {
+					case 'TRIANGLES':
+						threeMesh['isMesh'] = true
+						threeMesh['drawMode'] = TrianglesDrawMode
+						break
+
+					case 'SPRITE':
+						threeMesh['isMesh'] = true
+						threeMesh['drawMode'] = TrianglesDrawMode
+						break
+
+					case 'POINTS':
+						threeMesh['isPoints'] = true
+						break
+
+					case 'LINES':
+						threeMesh['isLine'] = true
+						threeMesh['isLineSegments'] = true
+						break
+
+					default:
+						throw 'Invalid value for GSIGeom.mode: ' + gsiMesh.geometry.mode
+				}
+				this.info.renderableCount++
+			} else {
+				threeMesh = new Object3D()
+			}
+
+			if (!this.config.decomposeMatrix) {
+				// @note avoid user mistakes, if matrix is handled by gsi processor, three.js methods should be disabled
+				sealTransform(threeMesh)
+			} else {
+				// TODO implement this!
+				// decompose the matrix at creation, or just set TRS if given
+				// do not update matrix anymore, only async TRS if given
+				// let three.js do all the job
+				throw 'decomposeMatrix is not implemented yet'
+			}
+
+			if (this.config.overrideFrustumCulling) {
+				threeMesh.frustumCulled = false
+			}
+
+			// update cache
+			this._threeMesh.set(gsiMesh, threeMesh)
+		}
+		// sync
+		{
+			if (isRenderableMesh(gsiMesh)) {
+				// threeMesh is a RenderableObject3D
+
+				const geometry = this._threeGeom.get(gsiMesh.geometry) as BufferGeometry
+				const material = this._threeMatr.get(gsiMesh.material) as Material
+
+				threeMesh['material'] = material
+				threeMesh['geometry'] = geometry
+
+				if (gsiMesh.geometry.attributes.uv) {
+					// @note it's safe to assume `defines` was created above
+					;(material['defines'] as any).GSI_USE_UV = true
+				}
+			}
+
+			threeMesh.visible = gsiMesh.visible
+
+			// @note three doesn't use localMatrix at all. it's only for generating worldMatrix
+			// threeMesh.matrix.elements = this.config.matrixProcessor.getLocalMatrix(gsiMesh)
+			threeMesh.matrixWorld.elements = this.config.matrixProcessor.getWorldMatrix(gsiMesh)
+		}
+
+		return threeMesh
+	}
+
+	/**
+	 * @note run after all the attributes are cached
+	 */
+	private convGeom(gsiGeom: GeomDataType): BufferGeometry {
+		let threeGeometry = this._threeGeom.get(gsiGeom) as BufferGeometry
+
+		// create
+		if (!threeGeometry) {
+			threeGeometry = new BufferGeometry()
+
+			// @note override three.js bounding logic.
+			// 		 three don't have default bounding and will compute bounding the first time used
+			// 		 GSI will always update the latest bounding
+			threeGeometry.boundingBox = new Box3()
+			threeGeometry.boundingSphere = new Sphere()
+
+			// TODO sprite, maybe only accept generated geom here. move generation out?
+
+			// update cache
+			this._threeGeom.set(gsiGeom, threeGeometry)
+		}
+		// sync
+		{
+			// Assign gsi attributes
+
+			// fast clear so that threeGeometry won't keep attributes that deleted from gsi
+			threeGeometry.attributes = {}
+			threeGeometry.index = null
+
+			// re-assign
+			for (const key in gsiGeom.attributes) {
+				const gsiAttr = gsiGeom.attributes[key]
+				// @note it is safe to assume that attributes were handled during #resource-stage
+				const threeAttribute = this._threeAttr.get(gsiAttr) as BufferAttribute
+
+				threeGeometry.attributes[key] = threeAttribute
+			}
+
+			if (gsiGeom.indices) {
+				const threeAttribute = this._threeAttr.get(gsiGeom.indices) as BufferAttribute
+				threeGeometry.index = threeAttribute
+			} else {
+				threeGeometry.index = null
+			}
+
+			// drawRange
+
+			if (
+				gsiGeom.extensions?.EXT_geometry_range?.drawRange?.start !== undefined &&
+				gsiGeom.extensions.EXT_geometry_range.drawRange.count !== undefined
+			) {
+				threeGeometry.setDrawRange(
+					gsiGeom.extensions.EXT_geometry_range.drawRange.start,
+					gsiGeom.extensions.EXT_geometry_range.drawRange.count
+				)
+			}
+
+			// bounding
+
+			if (gsiGeom.extensions?.EXT_geometry_bounds?.box) {
+				// user custom bounds override internal bounds
+				// TODO three.js only use boundingSphere for frustumCulling
+				// 		so maybe we should generate a *baggy* bsphere from bbox
+				const bbox = gsiGeom.extensions.EXT_geometry_bounds.box
+				const threeBbox = threeGeometry.boundingBox as Box3
+				threeBbox.min.x = bbox.min.x
+				threeBbox.min.y = bbox.min.y
+				threeBbox.min.z = bbox.min.z
+				threeBbox.max.x = bbox.max.x
+				threeBbox.max.y = bbox.max.y
+				threeBbox.max.z = bbox.max.z
+			} else if (gsiGeom.extensions?.EXT_geometry_bounds?.sphere) {
+				// user custom bounds override internal bounds
+				const bsphere = gsiGeom.extensions.EXT_geometry_bounds.sphere
+				const threeBsphere = threeGeometry.boundingSphere as Sphere
+				threeBsphere.center.x = bsphere.center.x
+				threeBsphere.center.y = bsphere.center.y
+				threeBsphere.center.z = bsphere.center.z
+				threeBsphere.radius = bsphere.radius
+			} else {
+				// @note three will use bsphere but may not use bbox so...
+				const bsphere = this.config.boundingProcessor.getGeomBoundingSphere(gsiGeom)
+				const threeBsphere = threeGeometry.boundingSphere as Sphere
+				threeBsphere.center.x = bsphere.center.x
+				threeBsphere.center.y = bsphere.center.y
+				threeBsphere.center.z = bsphere.center.z
+				threeBsphere.radius = bsphere.radius
+			}
+		}
+
+		// not versioning for three because we don't have control to VAOs
+
+		return threeGeometry
+	}
+
+	private convAttr(gsiAttr: AttributeDataType): BufferAttribute {
+		let threeAttribute = this._threeAttr.get(gsiAttr) as BufferAttribute
+		let committedVersion = this._committedAttr.get(gsiAttr) as Int
+
+		// create
+		if (!threeAttribute) {
+			// 类型检查
+			if (isDISPOSED(gsiAttr.array))
+				throw 'This attribute is already disposed. Can not create a new threejs object from it.'
+			if (!isTypedArray(gsiAttr.array)) throw 'GSI::Attribute.array must be a TypedArray'
+
+			// Basics
+			threeAttribute = new BufferAttribute(gsiAttr.array, gsiAttr.itemSize, gsiAttr.normalized)
+
+			// releaseOnUpload
+			if (gsiAttr.disposable) {
+				// 底层渲染器释放 array 的方案各有不同，用支持的即可
+				threeAttribute.onUploadCallback = function () {
+					threeAttribute.array = []
+					// @note this may still be used for generating bounds
+					// gsi 释放 array 用内置类型
+					gsiAttr.array = DISPOSED
+				}
+			}
+
+			committedVersion = gsiAttr.version
+
+			// update cache
+			this._threeAttr.set(gsiAttr, threeAttribute)
+			this._committedAttr.set(gsiAttr, committedVersion)
+		}
+
+		// sync
+		{
+			// TODO disable changing these values
+			// TODO itemSize normalized ...
+			switch (gsiAttr.usage) {
+				case 'STATIC_DRAW':
+					threeAttribute.usage = StaticDrawUsage || GL_STATIC_DRAW
+					break
+				case 'DYNAMIC_DRAW':
+					threeAttribute.usage = DynamicDrawUsage || GL_DYNAMIC_DRAW
+					break
+				default:
+					throw 'Invalid value for GSI::Attribute.usage: ' + gsiAttr.usage
+			}
+		}
+
+		// update
+		if (committedVersion !== gsiAttr.version || gsiAttr.version === -1) {
+			// @note new object will always be uploaded by three,
+			// 		 no needs to set needsUpdate for newly created object
+
+			if (isDISPOSED(gsiAttr.array))
+				throw 'This attribute is already disposed. Can not update its data. If its needs to be updated. Do not mark it `disposable`'
+
+			threeAttribute.needsUpdate = true
+
+			// Update process, with limitations by STATIC_DRAW or DYNAMIC_DRAW
+			if (gsiAttr.usage === 'STATIC_DRAW') {
+				// If the gsiAttr.array is new, update attribute by resending array to GPU
+				if (gsiAttr.extensions?.EXT_buffer_partial_update?.updateRanges?.length) {
+					console.warn('GSI::Attribute.updateRanges is not supported in `STATIC_DRAW` usage')
+				}
+				// Overwrite array
+				threeAttribute.array = gsiAttr.array
+			} else if (gsiAttr.usage === 'DYNAMIC_DRAW') {
+				// TODO: it should be okay to use a different array ?
+				// if (threeAttribute.array !== gsiAttr.array) {
+				// 	throw new Error(
+				// 		'GSI::Attribute.array: changing array itself is not permitted when attribute usage is `DYNAMIC_DRAW`'
+				// 	)
+				// }
+
+				// Merge and set .updateRanges
+				if (gsiAttr.extensions?.EXT_buffer_partial_update?.updateRanges?.length) {
+					const updateRanges = gsiAttr.extensions.EXT_buffer_partial_update.updateRanges
+					const mergedRange = { start: Infinity, end: -Infinity }
+					for (let i = 0; i < updateRanges.length; i++) {
+						const range = updateRanges[i]
+						const start = range.start
+						const end = start + range.count
+						if (start < mergedRange.start) mergedRange.start = start
+						if (end > mergedRange.end) mergedRange.end = end
+					}
+					threeAttribute.updateRange.offset = mergedRange.start
+					threeAttribute.updateRange.count = mergedRange.end - mergedRange.start
+				} else {
+					// @note @Simon no needs tp warn, this means to update the whole array
+					// console.warn('GSI::Attribute: needs update data but no updateRanges are provided')
+					// Default value - from BufferAttribute.js
+					threeAttribute.updateRange = { offset: 0, count: -1 }
+				}
+			} else {
+				throw new Error('Invalid value of GSI::Attribute.usage')
+			}
+
+			// update cache
+			committedVersion = gsiAttr.version
+			this._committedAttr.set(gsiAttr, committedVersion)
+		}
+
+		return threeAttribute
+	}
+
+	/**
+	 * @note run after all the textures are cached
+	 */
+	private convMatr(gsiMatr: GsiMatr) {
+		let threeMatr = this._threeMatr.get(gsiMatr) as Material
+		// let committedVersion = this._committedMatr.get(gsiMatr) as Int
+
+		// create
+		if (!threeMatr) {
+			switch (gsiMatr.type) {
+				// @note just throw
+				// case 'basic':
+				// 	console.error('Use MatrUnlit instead of MatrBasic')
+				// 	threeMatr = new PrgBasicMaterial(gsiMatr as MatrUnlitDataType)
+				// 	break
+				case 'point':
+					threeMatr = new PrgPointMaterial(gsiMatr as MatrPointDataType)
+					break
+				case 'unlit':
+					threeMatr = new PrgBasicMaterial(gsiMatr as MatrUnlitDataType)
+					break
+				case 'pbr':
+					threeMatr = new PrgStandardMaterial(gsiMatr as MatrPbrDataType)
+					break
+				case 'sprite':
+					threeMatr = new PrgSpriteMaterial(gsiMatr as MatrSpriteDataType)
+					break
+				default:
+					throw 'Unsupported GSI::Material Type: ' + gsiMatr['type']
+				// threeMatr = new PrgBasicMaterial(gsiMatr as MatrUnlitDataType)
+			}
+
+			// @note better performance to just sync threeMatr.version
+			// committedVersion = gsiMatr.version
+
+			// update cache
+			this._threeMatr.set(gsiMatr, threeMatr)
+			// this._committedMatr.set(gsiMatr, committedVersion)
+
+			syncMaterial(gsiMatr, threeMatr, this._threeTex)
+		}
+
+		/**
+		 * @NOTE these parameters are pipeline related. only update when version bumped
+		 */
+		// sync
+		// syncMaterial(gsiMatr, threeMatr, this._threeTex)
+
+		// material type specified parameters
+		// @note
+		// 		these parameters needs to be updated every time
+		// @note
+		// 		color parameters on THREE.Material must be THREE.Color
+		// 		@see THREEJS/renderers/webgl/WebGLMaterials :: refreshUniformsCommon
+		switch (gsiMatr.type) {
+			// @note there is no material type === basic, let it throw
+			// case 'basic':
+			// 	break
+
+			case 'pbr': {
+				const pbrThreeMatr = threeMatr as PrgStandardMaterial
+
+				pbrThreeMatr.color = this.convColor(gsiMatr.baseColorFactor)
+				pbrThreeMatr.emissive = this.convColor(gsiMatr.emissiveFactor)
+				pbrThreeMatr.metalness = gsiMatr.metallicFactor
+				pbrThreeMatr.roughness = gsiMatr.roughnessFactor
+
+				/**
+				 * @todo metallicRoughnessTexture 需要对 three 的 PBR 做一些修改
+				 * @QianXun 根据three的gltf loader实现，暂时将这个texture同时附给两个属性
+				 * https://threejs.org/examples/?q=gltf#webgl_loader_gltf_extensions
+				 * @note it is safe to assume that textures have been handled and cached in previews #resourceStage
+				 */
+				pbrThreeMatr.metalnessMap = gsiMatr.metallicRoughnessTexture
+					? (this._threeTex.get(gsiMatr.metallicRoughnessTexture) as ThreeTexture)
+					: null
+				pbrThreeMatr.roughnessMap = gsiMatr.metallicRoughnessTexture
+					? (this._threeTex.get(gsiMatr.metallicRoughnessTexture) as ThreeTexture)
+					: null
+				pbrThreeMatr.map = gsiMatr.baseColorTexture
+					? (this._threeTex.get(gsiMatr.baseColorTexture) as ThreeTexture)
+					: null
+				pbrThreeMatr.emissiveMap = gsiMatr.emissiveTexture
+					? (this._threeTex.get(gsiMatr.emissiveTexture) as ThreeTexture)
+					: null
+				pbrThreeMatr.normalMap = gsiMatr.normalTexture
+					? (this._threeTex.get(gsiMatr.normalTexture) as ThreeTexture)
+					: null
+				pbrThreeMatr.aoMap = gsiMatr.occlusionTexture
+					? (this._threeTex.get(gsiMatr.occlusionTexture) as ThreeTexture)
+					: null
+				break
+			}
+
+			case 'unlit': {
+				const unlitThreeMatr = threeMatr as PrgBasicMaterial
+				const matr = gsiMatr as MatrUnlitDataType
+
+				unlitThreeMatr.color = this.convColor(matr.baseColorFactor)
+				unlitThreeMatr.map = matr.baseColorTexture
+					? (this._threeTex.get(matr.baseColorTexture) as ThreeTexture)
+					: null
+				break
+			}
+
+			case 'point': {
+				const matr = gsiMatr as MatrPointDataType
+				const pointThreeMatr = threeMatr as PrgPointMaterial
+
+				pointThreeMatr.size = matr.size
+				pointThreeMatr.sizeAttenuation = matr.sizeAttenuation
+				pointThreeMatr.color = this.convColor(matr.baseColorFactor)
+				pointThreeMatr.map = matr.baseColorTexture
+					? (this._threeTex.get(matr.baseColorTexture) as ThreeTexture)
+					: null
+				break
+			}
+
+			case 'sprite': {
+				const threeM = threeMatr as PrgSpriteMaterial
+				const matr = gsiMatr as MatrSpriteDataType
+				threeM.uniforms.opacity.value = matr.opacity
+				// TODO @FIXME redesigned sprite transform
+				// threeM.uniforms['uCenter'].value.copy(matr.center as Vector2)
+				// threeM.uniforms['uSize'].value.copy(matr.size as Vector2)
+				// threeM.uniforms['uRotation'].value = matr.rotation
+				threeM.uniforms['diffuse'].value = this.convColor(matr.baseColorFactor)
+				threeM.map = matr.baseColorTexture
+					? (this._threeTex.get(matr.baseColorTexture) as ThreeTexture)
+					: null
+				// TODO @浅寻 bad naming
+				threeM.defines['USE_SIZEATTENUATION'] = !!matr.sizeAttenuation
+				break
+			}
+
+			default:
+				throw new Error('Unsupported value of GSI::Matr.type: ' + gsiMatr['type'])
+		}
+
+		// update
+		if (gsiMatr.version === -1) {
+			// it can't be right
+			// maybe throw an Error?
+			console.warn('Material.version set to -1, Will recompile it every time')
+			threeMatr.needsUpdate = true
+		} else {
+			if (threeMatr.version !== gsiMatr.version) {
+				// needs update
+				syncMaterial(gsiMatr, threeMatr, this._threeTex)
+				threeMatr.version = gsiMatr.version
+			}
+		}
+
+		return threeMatr
+	}
+
+	private convTexture(gsiTexture: Texture | undefined | null): ThreeTexture | null {
+		if (gsiTexture === undefined || gsiTexture === null) return null
+
+		let threeTexture = this._threeTex.get(gsiTexture) as ThreeTexture
+		// let committedVersion = this._committedTex.get(gsiTexture) as Int
+
+		// create
+		if (!threeTexture) {
+			const imgData = gsiTexture.image
+
+			// Create Texture via various image types
+			{
+				if (imgData.data !== undefined) {
+					if (imgData.data instanceof DataView)
+						throw 'GSI::Texture::image - type `DataView` is not supported'
+
+					threeTexture = new DataTexture(
+						imgData.data,
+						imgData.width as number,
+						imgData.height as number
+					)
+				} else if (imgData.uri !== undefined) {
+					threeTexture = texLoader.load(imgData.uri)
+				} else if (imgData.extensions?.EXT_image?.HTMLImage !== undefined) {
+					const image = imgData.extensions?.EXT_image?.HTMLImage
+					if (image instanceof HTMLElement) {
+						// HTMLElement
+						if (image instanceof HTMLCanvasElement) {
+							threeTexture = new CanvasTexture(image)
+						} else if (image instanceof HTMLVideoElement) {
+							throw 'VIDEO TEXTURE NOT IMPLEMENTED YET!'
+							/** @TODO 在three中需先解决每次uploadTexture都会创建一个 `dispose` listener 的问题 */
+						} else {
+							threeTexture = new ThreeTexture(image)
+						}
+					} else {
+						throw 'HTMLImage must be an HTMLElement'
+					}
+				} else {
+					throw 'GSI::Texture: need at least on image data source!'
+				}
+			}
+
+			// committedVersion = gsiTexture.image.version
+			threeTexture.version = gsiTexture.image.version
+
+			this._threeTex.set(gsiTexture, threeTexture)
+			// this._committedTex.set(gsiTexture, committedVersion)
+		}
+
+		// version bump
+		// if (committedVersion !== gsiTexture.image.version || gsiTexture.image.version === -1) {
+		// 	// @note new texture will always be uploaded by three,
+		// 	// 		 no needs to set needsUpdate for newly created texture
+
+		// 	threeTexture.needsUpdate = true
+
+		// 	committedVersion = gsiTexture.image.version
+		// 	this._committedTex.set(gsiTexture, committedVersion)
+		// }
+		if (gsiTexture.image.version === -1) {
+			threeTexture.needsUpdate = true
+		} else {
+			threeTexture.version = gsiTexture.image.version
+		}
+
+		// sync parameters
+
+		syncTexture(gsiTexture, threeTexture)
+
+		return threeTexture
+	}
+
+	private convColor(gsiColor: ColorRGB): Color {
+		let color = this._threeColor.get(gsiColor)
+
+		if (color) {
+			color.r = gsiColor.r
+			color.g = gsiColor.g
+			color.b = gsiColor.b
+		} else {
+			color = new Color(gsiColor.r, gsiColor.g, gsiColor.b)
+			this._threeColor.set(gsiColor, color)
+		}
+
+		return color
+	}
+
+	// #endregion
+
+	// recovery(node: MeshDataType) {}
+
+	dispose() {
+		this._cachedResources = getResourcesFlat([]) // init with a empty node
+		this._threeMesh = new WeakMap()
+		this._threeGeom = new WeakMap()
+		this._threeAttr = new WeakMap()
+		this._threeTex = new WeakMap()
+		// TODO use GsiMatr instead because MatrBaseDataType can not be used alone
+		this._threeMatr = new WeakMap()
+		this._threeColor = new WeakMap()
+
+		// this._committedVersions = new WeakMap<any, number>()
+		this._committedAttr = new WeakMap()
+		// this._committedMatr = new WeakMap()
+		// this._committedTex = new WeakMap()
+
+		// this._ar0.length = 0
+		// this._ar1.length = 0
+		// this._ar2.length = 0
+		// this._ar3.length = 0
+
+		// this._threeObjects = new WeakMap<ColorRGB, Color>()
+	}
 }
 
 /**
+ * get all the resources that needs to be `allocated` and `freed` manually
+ *
+ * these resources has underlying gpu objects that can not be GC-ed
+ *
+ * also it's better to modify remote resources pre-frame than mid-frame to avoid stalling.
+ *
+ * @deprecated use getResourcesFlat
+ */
+export function getResources(root?: MeshDataType) {
+	// programs
+	const materials = new Set<GsiMatr>()
+	// vao
+	const geometries = new Set<GeomDataType>()
+	// buffers
+	const attributes = new Set<AttributeDataType>()
+	// texture / framebuffer / samplers
+	const textures = new Set<Texture | CubeTexture>()
+
+	// @TODO uniform buffers
+
+	if (root) {
+		traverse(root, (mesh: MeshDataType) => {
+			if (isRenderableMesh(mesh)) {
+				materials.add(mesh.material as GsiMatr)
+				geometries.add(mesh.geometry)
+
+				// textures
+
+				// standard textures
+				if (mesh.material['baseColorTexture']) textures.add(mesh.material['baseColorTexture'])
+				if (mesh.material['metallicRoughnessTexture'])
+					textures.add(mesh.material['metallicRoughnessTexture'])
+				if (mesh.material['emissiveTexture']) textures.add(mesh.material['emissiveTexture'])
+				if (mesh.material['normalTexture']) textures.add(mesh.material['normalTexture'])
+				if (mesh.material['occlusionTexture']) textures.add(mesh.material['occlusionTexture'])
+
+				// custom textures
+				if (mesh.material.extensions?.EXT_matr_programmable?.uniforms) {
+					const uniforms = mesh.material.extensions.EXT_matr_programmable.uniforms
+
+					// @note this is a little bit slower than Object.values
+					// Object.keys(uniforms).forEach((key) => {
+					// 	const uniformValue = uniforms[key].value
+					// 	if (isTexture(uniformValue) || isCubeTexture(uniformValue)) {
+					// 		textures.add(uniformValue)
+					// 	}
+					// })
+
+					const values = Object.values(uniforms)
+					for (let i = 0; i < values.length; i++) {
+						const uniformValue = values[i].value
+						if (isTexture(uniformValue) || isCubeTexture(uniformValue)) {
+							textures.add(uniformValue)
+						}
+					}
+				}
+
+				// attributes
+				{
+					// @note this is a little bit slower than Object.values
+					// Object.keys(mesh.geometry.attributes).forEach((key) => {
+					// 	attributes.add(mesh.geometry.attributes[key])
+					// })
+					const values = Object.values(mesh.geometry.attributes)
+					for (let i = 0; i < values.length; i++) {
+						attributes.add(values[i])
+					}
+					if (mesh.geometry.indices) attributes.add(mesh.geometry.indices)
+				}
+			}
+		})
+	}
+
+	return {
+		materials,
+		geometries,
+		attributes,
+		textures,
+	}
+}
+
+/**
+ * get all the resources that needs to be `allocated` and `freed` manually
+ *
+ * these resources has underlying gpu objects that can not be GC-ed
+ *
+ * also it's better to modify remote resources pre-frame than mid-frame to avoid stalling.
+ *
+ */
+export function getResourcesFlat(flatScene: MeshDataType[]) {
+	// programs
+	const materials = new Set<GsiMatr>()
+	// vao
+	const geometries = new Set<GeomDataType>()
+	// buffers
+	const attributes = new Set<AttributeDataType>()
+	// texture / framebuffer / samplers
+	const textures = new Set<Texture | CubeTexture>()
+
+	// @TODO uniform buffers
+
+	for (let i = 0; i < flatScene.length; i++) {
+		const mesh = flatScene[i]
+		if (isRenderableMesh(mesh)) {
+			materials.add(mesh.material as GsiMatr)
+			geometries.add(mesh.geometry)
+
+			// textures
+
+			// standard textures
+			if (mesh.material['baseColorTexture']) textures.add(mesh.material['baseColorTexture'])
+			if (mesh.material['metallicRoughnessTexture'])
+				textures.add(mesh.material['metallicRoughnessTexture'])
+			if (mesh.material['emissiveTexture']) textures.add(mesh.material['emissiveTexture'])
+			if (mesh.material['normalTexture']) textures.add(mesh.material['normalTexture'])
+			if (mesh.material['occlusionTexture']) textures.add(mesh.material['occlusionTexture'])
+
+			// custom textures
+			if (mesh.material.extensions?.EXT_matr_programmable?.uniforms) {
+				const uniforms = mesh.material.extensions.EXT_matr_programmable.uniforms
+
+				// @note this is a little bit slower than Object.values
+				// Object.keys(uniforms).forEach((key) => {
+				// 	const uniformValue = uniforms[key].value
+				// 	if (isTexture(uniformValue) || isCubeTexture(uniformValue)) {
+				// 		textures.add(uniformValue)
+				// 	}
+				// })
+
+				const values = Object.values(uniforms)
+				for (let i = 0; i < values.length; i++) {
+					const uniformValue = values[i].value
+					if (isTexture(uniformValue) || isCubeTexture(uniformValue)) {
+						textures.add(uniformValue)
+					}
+				}
+			}
+
+			// attributes
+			{
+				// @note this is a little bit slower than Object.values
+				// Object.keys(mesh.geometry.attributes).forEach((key) => {
+				// 	attributes.add(mesh.geometry.attributes[key])
+				// })
+				const values = Object.values(mesh.geometry.attributes)
+				for (let i = 0; i < values.length; i++) {
+					attributes.add(values[i])
+				}
+				if (mesh.geometry.indices) attributes.add(mesh.geometry.indices)
+			}
+		}
+	}
+
+	return {
+		materials,
+		geometries,
+		attributes,
+		textures,
+	}
+}
+/**
+ * get all the resources that needs to be `allocated` and `freed` manually
+ *
+ * these resources has underlying gpu objects that can not be GC-ed
+ *
+ * also it's better to modify remote resources pre-frame than mid-frame to avoid stalling.
+ */
+function getResourcesFlatWidthFastDiff(
+	flatScene: MeshDataType[],
+	originalResources: ReturnType<typeof getResourcesFlat>
+) {
+	// programs
+	const materials = new Set<GsiMatr>()
+	// vao
+	const geometries = new Set<GeomDataType>()
+	// buffers
+	const attributes = new Set<AttributeDataType>()
+	// texture / framebuffer / samplers
+	const textures = new Set<Texture | CubeTexture>()
+
+	// @TODO uniform buffers
+
+	for (let i = 0; i < flatScene.length; i++) {
+		const mesh = flatScene[i]
+		if (isRenderableMesh(mesh)) {
+			materials.add(mesh.material as GsiMatr) && geometries.add(mesh.geometry)
+
+			// textures
+
+			// standard textures
+			if (mesh.material['baseColorTexture']) textures.add(mesh.material['baseColorTexture'])
+			if (mesh.material['metallicRoughnessTexture'])
+				textures.add(mesh.material['metallicRoughnessTexture'])
+			if (mesh.material['emissiveTexture']) textures.add(mesh.material['emissiveTexture'])
+			if (mesh.material['normalTexture']) textures.add(mesh.material['normalTexture'])
+			if (mesh.material['occlusionTexture']) textures.add(mesh.material['occlusionTexture'])
+
+			// custom textures
+			if (mesh.material.extensions?.EXT_matr_programmable?.uniforms) {
+				const uniforms = mesh.material.extensions.EXT_matr_programmable.uniforms
+
+				// @note this is a little bit slower than Object.values
+				// Object.keys(uniforms).forEach((key) => {
+				// 	const uniformValue = uniforms[key].value
+				// 	if (isTexture(uniformValue) || isCubeTexture(uniformValue)) {
+				// 		textures.add(uniformValue)
+				// 	}
+				// })
+
+				const values = Object.values(uniforms)
+				for (let i = 0; i < values.length; i++) {
+					const uniformValue = values[i].value
+					if (isTexture(uniformValue) || isCubeTexture(uniformValue)) {
+						textures.add(uniformValue)
+					}
+				}
+			}
+
+			// attributes
+			{
+				// @note this is a little bit slower than Object.values
+				// Object.keys(mesh.geometry.attributes).forEach((key) => {
+				// 	attributes.add(mesh.geometry.attributes[key])
+				// })
+				const values = Object.values(mesh.geometry.attributes)
+				for (let i = 0; i < values.length; i++) {
+					attributes.add(values[i])
+				}
+				if (mesh.geometry.indices) attributes.add(mesh.geometry.indices)
+			}
+		}
+	}
+
+	return {
+		materials,
+		geometries,
+		attributes,
+		textures,
+	}
+}
+/**
+ * TODO Maybe generate corresponding THREE.Mesh|Points instead of a kinda union type?
  * 把 three 的 Mesh Points Lines 合并到 父类 Object3D 上，来和 glTF2 保持一致
  */
 export class RenderableObject3D extends Object3D {
@@ -91,21 +1255,12 @@ export class RenderableObject3D extends Object3D {
 	isPoints?: boolean
 	isLine?: boolean
 	isLineSegments?: boolean
-	isSprite?: boolean
-
-	// Sprite需要这个属性
-	center?: Vector2
 
 	// TrianglesDrawMode / TriangleStripDrawMode / TriangleFanDrawMode
-	drawMode?: number
+	drawMode: number
 
-	geometry?: BufferGeometry
-	material?: Material
-
-	// transform缓存，用来和gsi2Mesh做比对
-	_tfPos?: Vec3
-	_tfRot?: Euler
-	_tfScl?: Vec3
+	geometry: BufferGeometry
+	material: Material
 
 	constructor(params: Partial<RenderableObject3D> = {}) {
 		super()
@@ -125,1308 +1280,8 @@ const texLoader = new TextureLoader()
 // texLoader.setCrossOrigin('')
 
 /**
- * 生成Three Lite Scene的Converter
- *
- * @export
- * @class ThreeLiteConverter
- * @implements {Converter}
- * @QianXun
- * @limit 由于CachedMap缓存机制，同一个converter不能同时作用于多个gsiMesh，否则可能会造成意外的GPU对象被dispose
- * @note 若任何对象从输入的gsiMesh上remove，会立即被Converter进行回收和dispose GPU resources
+ * union type of all gsi materials
+ * - better use this than MatrBaseDataType to make switch case work
+ * @simon
  */
-export class ThreeLiteConverter implements Converter {
-	/**
-	 * type
-	 */
-	readonly type = 'ThreeLite'
-
-	/**
-	 * config
-	 */
-	config: Partial<DefaultConverterConfig>
-
-	/**
-	 * Scene info
-	 */
-	info = {
-		renderablesCount: 0,
-		visibleCount: 0,
-	}
-
-	/**
-	 * Wrapper group as a container for all parsed meshes
-	 */
-	private _wrapper: MeshDataType = {
-		name: 'GSI-Scene-Wrapper',
-		renderOrder: 0,
-		transform: new Transform3(),
-		children: new Set<MeshDataType>(),
-		visible: true,
-	}
-
-	/**
-	 * Maps for cached objects querying
-	 */
-	private _meshMap = new Map<MeshDataType, RenderableObject3D>()
-	private _matrMap = new Map<MatrBaseDataType, Material>()
-	private _geomMap = new Map<GeomDataType, BufferGeometry>()
-	private _attrMap = new Map<AttributeDataType, BufferAttribute>()
-	private _textureMap = new Map<TextureType, Texture>()
-
-	/**
-	 * HashSet to store all resources used by the scene
-	 * Used to check if resource should be disposed
-	 */
-	private _usedResources = new Set<
-		Material | BufferGeometry | BufferAttribute | Texture | RenderableObject3D
-	>()
-
-	/**
-	 * WebGL Extensions which will be checked initially,
-	 * and turned on if the environment supports.
-	 */
-	private _extensions: any
-
-	/**
-	 * Temp vars
-	 */
-	private _infinityBox: Box3
-	private _infinitySphere: Sphere
-	private _emptyVec3: Vector3
-	private _emptyEuler: Euler
-	private _disposedArray: any[]
-
-	constructor(params: Partial<DefaultConverterConfig> = {}) {
-		this.config = {
-			...DefaultConfig,
-			...params,
-		}
-
-		this._infinityBox = new Box3().set(
-			new Vector3(-Infinity, -Infinity, -Infinity),
-			new Vector3(+Infinity, +Infinity, +Infinity)
-		)
-		this._infinitySphere = new Sphere(new Vector3(), Infinity)
-		this._emptyVec3 = new Vector3()
-		this._emptyEuler = new Euler()
-		this._disposedArray = []
-
-		this._extensions = SupportedExtensions
-	}
-
-	/**
-	 * 将输入的GSIMesh及子节点转换为threeRenderableObject3D，请在每一帧渲染前（或更新数据后）调用这个方法，以获得最新的three场景数据
-	 *
-	 * @param {MeshDataType} gsiMesh
-	 * @return {*}  {RenderableObject3D}
-	 * @memberof ThreeLiteConverter
-	 * @limit 由于CachedMap缓存机制，同一个converter不能同时作用于多个gsiMesh，否则可能会造成意外的GPU对象被dispose
-	 * @note 若任何对象从输入的gsiMesh上remove，会立即被Converter进行回收和dispose GPU resources
-	 */
-	convert(gsiMesh: MeshDataType): RenderableObject3D {
-		// Always return the one wrapper (holding everything converted) to prevent user losing scene pointer
-		this._wrapper.children.clear()
-		this._wrapper.children.add(gsiMesh)
-		gsiMesh.parent = this._wrapper
-
-		this.info.renderablesCount = 0
-		this.info.visibleCount = 0
-
-		// const res = this.convertMeshRecurrsive(this._wrapper)
-		const res = this.convertMeshNonRecurr(this._wrapper)
-
-		// Release unused resources & dispose GPU resources
-		this.releaseResources()
-
-		return res
-	}
-
-	dispose() {
-		// Release unused resources - disposing
-		this._attrMap.forEach((attr, dt, map) => {
-			attr.array = this._disposedArray
-			map.delete(dt)
-		})
-
-		this._textureMap.forEach((tex, dt, map) => {
-			tex.dispose()
-			map.delete(dt)
-		})
-
-		this._matrMap.forEach((mat, dt, map) => {
-			mat.dispose()
-			map.delete(dt)
-		})
-
-		this._geomMap.forEach((geom, dt, map) => {
-			geom.dispose()
-			geom.attributes = {}
-			map.delete(dt)
-		})
-
-		this._meshMap.forEach((mesh, dt, map) => {
-			mesh.geometry = undefined
-			mesh.material = undefined
-			map.delete(dt)
-		})
-
-		this._wrapper.children.clear()
-		this._usedResources.clear()
-	}
-
-	/**
-	 * 内部convert一个Mesh的方法，会递归convert children
-	 *
-	 * @private
-	 * @param {MeshDataType} gsiMesh
-	 * @return {*}  {RenderableObject3D}
-	 * @memberof ThreeLiteConverter
-	 */
-	private convertMeshRecurrsive(gsiMesh: MeshDataType): RenderableObject3D {
-		/**
-		 * Begin conversion
-		 */
-
-		/**
-		 * Mesh
-		 */
-		const res = this.convMesh(this._meshMap.get(gsiMesh), gsiMesh, this.config)
-
-		/**
-		 * Geom
-		 */
-		if (gsiMesh.geometry) {
-			const bufferGeom = this.convGeom(this._geomMap.get(gsiMesh.geometry), gsiMesh)
-			res.geometry = bufferGeom
-
-			// if (!this._geomMap.has(gsiMesh.geometry)) {
-			this._geomMap.set(gsiMesh.geometry, bufferGeom)
-			// }
-
-			// Mark as used resource
-			this._usedResources.add(bufferGeom)
-
-			// Assign mode
-			switch (gsiMesh.geometry.mode) {
-				case 'TRIANGLES':
-					res['isMesh'] = true
-					res['drawMode'] = TrianglesDrawMode
-					break
-
-				case 'SPRITE':
-					// Use the adv sprite mesh
-					res['isMesh'] = true
-					// res['isSprite'] = true
-					res['drawMode'] = TrianglesDrawMode
-					break
-
-				case 'POINTS':
-					res['isPoints'] = true
-					break
-
-				case 'LINES':
-					res['isLine'] = true
-					res['isLineSegments'] = true
-					break
-
-				default:
-					throw new Error('Invalid value for GSIGeom.mode: ' + gsiMesh.geometry.mode)
-			}
-		} else {
-			res.geometry = undefined
-		}
-
-		/**
-		 * Matr
-		 */
-		if (gsiMesh.material) {
-			const threeMatr = this.convMatr(this._matrMap.get(gsiMesh.material), gsiMesh.material, {
-				geomType: gsiMesh.geometry?.mode,
-			})
-			res.material = threeMatr
-
-			// if (!this._matrMap.has(gsiMesh.material)) {
-			this._matrMap.set(gsiMesh.material, threeMatr)
-			// }
-
-			// Mark as used resource
-			this._usedResources.add(threeMatr)
-
-			this.info.renderablesCount++
-		} else {
-			res.material = undefined
-		}
-
-		/**
-		 * A container only
-		 */
-		if (gsiMesh.name === 'RenderableMesh' && !gsiMesh.geometry && !gsiMesh.material) {
-			res.name = 'GSI-Group'
-		}
-
-		// Remove all children first and add them recurrsively when parsing the GSIMesh tree
-		// Solution for not checking structure tree, by creating a new tree every time
-		// res.children.forEach((child) => (child.parent = null))
-		res.children = []
-
-		// Convert children resurrsively
-		gsiMesh.children.forEach((child) => {
-			// 现在将worldMatrix的更新交给GsiRefiner去监测和更新
-			const childMesh = this.convertMeshRecurrsive(child)
-			res.children.push(childMesh)
-			childMesh.parent = res
-		})
-
-		return res
-	}
-
-	private convertMeshNonRecurr(gsiMesh: MeshDataType): RenderableObject3D {
-		/**
-		 * Begin conversion
-		 */
-		const queue: MeshDataType[] = []
-		queue.push(gsiMesh)
-
-		while (queue.length > 0) {
-			const _gsiMesh = queue.pop()
-			if (_gsiMesh === undefined) {
-				continue
-			}
-
-			/**
-			 * Mesh
-			 */
-			const res = this.convMesh(this._meshMap.get(_gsiMesh), _gsiMesh, this.config)
-
-			/**
-			 * Geom
-			 */
-			if (_gsiMesh.geometry && Object.keys(_gsiMesh.geometry.attributes).length > 0) {
-				const bufferGeom = this.convGeom(this._geomMap.get(_gsiMesh.geometry), _gsiMesh)
-				res.geometry = bufferGeom
-
-				// if (!this._geomMap.has(_gsiMesh.geometry)) {
-				this._geomMap.set(_gsiMesh.geometry, bufferGeom)
-				// }
-
-				// Mark as used resource
-				this._usedResources.add(bufferGeom)
-
-				// Assign mode
-				switch (_gsiMesh.geometry.mode) {
-					case 'TRIANGLES':
-						res['isMesh'] = true
-						res['drawMode'] = TrianglesDrawMode
-						break
-
-					case 'SPRITE':
-						res['isMesh'] = true
-						// res['isSprite'] = true
-						res['drawMode'] = TrianglesDrawMode
-						break
-
-					case 'POINTS':
-						res['isPoints'] = true
-						break
-
-					case 'LINES':
-						res['isLine'] = true
-						res['isLineSegments'] = true
-						break
-
-					default:
-						throw new Error('Invalid value for GSIGeom.mode: ' + _gsiMesh.geometry.mode)
-				}
-
-				this.info.renderablesCount++
-			} else {
-				res.geometry = undefined
-			}
-
-			/**
-			 * Matr
-			 */
-			if (_gsiMesh.material) {
-				const gsiMatr = _gsiMesh.material
-
-				// Add GSI_USE_UV define to matr
-				if (
-					_gsiMesh.geometry &&
-					_gsiMesh.geometry.attributes &&
-					_gsiMesh.geometry.attributes.uv !== undefined &&
-					gsiMatr['defines'] &&
-					gsiMatr['defines'].GSI_USE_UV === undefined
-				) {
-					gsiMatr['defines'].GSI_USE_UV = true
-				}
-
-				const threeMatr = this.convMatr(this._matrMap.get(gsiMatr), gsiMatr, {
-					geomType: _gsiMesh.geometry?.mode,
-				})
-				res.material = threeMatr
-
-				// if (!this._matrMap.has(_gsiMatr)) {
-				this._matrMap.set(gsiMatr, threeMatr)
-				// }
-
-				// Mark as used resource
-				this._usedResources.add(threeMatr)
-			} else {
-				res.material = undefined
-			}
-
-			/**
-			 * A container only
-			 */
-			// if (_gsiMesh.name === 'RenderableMesh' && !_gsiMesh.geometry && !_gsiMesh.material) {
-			// 	res.name = 'GSI-Group'
-			// }
-
-			// Remove all children first and add them recurrsively when parsing the GSIMesh tree
-			// Solution for not checking structure tree, by creating a new tree every time
-			// res.children.forEach((child) => (child.parent = null))
-			res.children = []
-
-			// Convert children resurrsively
-			_gsiMesh.children.forEach((child) => {
-				/** @QianXun 现在将worldMatrix的更新交给GsiRefiner去监测和更新 */
-				// 如果childMesh之前的parent不是当前的这个，该child被改变过父节点，需要进行updateMatrixWorld操作
-				queue.push(child)
-			})
-
-			if (_gsiMesh.parent) {
-				const parent = this._meshMap.get(_gsiMesh.parent)
-				if (parent !== undefined) {
-					parent.children.push(res)
-					res.parent = parent
-				}
-			}
-		}
-
-		return this._meshMap.get(gsiMesh) as RenderableObject3D
-	}
-
-	private convMesh(
-		threeMesh: RenderableObject3D | undefined,
-		gsiMesh: MeshDataType,
-		opt: { [key: string]: any } = {}
-	): RenderableObject3D {
-		if (threeMesh === undefined) {
-			// Init threeMesh
-			threeMesh = new RenderableObject3D()
-			threeMesh.frustumCulled = false
-		}
-
-		// Create internal prop
-		if (!gsiMesh[__GSI_MESH_INTERNAL_PROP_KEY_0__]) {
-			gsiMesh[__GSI_MESH_INTERNAL_PROP_KEY_0__] = __defaultMeshInternalProp()
-		}
-		const internal = gsiMesh[__GSI_MESH_INTERNAL_PROP_KEY_0__] as __GSI_MESH_INTERNAL_PROP_0__
-
-		// Assign properties when they are different
-		if (threeMesh.name !== gsiMesh.name) threeMesh.name = gsiMesh.name ?? 'GSI-Mesh'
-		if (threeMesh.renderOrder !== gsiMesh.renderOrder) threeMesh.renderOrder = gsiMesh.renderOrder
-		if (this.config.meshFrustumCulling && gsiMesh.visible !== undefined) {
-			threeMesh.visible = gsiMesh.visible && internal._frustumCulled === false ? true : false
-		} else {
-			threeMesh.visible = gsiMesh.visible === false ? false : true
-		}
-
-		if (threeMesh.visible === true) {
-			this.info.visibleCount++
-		}
-
-		/** @todo 避免transform.matrix每次请求都会计算的问题 */
-		/** @QianXun 现在将worldMatrix的更新交给Observer去监测和更新 */
-		// Set transform when they are different
-		if (!this.transformEquals(threeMesh, gsiMesh)) {
-			threeMesh.matrix.fromArray(gsiMesh.transform.matrix)
-		}
-
-		if (!gsiMesh.transform.worldMatrix) {
-			gsiMesh.transform.worldMatrix = Transform3.identityArray()
-		}
-		if (!matrix4Equals(threeMesh.matrixWorld.elements, gsiMesh.transform.worldMatrix)) {
-			threeMesh.matrixWorld.fromArray(gsiMesh.transform.worldMatrix)
-		}
-
-		// Add to cache map
-		// if (!this._meshMap.has(gsiMesh)) {
-		this._meshMap.set(gsiMesh, threeMesh)
-		// }
-		this._usedResources.add(threeMesh)
-
-		return threeMesh
-	}
-
-	private convGeom(
-		geom: BufferGeometry | undefined,
-		gsiMesh: MeshDataType,
-		opt: { [key: string]: any } = {}
-	): BufferGeometry {
-		const gsiGeom = gsiMesh.geometry as GeomDataType
-
-		if (!geom) {
-			// Generate sprite data before initialize threeBufferGeometry
-			if (gsiGeom.mode === 'SPRITE') {
-				generateGsiSpriteInfo(gsiGeom, gsiMesh.material as MatrSpriteDataType)
-			}
-
-			geom = new BufferGeometry()
-		}
-
-		// Assign gsi attributes
-		for (const key in gsiGeom.attributes) {
-			const gsiAttr = gsiGeom.attributes[key]
-			const attr = this.convAttr(this._attrMap.get(gsiAttr), gsiAttr, opt)
-
-			if (!geom.attributes[key]) {
-				// First time to set
-				geom.setAttribute(key, attr)
-			} else if (geom.attributes[key] !== attr) {
-				//
-				delete geom.attributes[key]
-				geom.setAttribute(key, attr)
-			}
-
-			this._attrMap.set(gsiAttr, attr)
-		}
-
-		// Remove target's index
-		if (geom.index) geom.index = null
-
-		// Assign gsi index
-		const gsiIndices = gsiGeom.indices
-		if (gsiIndices) {
-			const index = this.convAttr(this._attrMap.get(gsiIndices), gsiIndices, opt)
-
-			if (!geom.index) {
-				// First time to set
-				geom.setIndex(index)
-			} else if (geom.index !== index) {
-				//
-				geom.index = null
-				geom.setIndex(index)
-			}
-
-			this._attrMap.set(gsiIndices, index)
-		}
-
-		if (
-			gsiGeom.drawRange &&
-			(gsiGeom.drawRange.start !== geom.drawRange.start ||
-				gsiGeom.drawRange.count !== geom.drawRange.count)
-		) {
-			geom.setDrawRange(gsiGeom.drawRange.start, gsiGeom.drawRange.count)
-		}
-
-		//
-
-		// @todo 数据可视化中通常都不会出现 bbox 和 bsphere
-		// @todo bbox 和 bsphere 通常不会一起使用
-		const bbox = gsiGeom.boundingBox || this._infinityBox
-		const bsphere = gsiGeom.boundingSphere || this._infinitySphere
-
-		// BBox
-		if (!geom.boundingBox || !box3Equals(geom.boundingBox, bbox)) {
-			geom.boundingBox = new Box3(
-				new Vector3().copy(bbox.min as Vector3),
-				new Vector3().copy(bbox.max as Vector3)
-			)
-		}
-
-		// BSphere
-		if (!geom.boundingSphere || !sphereEquals(geom.boundingSphere, bsphere)) {
-			geom.boundingSphere = new Sphere(
-				new Vector3().copy(bsphere.center as Vector3),
-				bsphere.radius
-			)
-		}
-
-		//
-
-		return geom
-	}
-
-	private convAttr(
-		attr: BufferAttribute | undefined,
-		gsiAttr: AttributeDataType,
-		opt: { [key: string]: any } = {}
-	): BufferAttribute {
-		if (gsiAttr.version === undefined) {
-			gsiAttr.version = 0
-		}
-
-		if (attr && gsiAttr.version === attr.version) {
-			// No need to update
-			this._usedResources.add(attr)
-			return attr
-		}
-
-		if (!attr) {
-			// 类型检查
-			if (!isTypedArray(gsiAttr.array)) throw new Error('GSI::Attribute.array must be a TypedArray')
-
-			// Basics
-			attr = new BufferAttribute(gsiAttr.array, gsiAttr.itemSize, gsiAttr.normalized)
-
-			// .commitedVersion should be equal to .version after creation
-			// Backwards compatibility
-			attr.version = gsiAttr.commitedVersion = gsiAttr.version
-
-			// .updateRanges is unnecessary when attribute is created first time
-			// sAttr.updateRanges
-		} else if (gsiAttr.version > ((gsiAttr.commitedVersion as number) || attr.version)) {
-			// 类型检查
-			if (!isTypedArray(gsiAttr.array)) throw new Error('GSI::Attribute.array must be a TypedArray')
-
-			/**
-			 * Update attr array data
-			 * @NOTE .version must >= .commitedVersion
-			 */
-			attr.needsUpdate = true
-
-			// Update process, with limitations by STATIC_DRAW or DYNAMIC_DRAW
-			if (gsiAttr.usage === 'STATIC_DRAW') {
-				// If the gsiAttr.array is new, update attribute by resending array to GPU
-				if (gsiAttr.updateRanges && gsiAttr.updateRanges.length) {
-					console.warn('GSI::Attribute.updateRanges is not supported in `STATIC_DRAW` usage')
-				}
-				// Overwrite array
-				attr.array = gsiAttr.array
-			} else if (gsiAttr.usage === 'DYNAMIC_DRAW') {
-				if (attr.array !== gsiAttr.array) {
-					throw new Error(
-						'GSI::Attribute.array: changing array itself is not permitted when attribute usage is `DYNAMIC_DRAW`'
-					)
-				}
-				// Merge and set .updateRanges
-				if (gsiAttr.updateRanges && gsiAttr.updateRanges.length) {
-					const mergedRange = { start: Infinity, end: -Infinity }
-					for (let i = 0; i < gsiAttr.updateRanges.length; i++) {
-						const range = gsiAttr.updateRanges[i]
-						const start = range.start
-						const end = start + range.count
-						if (start < mergedRange.start) mergedRange.start = start
-						if (end > mergedRange.end) mergedRange.end = end
-					}
-					attr.updateRange.offset = mergedRange.start
-					attr.updateRange.count = mergedRange.end - mergedRange.start
-				} else {
-					console.warn('GSI::Attribute: needs update data but no updateRanges are provided')
-					// Default value - from BufferAttribute.js
-					attr.updateRange = { offset: 0, count: -1 }
-				}
-			} else {
-				throw new Error('Invalid value of GSI::Attribute.usage')
-			}
-
-			// Backwards compatibility
-			// .commitedVersion update
-			gsiAttr.commitedVersion = gsiAttr.version
-			if (gsiAttr.updateRanges) {
-				gsiAttr.updateRanges.length = 0
-			}
-		}
-
-		// .usage
-		switch (gsiAttr.usage) {
-			case 'STATIC_DRAW':
-				attr.usage = StaticDrawUsage || GL_STATIC_DRAW
-				break
-			case 'DYNAMIC_DRAW':
-				attr.usage = DynamicDrawUsage || GL_DYNAMIC_DRAW
-				break
-			default:
-				throw new Error('Invalid value for GSI::Attribute.usage: ' + gsiAttr.usage)
-		}
-
-		// releaseOnUpload
-		if (gsiAttr.disposable) {
-			// gsi 释放 array 用内置类型
-			gsiAttr.array = DISPOSED
-
-			// 底层渲染器释放 array 的方案各有不同，用支持的即可
-			attr.onUploadCallback = function () {
-				this.array = []
-			}
-		}
-
-		// Mark as used resource
-		this._usedResources.add(attr)
-
-		return attr
-	}
-
-	private convMatr(
-		threeMatr: Material | undefined,
-		gsiMatr: MatrBaseDataType,
-		opt: { [key: string]: any }
-	): Material {
-		if (threeMatr === undefined) {
-			switch (gsiMatr.type) {
-				case 'basic':
-					console.error('Use MatrUnlit instead of MatrBasic')
-					threeMatr = new PrgBasicMaterial(gsiMatr as MatrUnlitDataType)
-					break
-				case 'point':
-					threeMatr = new PrgPointMaterial(gsiMatr as MatrPointDataType)
-					break
-				case 'unlit':
-					threeMatr = new PrgBasicMaterial(gsiMatr as MatrUnlitDataType)
-					break
-				case 'pbr':
-					threeMatr = new PrgStandardMaterial(gsiMatr as MatrPbrDataType)
-					break
-				case 'sprite':
-					threeMatr = new PrgSpriteMaterial(gsiMatr as MatrSpriteDataType)
-					break
-				default:
-					console.error('Unsupported GSI::Material Type: ' + gsiMatr.type)
-					threeMatr = new PrgBasicMaterial(gsiMatr as MatrUnlitDataType)
-			}
-
-			for (const key in this._extensions) {
-				if (this._extensions[key] === false) {
-					threeMatr['extensions'][key] = false
-				}
-			}
-		}
-
-		threeMatr.name = gsiMatr.name || 'GSI-three-Matr'
-		threeMatr.visible = gsiMatr.visible
-
-		// face culling
-		switch (gsiMatr.side) {
-			case 'front':
-				threeMatr.side = FrontSide
-				break
-			case 'back':
-				threeMatr.side = BackSide
-				break
-			case 'double':
-				threeMatr.side = DoubleSide
-				break
-			default:
-				throw new Error('Unsupported value of GSI::Matr.side: ' + gsiMatr.side)
-		}
-
-		// trans / blending
-		switch (gsiMatr.alphaMode) {
-			case 'OPAQUE':
-				threeMatr.transparent = false
-				threeMatr.depthTest = true
-				threeMatr.depthWrite = true
-				threeMatr.blending = NoBlending
-				break
-			case 'MASK':
-				threeMatr.transparent = false
-				threeMatr.depthTest = true
-				threeMatr.depthWrite = true
-				threeMatr.blending = NoBlending
-				threeMatr.alphaTest = gsiMatr.alphaCutoff
-				break
-			case 'BLEND':
-				threeMatr.transparent = true
-				threeMatr.depthTest = true
-				threeMatr.depthWrite = false
-				threeMatr.blending = NormalBlending
-				break
-			case 'BLEND_ADD':
-				threeMatr.transparent = true
-				threeMatr.depthTest = true
-				threeMatr.depthWrite = false
-				threeMatr.blending = AdditiveBlending
-				break
-			default:
-				throw new Error('Unsupported value of GSI::Matr.alphaMode: ' + gsiMatr.alphaMode)
-		}
-
-		switch (gsiMatr.type) {
-			case 'basic':
-				//
-				break
-
-			case 'pbr': {
-				const matr = gsiMatr as MatrPbrDataType
-				threeMatr['defines'] = convDefines(threeMatr['defines'], matr.defines)
-				threeMatr['uniforms'] = this.convUniforms(threeMatr['uniforms'], matr.uniforms)
-				this.assignPbrParams(threeMatr, matr)
-				break
-			}
-
-			case 'unlit': {
-				const matr = gsiMatr as MatrUnlitDataType
-				threeMatr.opacity = matr.opacity
-				threeMatr['color'] = this.convColor(threeMatr['color'], matr.baseColorFactor)
-				threeMatr['map'] = this.convTexture(threeMatr['map'], matr.baseColorTexture, true)
-				threeMatr['defines'] = convDefines(threeMatr['defines'], matr.defines)
-				threeMatr['uniforms'] = this.convUniforms(threeMatr['uniforms'], matr.uniforms)
-				break
-			}
-
-			case 'point': {
-				const matr = gsiMatr as MatrPointDataType
-				threeMatr.opacity = matr.opacity
-				threeMatr['size'] = matr.size
-				threeMatr['sizeAttenuation'] = matr.sizeAttenuation
-				threeMatr['color'] = this.convColor(threeMatr['color'], matr.baseColorFactor)
-				threeMatr['map'] = this.convTexture(threeMatr['map'], matr.baseColorTexture, true)
-				threeMatr['defines'] = convDefines(threeMatr['defines'], matr.defines)
-				threeMatr['uniforms'] = this.convUniforms(threeMatr['uniforms'], matr.uniforms)
-				break
-			}
-
-			case 'sprite': {
-				const threeM = threeMatr as PrgSpriteMaterial
-				const matr = gsiMatr as MatrSpriteDataType
-				threeM.uniforms.opacity.value = matr.opacity
-				threeM.opacity = matr.opacity
-				threeM.uniforms['uCenter'].value.copy(matr.center as Vector2)
-				threeM.uniforms['uSize'].value.copy(matr.size as Vector2)
-				threeM.uniforms['uRotation'].value = matr.rotation
-				threeM.uniforms['diffuse'].value = this.convColor(threeM['color'], matr.baseColorFactor)
-				threeM.map = this.convTexture(threeM.map ?? undefined, matr.baseColorTexture, true)
-				threeM.defines['USE_SIZEATTENUATION'] = !!matr.sizeAttenuation
-				break
-			}
-
-			default:
-				throw new Error('Unsupported value of GSI::Matr.type: ' + gsiMatr.type)
-		}
-
-		threeMatr.depthTest = gsiMatr.depthTest ? true : false
-
-		return threeMatr
-	}
-
-	/**
-	 * @todo 缓存
-	 * @param threeColor
-	 * @param gsiColor
-	 */
-	private convColor(threeColor: Color | undefined, gsiColor: ColorLike | string): Color {
-		if (threeColor === undefined) {
-			if (typeof gsiColor === 'string') {
-				threeColor = new Color(gsiColor)
-			} else {
-				threeColor = new Color(gsiColor.r, gsiColor.g, gsiColor.b)
-			}
-		} else {
-			if (typeof gsiColor === 'string') {
-				threeColor.set(gsiColor)
-			} else {
-				threeColor.setRGB(gsiColor.r, gsiColor.g, gsiColor.b)
-			}
-		}
-		return threeColor
-	}
-
-	private convTexture(
-		threeTexture: Texture | undefined,
-		gsiTexture: TextureType | undefined,
-		resourceCache = true
-	): Texture | null {
-		if (!gsiTexture) return null
-
-		let cachedTex = this._textureMap.get(gsiTexture)
-
-		if (!cachedTex) {
-			/**
-			 * @QianXun @limit ImageData必须是Non-Texture-Shared
-			 */
-			const imgData = gsiTexture.image
-
-			// Create Texture via various image types
-			if (imgData.image) {
-				if (imgData.image instanceof HTMLElement) {
-					// HTMLElement
-					if (imgData.image instanceof HTMLCanvasElement) {
-						cachedTex = new CanvasTexture(imgData.image)
-					} else if (imgData.image instanceof HTMLVideoElement) {
-						/** @TODO 在three中需先解决每次uploadTexture都会创建一个 `dispose` listener 的问题 */
-						console.warn(
-							'GSI::Texture::image - type `HTMLVideoElement` is not supported, use normal texture instead. '
-						)
-						cachedTex = new VideoTexture(imgData.image)
-						const tex = cachedTex as VideoTexture
-						imgData.image.addEventListener('play', () => {
-							tex.needsUpdate = true
-						})
-
-						// threeTexture = new VideoTexture(imgData.image)
-						// console.log('threeTexture', threeTexture)
-						// const tex = threeTexture as VideoTexture
-						// imgData.image.addEventListener('play', () => {
-						// 	tex['interval'] = setInterval(() => {
-						// 		tex.needsUpdate = true
-						// 	}, 16)
-						// 	tex.addEventListener('dispose', () => {
-						// 		clearInterval(tex['interval'])
-						// 	})
-						// })
-					} else {
-						cachedTex = new Texture(imgData.image)
-					}
-				} else if (isTypedArray(imgData.image)) {
-					// TypedArray, must have .width & .height properties
-					if (!imgData.width || !imgData.height) {
-						console.warn(
-							'GSI::Texture - image missing .width & .height property, using 256 * 256 instead'
-						)
-						imgData.width = imgData.height = 256
-					}
-					cachedTex = new DataTexture(imgData.image as TypedArray, imgData.width, imgData.height)
-				} else if (imgData.image instanceof DataView) {
-					console.error('GSI::Texture::image - type `DataView` is not supported')
-					cachedTex = new Texture()
-				} else {
-					console.error('GSI::Texture - invalid image type', gsiTexture)
-					cachedTex = new Texture()
-				}
-			} else if (imgData.uri) {
-				// URI
-				cachedTex = texLoader.load(imgData.uri)
-			} else {
-				console.error(
-					'GSI::Texture - image has no .uri or .image property, use default texture instead',
-					gsiTexture
-				)
-				cachedTex = new Texture()
-			}
-		}
-
-		threeTexture = cachedTex as Texture
-
-		// Assign properties
-		if (!gsiTexture.sampler) {
-			console.warn('GSI::Texture - sampler property is missing, use default instead')
-			gsiTexture.sampler = {}
-		}
-
-		const sampler = gsiTexture.sampler
-		switch (sampler.magFilter) {
-			case 'NEAREST':
-				threeTexture.magFilter = NearestFilter
-				break
-			case 'LINEAR':
-				threeTexture.magFilter = LinearFilter
-				break
-			default:
-				threeTexture.magFilter = NearestFilter
-		}
-
-		// Set mipmaps to false first
-		threeTexture.generateMipmaps = false
-
-		switch (sampler.minFilter) {
-			case 'NEAREST':
-				threeTexture.minFilter = NearestFilter
-				break
-			case 'LINEAR':
-				threeTexture.minFilter = LinearFilter
-				break
-			case 'NEAREST_MIPMAP_NEAREST':
-				threeTexture.minFilter = NearestMipMapNearestFilter
-				// WebGL generateMipmaps
-				if (!threeTexture.generateMipmaps) threeTexture.generateMipmaps = true
-				break
-			case 'LINEAR_MIPMAP_NEAREST':
-				threeTexture.minFilter = LinearMipMapNearestFilter
-				// WebGL generateMipmaps
-				if (!threeTexture.generateMipmaps) threeTexture.generateMipmaps = true
-				break
-			case 'NEAREST_MIPMAP_LINEAR':
-				threeTexture.minFilter = NearestMipMapLinearFilter
-				// WebGL generateMipmaps
-				if (!threeTexture.generateMipmaps) threeTexture.generateMipmaps = true
-				break
-			case 'LINEAR_MIPMAP_LINEAR':
-				threeTexture.minFilter = LinearMipMapLinearFilter
-				// WebGL generateMipmaps
-				if (!threeTexture.generateMipmaps) threeTexture.generateMipmaps = true
-				break
-			default:
-				// throw new Error('Invalid value of GSISampler.minFilter: ' + sampler.minFilter)
-				threeTexture.minFilter = NearestFilter
-		}
-
-		switch (sampler.wrapS) {
-			case 'CLAMP_TO_EDGE':
-				threeTexture.wrapS = ClampToEdgeWrapping
-				break
-			case 'MIRRORED_REPEAT':
-				threeTexture.wrapS = MirroredRepeatWrapping
-				break
-			case 'REPEAT':
-				threeTexture.wrapS = RepeatWrapping
-				break
-			default:
-				// throw new Error('Invalid value of GSISampler.wrapS: ' + sampler.wrapS)
-				threeTexture.wrapS = ClampToEdgeWrapping
-		}
-
-		switch (sampler.wrapT) {
-			case 'CLAMP_TO_EDGE':
-				threeTexture.wrapT = ClampToEdgeWrapping
-				break
-			case 'MIRRORED_REPEAT':
-				threeTexture.wrapT = MirroredRepeatWrapping
-				break
-			case 'REPEAT':
-				threeTexture.wrapT = RepeatWrapping
-				break
-			default:
-				// throw new Error('Invalid value of GSISampler.wrapT: ' + sampler.wrapT)
-				threeTexture.wrapT = ClampToEdgeWrapping
-		}
-
-		// anisotropy
-		if (sampler.anisotropy === undefined) sampler.anisotropy = 1
-
-		if (threeTexture.anisotropy !== sampler.anisotropy) threeTexture.anisotropy = sampler.anisotropy
-
-		// flipY
-		threeTexture.flipY = gsiTexture.image.flipY || false
-
-		// transform
-
-		// Add to cached map
-		// if (!this._textureMap.has(gsiTexture)) {
-		this._textureMap.set(gsiTexture, threeTexture)
-		// }
-
-		// Mark as used resource
-		if (resourceCache) this._usedResources.add(threeTexture)
-
-		return threeTexture
-	}
-
-	private convUniforms(
-		threeUniforms: { [name: string]: any } | undefined,
-		gsiUniforms: { [name: string]: UniformDataType } | undefined
-	): any {
-		if (threeUniforms === undefined) threeUniforms = {}
-
-		if (gsiUniforms === undefined) return threeUniforms
-
-		for (const key in gsiUniforms) {
-			const elem = gsiUniforms[key]
-			if (elem !== undefined) {
-				this.assignUniformVals(threeUniforms, key, elem)
-			}
-		}
-		return threeUniforms
-	}
-
-	private assignPbrParams(threeMatr: Material, gsiMatr: MatrPbrDataType) {
-		threeMatr.opacity = (gsiMatr as MatrPbrDataType).opacity
-		threeMatr['color'] = this.convColor(
-			threeMatr['color'],
-			(gsiMatr as MatrPbrDataType).baseColorFactor
-		)
-		threeMatr['emissive'] = this.convColor(
-			threeMatr['emissive'],
-			(gsiMatr as MatrPbrDataType).emissiveFactor
-		)
-		threeMatr['metalness'] = (gsiMatr as MatrPbrDataType).metallicFactor
-		threeMatr['roughness'] = (gsiMatr as MatrPbrDataType).roughnessFactor
-
-		/**
-		 * @todo metallicRoughnessTexture 需要对 three 的 PBR 做一些修改
-		 * @QianXun 根据three的gltf loader实现，暂时将这个texture同时附给两个属性
-		 * https://threejs.org/examples/?q=gltf#webgl_loader_gltf_extensions
-		 */
-		threeMatr['metalnessMap'] = this.convTexture(
-			threeMatr['metalnessMap'],
-			(gsiMatr as MatrPbrDataType).metallicRoughnessTexture,
-			true
-		)
-		threeMatr['roughnessMap'] = this.convTexture(
-			threeMatr['roughnessMap'],
-			(gsiMatr as MatrPbrDataType).metallicRoughnessTexture,
-			true
-		)
-		threeMatr['map'] = this.convTexture(
-			threeMatr['map'],
-			(gsiMatr as MatrPbrDataType).baseColorTexture,
-			true
-		)
-		threeMatr['emissiveMap'] = this.convTexture(
-			threeMatr['emissiveMap'],
-			(gsiMatr as MatrPbrDataType).emissiveTexture,
-			true
-		)
-		threeMatr['normalMap'] = this.convTexture(
-			threeMatr['normalMap'],
-			(gsiMatr as MatrPbrDataType).normalTexture,
-			true
-		)
-		threeMatr['aoMap'] = this.convTexture(
-			threeMatr['aoMap'],
-			(gsiMatr as MatrPbrDataType).occlusionTexture,
-			true
-		)
-	}
-
-	private assignUniformVals(
-		threeUniforms: { [name: string]: any },
-		key: string,
-		gsiUniform: UniformDataType
-	) {
-		const val = gsiUniform.value as any
-		const type = gsiUniform.type
-		if (val === undefined) {
-			return
-		}
-		if (typeof val === 'number') {
-			if (threeUniforms[key] === undefined) {
-				threeUniforms[key] = { value: val }
-			} else {
-				threeUniforms[key].value = val
-			}
-		} else if (Array.isArray(val)) {
-			if (type === 'float') {
-				// 识别到普通的float array
-				if (threeUniforms[key] === undefined) {
-					threeUniforms[key] = { value: val }
-				} else {
-					threeUniforms[key].value = val
-				}
-			} else if (threeUniforms[key] === undefined) {
-				threeUniforms[key] = { value: this.arrayTothree(undefined, val) }
-			} else {
-				threeUniforms[key].value = this.arrayTothree(threeUniforms[key].value, val)
-			}
-		} else if (val['w'] !== undefined) {
-			if (threeUniforms[key] === undefined) {
-				threeUniforms[key] = { value: new Vector4().copy(val) }
-			} else {
-				;(threeUniforms[key].value as Vector4).copy(val)
-			}
-		} else if (val['z'] !== undefined) {
-			if (threeUniforms[key] === undefined) {
-				threeUniforms[key] = { value: new Vector3().copy(val) }
-			} else {
-				;(threeUniforms[key].value as Vector3).copy(val)
-			}
-		} else if (val['y'] !== undefined) {
-			if (threeUniforms[key] === undefined) {
-				threeUniforms[key] = { value: new Vector2().copy(val) }
-			} else {
-				;(threeUniforms[key].value as Vector2).copy(val)
-			}
-		} else if (val['r'] !== undefined) {
-			if (threeUniforms[key] === undefined) {
-				threeUniforms[key] = { value: new Color().copy(val) }
-			} else {
-				;(threeUniforms[key].value as Color).copy(val)
-			}
-		} else if (val.image) {
-			if (threeUniforms[key] === undefined) {
-				threeUniforms[key] = { value: this.convTexture(undefined, val as TextureType, true) }
-			} else {
-				threeUniforms[key].value = this.convTexture(
-					threeUniforms[key].value,
-					val as TextureType,
-					true
-				)
-			}
-		} else if (val.position && val.rotation && val.scale) {
-			/**
-			 * @note @performance 这里每一帧计算matrix会消耗性能
-			 */
-			const elements = val.matrix
-			if (
-				threeUniforms[key] === undefined ||
-				!elementsEquals(threeUniforms[key].value.elements, elements)
-			) {
-				let mat
-				if (elements.length === 9) {
-					mat = new Matrix3().fromArray(elements)
-				} else if (elements.length === 16) {
-					mat = new Matrix4().fromArray(elements)
-				} else {
-					throw new Error('Invalid Matrix elements length')
-				}
-				threeUniforms[key] = { value: mat }
-			}
-		} else {
-			console.error(`GSI::PrgMatr::Uniforms unsupported uniform type ${val}`)
-		}
-	}
-
-	private arrayTothree(
-		src: any[] | Matrix3 | Matrix4 | undefined,
-		val: any[]
-	): any[] | Matrix3 | Matrix4 {
-		const l = val.length
-		let result
-		if (l === 9 && val.every((v) => typeof v === 'number')) {
-			// 	Matrix3数组
-			if (src === undefined) {
-				result = new Matrix3().fromArray(val)
-			} else {
-				result = (src as Matrix3).fromArray(val)
-			}
-			return result
-		}
-		if (l === 16 && val.every((v) => typeof v === 'number')) {
-			// Matrix4数组
-			if (src === undefined) {
-				result = new Matrix4().fromArray(val)
-			} else {
-				result = (src as Matrix4).fromArray(val)
-			}
-			return result
-		}
-
-		// 多维对象数组，依次parse
-		result = src || []
-		for (let i = 0; i < l; i++) {
-			const v = val[i]
-			const s = result[i]
-			if (v === undefined || v === null) {
-				throw new Error('Array element is undefined or null')
-			} else if (Array.isArray(v)) {
-				switch (v.length) {
-					case 9:
-						if (s === undefined) {
-							result[i] = new Matrix3().fromArray(v)
-						} else {
-							s.fromArray(v)
-						}
-						break
-					case 16:
-						if (s === undefined) {
-							result[i] = new Matrix4().fromArray(v)
-						} else {
-							s.fromArray(v)
-						}
-						break
-					default:
-						throw new Error('Invalid array length for uniform')
-				}
-			} else if (typeof val === 'number' && result[i] !== v) {
-				result[i] = v
-			} else if (v.w !== undefined) {
-				if (s === undefined) {
-					result[i] = new Vector4().copy(v)
-				} else {
-					s.copy(v)
-				}
-			} else if (v.z !== undefined) {
-				if (s === undefined) {
-					result[i] = new Vector3().copy(v)
-				} else {
-					s.copy(v)
-				}
-			} else if (v.y !== undefined) {
-				if (s === undefined) {
-					result[i] = new Vector2().copy(v)
-				} else {
-					s.copy(v)
-				}
-			} else if (v.r !== undefined) {
-				if (s === undefined) {
-					result[i] = new Color().copy(v)
-				} else {
-					s.copy(v)
-				}
-			} else if (v.image) {
-				if (s === undefined) {
-					result[i] = this.convTexture(undefined, v as TextureType, true)
-				} else {
-					result[i] = this.convTexture(result[i], v as TextureType, true)
-				}
-			} else {
-				throw new Error(`Unsupported array item type: ${v}`)
-			}
-		}
-		return result
-	}
-
-	private transformEquals(threeMesh: RenderableObject3D, gsiMesh: MeshDataType): boolean {
-		if (threeMesh._tfPos === undefined) {
-			threeMesh._tfPos = new Vec3().copy((gsiMesh.transform.position ?? this._emptyVec3) as Vec3)
-		}
-		if (threeMesh._tfRot === undefined) {
-			threeMesh._tfRot = new Euler().copy((gsiMesh.transform.rotation ?? this._emptyEuler) as Euler)
-		}
-		if (threeMesh._tfScl === undefined) {
-			threeMesh._tfScl = new Vec3().copy((gsiMesh.transform.scale ?? this._emptyVec3) as Vec3)
-		}
-
-		if (!gsiMesh.transform.position || !gsiMesh.transform.rotation || !gsiMesh.transform.scale) {
-			return matrix4Equals(threeMesh.matrix.elements, gsiMesh.transform.matrix)
-		}
-
-		const p1 = threeMesh._tfPos
-		const p2 = gsiMesh.transform.position
-		const e1 = threeMesh._tfRot
-		const e2 = gsiMesh.transform.rotation
-		const s1 = threeMesh._tfScl
-		const s2 = gsiMesh.transform.scale
-		if (
-			p1.x === p2.x &&
-			p1.y === p2.y &&
-			p1.z === p2.z &&
-			e1.x === e2.x &&
-			e1.y === e2.y &&
-			e1.z === e2.z &&
-			e1.order === e2.order &&
-			s1.x === s2.x &&
-			s1.y === s2.y &&
-			s1.z === s2.z
-		) {
-			return true
-		} else {
-			return false
-		}
-	}
-
-	private releaseResources() {
-		// Release unused resources - disposing
-		this._attrMap.forEach((attr, dt, map) => {
-			if (!this._usedResources.has(attr)) {
-				// Release ArrayBuffer
-				attr.array = this._disposedArray
-				map.delete(dt)
-			}
-		})
-
-		this._textureMap.forEach((tex, dt, map) => {
-			if (!this._usedResources.has(tex)) {
-				tex.dispose()
-				map.delete(dt)
-			}
-		})
-
-		this._matrMap.forEach((mat, dt, map) => {
-			if (!this._usedResources.has(mat)) {
-				mat.dispose()
-				map.delete(dt)
-			}
-		})
-
-		this._geomMap.forEach((geom, dt, map) => {
-			if (!this._usedResources.has(geom)) {
-				geom.dispose()
-				// Release attributes
-				geom.attributes = {}
-				map.delete(dt)
-			}
-		})
-
-		this._meshMap.forEach((mesh, dt, map) => {
-			if (!this._usedResources.has(mesh)) {
-				mesh.geometry = undefined
-				mesh.material = undefined
-				map.delete(dt)
-			}
-		})
-
-		// Clear used resources marks
-		this._usedResources.clear()
-	}
-}
+type GsiMatr = MatrSpriteDataType | MatrPointDataType | MatrUnlitDataType | MatrPbrDataType

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import { MeshDataType, Int } from '@gs.i/schema-scene'
 import { Processor, TraverseType } from '@gs.i/processor-base'
 import { traverse, flatten } from '@gs.i/utils-traverse'
@@ -74,12 +75,12 @@ export class GraphProcessor extends Processor {
 	hashPosition(node: MeshDataType): PositionHash {
 		const upstreamPath = [this.getID(node)]
 
-		let curr: MeshDataType = node
+		const curr: MeshDataType = node
 		while (curr.parent) {
 			upstreamPath.push(this.getID(curr.parent))
 		}
 
-		let result = upstreamPath.reverse().join(',')
+		const result = upstreamPath.reverse().join(',')
 		return result
 	}
 
@@ -87,22 +88,24 @@ export class GraphProcessor extends Processor {
 	 * take a snapshot of the tree structure
 	 * - used to find out which parts of the tree changed
 	 */
-	snapshot(root: MeshDataType, keepRef = false): SnapShot {
+	snapshot(root?: MeshDataType, keepRef = false): SnapShot {
 		const result: SnapShot = {
 			values: new Set(),
 			references: new Map(),
 			positions: new Map(),
 		}
 
-		traverse(root, (node, parent) => {
-			const id = this.getID(node)
-			result.values.add(id)
-			result.positions.set(id, this.hashPosition(node))
+		if (root) {
+			traverse(root, (node, parent) => {
+				const id = this.getID(node)
+				result.values.add(id)
+				result.positions.set(id, this.hashPosition(node))
 
-			if (keepRef) {
-				result.references.set(id, node)
-			}
-		})
+				if (keepRef) {
+					result.references.set(id, node)
+				}
+			})
+		}
 
 		return result
 	}
@@ -150,6 +153,7 @@ function diffTrees(a: FlattenedTree, b: FlattenedTree): ChangeList {
 	return {
 		added,
 		removed,
+		kept: intersection,
 		moved,
 	}
 }
@@ -163,15 +167,48 @@ export interface SnapShot extends FlattenedTree {}
  *
  */
 export interface ChangeList<ValueType = number> {
+	/**
+	 * b - a
+	 */
 	added: Set<ValueType>
+	/**
+	 * a - b
+	 */
 	removed: Set<ValueType>
+	/**
+	 * insect(a,b)
+	 */
+	kept: Set<ValueType>
+	/**
+	 * insect(a,b).filter(positionChanged)
+	 */
 	moved: Set<ValueType>
 }
 
 /**
  * a - b
+ * @note this will modify a, use diffSets if you still need original a
  */
-function diffSets<T>(a: Set<T>, b: Set<T>): Set<T> {
+export function diffSetsFast<T>(a: Set<T>, b: Set<T> | Array<T>): Set<T> {
+	const difference = a
+	for (const elem of b) {
+		difference.delete(elem)
+	}
+	return difference
+}
+/**
+ * a - b
+ * @note this will modify a, use diffSets if you still need original a
+ */
+export function diffSetsFastAndToArray<T>(a: Set<T>, b: Set<T> | Array<T>, bAsArray: T[]): Set<T> {
+	const difference = a
+	for (const elem of b) {
+		bAsArray.push(elem)
+		difference.delete(elem)
+	}
+	return difference
+}
+export function diffSets<T>(a: Set<T> | Array<T>, b: Set<T> | Array<T>): Set<T> {
 	const difference = new Set(a)
 	for (const elem of b) {
 		difference.delete(elem)
@@ -179,7 +216,17 @@ function diffSets<T>(a: Set<T>, b: Set<T>): Set<T> {
 	return difference
 }
 
-function intersect<T>(a: Set<T>, b: Set<T>): Set<T> {
+export function diffWeakSets<T extends object>(a: Set<T> | Array<T>, b: WeakSet<T>): Set<T> {
+	const difference = new Set(a)
+	for (const elem of a) {
+		if (b.has(elem)) {
+			difference.delete(elem)
+		}
+	}
+	return difference
+}
+
+export function intersect<T>(a: Set<T>, b: Set<T>): Set<T> {
 	const intersection = new Set<T>()
 	for (const elem of b) {
 		if (a.has(elem)) {

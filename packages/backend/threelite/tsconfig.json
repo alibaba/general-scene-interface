@@ -10,7 +10,25 @@
 	"exclude": ["dist"],
 	"references": [
 		{
-			"path": "../../schema/core-old"
+			"path": "../../schema/core"
+		},
+		{
+			"path": "../../schema/converter"
+		},
+		{
+			"path": "../../processors/bound"
+		},
+		{
+			"path": "../../utils/traverse"
+		},
+		{
+			"path": "../../processors/specify"
+		},
+		{
+			"path": "../../processors/graph"
+		},
+		{
+			"path": "../../processors/matrix"
 		},
 		{
 			"path": "../../utils/geometry"
