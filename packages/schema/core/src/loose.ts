@@ -59,7 +59,10 @@ export type LooseGeomDataType = Replace<
 
 export type LooseSamplerDataType = Partial<SamplerDataType>
 export type LooseImageDataType = Partial<ImageDataType>
-export type LooseTextureType = Replace<TextureType, { image: LooseImageDataType }>
+export type LooseTextureType = Replace<
+	TextureType,
+	{ image: LooseImageDataType; sampler: Partial<SamplerDataType> | undefined }
+>
 
 // const text : LooseTextureType = {
 // 	image: {}
@@ -100,8 +103,19 @@ export type LooseMatrSpriteDataType = OnlyRequire<
 
 // mesh -------------------------------------
 
-export type LooseNode = Partial<Node>
-export type LooseRenderableMesh = OnlyRequire<RenderableMesh, 'geometry' | 'material'>
+export type LooseNode = Replace<
+	Node,
+	{ parent?: LooseMeshDataType; children?: Set<LooseMeshDataType> }
+>
+export type LooseRenderableMesh = Replace<
+	RenderableMesh,
+	{
+		geometry: LooseGeomDataType
+		material: LooseMatrBase
+		parent?: LooseMeshDataType
+		children?: Set<LooseMeshDataType>
+	}
+>
 export type LooseMeshDataType = LooseRenderableMesh | LooseNode
 
 // helper -------------------------------------

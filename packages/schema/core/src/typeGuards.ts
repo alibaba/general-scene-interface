@@ -21,6 +21,9 @@ import {
 	MatrBaseDataType,
 } from './Matr'
 
+import { Texture, CubeTexture } from './Texture'
+import { UniformDataType } from './Programable'
+
 import { RenderableMesh, MeshDataType } from './Mesh'
 
 export function isColorRGB(a: any): a is ColorRGB {
@@ -78,4 +81,20 @@ export function isTransform2Matrix(v: Transform2): v is Transform2Matrix {
 }
 export function isTransform2TRS(v: Transform2): v is Transform2TRS {
 	return v.matrix === undefined
+}
+
+export function isTexture(v: UniformDataType['value']): v is Texture {
+	return (
+		(v as Texture).sampler?.magFilter !== undefined &&
+		(v as Texture).sampler?.wrapS !== undefined &&
+		(v as Texture).image !== undefined
+	)
+}
+
+export function isCubeTexture(v: UniformDataType['value']): v is CubeTexture {
+	return (
+		(v as CubeTexture).sampler?.magFilter !== undefined &&
+		(v as CubeTexture).sampler?.wrapS !== undefined &&
+		(v as CubeTexture).images !== undefined
+	)
 }

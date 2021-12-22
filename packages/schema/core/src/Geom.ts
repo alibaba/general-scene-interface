@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-import { UpdateRanges, TypedArray, BBox, BSphere, DISPOSED, Versioned } from './basic'
+import { UpdateRanges, TypedArray, BBox, BSphere, DISPOSED, Versioned, Int } from './basic'
 
 /**
  * geometry data
@@ -115,7 +115,7 @@ export interface GeomDataType {
 			/**
 			 * 绘制区域（索引）
 			 */
-			drawRange?: { start: number; count: number }
+			drawRange?: { start: Int; count: Int }
 		}
 
 		/**
@@ -155,6 +155,8 @@ export interface AttributeDataType extends Versioned {
 
 	/**
 	 * array.length / itemSize
+	 * TODO delete it
+	 * @deprecated
 	 */
 	count: number
 
