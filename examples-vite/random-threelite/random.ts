@@ -8,8 +8,9 @@ import { scene as threeScene } from '../__utils/LiteScene'
 {
 	const scene = generateScene({
 		// scale: 10000,
-		count: 400,
+		count: 100,
 		depth: 10,
+		useAnimation: true,
 	})
 	console.log(scene)
 
@@ -24,6 +25,21 @@ import { scene as threeScene } from '../__utils/LiteScene'
 	const conv = new ThreeLiteConverter({ overrideFrustumCulling: true })
 	console.log(conv)
 
+	setInterval(() => {
+		const v = Math.sin(performance.now() * 0.001) * 0.5 + 1.0
+		// scene.transform.scale.x = v
+		// scene.transform.scale.y = v
+		// scene.transform.scale.z = v
+
+		// let m = Array.from(scene.children.values())[0]
+		// m = Array.from(m.children.values())[0]
+		// m = Array.from(m.children.values())[0]
+		// m = Array.from(m.children.values())[0]
+
+		// console.log('Local', conv.config.matrixProcessor.getLocalMatrix(m))
+		// console.log('World', conv.config.matrixProcessor.getWorldMatrix(m))
+	}, 30)
+
 	// debugger
 	const threeMesh = conv.convert(scene)
 	console.log(threeMesh)
@@ -34,7 +50,7 @@ import { scene as threeScene } from '../__utils/LiteScene'
 	timeline.add({
 		duration: Infinity,
 		onUpdate: () => {
-			scene.transform.version++
+			// scene.transform.version++
 			conv.convert(scene)
 			renderer.render(threeScene, camera)
 		},
