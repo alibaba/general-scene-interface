@@ -131,7 +131,7 @@ export class MatProcessor extends Processor {
 		if (rootMatrixCache === undefined) {
 			this._cacheMatrix.set(root.transform, { world: { matrix: this.getLocalMatrix(root) } })
 		} else {
-			rootMatrixCache.world = { matrix: this.getLocalMatrix(root) }
+			rootMatrixCache.world = { matrix: this.getLocalMatrix(root, rootMatrixCache) }
 		}
 
 		// loop from the second node (skip root)
@@ -166,7 +166,7 @@ export class MatProcessor extends Processor {
 				const parentWorldMatrixCache = this._cacheMatrix.get(parent.transform)
 					?.world as WorldMatrixCache
 
-				const currLocalMatrix = this.getLocalMatrix(curr)
+				const currLocalMatrix = this.getLocalMatrix(curr, matrixCache)
 				const currWorldMatrix = multiplyMatrices(parentWorldMatrixCache.matrix, currLocalMatrix)
 
 				// this._cacheMatrix.set(curr.transform, {
@@ -174,7 +174,7 @@ export class MatProcessor extends Processor {
 				// 	matrix: currWorldMatrix,
 				// })
 
-				const matrixCache = this._cacheMatrix.get(curr.transform)
+				// const matrixCache = this._cacheMatrix.get(curr.transform)
 				if (matrixCache === undefined) {
 					this._cacheMatrix.set(curr.transform, {
 						world: {
@@ -213,7 +213,7 @@ export class MatProcessor extends Processor {
 		return id
 	}
 
-	getLocalMatrix(node: MeshDataType): number[] {
+	getLocalMatrix(node: MeshDataType, cache: MatrixCache | null | undefined = null): number[] {
 		//
 		// if (!node) throw new SchemaNotValid(`MatProcessor: the node you input does not exist`)
 		// if (!node.transform)
@@ -232,7 +232,9 @@ export class MatProcessor extends Processor {
 			// 不缓存
 			return getMatrix(transform)
 		} else {
-			const cache = this._cacheMatrix.get(transform)
+			// if input a cache (including undefined), use it directly
+			// if input null (by default), fetch catch
+			cache = cache === null ? this._cacheMatrix.get(transform) : cache
 			if (!cache) {
 				// 未缓存
 				const matrix = getMatrix(transform)
