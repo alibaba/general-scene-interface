@@ -12,7 +12,7 @@
 		"target": "es2020",
 		"lib": ["ES2020", "DOM"],
 		"moduleResolution": "node",
-		"module": "ES2020", // @see https://www.typescriptlang.org/tsconfig#module
+		"module": "es2022", // @see https://www.typescriptlang.org/tsconfig#module
 		"declaration": true,
 		"declarationMap": true,
 		"sourceMap": false,
@@ -29,7 +29,6 @@
 		"exactOptionalPropertyTypes": false, // TODO 改成 true，
 		"alwaysStrict": true,
 		"noImplicitOverride": false, // TODO 改成 true，
-		"strictNullChecks": true,
 		//
 		"experimentalDecorators": true,
 		"incremental": false,
