@@ -234,8 +234,8 @@ export class ThreeLiteConverter implements Converter {
 
 	constructor(config: ConverterConfig = {}) {
 		this.config = {
-			...config,
 			...DefaultConfig,
+			...config,
 		}
 
 		// this._cachedSnapshot = this.config.graphProcessor.snapshot() // init with a empty node
@@ -499,6 +499,10 @@ export class ThreeLiteConverter implements Converter {
 				throw 'decomposeMatrix is not implemented yet'
 			}
 
+			if (this.config.overrideFrustumCulling) {
+				threeMesh.frustumCulled = false
+			}
+
 			// update cache
 			this._threeMesh.set(gsiMesh, threeMesh)
 		}
@@ -518,6 +522,8 @@ export class ThreeLiteConverter implements Converter {
 					;(material['defines'] as any).GSI_USE_UV = true
 				}
 			}
+
+			threeMesh.visible = gsiMesh.visible
 
 			// @note three doesn't use localMatrix at all. it's only for generating worldMatrix
 			// threeMesh.matrix.elements = this.config.matrixProcessor.getLocalMatrix(gsiMesh)
@@ -638,12 +644,12 @@ export class ThreeLiteConverter implements Converter {
 
 			// releaseOnUpload
 			if (gsiAttr.disposable) {
-				// gsi 释放 array 用内置类型
-				gsiAttr.array = DISPOSED
-
 				// 底层渲染器释放 array 的方案各有不同，用支持的即可
 				threeAttribute.onUploadCallback = function () {
 					threeAttribute.array = []
+					// @note this may still be used for generating bounds
+					// gsi 释放 array 用内置类型
+					gsiAttr.array = DISPOSED
 				}
 			}
 

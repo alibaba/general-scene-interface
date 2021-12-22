@@ -42,6 +42,9 @@
 			"path": "../packages/processors/base"
 		},
 		{
+			"path": "../packages/processors/indicator"
+		},
+		{
 			"path": "../packages/processors/bound"
 		},
 		{

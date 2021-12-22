@@ -45,6 +45,7 @@
 		"@gs.i/processor-culling": "^0.1.0-alpha",
 		"@gs.i/frontend-sdk": "^0.1.0-alpha",
 		"@gs.i/frontend-gltf2": "^0.1.0-alpha",
+		"@gs.i/processor-indicator": "^0.1.0-alpha",
 		"@gs.i/utils-random-scene": "^0.1.0-alpha"
 	}
 }

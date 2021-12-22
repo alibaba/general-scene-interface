@@ -142,17 +142,15 @@ export function genBSphereWireframe(bsphere: BSphere, segments = 12): GeomDataTy
 	return geom
 }
 
-export function genGeomWireframe(geom: GeomDataType): GeomDataType | undefined {
+export function genGeomWireframe(geom: GeomDataType): GeomDataType {
 	if (!geom.attributes.position) {
-		console.error('Geometry.attributes does not have position or has been disposed')
-		return
+		throw 'Geometry.attributes does not have position or has been disposed'
 	}
 
 	const position = geom.attributes.position
 
 	if (isDISPOSED(position.array)) {
-		console.error('Position attribute array has been disposed')
-		return
+		throw 'Position attribute array has been disposed'
 	}
 
 	const idxArr: number[] = []
@@ -168,8 +166,7 @@ export function genGeomWireframe(geom: GeomDataType): GeomDataType | undefined {
 
 	if (geom.indices) {
 		if (isDISPOSED(geom.indices.array)) {
-			console.error('Geometry.indices.array has been disposed')
-			return
+			throw 'Geometry.indices.array has been disposed'
 		}
 		const indices = geom.indices.array
 		for (let i = 0; i < indices.length; i += 3) {

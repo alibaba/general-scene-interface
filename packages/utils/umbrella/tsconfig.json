@@ -88,6 +88,9 @@
 			"path": "../../frontend/gltf2"
 		},
 		{
+			"path": "../../processors/indicator"
+		},
+		{
 			"path": "../random-scene"
 		}
 	]

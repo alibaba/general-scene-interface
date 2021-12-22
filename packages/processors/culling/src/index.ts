@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 /**
  * @note moved from @gs.i/utils-optimize
  */

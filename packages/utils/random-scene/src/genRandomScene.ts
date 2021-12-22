@@ -35,15 +35,69 @@ import {
 
 const builderAlias = [
 	(scale: Double) =>
-		buildBox({ width: scale, height: scale, depth: scale, uv: true, normal: true }),
-	(scale: Double) => buildCircle({ radius: scale, uv: true, normal: true }),
+		buildBox({
+			width: scale,
+			height: scale,
+			depth: scale,
+			uv: true,
+			normal: true,
+			widthSegments: Math.round(Math.random() * 3 + 1),
+			heightSegments: Math.round(Math.random() * 3 + 1),
+			depthSegments: Math.round(Math.random() * 3 + 1),
+		}),
 	(scale: Double) =>
-		buildCylinder({ radiusTop: scale, radiusBottom: scale, height: scale, uv: true, normal: true }),
-	(scale: Double) => buildPlane({ width: scale, height: scale, uv: true, normal: true }),
+		buildCircle({
+			radius: scale / 2,
+			uv: true,
+			normal: true,
+			segments: Math.round(Math.random() * 20 + 3),
+		}),
 	(scale: Double) =>
-		buildRing({ innerRadius: scale * 0.7, outerRadius: scale, uv: true, normal: true }),
-	(scale: Double) => buildSphere({ radius: scale, uv: true, normal: true }),
-	(scale: Double) => buildTorus({ radius: scale, uv: true, normal: true }),
+		buildCylinder({
+			radiusTop: scale / 2,
+			radiusBottom: scale / 2,
+			height: scale,
+			uv: true,
+			normal: true,
+			radialSegments: Math.round(Math.random() * 3 + 3),
+			heightSegments: Math.round(Math.random() * 3 + 1),
+		}),
+	(scale: Double) =>
+		buildPlane({
+			width: scale,
+			height: scale,
+			uv: true,
+			normal: true,
+			widthSegments: Math.round(Math.random() * 3 + 1),
+			heightSegments: Math.round(Math.random() * 3 + 1),
+		}),
+	(scale: Double) =>
+		buildRing({
+			innerRadius: (scale * 0.7) / 2,
+			outerRadius: scale / 2,
+			uv: true,
+			normal: true,
+			thetaSegments: Math.round(Math.random() * 10 + 3),
+			phiSegments: Math.round(Math.random() * 3 + 1),
+		}),
+	(scale: Double) =>
+		buildSphere({
+			radius: scale / 2,
+			uv: true,
+			normal: true,
+			widthSegments: Math.round(Math.random() * 10 + 7),
+			heightSegments: Math.round(Math.random() * 10 + 7),
+		}),
+
+	(scale: Double) =>
+		buildTorus({
+			radius: scale / 2,
+			tube: (scale / 2) * 0.5,
+			uv: true,
+			normal: true,
+			radialSegments: Math.round(Math.random() * 10 + 5),
+			tubularSegments: Math.round(Math.random() * 20 + 5),
+		}),
 	// (scale) => buildPolyhedron(),
 ]
 

@@ -1,5 +1,5 @@
 import { MeshDataType, LooseMeshDataType } from '@gs.i/schema-scene'
-import { traverse } from '@gs.i/utils-traverse'
+import { traverse, traversePostOrder } from '@gs.i/utils-traverse'
 
 export interface IProcessor {
 	readonly type: string
@@ -72,6 +72,8 @@ export class Processor<Input extends LooseMeshDataType = MeshDataType> implement
 	traverse(mesh: Input) {
 		if ((this.traverseType & TraverseType.PreOrder) === TraverseType.PreOrder) {
 			traverse(mesh as MeshDataType, this.processNode.bind(this))
+		} else if ((this.traverseType & TraverseType.PostOrder) === TraverseType.PostOrder) {
+			traversePostOrder(mesh as MeshDataType, this.processNode.bind(this))
 		} else if (this.traverseType === TraverseType.None) {
 			console.warn(`This processor (${this.type}) does not traverse, skipped`)
 		} else {
@@ -124,6 +126,10 @@ export enum TraverseType {
 	 * Breadth-first
 	 */
 	LevelOrder = 1 << 1, // 0010
+	/**
+	 * depth-first + post-order
+	 */
+	PostOrder = 1 << 2, // 0100
 
 	/**
 	 * Any Order is ok

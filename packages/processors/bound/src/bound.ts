@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import { MeshDataType, GeomDataType, Int, BBox, BSphere } from '@gs.i/schema-scene'
 import { Processor, TraverseType } from '@gs.i/processor-base'
 
