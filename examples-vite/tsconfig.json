@@ -5,7 +5,7 @@
 		"baseUrl": ".",
 		"composite": false
 	},
-	"include": ["./", "typings"],
+	"include": [".", "typings"],
 	"exclude": ["dist", "node_modules", "packages"],
 	"references": [
 		{
