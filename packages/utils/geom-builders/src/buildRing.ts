@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-import { AttributeDataType, GeomDataType } from '@gs.i/schema'
+import { AttributeDataType, GeomDataType } from '@gs.i/schema-scene'
 import { Box3, Sphere, Vector3 } from '@gs.i/utils-math'
 
 export const DefaultParams = {
@@ -127,6 +127,7 @@ export function buildRing(
 		normalized: false,
 		usage: 'STATIC_DRAW',
 		version: 0,
+		disposable: true,
 	}
 
 	const indicesAttr: AttributeDataType = {
@@ -136,6 +137,7 @@ export function buildRing(
 		normalized: false,
 		usage: 'STATIC_DRAW',
 		version: 0,
+		disposable: true,
 	}
 
 	// box.getBoundingSphere(sphere)
@@ -147,13 +149,17 @@ export function buildRing(
 			position: position,
 		},
 		indices: indicesAttr,
-		boundingBox: {
-			min: { ...box.min },
-			max: { ...box.max },
-		},
-		boundingSphere: {
-			center: { ...sphere.center },
-			radius: sphere.radius,
+		extensions: {
+			EXT_geometry_bounds: {
+				box: {
+					min: { ...box.min },
+					max: { ...box.max },
+				},
+				sphere: {
+					center: { ...sphere.center },
+					radius: sphere.radius,
+				},
+			},
 		},
 	}
 
@@ -165,6 +171,7 @@ export function buildRing(
 			normalized: false,
 			usage: 'STATIC_DRAW',
 			version: 0,
+			disposable: true,
 		}
 	}
 
@@ -176,6 +183,7 @@ export function buildRing(
 			normalized: false,
 			usage: 'STATIC_DRAW',
 			version: 0,
+			disposable: true,
 		}
 	}
 
