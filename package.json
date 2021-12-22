@@ -7,6 +7,7 @@
 		"packages": [
 			"packages/**",
 			"examples",
+			"examples-vite",
 			"test"
 		],
 		"nohoist": [
@@ -19,6 +20,7 @@
 			"**/three-lite/**",
 			"**/three-lite",
 			"**/@gs.i/examples/**",
+			"**/@gs.i/examples-vite/**",
 			"**/@gs.i/test/**",
 			"**/@types/**"
 		]
@@ -27,8 +29,9 @@
 		"setup": "node scripts/setup.mjs",
 		"setup:core": "node scripts/setup.mjs --no-examples",
 		"setup:examples": "./scripts/setupExamples.sh",
-		"updateStructure": "rm -rf ./yarn.lock && npm run setup && node scripts/copyFiles.mjs && node scripts/fixTsReferences.mjs && node scripts/updateUmbrella.mjs",
-		"start": "npx concurrently --kill-others --names \"watch,examples\" \"npm run watch\" \"cd ./examples && npm start\" ",
+		"updateStructure": "rm -rf ./yarn.lock && node scripts/updateUmbrella.mjs && npm run setup && node scripts/copyFiles.mjs && node scripts/fixTsReferences.mjs",
+		"start:webpack": "npx concurrently --kill-others --names \"watch,examples\" \"npm run watch\" \"cd ./examples && npm start\" ",
+		"start": "npx concurrently --kill-others --names \"watch,examples\" \"npm run watch\" \"cd ./examples-vite && npm start\" ",
 		"build": "lerna run --no-private --stream build",
 		"watch": "node scripts/watch.mjs --fast",
 		"clean": "rm -rf ./yarn.lock && rm -rf ./node_modules && lerna clean -y && lerna run --no-private --stream --parallel clean",

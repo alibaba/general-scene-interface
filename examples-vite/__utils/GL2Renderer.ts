@@ -2,10 +2,16 @@
  * 不在标准里的内容
  */
 
-import * as THREE from 'three-lite'
+import GL2, { THREE, Renderer as GL2THREERenderer } from 'gl2'
 
 import { Timeline } from 'ani-timeline'
-import { PointerControl, AnimatedCameraProxy, TouchControl } from 'camera-proxy'
+import {
+	PointerControl,
+	AnimatedCameraProxy,
+	TouchControl,
+	Cameraman,
+	GeographicStates,
+} from 'camera-proxy'
 
 // basic setting
 
@@ -22,32 +28,22 @@ CANVAS.style.left = '0px'
 CANVAS.style.top = '0px'
 CANVAS.style.width = WIDTH + 'px'
 CANVAS.style.height = HEIGHT + 'px'
-CANVAS.style.zIndex = '999999999'
 CANVAS.width = WIDTH
 CANVAS.height = HEIGHT
 
 CONTAINER.appendChild(CANVAS)
 
-const gl = CANVAS.getContext('webgl')
-
-if (!gl) {
-	throw new Error('Cannot get WebGL context. ')
-}
-
 /**
  * 渲染器
  */
-export const renderer = new THREE.WebGLRenderer({
-	// width: WIDTH,
-	// height: HEIGHT,
+export const renderer = new GL2.Renderer({
+	width: WIDTH,
+	height: HEIGHT,
 	canvas: CANVAS,
-	context: gl,
 	alpha: true,
 	antialias: true,
 	stencil: false,
 })
-// 如果需要关闭webgl warnings
-// renderer.debug.checkShaderErrors = false
 
 /**
  * 时间线
@@ -93,24 +89,9 @@ cameraProxy.setZoom(20)
 cameraProxy.setPitch(0.5)
 cameraProxy.setRotation(0)
 
-function isTouchDevice() {
-	return (
-		'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator['msMaxTouchPoints'] > 0
-	)
-}
+const cameraControl = new PointerControl({
+	camera: cameraProxy,
+	element: CANVAS,
+})
 
-let cameraControl
-if (isTouchDevice()) {
-	cameraControl = new TouchControl({
-		camera: cameraProxy,
-		element: CANVAS,
-	})
-} else {
-	cameraControl = new PointerControl({
-		camera: cameraProxy,
-		element: CANVAS,
-	})
-}
-
-export { cameraControl }
 //
