@@ -157,12 +157,17 @@ export const defaultConfig = {
 }
 export type Config = Partial<typeof defaultConfig>
 
-export function generateScene(config: Config = {}): MeshDataType {
+export function generateScene(config: Config = {}): Mesh {
 	const c = {
 		...defaultConfig,
 		...config,
 	}
 	const root = new Mesh()
+
+	const intervalIDs = [] as number[]
+	root.extras = {
+		intervalIDs,
+	}
 
 	// how to build a tree that has specified depth and leaf count
 
@@ -202,6 +207,43 @@ export function generateScene(config: Config = {}): MeshDataType {
 		const node = trunk[pointer]
 		node.children.add(mesh)
 
+		if (config.useAnimation) {
+			const ran = Math.random()
+			if (ran < 0.1) {
+				intervalIDs.push(
+					setInterval(() => {
+						const v = Math.sin(performance.now() * 0.001) * 0.5 + 1.0
+						mesh.transform.scale.set(v, v, v)
+					}, 30)
+				)
+			} else if (ran < 0.2) {
+				intervalIDs.push(
+					setInterval(() => {
+						const v = Math.sin(performance.now() * 0.001) + 1.0
+						mesh.transform.position.z = v * 0.5 * c.scale
+					}, 30)
+				)
+			} else if (ran < 0.3) {
+				intervalIDs.push(
+					setInterval(() => {
+						mesh.transform.rotation.x = performance.now() * 0.001
+					}, 30)
+				)
+			} else if (ran < 0.4) {
+				intervalIDs.push(
+					setInterval(() => {
+						mesh.transform.rotation.y = performance.now() * 0.001
+					}, 30)
+				)
+			} else if (ran < 0.5) {
+				intervalIDs.push(
+					setInterval(() => {
+						mesh.transform.rotation.z = performance.now() * 0.001
+					}, 30)
+				)
+			}
+		}
+
 		index++
 		pointer--
 		if (pointer < 0) {
@@ -213,7 +255,7 @@ export function generateScene(config: Config = {}): MeshDataType {
 
 	specifier.traverse(root)
 
-	return root as MeshDataType
+	return root as Mesh
 }
 
 // export function updateScene(root: MeshDataType, config: Config): MeshDataType {}
