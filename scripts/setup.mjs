@@ -1,3 +1,4 @@
+/*eslint-env node*/
 import { argv } from 'process'
 import { constants, fstat } from 'fs'
 import { readFile, writeFile, copyFile, access, rename, unlink } from 'fs/promises'
@@ -5,8 +6,8 @@ import path from 'path'
 
 import { execSync, spawn, exec, execFileSync } from 'child_process'
 
-console.log(argv)
-console.log(process.env.PWD)
+// console.log(argv)
+// console.log(process.env.PWD)
 
 import { fileURLToPath } from 'url'
 
@@ -69,7 +70,7 @@ await Promise.all(
 		try {
 			await writeFile(pjsonPath, JSON.stringify(originalJson))
 		} catch (error) {
-			console.error(pkg.name, tsconfigPath, error)
+			console.error(pkg.name, pjsonPath, error)
 		}
 	})
 )
@@ -91,7 +92,7 @@ await Promise.all(
 			try {
 				await writeFile(pjsonPath, JSON.stringify(originalJson))
 			} catch (error) {
-				console.error(pkg.name, tsconfigPath, error)
+				console.error(pkg.name, pjsonPath, error)
 			}
 		}
 	})

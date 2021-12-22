@@ -1,10 +1,21 @@
+/*eslint-env node*/
 import { argv } from 'process'
 import path from 'path'
 
 import { execSync } from 'child_process'
 
-console.log(argv)
-console.log(process.env.PWD)
+// console.log(argv)
+// console.log(process.env.PWD)
+console.log(
+	'\x1b[36m%s\x1b[0m',
+	`
+*********************
+*                   *
+* copy shared files *
+*                   *
+*********************
+`
+)
 
 import blacklist from './ignore.mjs'
 
@@ -21,7 +32,7 @@ const packages = execSync('npx lerna ls -p')
 		// return !line.startsWith('lerna ') && line.trim() !== '' && !inBL
 		return line.trim() !== '' && !inBL
 	})
-console.log(packages)
+// console.log(packages)
 
 const COPY_TS_CONFIG = true
 

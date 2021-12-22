@@ -2,7 +2,7 @@
  * 原则上，package depends 中的本地 package 和 tsconfig 中的 references 应该是一一对应的。
  * 如果两者不同，则应该检查并修复
  */
-
+/*eslint-env node*/
 import { argv } from 'process'
 import { constants, fstat } from 'fs'
 import { readFile, writeFile, copyFile, access } from 'fs/promises'
@@ -10,8 +10,8 @@ import path from 'path'
 
 import { execSync } from 'child_process'
 
-console.log(argv)
-console.log(process.env.PWD)
+// console.log(argv)
+// console.log(process.env.PWD)
 
 const packagesJSON = execSync('npx lerna ls --toposort --json').toString()
 const packageALL = JSON.parse(packagesJSON)
