@@ -6,8 +6,11 @@ import {
 	// MatrPbrDataType,
 	// MatrPointDataType,
 	// MatrSpriteDataType,
-	TextureType,
+	Texture,
+	ImageDataType,
+	SamplerDataType,
 	GeomDataType,
+	AttributeDataType,
 	Transform3,
 	Transform2,
 	DISPOSED,
@@ -18,10 +21,10 @@ import {
 	LooseMatrUnlitDataType,
 	LooseMatrPointDataType,
 	LooseMatrSpriteDataType,
-	// LooseAttribute,
+	LooseAttribute,
 	LooseGeomDataType,
-	// LooseSamplerDataType,
-	// LooseImageDataType,
+	LooseSamplerDataType,
+	LooseImageDataType,
 	LooseTextureType,
 	// LooseNode,
 	// LooseRenderableMesh,
@@ -40,7 +43,7 @@ import { Processor, TraverseType } from '@gs.i/processor-base'
  * Input Loose types and output strict types
  * @note NOT PURE FUNCTIONS. this process will modify the object you input
  */
-export class Specifier extends Processor {
+export class Specifier extends Processor<LooseMeshDataType> {
 	traverseType = TraverseType.Any
 	type = 'Specifier'
 	canEditNode = true
@@ -57,7 +60,7 @@ export class Specifier extends Processor {
 }
 
 /**
- * specify a mesh node
+ * specify a mesh node by filling all the default values, transform a loose mesh into strict mesh
  * - includes its material and geometry,
  * - **not** includes its children.
  * - **not** includes its children.
@@ -70,11 +73,11 @@ export function specifyMesh(node: LooseMeshDataType, parent?: LooseMeshDataType)
 
 	if (parent) node.parent = parent as MeshDataType | undefined
 
-	if (node.visible === undefined) node.visible = true
 	if (node.name === undefined) node.name = 'unnamed mesh'
-	if (node.children === undefined) node.children = new Set()
 	if (node.extensions === undefined) node.extensions = {}
 	if (node.extras === undefined) node.extras = {}
+	if (node.visible === undefined) node.visible = true
+	if (node.children === undefined) node.children = new Set()
 
 	if (node.transform === undefined) node.transform = genDefaultTransform3()
 	specifyTransform3(node.transform)
@@ -97,12 +100,12 @@ export function specifyMaterial(matr: LooseMatrBase): MatrBaseDataType {
 	 * common
 	 */
 	if (matr.name === undefined) matr.name = 'unnamed matr'
+	if (matr.extensions === undefined) matr.extensions = {}
+	if (matr.extras === undefined) matr.extras = {}
 	if (matr.visible === undefined) matr.visible = true
 	if (matr.side === undefined) matr.side = 'front'
 	if (matr.alphaMode === undefined) matr.alphaMode = 'OPAQUE'
 	if (matr.opacity === undefined) matr.opacity = 1
-	if (matr.extensions === undefined) matr.extensions = {}
-	if (matr.extras === undefined) matr.extras = {}
 
 	/**
 	 * Programable extension
@@ -115,8 +118,8 @@ export function specifyMaterial(matr: LooseMatrBase): MatrBaseDataType {
 		if (p.extension === undefined) p.extension = ''
 		if (p.defines === undefined) p.defines = {}
 		if (p.uniforms === undefined) p.uniforms = {}
-		if (p.attributes === undefined) p.attributes = {}
-		if (p.varyings === undefined) p.varyings = {}
+		// if (p.attributes === undefined) p.attributes = {}
+		// if (p.varyings === undefined) p.varyings = {}
 	}
 
 	/**
@@ -157,7 +160,7 @@ export function specifyMaterial(matr: LooseMatrBase): MatrBaseDataType {
 
 	if (isMatrSpriteDataType(matr)) {
 		if (matr.baseColorFactor === undefined) matr.baseColorFactor = { r: 1, g: 1, b: 1 }
-		if (matr.size === undefined) matr.size = 10
+		// if (matr.size === undefined) matr.size = 10
 		if (matr.sizeAttenuation === undefined) matr.sizeAttenuation = false
 		if (matr.transform === undefined) matr.transform = genDefaultTransform2()
 
@@ -183,49 +186,71 @@ export function specifyGeometry(geom: LooseGeomDataType): GeomDataType {
 	if (geom.attributes === undefined)
 		throw new SchemaNotValid(`geom.attributes can not be undefined`)
 
-	const keys = Object.keys(geom.attributes)
+	const keys = Object.keys(geom.attributes) // @note Object.keys throw if undefined
 
-	if (keys.length === 0) throw new SchemaNotValid(`geom.attributes needs at least one attribute`)
+	// @note Alow user to use this before adding any attributes
+	// if (keys.length === 0) throw new SchemaNotValid(`geom.attributes needs at least one attribute`)
 
 	for (let i = 0; i < keys.length; i++) {
 		const key = keys[i]
 		const attribute = geom.attributes[key]
 
-		if (attribute.array === undefined)
-			throw new SchemaNotValid(`attribute[${key}] .array can not be undefined`)
+		specifyAttribute(attribute, key)
+	}
 
-		if (attribute.itemSize === undefined)
-			throw new SchemaNotValid(`attribute[${key}] .itemSize can not be undefined`)
-
-		if (attribute.count === undefined) {
-			if (attribute.array === DISPOSED)
-				throw new SchemaNotValid(
-					`attribute[${key}] .array shall not be DISPOSED before actually used`
-				)
-
-			attribute.count = attribute.array.length / attribute.itemSize
-		}
-
-		if (attribute.normalized === undefined) attribute.normalized = false
-		if (attribute.usage === undefined) attribute.usage = 'STATIC_DRAW'
-		if (attribute.version === undefined) attribute.version = 0
-		if (attribute.disposable === undefined) attribute.disposable = true
-
-		if (attribute.extensions === undefined) attribute.extensions = {}
+	if (geom.indices) {
+		specifyAttribute(geom.indices, 'indices')
 	}
 
 	return geom as GeomDataType
 }
+
+export function specifyAttribute(attribute: LooseAttribute, name = ''): AttributeDataType {
+	if (attribute.array === undefined)
+		throw new SchemaNotValid(`attribute[${name}] .array can not be undefined`)
+
+	if (attribute.itemSize === undefined)
+		throw new SchemaNotValid(`attribute[${name}] .itemSize can not be undefined`)
+
+	if (attribute.count === undefined) {
+		if (attribute.array === DISPOSED)
+			throw new SchemaNotValid(`attribute[${name}] .array can not be DISPOSED before actually used`)
+
+		attribute.count = attribute.array.length / attribute.itemSize
+	}
+
+	if (attribute.normalized === undefined) attribute.normalized = false
+	if (attribute.usage === undefined) attribute.usage = 'STATIC_DRAW'
+	if (attribute.version === undefined) attribute.version = 0
+	if (attribute.disposable === undefined) attribute.disposable = true
+
+	if (attribute.extensions === undefined) attribute.extensions = {}
+
+	return attribute as AttributeDataType
+}
+
 /**
  * specify a texture, including its image data and sampler.
  * @param t
  * @returns
  */
-export function specifyTexture(t: LooseTextureType): TextureType {
+export function specifyTexture(t: LooseTextureType): Texture {
 	if (t.image === undefined) throw new SchemaNotValid(`texture.image can not be undefined`)
 
-	const i = t.image
+	specifyImage(t.image)
 
+	if (t.sampler === undefined) t.sampler = {}
+
+	specifySampler(t.sampler)
+
+	if (t.transform === undefined) t.transform = [1, 0, 0, 0, 1, 0, 0, 0, 1]
+	if (t.extensions === undefined) t.extensions = {}
+	if (t.extras === undefined) t.extras = {}
+
+	return t as Texture
+}
+
+export function specifyImage(i: LooseImageDataType): ImageDataType {
 	if (i.version === undefined) i.version = 0
 
 	// verify image data source
@@ -272,32 +297,18 @@ export function specifyTexture(t: LooseTextureType): TextureType {
 		throw new SchemaNotValid(`texture.image doesn't have any image data source`)
 	}
 
-	if (t.sampler === undefined) {
-		t.sampler = {
-			magFilter: 'NEAREST',
-			minFilter: 'NEAREST',
-			wrapS: 'CLAMP_TO_EDGE',
-			wrapT: 'CLAMP_TO_EDGE',
-			anisotropy: 0,
-			extensions: {},
-			extras: {},
-		}
-	} else {
-		const s = t.sampler
-		if (s.magFilter === undefined) s.magFilter = 'NEAREST'
-		if (s.minFilter === undefined) s.minFilter = 'NEAREST'
-		if (s.wrapS === undefined) s.wrapS = 'CLAMP_TO_EDGE'
-		if (s.wrapT === undefined) s.wrapT = 'CLAMP_TO_EDGE'
-		if (s.anisotropy === undefined) s.anisotropy = 0
-		if (s.extensions === undefined) s.extensions = {}
-		if (s.extras === undefined) s.extras = {}
-	}
+	return i as ImageDataType
+}
 
-	if (t.transform === undefined) t.transform = [1, 0, 0, 0, 1, 0, 0, 0, 1]
-	if (t.extensions === undefined) t.extensions = {}
-	if (t.extras === undefined) t.extras = {}
-
-	return t as TextureType
+export function specifySampler(s: LooseSamplerDataType): SamplerDataType {
+	if (s.magFilter === undefined) s.magFilter = 'NEAREST'
+	if (s.minFilter === undefined) s.minFilter = 'NEAREST'
+	if (s.wrapS === undefined) s.wrapS = 'CLAMP_TO_EDGE'
+	if (s.wrapT === undefined) s.wrapT = 'CLAMP_TO_EDGE'
+	if (s.anisotropy === undefined) s.anisotropy = 0
+	if (s.extensions === undefined) s.extensions = {}
+	if (s.extras === undefined) s.extras = {}
+	return s as SamplerDataType
 }
 
 /**
@@ -359,6 +370,6 @@ export function isMatrSpriteDataType(v: LooseMatrBase): v is LooseMatrSpriteData
 	return v.type === 'sprite'
 }
 
-export function isRenderableMesh(v: Partial<MeshDataType>): v is RenderableMesh {
+export function isRenderableMesh(v: LooseMeshDataType): v is RenderableMesh {
 	return v['geometry'] && v['material']
 }
