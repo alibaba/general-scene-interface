@@ -84,42 +84,40 @@ export function syncMaterial(
 
 	// advanced controls
 	{
-		if (gsiMatr.extensions?.EXT_matr_advanced?.depthTest !== undefined)
-			threeMatr.depthTest = gsiMatr.extensions?.EXT_matr_advanced?.depthTest
+		const extAdvanced = gsiMatr.extensions?.EXT_matr_advanced
+		if (extAdvanced) {
+			if (extAdvanced.depthTest !== undefined) threeMatr.depthTest = extAdvanced.depthTest
 
-		if (gsiMatr.extensions?.EXT_matr_advanced?.depthWrite !== undefined)
-			threeMatr.depthWrite = gsiMatr.extensions?.EXT_matr_advanced?.depthWrite
+			if (extAdvanced.depthWrite !== undefined) threeMatr.depthWrite = extAdvanced.depthWrite
 
-		if (gsiMatr.extensions?.EXT_matr_advanced?.depthFunc !== undefined)
-			threeMatr.depthFunc = gsiMatr.extensions?.EXT_matr_advanced?.depthFunc
+			if (extAdvanced.depthFunc !== undefined) threeMatr.depthFunc = extAdvanced.depthFunc
 
-		if (gsiMatr.extensions?.EXT_matr_advanced?.polygonOffset !== undefined)
-			threeMatr.polygonOffset = gsiMatr.extensions?.EXT_matr_advanced?.polygonOffset
+			if (extAdvanced.polygonOffset !== undefined)
+				threeMatr.polygonOffset = extAdvanced.polygonOffset
 
-		if (gsiMatr.extensions?.EXT_matr_advanced?.polygonOffsetFactor !== undefined)
-			threeMatr.polygonOffsetFactor = gsiMatr.extensions?.EXT_matr_advanced?.polygonOffsetFactor
+			if (extAdvanced.polygonOffsetFactor !== undefined)
+				threeMatr.polygonOffsetFactor = extAdvanced.polygonOffsetFactor
 
-		if (gsiMatr.extensions?.EXT_matr_advanced?.polygonOffsetUnits !== undefined)
-			threeMatr.polygonOffsetUnits = gsiMatr.extensions?.EXT_matr_advanced?.polygonOffsetUnits
+			if (extAdvanced.polygonOffsetUnits !== undefined)
+				threeMatr.polygonOffsetUnits = extAdvanced.polygonOffsetUnits
+		}
 	}
 
 	// defines
+	const extProgramable = gsiMatr.extensions?.EXT_matr_programmable
 	{
-		if (gsiMatr.extensions?.EXT_matr_programmable?.defines) {
-			threeMatr.defines = convDefines(
-				threeMatr['defines'],
-				gsiMatr.extensions.EXT_matr_programmable.defines
-			)
+		if (extProgramable?.defines) {
+			threeMatr.defines = convDefines(threeMatr['defines'], extProgramable.defines)
 		}
 	}
 
 	// uniforms
 	{
-		if (gsiMatr.extensions?.EXT_matr_programmable?.uniforms) {
+		if (extProgramable?.uniforms) {
 			// it should be a shaderMaterial
 			threeMatr['uniforms'] = threeMatr['uniforms'] || {}
 
-			const uniforms = gsiMatr.extensions?.EXT_matr_programmable?.uniforms
+			const uniforms = extProgramable.uniforms
 
 			Object.keys(uniforms).forEach((key) => {
 				const uniform = uniforms[key]

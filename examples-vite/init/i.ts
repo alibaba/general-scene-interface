@@ -7,8 +7,8 @@ import { scene as threeScene } from '../__utils/LiteScene'
 {
 	const scene = generateScene({
 		// scale: 10000,
-		count: 1000,
-		depth: 100,
+		count: 4000,
+		depth: 10,
 	})
 	console.log(scene)
 
@@ -25,6 +25,7 @@ import { scene as threeScene } from '../__utils/LiteScene'
 	timeline.add({
 		duration: Infinity,
 		onUpdate: () => {
+			scene.transform.version++
 			conv.convert(scene)
 			renderer.render(threeScene, camera)
 		},

@@ -36,6 +36,14 @@ interface WorldMatrixCache {
 }
 
 /**
+ * union cache of local and world matrices
+ */
+interface MatrixCache {
+	local?: LocalMatrixCache
+	world?: WorldMatrixCache
+}
+
+/**
  * @note PURE FUNCTIONS, will not modify your input
  * @note CACHED
  */
@@ -53,8 +61,9 @@ export class MatProcessor extends Processor {
 	private _counter = 0
 	private _ids = new WeakMap<MeshDataType, Int>()
 
-	private _cacheLocalMatrix = new WeakMap<Transform3, LocalMatrixCache>()
-	private _cacheWorldMatrix = new WeakMap<Transform3, WorldMatrixCache>()
+	// private _cacheLocalMatrix = new WeakMap<Transform3, LocalMatrixCache>()
+	// private _cacheWorldMatrix = new WeakMap<Transform3, WorldMatrixCache>()
+	private _cacheMatrix = new WeakMap<Transform3, MatrixCache>()
 
 	processNode(node: MeshDataType, parent?: MeshDataType) {
 		// this.getWorldMatrixShallow(node, parent)
@@ -109,7 +118,7 @@ export class MatProcessor extends Processor {
 			// 如果该节点禁用缓存，则子树永远为脏
 			root.transform.version === -1 ||
 			// 如果节点的 local transform 变化，则子树为脏
-			this._cacheLocalMatrix.get(root.transform)?.version !== root.transform.version
+			this._cacheMatrix.get(root.transform)?.local?.version !== root.transform.version
 		) {
 			isDirty = true
 		}
@@ -118,15 +127,21 @@ export class MatProcessor extends Processor {
 		// @TODO how to cache this ?
 		// @NOTE it's not necessary to cache the matrix because it's done by local matrix cache
 		// @NOTE but may be should avoid weakMap reset the same value?
-		this._cacheWorldMatrix.set(root.transform, { matrix: this.getLocalMatrix(root) })
+		const rootMatrixCache = this._cacheMatrix.get(root.transform)
+		if (rootMatrixCache === undefined) {
+			this._cacheMatrix.set(root.transform, { world: { matrix: this.getLocalMatrix(root) } })
+		} else {
+			rootMatrixCache.world = { matrix: this.getLocalMatrix(root) }
+		}
 
 		// loop from the second node (skip root)
 		for (let i = 1 /* !NOTICE */; i < path.length; i++) {
 			const curr = path[i]
 			const parent = path[i - 1] // not undefined
 
-			const currWorldMatrixCache = this._cacheWorldMatrix.get(curr.transform)
-			const currLocalMatrixCache = this._cacheLocalMatrix.get(curr.transform)
+			const matrixCache = this._cacheMatrix.get(curr.transform)
+			const currWorldMatrixCache = matrixCache?.world
+			const currLocalMatrixCache = matrixCache?.local
 
 			if (
 				// 如果处于脏子树中，则跳过后面的检查，直接为脏
@@ -148,21 +163,36 @@ export class MatProcessor extends Processor {
 				// 由于是从 root 后的第一个节点开始遍历，并提前对 root 做了处理，
 				// 所以 parent 的 localMatrixCache 和 worldMatrixCache 都是存在且最新的
 				// previous logic made sure that parent worldMatrix is updated
-				const parentWorldMatrixCache = this._cacheWorldMatrix.get(
-					parent.transform
-				) as WorldMatrixCache
+				const parentWorldMatrixCache = this._cacheMatrix.get(parent.transform)
+					?.world as WorldMatrixCache
 
 				const currLocalMatrix = this.getLocalMatrix(curr)
 				const currWorldMatrix = multiplyMatrices(parentWorldMatrixCache.matrix, currLocalMatrix)
 
-				this._cacheWorldMatrix.set(curr.transform, {
-					parentID: this.getID(parent),
-					matrix: currWorldMatrix,
-				})
+				// this._cacheMatrix.set(curr.transform, {
+				// 	parentID: this.getID(parent),
+				// 	matrix: currWorldMatrix,
+				// })
+
+				const matrixCache = this._cacheMatrix.get(curr.transform)
+				if (matrixCache === undefined) {
+					this._cacheMatrix.set(curr.transform, {
+						world: {
+							parentID: this.getID(parent),
+							matrix: currWorldMatrix,
+						},
+					})
+				} else {
+					matrixCache.world = {
+						parentID: this.getID(parent),
+						matrix: currWorldMatrix,
+					}
+				}
 			}
 		}
 
-		return this._cacheWorldMatrix.get(node.transform)?.matrix as number[]
+		// TODO this weakmap.get is redundant
+		return this._cacheMatrix.get(node.transform)?.world?.matrix as number[]
 	}
 
 	// getID(node: MeshDataType | undefined): Int | undefined {
@@ -202,20 +232,25 @@ export class MatProcessor extends Processor {
 			// 不缓存
 			return getMatrix(transform)
 		} else {
-			const cache = this._cacheLocalMatrix.get(transform)
+			const cache = this._cacheMatrix.get(transform)
 			if (!cache) {
 				// 未缓存
 				const matrix = getMatrix(transform)
-				this._cacheLocalMatrix.set(transform, { version: transform.version, matrix })
+				this._cacheMatrix.set(transform, { local: { version: transform.version, matrix } })
+				return matrix
+			} else if (cache.local === undefined) {
+				// 未缓存
+				const matrix = getMatrix(transform)
+				cache.local = { version: transform.version, matrix }
 				return matrix
 			} else {
 				// 命中缓存
-				if (cache.version !== transform.version) {
+				if (cache.local.version !== transform.version) {
 					// 更新缓存版本
-					getMatrix(transform, cache.matrix)
-					cache.version = transform.version
+					getMatrix(transform, cache.local.matrix)
+					cache.local.version = transform.version
 				}
-				return cache.matrix
+				return cache.local.matrix
 			}
 		}
 

@@ -223,7 +223,7 @@ export class ThreeLiteConverter implements Converter {
 
 	// private _committedVersions = new WeakMap<any, number>()
 	private _committedAttr = new WeakMap<AttributeDataType, Int>()
-	private _committedMatr = new WeakMap<GsiMatr | MatrBaseDataType, Int>()
+	// private _committedMatr = new WeakMap<GsiMatr | MatrBaseDataType, Int>()
 	private _committedTex = new WeakMap<Texture | CubeTexture, Int>()
 
 	// #endregion
@@ -495,7 +495,7 @@ export class ThreeLiteConverter implements Converter {
 
 			if (
 				gsiGeom.extensions?.EXT_geometry_range?.drawRange?.start !== undefined &&
-				gsiGeom.extensions?.EXT_geometry_range?.drawRange?.count !== undefined
+				gsiGeom.extensions.EXT_geometry_range.drawRange.count !== undefined
 			) {
 				threeGeometry.setDrawRange(
 					gsiGeom.extensions.EXT_geometry_range.drawRange.start,
@@ -606,7 +606,7 @@ export class ThreeLiteConverter implements Converter {
 
 				// Merge and set .updateRanges
 				if (gsiAttr.extensions?.EXT_buffer_partial_update?.updateRanges?.length) {
-					const updateRanges = gsiAttr.extensions?.EXT_buffer_partial_update?.updateRanges
+					const updateRanges = gsiAttr.extensions.EXT_buffer_partial_update.updateRanges
 					const mergedRange = { start: Infinity, end: -Infinity }
 					for (let i = 0; i < updateRanges.length; i++) {
 						const range = updateRanges[i]
@@ -651,7 +651,7 @@ export class ThreeLiteConverter implements Converter {
 	 */
 	private convMatr(gsiMatr: GsiMatr) {
 		let threeMatr = this._threeMatr.get(gsiMatr) as Material
-		let committedVersion = this._committedMatr.get(gsiMatr) as Int
+		// let committedVersion = this._committedMatr.get(gsiMatr) as Int
 
 		// create
 		if (!threeMatr) {
@@ -678,11 +678,12 @@ export class ThreeLiteConverter implements Converter {
 				// threeMatr = new PrgBasicMaterial(gsiMatr as MatrUnlitDataType)
 			}
 
-			committedVersion = gsiMatr.version
+			// @note better performance to just sync threeMatr.version
+			// committedVersion = gsiMatr.version
 
 			// update cache
 			this._threeMatr.set(gsiMatr, threeMatr)
-			this._committedMatr.set(gsiMatr, committedVersion)
+			// this._committedMatr.set(gsiMatr, committedVersion)
 		}
 
 		// sync
@@ -765,16 +766,7 @@ export class ThreeLiteConverter implements Converter {
 			console.warn('Material.version set to -1, Will recompile it every time')
 		}
 
-		if (committedVersion !== gsiMatr.version || gsiMatr.version === -1) {
-			// @note new object will always be uploaded by three,
-			// 		 no needs to set needsUpdate for newly created object
-
-			threeMatr.needsUpdate = true
-
-			// update cache
-			committedVersion = gsiMatr.version
-			this._committedMatr.set(gsiMatr, committedVersion)
-		}
+		threeMatr.version = gsiMatr.version
 
 		return threeMatr
 	}
@@ -877,7 +869,7 @@ export class ThreeLiteConverter implements Converter {
 
 		// this._committedVersions = new WeakMap<any, number>()
 		this._committedAttr = new WeakMap()
-		this._committedMatr = new WeakMap()
+		// this._committedMatr = new WeakMap()
 		this._committedTex = new WeakMap()
 
 		// this._threeObjects = new WeakMap<ColorRGB, Color>()
