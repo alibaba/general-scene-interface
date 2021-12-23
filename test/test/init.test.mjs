@@ -1,5 +1,5 @@
 import { MatProcessor } from '@gs.i/processor-matrix'
-import { specifyMesh } from '@gs.i/processor-specify'
+import { specifyMesh } from '@gs.i/utils-specify'
 import chai from 'chai'
 const expect = chai.expect
 

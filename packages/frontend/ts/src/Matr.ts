@@ -19,7 +19,7 @@ import {
 	TextureType,
 } from '@gs.i/schema-scene'
 
-import { specifyMaterial } from '@gs.i/processor-specify'
+import { specifyMaterial } from '@gs.i/utils-specify'
 
 const pbrPrgProperties = ['fragPreLighting', 'fragGeometry'] as any[]
 const pointPrgProperties = ['vertPointGeometry'] as any[]

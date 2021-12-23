@@ -54,7 +54,7 @@
 			"path": "../packages/processors/matrix"
 		},
 		{
-			"path": "../packages/processors/specify"
+			"path": "../packages/utils/specify"
 		},
 		{
 			"path": "../packages/backend/gltf2"

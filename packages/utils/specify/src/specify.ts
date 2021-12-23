@@ -36,27 +36,15 @@ import {
 	// isTransform2Matrix,
 	// isTransform2TRS,
 } from '@gs.i/schema-scene'
-import { Processor, TraverseType } from '@gs.i/processor-base'
 
-/**
- * specify all the optional properties of an interface or a scene graph
- * Input Loose types and output strict types
- * @note NOT PURE FUNCTIONS. this process will modify the object you input
- */
-export class Specifier extends Processor<LooseMeshDataType> {
-	traverseType = TraverseType.Any
-	type = 'Specifier'
-	canEditNode = true
-	canEditTree = false
+import { traverse } from '@gs.i/utils-traverse'
 
-	/**
-	 * specify a mesh node and all descendants
-	 * @param node
-	 * @param parent
-	 */
-	processNode(node: LooseMeshDataType, parent?: LooseMeshDataType) {
-		specifyMesh(node, parent)
-	}
+export function specifyTree(root: LooseMeshDataType): MeshDataType {
+	traverse(root as MeshDataType, (node) => {
+		specifyMesh(node)
+	})
+
+	return root as MeshDataType
 }
 
 /**

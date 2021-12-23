@@ -4,7 +4,7 @@
  */
 
 import { TypedArray, AttributeDataType, DISPOSED, isDISPOSED } from '@gs.i/schema-scene'
-import { specifyAttribute } from '@gs.i/processor-specify'
+import { specifyAttribute } from '@gs.i/utils-specify'
 
 export interface Attr extends AttributeDataType {}
 export class Attr implements AttributeDataType {

@@ -13,7 +13,7 @@ import {
 } from '@gs.i/schema-scene'
 import { Vector3, Euler, Quaternion } from '@gs.i/utils-math'
 
-import { specifyMesh } from '@gs.i/processor-specify'
+import { specifyMesh } from '@gs.i/utils-specify'
 import { defaultMatrixProcessor } from './defaultProcessors'
 
 export interface Mesh extends RenderableMesh, Node {}

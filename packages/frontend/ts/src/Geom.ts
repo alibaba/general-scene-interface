@@ -4,7 +4,7 @@
  */
 
 import { GeomDataType } from '@gs.i/schema-scene'
-import { specifyGeometry } from '@gs.i/processor-specify'
+import { specifyGeometry } from '@gs.i/utils-specify'
 
 export interface Geom extends GeomDataType {} // this do member declarations for you
 export class Geom implements GeomDataType {

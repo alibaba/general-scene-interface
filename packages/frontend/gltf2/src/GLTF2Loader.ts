@@ -1,4 +1,4 @@
-import { specifyGeometry } from '@gs.i/processor-specify'
+import { specifyGeometry } from '@gs.i/utils-specify'
 /**
  * Copyright (C) 2021 Alibaba Group Holding Limited
  * All rights reserved.
@@ -7,7 +7,7 @@ import { specifyGeometry } from '@gs.i/processor-specify'
 import * as IR from '@gs.i/schema-scene' // type only, will be deleted after compiled
 import { Quaternion } from '@gs.i/utils-math'
 
-import { Specifier } from '@gs.i/processor-specify'
+import { specifyTree } from '@gs.i/utils-specify'
 
 // import * as SDK from '@gs.i/frontend-sdk'
 
@@ -35,13 +35,6 @@ import {
  * 数据转换使用
  */
 const quaternion = new Quaternion()
-
-/**
- * 接口补全
- * @note this processor only has pure functions
- * 		 it's okay to be put in global scope
- */
-const specifier = new Specifier()
 
 export class GLTF2Loader {
 	private _meshesCache: IR.LooseMeshDataType[] = []
@@ -393,7 +386,7 @@ export class GLTF2Loader {
 		})
 
 		// specify the whole scene
-		specifier.traverse(result as IR.MeshDataType)
+		specifyTree(result as IR.MeshDataType)
 
 		return result
 	}

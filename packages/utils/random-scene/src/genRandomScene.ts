@@ -12,7 +12,7 @@ import {
 	GeomDataType,
 	MatrBaseDataType,
 } from '@gs.i/schema-scene'
-import { Specifier } from '@gs.i/processor-specify'
+import { specifyTree } from '@gs.i/utils-specify'
 import {
 	AutoVersionTransform3,
 	MatrPbr,
@@ -104,9 +104,6 @@ const builderAlias = [
 function getRandomBuilder() {
 	return builderAlias[Math.floor((builderAlias.length - 0.1) * Math.random())]
 }
-
-// @note this processor is safe to be put in global scope
-const specifier = new Specifier()
 
 export const defaultConfig = {
 	/**
@@ -253,7 +250,7 @@ export function generateScene(config: Config = {}): Mesh {
 
 	//
 
-	specifier.traverse(root)
+	specifyTree(root)
 
 	return root as Mesh
 }

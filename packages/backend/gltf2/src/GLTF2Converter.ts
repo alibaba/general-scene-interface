@@ -24,7 +24,7 @@ import type { Converter } from '@gs.i/schema-converter'
 import { Color } from '@gs.i/utils-math'
 
 import { MatProcessor } from '@gs.i/processor-matrix'
-import { specifyMesh } from '@gs.i/processor-specify'
+import { specifyMesh } from '@gs.i/utils-specify'
 
 import {
 	GLTF,
@@ -71,10 +71,6 @@ export const DefaultConfig = {
 	 * @note It is safe to use a matrix processor universally
 	 */
 	matrixProcessor: new MatProcessor(),
-	/**
-	 * @note It is safe to use a specifier processor universally
-	 */
-	// specifier: new Specifier(),
 	/**
 	 *
 	 */

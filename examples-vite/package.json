@@ -1,6 +1,6 @@
 {
-	"name": "@gs.i/examples-snowpack",
-	"_name": "@gs.i/examples-snowpack",
+	"name": "@gs.i/examples-vite",
+	"_name": "@gs.i/examples-vite",
 	"version": "0.1.0-alpha",
 	"private": true,
 	"scripts": {
@@ -25,7 +25,7 @@
 		"@gs.i/processor-bound": "^0.1.0-alpha",
 		"@gs.i/processor-graph": "^0.1.0-alpha",
 		"@gs.i/processor-matrix": "^0.1.0-alpha",
-		"@gs.i/processor-specify": "^0.1.0-alpha",
+		"@gs.i/utils-specify": "^0.1.0-alpha",
 		"@gs.i/backend-gltf2": "^0.1.0-alpha",
 		"@gs.i/backend-threelite": "^0.1.0-alpha",
 		"@gs.i/processor-culling": "^0.1.0-alpha",

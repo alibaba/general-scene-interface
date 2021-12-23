@@ -35,7 +35,6 @@ import type { Converter } from '@gs.i/schema-converter'
 import { MatProcessor } from '@gs.i/processor-matrix'
 import { BoundingProcessor } from '@gs.i/processor-bound'
 import { diffSetsFast, diffSetsFastAndToArray, GraphProcessor } from '@gs.i/processor-graph'
-import { specifyMesh, specifyTexture } from '@gs.i/processor-specify'
 import { traverse, flatten } from '@gs.i/utils-traverse'
 
 import { syncMaterial } from './syncMaterial'

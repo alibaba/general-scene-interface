@@ -21,7 +21,7 @@
 	},
 	"dependencies": {
 		"@gs.i/schema-scene": "^0.1.0-alpha",
-		"@gs.i/processor-specify": "^0.1.0-alpha",
+		"@gs.i/utils-specify": "^0.1.0-alpha",
 		"@gs.i/frontend-sdk": "^0.1.0-alpha",
 		"@gs.i/utils-geom-builders": "^0.1.0-alpha"
 	},

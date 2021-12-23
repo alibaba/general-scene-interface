@@ -4,7 +4,7 @@
  */
 
 import { ImageDataType, SamplerDataType, TextureType, Int } from '@gs.i/schema-scene'
-import { specifyTexture, specifyImage, specifySampler } from '@gs.i/processor-specify'
+import { specifyTexture, specifyImage, specifySampler } from '@gs.i/utils-specify'
 
 export interface ImageData extends ImageDataType {}
 export class ImageData {

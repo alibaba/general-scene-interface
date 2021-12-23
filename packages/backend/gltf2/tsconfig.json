@@ -22,7 +22,7 @@
 			"path": "../../utils/traverse"
 		},
 		{
-			"path": "../../processors/specify"
+			"path": "../../utils/specify"
 		},
 		{
 			"path": "../../processors/matrix"

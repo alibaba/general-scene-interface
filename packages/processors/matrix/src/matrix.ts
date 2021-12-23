@@ -8,7 +8,7 @@ import {
 } from '@gs.i/schema-scene'
 import { Processor, TraverseType } from '@gs.i/processor-base'
 
-// import { specifyTransform3 } from '@gs.i/processor-specify'
+// import { specifyTransform3 } from '@gs.i/utils-specify'
 
 import { Euler, Quaternion, Vector3, Matrix4 } from '@gs.i/utils-math'
 

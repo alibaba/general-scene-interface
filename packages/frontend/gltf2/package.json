@@ -22,7 +22,7 @@
 	"dependencies": {
 		"@gs.i/frontend-sdk": "^0.1.0-alpha",
 		"@gs.i/schema-scene": "^0.1.0-alpha",
-		"@gs.i/processor-specify": "^0.1.0-alpha",
+		"@gs.i/utils-specify": "^0.1.0-alpha",
 		"@gs.i/utils-gltf2": "^0.1.0-alpha",
 		"@gs.i/utils-math": "^0.0.0-beta"
 	},

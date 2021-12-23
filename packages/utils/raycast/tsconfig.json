@@ -11,9 +11,6 @@
 	"references": [
 		{
 			"path": "../../schema/core-old"
-		},
-		{
-			"path": "../math"
 		}
 	]
 }

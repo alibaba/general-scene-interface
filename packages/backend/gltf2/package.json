@@ -24,7 +24,7 @@
 		"@gs.i/schema-converter": "^0.1.0-alpha",
 		"@gs.i/processor-bound": "^0.1.0-alpha",
 		"@gs.i/utils-traverse": "^0.1.0-alpha",
-		"@gs.i/processor-specify": "^0.1.0-alpha",
+		"@gs.i/utils-specify": "^0.1.0-alpha",
 		"@gs.i/processor-matrix": "^0.1.0-alpha",
 		"@gs.i/utils-gltf2": "^0.1.0-alpha",
 		"@gs.i/utils-math": "^0.0.0-beta"

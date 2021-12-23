@@ -50,7 +50,7 @@ Refine scene schema & add processor logic.
 - bump some versions to `0.1.0-alpha`
 - add `@gs.i/schema-converter`
 - add `@gs.i/schema-processor`  
-- add `@gs.i/processor-specify`
+- add `@gs.i/utils-specify`
 - add `@gs.i/utils-traverse`
 
 ### @gs.i/schema-scene

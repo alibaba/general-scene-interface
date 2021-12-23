@@ -16,7 +16,7 @@
 			"path": "../../schema/core"
 		},
 		{
-			"path": "../../processors/specify"
+			"path": "../../utils/specify"
 		},
 		{
 			"path": "../../utils/gltf2"

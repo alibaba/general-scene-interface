@@ -13,12 +13,6 @@
 			"path": "../../schema/core-old"
 		},
 		{
-			"path": "../../utils/geometry"
-		},
-		{
-			"path": "../../utils/math"
-		},
-		{
 			"path": "../../utils/transform"
 		}
 	]
