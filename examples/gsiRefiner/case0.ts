@@ -16,36 +16,51 @@ import { AxesHelper } from '../_util/GSIAxesHelper'
 const group = new SDK.Mesh()
 
 timeline.config.ignoreErrors = false
-timeline.config.openStates = true
+timeline.config.openStats = true
 
 // Axes helper
-group.add(new AxesHelper({ length: 10000 }))
+// group.add(new AxesHelper({ length: 10000 }))
 
 //
-const subGroup = new SDK.Mesh()
-group.add(subGroup)
-const arr: SDK.Mesh[] = []
+// const subGroup = new SDK.Mesh()
+// group.add(subGroup)
+// const arr: SDK.Mesh[] = []
 
-const matr = new SDK.MatrUnlit()
-const meshCount = 2000
-for (let i = 0; i < meshCount; i++) {
-	const geom = buildSphere({ radius: 1, widthSegments: 40, heightSegments: 20 })
-	const mesh = new SDK.Mesh({
-		geometry: geom,
-		material: matr,
-	})
-	mesh.transform.position.set(
-		Math.random() * 100 - 50,
-		Math.random() * 100 - 50,
-		Math.random() * 100
-	)
-	subGroup.add(mesh)
+const meshCount = 4000
+const depth = 10
+const groups: SDK.Mesh[] = []
+groups.push(group)
+for (let i = 0; i < depth; i++) {
+	const lastGroup = groups[groups.length - 1]
+	const newGroup = new SDK.Mesh()
+	lastGroup.add(newGroup)
+	groups.push(newGroup)
 
-	arr.push(mesh)
+	for (let j = 0; j < meshCount / depth; j++) {
+		const geom = buildSphere({
+			radius: 1,
+			widthSegments: 40,
+			heightSegments: 20,
+			normal: true,
+			uv: true,
+		})
+		const mesh = new SDK.Mesh({
+			geometry: geom,
+			material: new SDK.MatrPbr(),
+		})
+		mesh.transform.position.set(
+			Math.random() * 100 - 50,
+			Math.random() * 100 - 50,
+			Math.random() * 100
+		)
+		lastGroup.add(mesh)
+	}
 }
 
 const converter = new GL2Converter(GL2ConvConfig)
 const refiner = new GSIRefiner(RefinerConfig)
+converter.config.meshFrustumCulling = false
+refiner.config.frustumCulling = false
 
 // 渲染逻辑
 scene.add(converter.convert(group))
@@ -66,23 +81,23 @@ timeline.addTrack({
 		converter.convert(group)
 		const t2 = performance.now()
 
-		renderer.render(scene, camera)
+		// renderer.render(scene, camera)
 		const t3 = performance.now()
 
-		subGroup.transform.rotation.x += 0.1
-		subGroup.transform.rotation.y += 0.1
+		group.transform.rotation.x += 0.1
+		group.transform.rotation.y += 0.1
 
-		if (Math.random() < 0.2 && arr.length > 0) {
-			const meshes: SDK.Mesh[] = []
-			for (let i = 0; i < Math.random() * 10; i++) {
-				if (arr.length === 0) continue
-				meshes.push(arr.pop() as SDK.Mesh)
-			}
-			meshes.forEach((mesh) => {
-				subGroup.remove(mesh)
-				group.add(mesh)
-			})
-		}
+		// if (Math.random() < 0.2 && arr.length > 0) {
+		// 	const meshes: SDK.Mesh[] = []
+		// 	for (let i = 0; i < Math.random() * 10; i++) {
+		// 		if (arr.length === 0) continue
+		// 		meshes.push(arr.pop() as SDK.Mesh)
+		// 	}
+		// 	meshes.forEach((mesh) => {
+		// 		subGroup.remove(mesh)
+		// 		group.add(mesh)
+		// 	})
+		// }
 		const t4 = performance.now()
 
 		div.innerText = `Meshes count ${meshCount}
