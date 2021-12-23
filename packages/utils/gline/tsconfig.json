@@ -16,6 +16,9 @@
 			"path": "../../schema/core-old"
 		},
 		{
+			"path": "../math"
+		},
+		{
 			"path": "../transform"
 		}
 	]

@@ -19,15 +19,6 @@
 			"path": "../math"
 		},
 		{
-			"path": "../raycast"
-		},
-		{
-			"path": "../transform"
-		},
-		{
-			"path": "../../backend/gl2"
-		},
-		{
 			"path": "../../schema/converter"
 		},
 		{
@@ -37,16 +28,16 @@
 			"path": "../geometry"
 		},
 		{
-			"path": "../gline"
-		},
-		{
 			"path": "../gltf2"
 		},
 		{
-			"path": "../optimize"
+			"path": "../raycast"
 		},
 		{
 			"path": "../sprite"
+		},
+		{
+			"path": "../transform"
 		},
 		{
 			"path": "../traverse"
@@ -55,7 +46,16 @@
 			"path": "../wireframe"
 		},
 		{
+			"path": "../../backend/gl2"
+		},
+		{
 			"path": "../../processors/base"
+		},
+		{
+			"path": "../gline"
+		},
+		{
+			"path": "../optimize"
 		},
 		{
 			"path": "../specify"
