@@ -1,0 +1,32 @@
+{
+	"name": "@gs.i/frontend-gline",
+	"version": "0.1.0-alpha",
+	"description": "",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"type": "module",
+	"license": "MIT",
+	"publishConfig": {
+		"access": "public"
+	},
+	"files": [
+		"README.md",
+		"dist/*"
+	],
+	"scripts": {
+		"build": "./scripts/build.sh",
+		"clean": "./scripts/clean.sh",
+		"rebuild": "./scripts/rebuild.sh",
+		"prebuild": "node ./scripts/glsl-processor.cjs",
+		"prerebuild": "node ./scripts/glsl-processor.cjs",
+		"v": "node -v && tsc -v"
+	},
+	"dependencies": {
+		"@gs.i/frontend-sdk": "0.1.0-alpha",
+		"@gs.i/schema-scene": "0.1.0-alpha",
+		"@gs.i/utils-math": "^0.0.0-beta"
+	},
+	"devDependencies": {
+		"typescript": ">4.4.0"
+	}
+}

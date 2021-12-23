@@ -6,7 +6,7 @@
 import { Mesh } from '@gs.i/frontend-sdk'
 import { GLineGeom } from './GLineGeom'
 import { GLineMatr, GLinePointMatr } from './GLineMatr'
-import { ColorLike, TextureType, Vec2 } from '@gs.i/schema'
+import { ColorRGB, TextureType, Vec2 } from '@gs.i/schema-scene'
 
 export interface DefaultGLineConfig {
 	/**
@@ -33,7 +33,7 @@ export interface DefaultGLineConfig {
 	/**
 	 * 如果有colors，此项会被忽略
 	 */
-	color?: ColorLike
+	color?: ColorRGB
 
 	/**
 	 * 是否需要频繁动态更新数据
@@ -93,16 +93,24 @@ export class GLine extends Mesh {
 
 	material: GLineMatr | GLinePointMatr
 	geometry: GLineGeom
+	extensions: Exclude<Mesh['extensions'], undefined> = {}
 
 	constructor(props: DefaultGLineConfig) {
+		super()
+
 		const config = {
 			...DefaultConfig,
 			...props,
 		}
 
-		super(config)
-
 		this.config = config
+
+		this.extensions.EXT_mesh_order = {
+			renderOrder: config.renderOrder,
+		}
+		this.extensions.EXT_mesh_advanced = {
+			frustumCulling: true,
+		}
 
 		if (![0, 1, 2, 4].includes(this.config.level)) {
 			throw new Error(`GSI::GLine - Invalid level: ${this.config.level}, expected: 0 | 1 | 2 | 4`)

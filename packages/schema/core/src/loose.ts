@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 /**
  * A loose version of scene graph interfaces
  * @NOTE this file will break esm tree shaking, luckily, it's type-only

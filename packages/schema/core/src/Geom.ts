@@ -122,7 +122,7 @@ export interface GeomDataType {
 		 * instanced geometry
 		 * @TODO
 		 */
-		EXT_geometry_instance?: {}
+		// EXT_geometry_instance?: {}
 
 		[key: string]: any
 	}
