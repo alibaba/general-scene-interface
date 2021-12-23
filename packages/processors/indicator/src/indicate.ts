@@ -162,9 +162,5 @@ function HSVtoRGB(h, s, v) {
 			;(r = v), (g = p), (b = q)
 			break
 	}
-	return {
-		r: Math.round(r * 255),
-		g: Math.round(g * 255),
-		b: Math.round(b * 255),
-	}
+	return { r, g, b }
 }
