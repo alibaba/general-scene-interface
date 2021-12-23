@@ -1,0 +1,1 @@
+# Generate sprite geometry and so.

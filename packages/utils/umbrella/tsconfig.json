@@ -19,6 +19,9 @@
 			"path": "../math"
 		},
 		{
+			"path": "../../frontend/sprite"
+		},
+		{
 			"path": "../../schema/converter"
 		},
 		{
@@ -80,6 +83,9 @@
 		},
 		{
 			"path": "../../frontend/ts"
+		},
+		{
+			"path": "../../frontend/gline"
 		},
 		{
 			"path": "../../frontend/gltf2"

@@ -22,6 +22,7 @@
 		"@gs.i/schema-scene": "^0.1.0-alpha",
 		"@gs.i/schema-ext-scene": "^0.0.0-beta",
 		"@gs.i/utils-math": "^0.0.0-beta",
+		"@gs.i/frontend-sprite": "^0.1.0-alpha",
 		"@gs.i/schema-converter": "^0.1.0-alpha",
 		"@gs.i/utils-geom-builders": "^0.1.0-alpha",
 		"@gs.i/utils-geometry": "^0.1.0-alpha",
@@ -43,6 +44,7 @@
 		"@gs.i/backend-threelite": "^0.1.0-alpha",
 		"@gs.i/processor-culling": "^0.1.0-alpha",
 		"@gs.i/frontend-sdk": "^0.1.0-alpha",
+		"@gs.i/frontend-gline": "^0.1.0-alpha",
 		"@gs.i/frontend-gltf2": "^0.1.0-alpha",
 		"@gs.i/processor-indicator": "^0.1.0-alpha",
 		"@gs.i/utils-random-scene": "^0.1.0-alpha"
