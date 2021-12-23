@@ -76,13 +76,21 @@ export function computeBBox(geometry: GeomDataType): BBox {
 	return convBox3ToBBox(box)
 }
 
+export function computeBSphere(geometry: GeomDataType): BSphere {
+	const efficientBSphere = fastEstimateBSphere(geometry)
+	const boxBSphere = estimateBSphereFromBBox(geometry)
+	if (efficientBSphere.radius < boxBSphere.radius) {
+		return efficientBSphere
+	} else {
+		return boxBSphere
+	}
+}
+
 /**
  * AN EFFICIENT BOUNDING SPHERE by Jack Ritter
  * @link http://inis.jinr.ru/sl/vol1/CMC/Graphics_Gems_1,ed_A.Glassner.pdf - Page 301
- * @param geometry
- * @returns
  */
-export function computeBSphere(geometry: GeomDataType): BSphere {
+function fastEstimateBSphere(geometry: GeomDataType): BSphere {
 	if (!geometry.attributes.position || isDISPOSED(geometry.attributes.position.array)) {
 		console.warn('Geometry does not have position attribute, generating an infinity sphere')
 		return convSphereToBSphere(infinitySphere())
@@ -146,6 +154,50 @@ export function computeBSphere(geometry: GeomDataType): BSphere {
 	}
 
 	return convSphereToBSphere(sphere)
+}
+
+function estimateBSphereFromBBox(geometry: GeomDataType): BSphere {
+	const sphere = new Sphere()
+	const center = sphere.center
+	const v = new Vector3()
+
+	if (!geometry.attributes.position || isDISPOSED(geometry.attributes.position.array)) {
+		sphere.center.set(0, 0, 0)
+		sphere.radius = Infinity
+		return convBSphereToSphere(sphere)
+	}
+
+	let bbox: BBox
+	if (!geometry.extensions?.EXT_geometry_bounds?.box) {
+		bbox = computeBBox(geometry)
+	} else {
+		bbox = geometry.extensions.EXT_geometry_bounds.box
+	}
+
+	const min = new Vector3().copy(bbox.min as Vector3)
+	const max = new Vector3().copy(bbox.max as Vector3)
+	const box3 = new Box3(min, max)
+	const boxDiag = min.distanceTo(max) * 0.5
+
+	center.copy(v.addVectors(box3.min, box3.max).multiplyScalar(0.5))
+
+	// compatibility for InfinityBox
+	if (isNaN(center.x) || isNaN(center.y) || isNaN(center.z)) {
+		sphere.center.set(0, 0, 0)
+		sphere.radius = Infinity
+		convBSphereToSphere(sphere)
+	}
+
+	// try to find sphere radius less than BBox diagonal
+	let maxRadiusSq = 0
+	const positions = geometry.attributes.position.array
+	for (let i = 0, il = positions.length; i < il; i += 3) {
+		v.fromArray(positions, i)
+		maxRadiusSq = Math.max(maxRadiusSq, center.distanceToSquared(v))
+	}
+	// choose the smaller one: box diagonal, or sphere radius
+	sphere.radius = Math.min(Math.sqrt(maxRadiusSq), boxDiag)
+	return convBSphereToSphere(sphere)
 }
 
 export function mergeGeometries(geometries: GeomDataType[]): GeomDataType | undefined {
