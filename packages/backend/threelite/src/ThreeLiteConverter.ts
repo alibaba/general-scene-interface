@@ -1043,17 +1043,7 @@ export class ThreeLiteConverter implements Converter {
 		this._threeMatr = new WeakMap()
 		this._threeColor = new WeakMap()
 
-		// this._committedVersions = new WeakMap<any, number>()
 		this._committedAttr = new WeakMap()
-		// this._committedMatr = new WeakMap()
-		// this._committedTex = new WeakMap()
-
-		// this._ar0.length = 0
-		// this._ar1.length = 0
-		// this._ar2.length = 0
-		// this._ar3.length = 0
-
-		// this._threeObjects = new WeakMap<ColorRGB, Color>()
 	}
 }
 
@@ -1218,86 +1208,7 @@ export function getResourcesFlat(flatScene: MeshDataType[]) {
 		textures,
 	}
 }
-/**
- * get all the resources that needs to be `allocated` and `freed` manually
- *
- * these resources has underlying gpu objects that can not be GC-ed
- *
- * also it's better to modify remote resources pre-frame than mid-frame to avoid stalling.
- */
-function getResourcesFlatWidthFastDiff(
-	flatScene: MeshDataType[],
-	originalResources: ReturnType<typeof getResourcesFlat>
-) {
-	// programs
-	const materials = new Set<GsiMatr>()
-	// vao
-	const geometries = new Set<GeomDataType>()
-	// buffers
-	const attributes = new Set<AttributeDataType>()
-	// texture / framebuffer / samplers
-	const textures = new Set<Texture | CubeTexture>()
 
-	// @TODO uniform buffers
-
-	for (let i = 0; i < flatScene.length; i++) {
-		const mesh = flatScene[i]
-		if (isRenderableMesh(mesh)) {
-			materials.add(mesh.material as GsiMatr) && geometries.add(mesh.geometry)
-
-			// textures
-
-			// standard textures
-			if (mesh.material['baseColorTexture']) textures.add(mesh.material['baseColorTexture'])
-			if (mesh.material['metallicRoughnessTexture'])
-				textures.add(mesh.material['metallicRoughnessTexture'])
-			if (mesh.material['emissiveTexture']) textures.add(mesh.material['emissiveTexture'])
-			if (mesh.material['normalTexture']) textures.add(mesh.material['normalTexture'])
-			if (mesh.material['occlusionTexture']) textures.add(mesh.material['occlusionTexture'])
-
-			// custom textures
-			if (mesh.material.extensions?.EXT_matr_programmable?.uniforms) {
-				const uniforms = mesh.material.extensions.EXT_matr_programmable.uniforms
-
-				// @note this is a little bit slower than Object.values
-				// Object.keys(uniforms).forEach((key) => {
-				// 	const uniformValue = uniforms[key].value
-				// 	if (isTexture(uniformValue) || isCubeTexture(uniformValue)) {
-				// 		textures.add(uniformValue)
-				// 	}
-				// })
-
-				const values = Object.values(uniforms)
-				for (let i = 0; i < values.length; i++) {
-					const uniformValue = values[i].value
-					if (isTexture(uniformValue) || isCubeTexture(uniformValue)) {
-						textures.add(uniformValue)
-					}
-				}
-			}
-
-			// attributes
-			{
-				// @note this is a little bit slower than Object.values
-				// Object.keys(mesh.geometry.attributes).forEach((key) => {
-				// 	attributes.add(mesh.geometry.attributes[key])
-				// })
-				const values = Object.values(mesh.geometry.attributes)
-				for (let i = 0; i < values.length; i++) {
-					attributes.add(values[i])
-				}
-				if (mesh.geometry.indices) attributes.add(mesh.geometry.indices)
-			}
-		}
-	}
-
-	return {
-		materials,
-		geometries,
-		attributes,
-		textures,
-	}
-}
 /**
  * TODO Maybe generate corresponding THREE.Mesh|Points instead of a kinda union type?
  * 把 three 的 Mesh Points Lines 合并到 父类 Object3D 上，来和 glTF2 保持一致
