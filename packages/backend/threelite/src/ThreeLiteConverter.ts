@@ -586,6 +586,7 @@ export class ThreeLiteConverter implements Converter {
 		}
 
 		// culling
+		// TODO set .visible false will cull all its children
 		if (this.config.overrideFrustumCulling && isRenderableMesh(gsiMesh) && gsiMesh.visible) {
 			if (this.config.cullingProcessor.isFrustumCulled(gsiMesh)) {
 				this.info.culledCount++
