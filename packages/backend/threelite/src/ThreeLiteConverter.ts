@@ -253,6 +253,9 @@ export class ThreeLiteConverter implements Converter {
 		// 		it's quite expensive to traverse a tree multiple times
 		const flatScene = flatten(root)
 
+		// update all the matrices
+		this.config.matrixProcessor.updateMatrixFlat(flatScene)
+
 		// check resources that require special handling
 		// #resource-stage
 
@@ -524,9 +527,23 @@ export class ThreeLiteConverter implements Converter {
 
 			threeMesh.visible = gsiMesh.visible
 
-			// @note three doesn't use localMatrix at all. it's only for generating worldMatrix
+			// @note three doesn't use localMatrix at all. it's only for generating worldMatrix.
 			// threeMesh.matrix.elements = this.config.matrixProcessor.getLocalMatrix(gsiMesh)
-			threeMesh.matrixWorld.elements = this.config.matrixProcessor.getWorldMatrix(gsiMesh)
+
+			// @note use cached matrices instead of dirty-checking every time.
+			// threeMesh.matrixWorld.elements = this.config.matrixProcessor.getWorldMatrix(gsiMesh)
+
+			const matrix = this.config.matrixProcessor.getCachedWorldMatrix(gsiMesh)
+			if (matrix) {
+				threeMesh.matrixWorld.elements = matrix
+			} else {
+				console.warn(
+					`Conv-threelite:: WorldMatrix of ${gsiMesh.name} is not cached. ` +
+						`Will fall back to dirty-checking. ` +
+						`The scene-graph may have changed during this conversion.`
+				)
+				threeMesh.matrixWorld.elements = this.config.matrixProcessor.getWorldMatrix(gsiMesh)
+			}
 		}
 
 		return threeMesh
