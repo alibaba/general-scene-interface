@@ -104,10 +104,10 @@ export function computeBSphere(geometry: GeomDataType): BSphere {
 		v.fromArray(positions, i)
 		if (v.x < minX.x) minX.copy(v)
 		if (v.x > maxX.x) maxX.copy(v)
-		if (v.y < minX.y) minY.copy(v)
-		if (v.y > maxX.y) maxY.copy(v)
-		if (v.z < minX.z) minZ.copy(v)
-		if (v.z > maxX.z) maxZ.copy(v)
+		if (v.y < minY.y) minY.copy(v)
+		if (v.y > maxY.y) maxY.copy(v)
+		if (v.z < minZ.z) minZ.copy(v)
+		if (v.z > maxZ.z) maxZ.copy(v)
 	}
 
 	const distSqX = minX.distanceToSquared(maxX)

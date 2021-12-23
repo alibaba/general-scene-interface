@@ -32,7 +32,6 @@
 		"@gs.i/utils-traverse": "^0.1.0-alpha",
 		"@gs.i/utils-wireframe": "^0.1.0-alpha",
 		"@gs.i/backend-gl2": "^0.0.0-beta",
-		"@gs.i/backend-threelite-old": "^0.0.0-beta",
 		"@gs.i/processor-base": "^0.1.0-alpha",
 		"@gs.i/utils-gline": "^0.0.0-beta",
 		"@gs.i/utils-optimize": "^0.0.0-beta",
