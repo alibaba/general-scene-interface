@@ -173,12 +173,12 @@ export class MatProcessor extends Processor {
 				// 如果该节点没有处理过，则子树为脏
 				currWorldMatrixCache === undefined ||
 				currLocalMatrixCache === undefined ||
-				// 如果这个节点的父节点引用改变，则子树为脏
-				currWorldMatrixCache.parentID !== this.getID(parent) ||
 				// 如果节点的 local transform 变化，则子树为脏
 				currLocalMatrixCache.version !== curr.transform.version ||
 				// 如果父节点的 world transform 变化，则子树为脏
-				currWorldMatrixCache.parentVersion !== parentMatrixCache.world?.version
+				currWorldMatrixCache.parentVersion !== parentMatrixCache.world?.version ||
+				// 如果这个节点的父节点引用改变，则子树为脏
+				currWorldMatrixCache.parentID !== this.getID(parent)
 			) {
 				isDirty = true
 			}
