@@ -8,14 +8,14 @@ import { scene as threeScene } from '../__utils/LiteScene'
 {
 	const scene = generateScene({
 		// scale: 10000,
-		count: 100,
+		count: 64,
 		depth: 10,
 		useAnimation: true,
 	})
 	console.log(scene)
 
 	const indicator = new IndicatorProcessor({
-		hideOriginal: false,
+		// hideOriginal: true,
 		useBBox: true,
 		useBSphere: true,
 		// useWireframe: true,
