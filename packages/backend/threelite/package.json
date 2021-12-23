@@ -29,6 +29,7 @@
 		"@gs.i/utils-specify": "^0.1.0-alpha",
 		"@gs.i/processor-graph": "^0.1.0-alpha",
 		"@gs.i/processor-matrix": "^0.1.0-alpha",
+		"@gs.i/processor-culling": "^0.1.0-alpha",
 		"@gs.i/utils-geometry": "^0.1.0-alpha",
 		"three-lite": "0.0.2",
 		"@gs.i/utils-math": "^0.0.0-beta"

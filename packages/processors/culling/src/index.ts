@@ -5,7 +5,7 @@
 
 import { MeshDataType, isRenderableMesh, Int, BBox, RenderableMesh } from '@gs.i/schema-scene'
 import { Processor, TraverseType } from '@gs.i/processor-base'
-import { Frustum, Euler, Quaternion, Vector3, Matrix4, Box3 } from '@gs.i/utils-math'
+import { Frustum, Euler, Quaternion, Vector3, Matrix4, Box3, Sphere } from '@gs.i/utils-math'
 
 // type only imports
 // @see https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-8.html#type-only-imports-and-export
@@ -16,7 +16,6 @@ const DEG2RAD = Math.PI / 180
 
 const Culled = true
 const NotCulled = false
-type isCulled = boolean
 
 export type FrustumParams = {
 	cameraPosition: { x: number; y: number; z: number }
@@ -33,6 +32,13 @@ export type FrustumParams = {
 		fullWidth: number
 		fullHeight: number
 	}
+}
+
+// TODO add ref to geometry, in case use change the whole geometry
+interface CullingCache {
+	frustumVersion: Int
+	boundsVersion?: Int
+	culling: boolean
 }
 
 /**
@@ -54,6 +60,16 @@ export class CullingProcessor extends Processor {
 	private _frustum = new Frustum()
 
 	/**
+	 * used for caching
+	 */
+	private _frustumVersion = 0
+
+	/**
+	 * cache
+	 */
+	private _frustumCache = new WeakMap<RenderableMesh, CullingCache>()
+
+	/**
 	 * Helper vars
 	 */
 	private _viewMat = new Matrix4()
@@ -64,15 +80,8 @@ export class CullingProcessor extends Processor {
 	private _camEuler = new Euler()
 	private _camScale = new Vector3(1.0, 1.0, 1.0)
 	private _box = new Box3()
+	private _sphere = new Sphere()
 	private _meshWorldMatrix = new Matrix4()
-
-	/**
-	 * 这个计数器配合 WeakMap 一起使用作为 **局部**唯一ID，可以避免多个 MatProcessor 实例存在时的撞表问题。
-	 *
-	 * 所有 id 都从 WeakMap 得到，一个 key 在一个实例中的 id 是唯一的
-	 */
-	private _counter = 0
-	private _ids = new WeakMap<object, Int>()
 
 	constructor(params: { boundingProcessor: BoundingProcessor; matrixProcessor: MatProcessor }) {
 		super()
@@ -80,17 +89,9 @@ export class CullingProcessor extends Processor {
 		this.matrixProcessor = params.matrixProcessor
 	}
 
-	getID(o: object): Int {
-		let id = this._ids.get(o)
-		if (id === undefined) {
-			id = this._counter++
-			this._ids.set(o, id)
-		}
-		if (id >= 9007199254740990) throw 'ID exceeds MAX_SAFE_INTEGER'
-		return id
-	}
-
 	updateFrustum(params: FrustumParams): void {
+		this._frustumVersion++
+
 		this._camPosition.set(params.cameraPosition.x, params.cameraPosition.y, params.cameraPosition.z)
 		this._camEuler.set(
 			params.cameraRotation.x,
@@ -125,34 +126,60 @@ export class CullingProcessor extends Processor {
 	/**
 	 * check if a mesh is culled by the frustum
 	 * @note this only handle renderable nodes with geometry
-	 * @note this do not consider children
+	 * @note this do not check children
+	 * @note Sprite should also be able to cull
 	 * @todo how to deal with non-leaf nodes
-	 * @param mesh
-	 * @returns true if culled (shouldn't render)
+	 * @returns true if Culled (not visible, shouldn't render)
 	 */
-	frustumTest(mesh: RenderableMesh): isCulled {
-		if (isRenderableMesh(mesh)) {
-			// if user specified to skip culling, return not culled
-			if (mesh.extensions?.EXT_mesh_advanced?.frustumCulling === false) {
-				return NotCulled
-			}
+	isFrustumCulled(mesh: RenderableMesh, worldMatrix?: number[]): boolean {
+		if (!isRenderableMesh(mesh)) {
+			console.warn('this method only handle visible renderable meshes')
+			return NotCulled
+		}
 
-			const worldMatrix = this.matrixProcessor.getWorldMatrix(mesh)
+		// if user specified to skip culling, return not culled
+		if (mesh.extensions?.EXT_mesh_advanced?.frustumCulling === false) {
+			return NotCulled
+		}
+
+		// check cache
+		let init = false
+		let cache = this._frustumCache.get(mesh)
+		if (!cache) {
+			cache = {} as CullingCache
+			this._frustumCache.set(mesh, cache)
+			init = true
+		}
+
+		// const posVersion = mesh.geometry.attributes.position?.version
+
+		const { bbox, bsphere, version } = this.boundingProcessor.getBounds(mesh.geometry)
+
+		if (init || cache.boundsVersion !== version || cache.frustumVersion !== this._frustumVersion) {
+			// needs update
+
+			// if no matrix input, get the latest matrix with dirty-checking
+			if (!worldMatrix) worldMatrix = this.matrixProcessor.getWorldMatrix(mesh)
+
 			this._meshWorldMatrix.fromArray(worldMatrix)
 
-			const bbox = this.boundingProcessor.getGeomBoundingBox(mesh.geometry)
 			this._box.set(bbox.min as Vector3, bbox.max as Vector3) // safe here
 			this._box.applyMatrix4(this._meshWorldMatrix)
 
-			if (this._frustum.intersectsBox(this._box)) {
-				return NotCulled
-			} else {
-				return Culled
-			}
-		} else {
-			console.warn('this method only handle renderable meshes')
-			return false
+			this._sphere.set(bsphere.center as Vector3, bsphere.radius) // safe here
+			this._sphere.applyMatrix4(this._meshWorldMatrix)
+
+			const result =
+				this._frustum.intersectsSphere(this._sphere) && this._frustum.intersectsBox(this._box)
+					? NotCulled
+					: Culled
+
+			cache.culling = result
+			cache.boundsVersion = version
+			cache.frustumVersion = this._frustumVersion
 		}
+
+		return cache.culling
 	}
 }
 

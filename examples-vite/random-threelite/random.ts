@@ -24,6 +24,7 @@ import { scene as threeScene } from '../__utils/LiteScene'
 
 	const conv = new ThreeLiteConverter({ overrideFrustumCulling: true })
 	console.log(conv)
+	window['conv'] = conv
 
 	setInterval(() => {
 		const v = Math.sin(performance.now() * 0.001) * 0.5 + 1.0
@@ -51,6 +52,17 @@ import { scene as threeScene } from '../__utils/LiteScene'
 		duration: Infinity,
 		onUpdate: () => {
 			// scene.transform.version++
+
+			// TODO should check if this needs to be updated
+			conv.cullingProcessor.updateFrustum({
+				cameraPosition: camera.position,
+				cameraRotation: camera.rotation,
+				cameraNear: camera.near,
+				cameraFar: camera.far,
+				cameraFOV: camera.fov,
+				cameraAspect: camera.aspect,
+			})
+
 			conv.convert(scene)
 			renderer.render(threeScene, camera)
 		},

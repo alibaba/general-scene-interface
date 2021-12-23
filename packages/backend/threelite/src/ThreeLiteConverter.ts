@@ -34,6 +34,7 @@ import {
 import type { Converter } from '@gs.i/schema-converter'
 import { MatProcessor } from '@gs.i/processor-matrix'
 import { BoundingProcessor } from '@gs.i/processor-bound'
+import { CullingProcessor } from '@gs.i/processor-culling'
 import { diffSetsFast, diffSetsFastAndToArray, GraphProcessor } from '@gs.i/processor-graph'
 import { traverse, flatten } from '@gs.i/utils-traverse'
 
@@ -59,6 +60,26 @@ import {
 } from 'three-lite'
 import { PrgSpriteMaterial } from './PrgSpriteMaterial'
 import { sealTransform } from './utils'
+
+/**
+ * @note safe to share globally @simon
+ */
+const defaultMatrixProcessor = new MatProcessor()
+/**
+ * @note safe to share globally @simon
+ */
+const defaultBoundingProcessor = new BoundingProcessor()
+/**
+ * @note safe to share globally @simon
+ */
+const defaultGraphProcessor = new GraphProcessor()
+/**
+ * @note safe to share globally @simon
+ */
+const defaultCullingProcessor = new CullingProcessor({
+	boundingProcessor: defaultBoundingProcessor,
+	matrixProcessor: defaultMatrixProcessor,
+})
 
 export const DefaultConfig = {
 	/**
@@ -102,7 +123,7 @@ export const DefaultConfig = {
 	 * #### if enabled:
 	 * - all converted `Object3D.frustumCulled` will be set to `false`, so that three.js will skip checking
 	 * - converter will use processor-culling to check every time `convert` is called
-	 * - if mesh culled, the converted `Object3D.visible` will be set to `false`
+	 * - if mesh culled, the converted `Threejs.Object3D.visible` will be set to `false`
 	 */
 	overrideFrustumCulling: false,
 
@@ -126,15 +147,19 @@ export const DefaultConfig = {
 	/**
 	 * @note safe to share globally @simon
 	 */
-	matrixProcessor: new MatProcessor(),
+	matrixProcessor: defaultMatrixProcessor,
 	/**
 	 * @note safe to share globally @simon
 	 */
-	boundingProcessor: new BoundingProcessor(),
+	boundingProcessor: defaultBoundingProcessor,
 	/**
 	 * @note safe to share globally @simon
 	 */
-	graphProcessor: new GraphProcessor(),
+	graphProcessor: defaultGraphProcessor,
+	/**
+	 * @note safe to share globally @simon
+	 */
+	cullingProcessor: defaultCullingProcessor,
 }
 
 export type ConverterConfig = Partial<typeof DefaultConfig>
@@ -160,7 +185,13 @@ export class ThreeLiteConverter implements Converter {
 	 */
 	info = {
 		renderableCount: 0,
+		culledCount: 0,
 	}
+
+	readonly matrixProcessor: MatProcessor
+	readonly boundingProcessor: BoundingProcessor
+	readonly graphProcessor: GraphProcessor
+	readonly cullingProcessor: CullingProcessor
 
 	// #region id generator
 
@@ -237,6 +268,11 @@ export class ThreeLiteConverter implements Converter {
 			...config,
 		}
 
+		this.matrixProcessor = this.config.matrixProcessor
+		this.boundingProcessor = this.config.boundingProcessor
+		this.graphProcessor = this.config.graphProcessor
+		this.cullingProcessor = this.config.cullingProcessor
+
 		// this._cachedSnapshot = this.config.graphProcessor.snapshot() // init with a empty node
 	}
 
@@ -247,6 +283,9 @@ export class ThreeLiteConverter implements Converter {
 		 * 		 But that will make this process unlikely to be re-used to a different backend
 		 *		 Also worth to notice that these components can be used multiple times in a tree
 		 */
+
+		this.info.culledCount = 0
+		// this.info.renderableCount = 0
 
 		// @note
 		// 		optimize with flatten tree
@@ -546,6 +585,14 @@ export class ThreeLiteConverter implements Converter {
 			}
 		}
 
+		// culling
+		if (this.config.overrideFrustumCulling && isRenderableMesh(gsiMesh) && gsiMesh.visible) {
+			if (this.config.cullingProcessor.isFrustumCulled(gsiMesh)) {
+				this.info.culledCount++
+				threeMesh.visible = false
+			}
+		}
+
 		return threeMesh
 	}
 
@@ -607,31 +654,19 @@ export class ThreeLiteConverter implements Converter {
 			}
 
 			// bounding
+			{
+				const { bbox, bsphere } = this.config.boundingProcessor.getBounds(gsiGeom)
 
-			if (gsiGeom.extensions?.EXT_geometry_bounds?.box) {
-				// user custom bounds override internal bounds
-				// TODO three.js only use boundingSphere for frustumCulling
-				// 		so maybe we should generate a *baggy* bsphere from bbox
-				const bbox = gsiGeom.extensions.EXT_geometry_bounds.box
 				const threeBbox = threeGeometry.boundingBox as Box3
+				const threeBsphere = threeGeometry.boundingSphere as Sphere
+
 				threeBbox.min.x = bbox.min.x
 				threeBbox.min.y = bbox.min.y
 				threeBbox.min.z = bbox.min.z
 				threeBbox.max.x = bbox.max.x
 				threeBbox.max.y = bbox.max.y
 				threeBbox.max.z = bbox.max.z
-			} else if (gsiGeom.extensions?.EXT_geometry_bounds?.sphere) {
-				// user custom bounds override internal bounds
-				const bsphere = gsiGeom.extensions.EXT_geometry_bounds.sphere
-				const threeBsphere = threeGeometry.boundingSphere as Sphere
-				threeBsphere.center.x = bsphere.center.x
-				threeBsphere.center.y = bsphere.center.y
-				threeBsphere.center.z = bsphere.center.z
-				threeBsphere.radius = bsphere.radius
-			} else {
-				// @note three will use bsphere but may not use bbox so...
-				const bsphere = this.config.boundingProcessor.getGeomBoundingSphere(gsiGeom)
-				const threeBsphere = threeGeometry.boundingSphere as Sphere
+
 				threeBsphere.center.x = bsphere.center.x
 				threeBsphere.center.y = bsphere.center.y
 				threeBsphere.center.z = bsphere.center.z
