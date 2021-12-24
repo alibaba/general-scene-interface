@@ -258,7 +258,7 @@ export class ThreeLiteConverter implements Converter {
 	// private _committedVersions = new WeakMap<any, number>()
 	private _committedAttr = new WeakMap<AttributeDataType, Int>()
 	// private _committedMatr = new WeakMap<GsiMatr | MatrBaseDataType, Int>()
-	// private _committedTex = new WeakMap<Texture | CubeTexture, Int>()
+	private _committedTex = new WeakMap<Texture | CubeTexture, Int>()
 
 	// #endregion
 
@@ -945,7 +945,7 @@ export class ThreeLiteConverter implements Converter {
 		if (gsiTexture === undefined || gsiTexture === null) return null
 
 		let threeTexture = this._threeTex.get(gsiTexture) as ThreeTexture
-		// let committedVersion = this._committedTex.get(gsiTexture) as Int
+		let committedVersion = this._committedTex.get(gsiTexture) as Int
 
 		// create
 		if (!threeTexture) {
@@ -984,28 +984,28 @@ export class ThreeLiteConverter implements Converter {
 				}
 			}
 
-			// committedVersion = gsiTexture.image.version
+			committedVersion = gsiTexture.image.version
 			threeTexture.version = gsiTexture.image.version
 
 			this._threeTex.set(gsiTexture, threeTexture)
-			// this._committedTex.set(gsiTexture, committedVersion)
+			this._committedTex.set(gsiTexture, committedVersion)
 		}
 
 		// version bump
-		// if (committedVersion !== gsiTexture.image.version || gsiTexture.image.version === -1) {
-		// 	// @note new texture will always be uploaded by three,
-		// 	// 		 no needs to set needsUpdate for newly created texture
+		if (committedVersion !== gsiTexture.image.version || gsiTexture.image.version === -1) {
+			// @note new texture will always be uploaded by three,
+			// 		 no needs to set needsUpdate for newly created texture
 
-		// 	threeTexture.needsUpdate = true
-
-		// 	committedVersion = gsiTexture.image.version
-		// 	this._committedTex.set(gsiTexture, committedVersion)
-		// }
-		if (gsiTexture.image.version === -1) {
 			threeTexture.needsUpdate = true
-		} else {
-			threeTexture.version = gsiTexture.image.version
+
+			committedVersion = gsiTexture.image.version
+			this._committedTex.set(gsiTexture, committedVersion)
 		}
+		// if (gsiTexture.image.version === -1) {
+		// 	threeTexture.needsUpdate = true
+		// } else {
+		// 	threeTexture.version = gsiTexture.image.version
+		// }
 
 		// sync parameters
 
@@ -1043,6 +1043,7 @@ export class ThreeLiteConverter implements Converter {
 		this._threeMatr = new WeakMap()
 		this._threeColor = new WeakMap()
 
+		this._committedTex = new WeakMap()
 		this._committedAttr = new WeakMap()
 	}
 }
