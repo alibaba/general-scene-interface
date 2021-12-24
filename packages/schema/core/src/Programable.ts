@@ -93,7 +93,7 @@ export interface Programable {
 	 * 在vertex shader中可以（并且只能）在此处对 position/normal/uv 进行修改
 	 * @param vec3 position - [modifiable]
 	 * @param vec3 normal - [modifiable]
-	 * @param vec2 uv - [modifiable] 如果未使用贴图则uv为(0, 0)
+	 * @param vec2 uv - [modifiable] If no uv attribute provided, the value will be [0, 0]
 	 * @param mat4 modelMatrix - [readonly]: The mesh's modelMatrix
 	 * @param mat4 modelViewMatrix - [readonly]: Equals to viewMatrix * modelMatrix
 	 * @param mat4 projectionMatrix - [readonly]
@@ -104,6 +104,8 @@ export interface Programable {
 	/**
 	 * vertex shader的最终输出结果阶段，可以对gl_Position做最终修改
 	 * 若在此处修改了 glPosition (注意没有下划线)，渲染管线会在后续直接使用此处的输出结果
+	 * @NOTE If glPosition is computed manually here, it MUST be returned manually as well.
+	 *
 	 * @param vec3 modelViewPosition - [modifiable]
 	 * @param mat4 modelViewMatrix - [readonly]
 	 * @param mat4 projectionMatrix - [readonly]

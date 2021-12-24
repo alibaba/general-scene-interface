@@ -2,7 +2,15 @@ import { generateScene } from '@gs.i/utils-random-scene'
 import { ThreeLiteConverter } from '@gs.i/backend-threelite'
 import { IndicatorProcessor } from '@gs.i/processor-indicator'
 
-import { renderer, timeline, camera, cameraControl, cameraProxy } from '../__utils/LiteRenderer'
+import {
+	renderer,
+	timeline,
+	camera,
+	cameraControl,
+	cameraProxy,
+	WIDTH,
+	HEIGHT,
+} from '../__utils/LiteRenderer'
 import { scene as threeScene } from '../__utils/LiteScene'
 
 {
@@ -11,6 +19,7 @@ import { scene as threeScene } from '../__utils/LiteScene'
 		count: 64,
 		depth: 10,
 		useAnimation: true,
+		resolution: [WIDTH, HEIGHT],
 	})
 	console.log(scene)
 

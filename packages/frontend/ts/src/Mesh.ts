@@ -37,7 +37,7 @@ export class Mesh {
 
 	transform = new AutoVersionTransform3()
 
-	constructor(params: Partial<Omit<MeshDataType, 'transform'>> = {}) {
+	constructor(params: Partial<Omit<RenderableMesh, 'transform'>> = {}) {
 		for (const key of Object.keys(params)) {
 			const v = params[key]
 			if (v !== undefined) {

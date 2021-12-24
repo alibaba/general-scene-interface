@@ -11,6 +11,7 @@ import {
 	Transform3TRS,
 	GeomDataType,
 	MatrBaseDataType,
+	isRenderableMesh,
 } from '@gs.i/schema-scene'
 import { specifyTree } from '@gs.i/utils-specify'
 import {
@@ -33,8 +34,10 @@ import {
 	// buildPolyhedron,
 } from '@gs.i/utils-geom-builders'
 
+import { GLine } from '@gs.i/frontend-gline'
+
 const builderAlias = [
-	(scale: Double) =>
+	(scale: Double, config: Config) =>
 		buildBox({
 			width: scale,
 			height: scale,
@@ -45,14 +48,14 @@ const builderAlias = [
 			heightSegments: Math.round(Math.random() * 3 + 1),
 			depthSegments: Math.round(Math.random() * 3 + 1),
 		}),
-	(scale: Double) =>
+	(scale: Double, config: Config) =>
 		buildCircle({
 			radius: scale / 2,
 			uv: true,
 			normal: true,
 			segments: Math.round(Math.random() * 20 + 3),
 		}),
-	(scale: Double) =>
+	(scale: Double, config: Config) =>
 		buildCylinder({
 			radiusTop: scale / 2,
 			radiusBottom: scale / 2,
@@ -62,7 +65,7 @@ const builderAlias = [
 			radialSegments: Math.round(Math.random() * 3 + 3),
 			heightSegments: Math.round(Math.random() * 3 + 1),
 		}),
-	(scale: Double) =>
+	(scale: Double, config: Config) =>
 		buildPlane({
 			width: scale,
 			height: scale,
@@ -71,7 +74,7 @@ const builderAlias = [
 			widthSegments: Math.round(Math.random() * 3 + 1),
 			heightSegments: Math.round(Math.random() * 3 + 1),
 		}),
-	(scale: Double) =>
+	(scale: Double, config: any) =>
 		buildRing({
 			innerRadius: (scale * 0.7) / 2,
 			outerRadius: scale / 2,
@@ -80,7 +83,7 @@ const builderAlias = [
 			thetaSegments: Math.round(Math.random() * 10 + 3),
 			phiSegments: Math.round(Math.random() * 3 + 1),
 		}),
-	(scale: Double) =>
+	(scale: Double, config: Config) =>
 		buildSphere({
 			radius: scale / 2,
 			uv: true,
@@ -89,7 +92,7 @@ const builderAlias = [
 			heightSegments: Math.round(Math.random() * 10 + 7),
 		}),
 
-	(scale: Double) =>
+	(scale: Double, config: Config) =>
 		buildTorus({
 			radius: scale / 2,
 			tube: (scale / 2) * 0.5,
@@ -151,6 +154,8 @@ export const defaultConfig = {
 	useDoubleSide: false,
 
 	useAnimation: false,
+
+	resolution: [1000, 1000],
 }
 export type Config = Partial<typeof defaultConfig>
 
@@ -194,11 +199,7 @@ export function generateScene(config: Config = {}): Mesh {
 	let pointer = trunk.length - 1
 	let index = 0
 	while (index < c.count) {
-		const geom = getGeom(c)
-		const matr = getMatr(c)
-		const mesh = new Mesh()
-		mesh.geometry = geom
-		mesh.material = matr
+		const mesh = getMesh(c)
 		mesh.transform = getTransform(index, c.count, c.scale, c.space, c.ditherPositions)
 
 		const node = trunk[pointer]
@@ -257,8 +258,54 @@ export function generateScene(config: Config = {}): Mesh {
 
 // export function updateScene(root: MeshDataType, config: Config): MeshDataType {}
 
+export function getMesh(config: Config): Mesh {
+	if (Math.random() < 1.0) {
+		return buildGLine({
+			scale: config.scale || 100,
+			lines: 2,
+			linePoints: 10,
+			resolution: config.resolution || [1000, 1000],
+		})
+	}
+
+	const geom = getRandomBuilder()(config.scale ?? 1, config)
+	let usePBR = config.usePBR
+	if (usePBR && config.ditherOptions) usePBR = Math.random() > 0.3
+	let matr: MatrPbr | MatrUnlit
+	if (usePBR) {
+		matr = new MatrPbr({
+			baseColorFactor: {
+				r: Math.random(),
+				g: Math.random(),
+				b: Math.random(),
+			},
+			emissiveFactor: {
+				r: Math.random() * 0.2,
+				g: Math.random() * 0.2,
+				b: Math.random() * 0.2,
+			},
+			metallicFactor: 0.1 + Math.random() * 0.8,
+			roughnessFactor: 0.1 + Math.random() * 0.8,
+		})
+	} else {
+		matr = new MatrUnlit({
+			baseColorFactor: {
+				r: Math.random(),
+				g: Math.random(),
+				b: Math.random(),
+			},
+		})
+	}
+
+	const mesh = new Mesh({
+		geometry: geom,
+		material: matr,
+	})
+	return mesh
+}
+
 export function getGeom(config: Config): GeomDataType {
-	return getRandomBuilder()(config.scale ?? 1)
+	return getRandomBuilder()(config.scale ?? 1, config)
 }
 
 export function getMatr(config: Config): MatrBaseDataType {
@@ -328,4 +375,50 @@ export function getTransform(
 	transform.scale.set(1, 1, 1) // scale has affected geometry, do not scale again
 
 	return transform
+}
+
+function buildGLine(options = { scale: 100, lines: 2, linePoints: 3, resolution: [1000, 1000] }) {
+	const { scale, lines, linePoints, resolution } = options
+	// gline
+	const gline = new GLine({
+		level: 2,
+		dynamic: true,
+		u: true,
+		color: { r: 1, g: 0.4, b: 0.1 },
+		opacity: 1.0,
+		lineWidth: 100.0,
+		usePerspective: false,
+		resolution: { x: resolution[0], y: resolution[1] },
+		useColors: true,
+		texture: undefined,
+		// texture: {
+		// 	image: { uri: 'https://img.alicdn.com/tfs/TB1fNL.awDD8KJjy0FdXXcjvXXa-24-527.png' },
+		// 	sampler: {},
+		// },
+		pointSize: 10,
+		infinity: 99999999.999,
+		depthTest: true,
+		renderOrder: 0,
+		// transparent: false,
+		// alphaTest: 0.3,
+	})
+	const geom = gline.geometry
+	const matr = gline.material
+
+	const positions: number[][] = []
+	const colors: number[][] = []
+	for (let line = 0; line < lines; line++) {
+		const linePositions: number[] = []
+		const lineColors: number[] = []
+		for (let point = 0; point < linePoints; point++) {
+			linePositions.push(Math.random() * scale, Math.random() * scale, Math.random() * scale)
+			lineColors.push(Math.random(), Math.random(), Math.random(), 1.0)
+		}
+		positions.push(linePositions)
+		colors.push(lineColors)
+	}
+
+	geom.updateData({ positions, colors })
+
+	return gline
 }

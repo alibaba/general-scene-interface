@@ -20,6 +20,9 @@
 		},
 		{
 			"path": "../geom-builders"
+		},
+		{
+			"path": "../../frontend/gline"
 		}
 	]
 }

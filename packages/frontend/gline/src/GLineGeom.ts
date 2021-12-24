@@ -158,6 +158,14 @@ export class GLineGeom extends Geom {
 		this.attributes.u = new Attr(this.buffers.u, 1, false, 'STATIC_DRAW')
 		!this.usePoint && (this.indices = new Attr(this.buffers.index, 1, false, 'STATIC_DRAW'))
 
+		this.attributes.prev.disposable = false
+		this.attributes.curr.disposable = false
+		this.attributes.next.disposable = false
+		this.attributes.color.disposable = false
+		this.attributes.side.disposable = false
+		this.attributes.u.disposable = false
+		!this.usePoint && (this.indices.disposable = false)
+
 		// 动态属性
 		if (this.config.dynamic) {
 			this.attributes.curr.usage = 'DYNAMIC_DRAW'

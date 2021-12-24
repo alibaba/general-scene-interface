@@ -4,18 +4,13 @@
  */
 
 /* eslint-disable @typescript-eslint/no-this-alias */
+import { MatrUnlit, MatrPoint } from '@gs.i/frontend-sdk'
 import vsPreVert from './lv24.preVert.glsl'
 import vsVertOutput from './lv24.vertOutput.glsl'
 import nativeVertGeometry from './lv1.vertGeometry.glsl'
 import pointsVertGeometry from './lv0.vertGeometry.glsl'
 import FS from './fs.glsl'
-import {
-	ColorRGB,
-	MatrPointDataType,
-	MatrUnlitDataType,
-	Vec2,
-	TextureType,
-} from '@gs.i/schema-scene'
+import { ColorRGB, MatrPointDataType, Vec2, TextureType, Programable } from '@gs.i/schema-scene'
 
 export interface GLineMatrConfig {
 	/**
@@ -103,32 +98,14 @@ const MatrProps = {
 /**
  * GLineMaterial
  */
-export class GLineMatr implements MatrUnlitDataType {
-	get type() {
-		return 'unlit' as const
-	}
-
-	version = 0
+export class GLineMatr extends MatrUnlit {
 	name = 'GLineMatr'
-	side: 'front' | 'back' | 'double' = 'front'
-	baseColorFactor = { r: 0, g: 0, b: 0 } // Not used
-	opacity = 1.0
-	visible = true
-	alphaCutoff = 0
-	alphaMode: 'OPAQUE' | 'MASK' | 'BLEND' | 'BLEND_ADD' = 'OPAQUE'
-	depthTest = true
-	language: 'GLSL100' | 'GLSL300' | 'WLSL' = 'GLSL300'
-	defines: any = {}
-	extension?: string
-	uniforms: any = {}
-	attributes: any = {}
-	varyings: any = {}
-	preVert?: string
-	vertGeometry?: string
-	vertOutput?: string
-	preFrag?: string
-	fragColor?: string
 
+	extensions: Exclude<MatrUnlit['extensions'], undefined> = {}
+
+	/**
+	 * GLine level
+	 */
 	level: 0 | 1 | 2 | 4
 
 	/**
@@ -137,6 +114,8 @@ export class GLineMatr implements MatrUnlitDataType {
 	config: any = {}
 
 	constructor(props: Partial<GLineMatrConfig> = {}) {
+		super()
+
 		const _config = {
 			...DefaultMatrConfig,
 			...props,
@@ -146,61 +125,98 @@ export class GLineMatr implements MatrUnlitDataType {
 		this.level = _config.level
 		this.opacity = _config.opacity
 
-		this.uniforms = {
-			uColor: { value: _config.color, type: 'vec3' },
-			lineWidth: { value: _config.lineWidth, type: 'float' },
-			resolution: { value: _config.resolution, type: 'vec2' },
-			alphaTest: { value: _config.alphaTest, type: 'float' },
+		this.extensions.EXT_matr_programmable = {
+			language: 'GLSL100',
+			extension: '',
+			defines: {
+				// 禁止修改
+				LEVEL: _config.level,
+				INFINITY: _config.infinity,
+				// 可以修改
+				USE_PERSPECTIVE: _config.usePerspective ?? false,
+				USE_COLORS: _config.useColors ?? false,
+				USE_TEXTURE: _config.texture && true,
+				USE_ALPHA_TEST: _config.alphaTest !== undefined && _config.alphaTest > 0,
+			},
+			uniforms: {
+				uColor: { value: _config.color ?? { x: 0.5, y: 0.5, z: 0.5 } },
+				lineWidth: { value: _config.lineWidth },
+				resolution: { value: _config.resolution },
+			},
 		}
 
 		if (_config.texture) {
-			this.uniforms['TEX'] = {
+			this.extensions.EXT_matr_programmable.uniforms.TEX = {
 				value: _config.texture,
-				type: 'sampler2D',
 			}
 		}
 
 		if (this.level === 0) {
-			this.uniforms['pointSize'] = { value: _config.pointSize, type: 'float' }
+			this.extensions.EXT_matr_programmable.uniforms.pointSize = { value: _config.pointSize ?? 1 }
 		}
 
-		this.defines = {
-			// 禁止修改
-			LEVEL: _config.level,
-			INFINITY: _config.infinity,
-			// 可以修改
-			USE_PERSPECTIVE: _config.usePerspective ?? false,
-			USE_COLORS: _config.useColors ?? false,
-			USE_TEXTURE: _config.texture && true,
-			USE_ALPHA_TEST: _config.alphaTest !== undefined && _config.alphaTest > 0,
-		}
+		// this.defines = {
+		// 	// 禁止修改
+		// 	LEVEL: _config.level,
+		// 	INFINITY: _config.infinity,
+		// 	// 可以修改
+		// 	USE_PERSPECTIVE: _config.usePerspective ?? false,
+		// 	USE_COLORS: _config.useColors ?? false,
+		// 	USE_TEXTURE: _config.texture && true,
+		// 	USE_ALPHA_TEST: _config.alphaTest !== undefined && _config.alphaTest > 0,
+		// }
 
 		switch (this.level) {
 			case 4:
 			case 2:
-				this.attributes = {
-					curr: 'vec3',
-					prev: 'vec3',
-					next: 'vec3',
-					side: 'float',
-					u: 'float',
-					color: 'vec4',
-				}
+				// this.attributes = {
+				// 	curr: 'vec3',
+				// 	prev: 'vec3',
+				// 	next: 'vec3',
+				// 	side: 'float',
+				// 	u: 'float',
+				// 	color: 'vec4',
+				// }
+				this.extensions.EXT_matr_programmable.vertGlobal = `
+				attribute vec3 curr;
+				attribute vec3 prev;
+				attribute vec3 next;
+				attribute vec3 side;
+				attribute vec3 u;
+				attribute vec3 color;
+				varying vec2 vUv;
+				varying vec4 vColor4;
+				`
+				this.extensions.EXT_matr_programmable.fragGlobal = `
+				varying vec2 vUv;
+				varying vec4 vColor4;
+				`
 				break
 			case 1:
 			case 0:
-				this.attributes = {
-					curr: 'vec3',
-					u: 'float',
-					color: 'vec4',
-				}
+				// this.attributes = {
+				// 	curr: 'vec3',
+				// 	u: 'float',
+				// 	color: 'vec4',
+				// }
+				this.extensions.EXT_matr_programmable.vertGlobal = `
+				attribute vec3 curr;
+				attribute vec3 u;
+				attribute vec3 color;
+				varying vec2 vUv;
+				varying vec4 vColor4;
+				`
+				this.extensions.EXT_matr_programmable.fragGlobal = `
+				varying vec2 vUv;
+				varying vec4 vColor4;
+				`
 				break
 		}
 
-		this.varyings = {
-			vUv: 'vec2',
-			vColor4: 'vec4',
-		}
+		// this.varyings = {
+		// 	vUv: 'vec2',
+		// 	vColor4: 'vec4',
+		// }
 
 		if (_config.transparent !== undefined) {
 			this.alphaMode = _config.transparent ? 'BLEND' : 'OPAQUE'
@@ -323,49 +339,45 @@ export class GLineMatr implements MatrUnlitDataType {
 		const vs = getVS(this.level)
 		const fs = getFS(this.level)
 
-		this.preVert = vs.preVert
+		this.vertGlobal += '\n' + vs.preVert
 		this.vertGeometry = vs.vertGeometry
 		this.vertOutput = vs.vertOutput
-		this.preFrag = fs.preFrag
-		this.fragColor = fs.fragColor
+		this.fragGlobal += '\n' + fs.preFrag
+		this.fragOutput = fs.fragColor
 	}
 }
 
-export class GLinePointMatr implements MatrPointDataType {
-	get type() {
-		return 'point' as const
-	}
-
-	version = 0
-
-	size: number
-	sizeAttenuation: boolean
-
+export class GLinePointMatr extends MatrPoint {
 	name = 'GLineMatr'
-	side: 'front' | 'back' | 'double' = 'front'
-	baseColorFactor = { r: 1, g: 0.4, b: 0.1 }
-	opacity = 1.0
-	visible = true
-	alphaCutoff = 0
-	alphaMode: 'OPAQUE' | 'MASK' | 'BLEND' | 'BLEND_ADD' = 'OPAQUE'
-	depthTest = true
 
-	language: 'GLSL100' | 'GLSL300' | 'WLSL' = 'GLSL300'
-	defines = {}
-	extension?: string
-	uniforms = {}
-	attributes = {}
-	varyings = {}
-	preVert?: string
-	vertGeometry?: string
-	vertOutput?: string
-	preFrag?: string
-	fragColor?: string
+	extensions: Exclude<MatrUnlit['extensions'], undefined> = {}
+
+	// side: 'front' | 'back' | 'double' = 'front'
+	// baseColorFactor = { r: 1, g: 0.4, b: 0.1 }
+	// opacity = 1.0
+	// visible = true
+	// alphaCutoff = 0
+	// alphaMode: 'OPAQUE' | 'MASK' | 'BLEND' | 'BLEND_ADD' = 'OPAQUE'
+	// depthTest = true
+
+	// language: 'GLSL100' | 'GLSL300' | 'WLSL' = 'GLSL300'
+	// defines = {}
+	// extension?: string
+	// uniforms = {}
+	// attributes = {}
+	// varyings = {}
+	// preVert?: string
+	// vertGeometry?: string
+	// vertOutput?: string
+	// preFrag?: string
+	// fragColor?: string
 
 	level = 0
-	config = {}
+	config: any = {}
 
 	constructor(props: Partial<GLineMatrConfig> = {}) {
+		super()
+
 		const _config = {
 			...DefaultMatrConfig,
 			...props,
@@ -373,37 +385,61 @@ export class GLinePointMatr implements MatrPointDataType {
 
 		// Cannot be changed once created
 		this.opacity = _config.opacity
-
-		this.uniforms = {
-			uColor: { value: _config.color, type: 'vec3' },
-		}
-
-		if (_config.texture) {
-			this.uniforms['TEX'] = { value: _config.texture, type: 'sampler2D' }
-		}
-
 		this.size = _config.pointSize || 5
 		this.sizeAttenuation = !!_config.usePerspective
 
-		this.defines = {
-			// 禁止修改
-			LEVEL: _config.level,
-			INFINITY: _config.infinity,
-			// 可以修改
-			USE_COLORS: _config.useColors || false,
-			USE_TEXTURE: _config.texture && true,
+		this.extensions.EXT_matr_programmable = {
+			language: 'GLSL100',
+			extension: '',
+			defines: {
+				// 禁止修改
+				LEVEL: _config.level,
+				INFINITY: _config.infinity,
+				// 可以修改
+				USE_COLORS: _config.useColors || false,
+				USE_TEXTURE: _config.texture && true,
+			},
+			uniforms: {
+				uColor: { value: _config.color ?? { x: 0.5, y: 0.5, z: 0.5 } },
+				lineWidth: { value: _config.lineWidth },
+				resolution: { value: _config.resolution },
+			},
+			vertGlobal: `
+				attribute vec3 curr;
+				attribute vec3 u;
+				attribute vec3 color;
+				varying vec2 vUv;
+				varying vec4 vColor4;
+				`,
+			fragGlobal: `
+				varying vec2 vUv;
+				varying vec4 vColor4;
+				`,
 		}
 
-		this.attributes = {
-			curr: 'vec3',
-			u: 'float',
-			color: 'vec4',
+		if (_config.texture) {
+			this.uniforms.TEX = { value: _config.texture }
 		}
 
-		this.varyings = {
-			vUv: 'vec2',
-			vColor4: 'vec4',
-		}
+		// this.defines = {
+		// 	// 禁止修改
+		// 	LEVEL: _config.level,
+		// 	INFINITY: _config.infinity,
+		// 	// 可以修改
+		// 	USE_COLORS: _config.useColors || false,
+		// 	USE_TEXTURE: _config.texture && true,
+		// }
+
+		// this.attributes = {
+		// 	curr: 'vec3',
+		// 	u: 'float',
+		// 	color: 'vec4',
+		// }
+
+		// this.varyings = {
+		// 	vUv: 'vec2',
+		// 	vColor4: 'vec4',
+		// }
 
 		if (_config.transparent !== undefined) {
 			this.alphaMode = _config.transparent ? 'BLEND' : 'OPAQUE'
@@ -521,11 +557,11 @@ export class GLinePointMatr implements MatrPointDataType {
 		const vs = getVS(this.level)
 		const fs = getFS(this.level)
 
-		this.preVert = vs.preVert
+		this.vertGlobal += '\n' + vs.preVert
 		this.vertGeometry = vs.vertGeometry
 		this.vertOutput = vs.vertOutput
-		this.preFrag = fs.preFrag
-		this.fragColor = fs.fragColor
+		this.fragGlobal += '\n' + fs.preFrag
+		this.fragOutput = fs.fragColor
 	}
 }
 

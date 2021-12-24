@@ -65,7 +65,7 @@ export function computeBBox(geometry: GeomDataType): BBox {
 			box.expandByPoint(v.fromArray(positions, i))
 		}
 	} else {
-		console.warn('Geometry does not have position attribute, generating an infinity box')
+		// console.warn('Geometry does not have position attribute, generating an infinity box')
 		// box.copy(InfinityBox)
 		box.set(
 			new Vector3(-Infinity, -Infinity, -Infinity),
@@ -92,7 +92,7 @@ export function computeBSphere(geometry: GeomDataType): BSphere {
  */
 function fastEstimateBSphere(geometry: GeomDataType): BSphere {
 	if (!geometry.attributes.position || isDISPOSED(geometry.attributes.position.array)) {
-		console.warn('Geometry does not have position attribute, generating an infinity sphere')
+		// console.warn('Geometry does not have position attribute, generating an infinity sphere')
 		return convSphereToBSphere(infinitySphere())
 	}
 
