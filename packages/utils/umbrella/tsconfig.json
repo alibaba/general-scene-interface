@@ -76,10 +76,10 @@
 			"path": "../../backend/gltf2"
 		},
 		{
-			"path": "../../backend/threelite"
+			"path": "../../processors/culling"
 		},
 		{
-			"path": "../../processors/culling"
+			"path": "../../backend/threelite"
 		},
 		{
 			"path": "../../frontend/ts"

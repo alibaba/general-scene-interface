@@ -34,6 +34,7 @@ import {
 import type { Converter } from '@gs.i/schema-converter'
 import { MatProcessor } from '@gs.i/processor-matrix'
 import { BoundingProcessor } from '@gs.i/processor-bound'
+import { CullingProcessor } from '@gs.i/processor-culling'
 import { diffSetsFast, diffSetsFastAndToArray, GraphProcessor } from '@gs.i/processor-graph'
 import { traverse, flatten } from '@gs.i/utils-traverse'
 
@@ -59,6 +60,26 @@ import {
 } from 'three-lite'
 import { PrgSpriteMaterial } from './PrgSpriteMaterial'
 import { sealTransform } from './utils'
+
+/**
+ * @note safe to share globally @simon
+ */
+const defaultMatrixProcessor = new MatProcessor()
+/**
+ * @note safe to share globally @simon
+ */
+const defaultBoundingProcessor = new BoundingProcessor()
+/**
+ * @note safe to share globally @simon
+ */
+const defaultGraphProcessor = new GraphProcessor()
+/**
+ * @note safe to share globally @simon
+ */
+const defaultCullingProcessor = new CullingProcessor({
+	boundingProcessor: defaultBoundingProcessor,
+	matrixProcessor: defaultMatrixProcessor,
+})
 
 export const DefaultConfig = {
 	/**
@@ -102,7 +123,7 @@ export const DefaultConfig = {
 	 * #### if enabled:
 	 * - all converted `Object3D.frustumCulled` will be set to `false`, so that three.js will skip checking
 	 * - converter will use processor-culling to check every time `convert` is called
-	 * - if mesh culled, the converted `Object3D.visible` will be set to `false`
+	 * - if mesh culled, the converted `Threejs.Object3D.visible` will be set to `false`
 	 */
 	overrideFrustumCulling: false,
 
@@ -126,15 +147,19 @@ export const DefaultConfig = {
 	/**
 	 * @note safe to share globally @simon
 	 */
-	matrixProcessor: new MatProcessor(),
+	matrixProcessor: defaultMatrixProcessor,
 	/**
 	 * @note safe to share globally @simon
 	 */
-	boundingProcessor: new BoundingProcessor(),
+	boundingProcessor: defaultBoundingProcessor,
 	/**
 	 * @note safe to share globally @simon
 	 */
-	graphProcessor: new GraphProcessor(),
+	graphProcessor: defaultGraphProcessor,
+	/**
+	 * @note safe to share globally @simon
+	 */
+	cullingProcessor: defaultCullingProcessor,
 }
 
 export type ConverterConfig = Partial<typeof DefaultConfig>
@@ -160,7 +185,13 @@ export class ThreeLiteConverter implements Converter {
 	 */
 	info = {
 		renderableCount: 0,
+		culledCount: 0,
 	}
+
+	readonly matrixProcessor: MatProcessor
+	readonly boundingProcessor: BoundingProcessor
+	readonly graphProcessor: GraphProcessor
+	readonly cullingProcessor: CullingProcessor
 
 	// #region id generator
 
@@ -237,6 +268,11 @@ export class ThreeLiteConverter implements Converter {
 			...config,
 		}
 
+		this.matrixProcessor = this.config.matrixProcessor
+		this.boundingProcessor = this.config.boundingProcessor
+		this.graphProcessor = this.config.graphProcessor
+		this.cullingProcessor = this.config.cullingProcessor
+
 		// this._cachedSnapshot = this.config.graphProcessor.snapshot() // init with a empty node
 	}
 
@@ -248,10 +284,16 @@ export class ThreeLiteConverter implements Converter {
 		 *		 Also worth to notice that these components can be used multiple times in a tree
 		 */
 
+		this.info.culledCount = 0
+		// this.info.renderableCount = 0
+
 		// @note
 		// 		optimize with flatten tree
 		// 		it's quite expensive to traverse a tree multiple times
 		const flatScene = flatten(root)
+
+		// update all the matrices
+		this.config.matrixProcessor.updateMatrixFlat(flatScene)
 
 		// check resources that require special handling
 		// #resource-stage
@@ -524,9 +566,32 @@ export class ThreeLiteConverter implements Converter {
 
 			threeMesh.visible = gsiMesh.visible
 
-			// @note three doesn't use localMatrix at all. it's only for generating worldMatrix
+			// @note three doesn't use localMatrix at all. it's only for generating worldMatrix.
 			// threeMesh.matrix.elements = this.config.matrixProcessor.getLocalMatrix(gsiMesh)
-			threeMesh.matrixWorld.elements = this.config.matrixProcessor.getWorldMatrix(gsiMesh)
+
+			// @note use cached matrices instead of dirty-checking every time.
+			// threeMesh.matrixWorld.elements = this.config.matrixProcessor.getWorldMatrix(gsiMesh)
+
+			const matrix = this.config.matrixProcessor.getCachedWorldMatrix(gsiMesh)
+			if (matrix) {
+				threeMesh.matrixWorld.elements = matrix
+			} else {
+				console.warn(
+					`Conv-threelite:: WorldMatrix of ${gsiMesh.name} is not cached. ` +
+						`Will fall back to dirty-checking. ` +
+						`The scene-graph may have changed during this conversion.`
+				)
+				threeMesh.matrixWorld.elements = this.config.matrixProcessor.getWorldMatrix(gsiMesh)
+			}
+		}
+
+		// culling
+		// TODO set .visible false will cull all its children
+		if (this.config.overrideFrustumCulling && isRenderableMesh(gsiMesh) && gsiMesh.visible) {
+			if (this.config.cullingProcessor.isFrustumCulled(gsiMesh)) {
+				this.info.culledCount++
+				threeMesh.visible = false
+			}
 		}
 
 		return threeMesh
@@ -590,31 +655,19 @@ export class ThreeLiteConverter implements Converter {
 			}
 
 			// bounding
+			{
+				const { bbox, bsphere } = this.config.boundingProcessor.getBounds(gsiGeom)
 
-			if (gsiGeom.extensions?.EXT_geometry_bounds?.box) {
-				// user custom bounds override internal bounds
-				// TODO three.js only use boundingSphere for frustumCulling
-				// 		so maybe we should generate a *baggy* bsphere from bbox
-				const bbox = gsiGeom.extensions.EXT_geometry_bounds.box
 				const threeBbox = threeGeometry.boundingBox as Box3
+				const threeBsphere = threeGeometry.boundingSphere as Sphere
+
 				threeBbox.min.x = bbox.min.x
 				threeBbox.min.y = bbox.min.y
 				threeBbox.min.z = bbox.min.z
 				threeBbox.max.x = bbox.max.x
 				threeBbox.max.y = bbox.max.y
 				threeBbox.max.z = bbox.max.z
-			} else if (gsiGeom.extensions?.EXT_geometry_bounds?.sphere) {
-				// user custom bounds override internal bounds
-				const bsphere = gsiGeom.extensions.EXT_geometry_bounds.sphere
-				const threeBsphere = threeGeometry.boundingSphere as Sphere
-				threeBsphere.center.x = bsphere.center.x
-				threeBsphere.center.y = bsphere.center.y
-				threeBsphere.center.z = bsphere.center.z
-				threeBsphere.radius = bsphere.radius
-			} else {
-				// @note three will use bsphere but may not use bbox so...
-				const bsphere = this.config.boundingProcessor.getGeomBoundingSphere(gsiGeom)
-				const threeBsphere = threeGeometry.boundingSphere as Sphere
+
 				threeBsphere.center.x = bsphere.center.x
 				threeBsphere.center.y = bsphere.center.y
 				threeBsphere.center.z = bsphere.center.z
@@ -990,17 +1043,7 @@ export class ThreeLiteConverter implements Converter {
 		this._threeMatr = new WeakMap()
 		this._threeColor = new WeakMap()
 
-		// this._committedVersions = new WeakMap<any, number>()
 		this._committedAttr = new WeakMap()
-		// this._committedMatr = new WeakMap()
-		// this._committedTex = new WeakMap()
-
-		// this._ar0.length = 0
-		// this._ar1.length = 0
-		// this._ar2.length = 0
-		// this._ar3.length = 0
-
-		// this._threeObjects = new WeakMap<ColorRGB, Color>()
 	}
 }
 
@@ -1165,86 +1208,7 @@ export function getResourcesFlat(flatScene: MeshDataType[]) {
 		textures,
 	}
 }
-/**
- * get all the resources that needs to be `allocated` and `freed` manually
- *
- * these resources has underlying gpu objects that can not be GC-ed
- *
- * also it's better to modify remote resources pre-frame than mid-frame to avoid stalling.
- */
-function getResourcesFlatWidthFastDiff(
-	flatScene: MeshDataType[],
-	originalResources: ReturnType<typeof getResourcesFlat>
-) {
-	// programs
-	const materials = new Set<GsiMatr>()
-	// vao
-	const geometries = new Set<GeomDataType>()
-	// buffers
-	const attributes = new Set<AttributeDataType>()
-	// texture / framebuffer / samplers
-	const textures = new Set<Texture | CubeTexture>()
 
-	// @TODO uniform buffers
-
-	for (let i = 0; i < flatScene.length; i++) {
-		const mesh = flatScene[i]
-		if (isRenderableMesh(mesh)) {
-			materials.add(mesh.material as GsiMatr) && geometries.add(mesh.geometry)
-
-			// textures
-
-			// standard textures
-			if (mesh.material['baseColorTexture']) textures.add(mesh.material['baseColorTexture'])
-			if (mesh.material['metallicRoughnessTexture'])
-				textures.add(mesh.material['metallicRoughnessTexture'])
-			if (mesh.material['emissiveTexture']) textures.add(mesh.material['emissiveTexture'])
-			if (mesh.material['normalTexture']) textures.add(mesh.material['normalTexture'])
-			if (mesh.material['occlusionTexture']) textures.add(mesh.material['occlusionTexture'])
-
-			// custom textures
-			if (mesh.material.extensions?.EXT_matr_programmable?.uniforms) {
-				const uniforms = mesh.material.extensions.EXT_matr_programmable.uniforms
-
-				// @note this is a little bit slower than Object.values
-				// Object.keys(uniforms).forEach((key) => {
-				// 	const uniformValue = uniforms[key].value
-				// 	if (isTexture(uniformValue) || isCubeTexture(uniformValue)) {
-				// 		textures.add(uniformValue)
-				// 	}
-				// })
-
-				const values = Object.values(uniforms)
-				for (let i = 0; i < values.length; i++) {
-					const uniformValue = values[i].value
-					if (isTexture(uniformValue) || isCubeTexture(uniformValue)) {
-						textures.add(uniformValue)
-					}
-				}
-			}
-
-			// attributes
-			{
-				// @note this is a little bit slower than Object.values
-				// Object.keys(mesh.geometry.attributes).forEach((key) => {
-				// 	attributes.add(mesh.geometry.attributes[key])
-				// })
-				const values = Object.values(mesh.geometry.attributes)
-				for (let i = 0; i < values.length; i++) {
-					attributes.add(values[i])
-				}
-				if (mesh.geometry.indices) attributes.add(mesh.geometry.indices)
-			}
-		}
-	}
-
-	return {
-		materials,
-		geometries,
-		attributes,
-		textures,
-	}
-}
 /**
  * TODO Maybe generate corresponding THREE.Mesh|Points instead of a kinda union type?
  * 把 three 的 Mesh Points Lines 合并到 父类 Object3D 上，来和 glTF2 保持一致
