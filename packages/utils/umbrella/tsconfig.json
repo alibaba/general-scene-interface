@@ -64,13 +64,13 @@
 			"path": "../specify"
 		},
 		{
-			"path": "../../processors/bound"
-		},
-		{
 			"path": "../../processors/graph"
 		},
 		{
 			"path": "../../processors/matrix"
+		},
+		{
+			"path": "../../processors/bound"
 		},
 		{
 			"path": "../../backend/gltf2"

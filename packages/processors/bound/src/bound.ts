@@ -2,6 +2,9 @@
 import { MeshDataType, GeomDataType, Int, BBox, BSphere } from '@gs.i/schema-scene'
 import { Processor, TraverseType } from '@gs.i/processor-base'
 
+import type { MatProcessor } from '@gs.i/processor-matrix'
+import { traverseBFSBottomUp } from '@gs.i/utils-traverse'
+
 import { computeBBox, computeBSphere } from '@gs.i/utils-geometry'
 
 interface BBoxCache {
@@ -58,8 +61,22 @@ export class BoundingProcessor extends Processor {
 	private _cacheGeomBSphere = new WeakMap<GeomDataType, BSphereCache>()
 	private _cachedBounds = new WeakMap<GeomDataType, BoundsCache>()
 
+	matrixProcessor?: MatProcessor
+
 	override processNode(node: MeshDataType, parent?: MeshDataType) {
 		// this.getWorldMatrixShallow(node, parent)
+	}
+
+	constructor(
+		config: {
+			/**
+			 * used for generating BVH
+			 */
+			matrixProcessor?: MatProcessor
+		} = {}
+	) {
+		super()
+		this.matrixProcessor = config.matrixProcessor
 	}
 
 	private getID(o: object): Int {
@@ -184,16 +201,13 @@ export class BoundingProcessor extends Processor {
 
 	/**
 	 * @unfinished @TODO
-	 * @param node
-	 * @param force
 	 */
-	generateBVH(node: MeshDataType, force = false) {}
-}
-
-class SchemaNotValid extends TypeError {
-	constructor(msg?: string) {
-		super('GSI:SchemaNotValid: ' + (msg || ''))
-	}
+	updateBVH(root: MeshDataType) {}
+	/**
+	 * get **cached** BVH bounds
+	 * @unfinished @TODO
+	 */
+	getBVHBounds(node: MeshDataType) {}
 }
 
 /**

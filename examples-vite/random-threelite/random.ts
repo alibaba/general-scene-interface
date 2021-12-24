@@ -1,6 +1,7 @@
 import { generateScene } from '@gs.i/utils-random-scene'
 import { ThreeLiteConverter } from '@gs.i/backend-threelite'
 import { IndicatorProcessor } from '@gs.i/processor-indicator'
+// import { traverseBFS } from '@gs.i/utils-traverse'
 
 import {
 	renderer,
@@ -34,6 +35,8 @@ import { scene as threeScene } from '../__utils/LiteScene'
 	const conv = new ThreeLiteConverter({ overrideFrustumCulling: true })
 	console.log(conv)
 	window['conv'] = conv
+
+	// traverseBFS(scene, () => {})
 
 	setInterval(() => {
 		const v = Math.sin(performance.now() * 0.001) * 0.5 + 1.0

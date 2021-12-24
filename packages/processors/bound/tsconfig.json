@@ -16,6 +16,12 @@
 			"path": "../base"
 		},
 		{
+			"path": "../matrix"
+		},
+		{
+			"path": "../../utils/traverse"
+		},
+		{
 			"path": "../../schema/core"
 		}
 	]
