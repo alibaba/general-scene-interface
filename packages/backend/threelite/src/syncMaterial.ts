@@ -143,7 +143,7 @@ export function syncMaterial(
 					// 		as long as matrices are arrays, vectors are xyz\rgb\arrays,
 					// 		it will be fine.
 
-					threeUniforms[key].value = uniforms.value
+					threeUniforms[key].value = uniform.value
 				}
 			})
 		}
