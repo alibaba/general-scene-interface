@@ -21,7 +21,7 @@ export class ImageData {
 		this.extensions.EXT_image.flipY = v
 	}
 
-	constructor(
+	constructor(params: {
 		imageSource: Exclude<
 			| ImageDataType['data']
 			| ImageDataType['uri']
@@ -29,10 +29,11 @@ export class ImageData {
 			| HTMLCanvasElement
 			| HTMLVideoElement,
 			undefined
-		>,
-		width?: Int,
+		>
+		width?: Int
 		height?: Int
-	) {
+	}) {
+		const { imageSource, width, height } = params
 		if (typeof imageSource === 'string') {
 			this.uri = imageSource
 		} else if (imageSource instanceof HTMLElement) {

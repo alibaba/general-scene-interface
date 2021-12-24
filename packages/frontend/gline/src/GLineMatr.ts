@@ -101,13 +101,6 @@ const MatrProps = {
 export class GLineMatr extends MatrUnlit {
 	name = 'GLineMatr'
 
-	extensions: Exclude<MatrUnlit['extensions'], undefined> = {}
-
-	/**
-	 * GLine level
-	 */
-	level: 0 | 1 | 2 | 4
-
 	/**
 	 * 外界需要更改任何Matr属性时，务必在config中修改
 	 */
@@ -122,7 +115,6 @@ export class GLineMatr extends MatrUnlit {
 		}
 
 		// Cannot be changed once created
-		this.level = _config.level
 		this.opacity = _config.opacity
 
 		this.extensions.EXT_matr_programmable = {
@@ -151,7 +143,7 @@ export class GLineMatr extends MatrUnlit {
 			}
 		}
 
-		if (this.level === 0) {
+		if (_config.level === 0) {
 			this.extensions.EXT_matr_programmable.uniforms.pointSize = { value: _config.pointSize ?? 1 }
 		}
 
@@ -166,7 +158,7 @@ export class GLineMatr extends MatrUnlit {
 		// 	USE_ALPHA_TEST: _config.alphaTest !== undefined && _config.alphaTest > 0,
 		// }
 
-		switch (this.level) {
+		switch (_config.level) {
 			case 4:
 			case 2:
 				// this.attributes = {
@@ -181,15 +173,17 @@ export class GLineMatr extends MatrUnlit {
 				attribute vec3 curr;
 				attribute vec3 prev;
 				attribute vec3 next;
-				attribute vec3 side;
-				attribute vec3 u;
-				attribute vec3 color;
-				varying vec2 vUv;
-				varying vec4 vColor4;
+				attribute float side;
+				attribute float u;
+				attribute vec4 color;
 				`
-				this.extensions.EXT_matr_programmable.fragGlobal = `
+				this.extensions.EXT_matr_programmable.global = `
 				varying vec2 vUv;
 				varying vec4 vColor4;
+				uniform vec3 uColor;
+				uniform float lineWidth;
+				uniform vec2 resolution;
+				uniform sampler2D TEX;
 				`
 				break
 			case 1:
@@ -201,14 +195,16 @@ export class GLineMatr extends MatrUnlit {
 				// }
 				this.extensions.EXT_matr_programmable.vertGlobal = `
 				attribute vec3 curr;
-				attribute vec3 u;
-				attribute vec3 color;
-				varying vec2 vUv;
-				varying vec4 vColor4;
+				attribute float u;
+				attribute vec4 color;
 				`
-				this.extensions.EXT_matr_programmable.fragGlobal = `
+				this.extensions.EXT_matr_programmable.global = `
 				varying vec2 vUv;
 				varying vec4 vColor4;
+				uniform vec3 uColor;
+				uniform float lineWidth;
+				uniform vec2 resolution;
+				uniform sampler2D TEX;
 				`
 				break
 		}
@@ -336,43 +332,20 @@ export class GLineMatr extends MatrUnlit {
 			},
 		})
 
-		const vs = getVS(this.level)
-		const fs = getFS(this.level)
+		const vs = getVS(_config.level)
+		const fs = getFS(_config.level)
 
-		this.vertGlobal += '\n' + vs.preVert
-		this.vertGeometry = vs.vertGeometry
-		this.vertOutput = vs.vertOutput
-		this.fragGlobal += '\n' + fs.preFrag
-		this.fragOutput = fs.fragColor
+		this.extensions.EXT_matr_programmable.vertGlobal += '\n' + (vs.preVert || '')
+		this.extensions.EXT_matr_programmable.vertGeometry = vs.vertGeometry
+		this.extensions.EXT_matr_programmable.vertOutput = vs.vertOutput
+		this.extensions.EXT_matr_programmable.fragGlobal = fs.preFrag || ''
+		this.extensions.EXT_matr_programmable.fragOutput = fs.fragColor
 	}
 }
 
 export class GLinePointMatr extends MatrPoint {
 	name = 'GLineMatr'
 
-	extensions: Exclude<MatrUnlit['extensions'], undefined> = {}
-
-	// side: 'front' | 'back' | 'double' = 'front'
-	// baseColorFactor = { r: 1, g: 0.4, b: 0.1 }
-	// opacity = 1.0
-	// visible = true
-	// alphaCutoff = 0
-	// alphaMode: 'OPAQUE' | 'MASK' | 'BLEND' | 'BLEND_ADD' = 'OPAQUE'
-	// depthTest = true
-
-	// language: 'GLSL100' | 'GLSL300' | 'WLSL' = 'GLSL300'
-	// defines = {}
-	// extension?: string
-	// uniforms = {}
-	// attributes = {}
-	// varyings = {}
-	// preVert?: string
-	// vertGeometry?: string
-	// vertOutput?: string
-	// preFrag?: string
-	// fragColor?: string
-
-	level = 0
 	config: any = {}
 
 	constructor(props: Partial<GLineMatrConfig> = {}) {
@@ -406,14 +379,18 @@ export class GLinePointMatr extends MatrPoint {
 			},
 			vertGlobal: `
 				attribute vec3 curr;
-				attribute vec3 u;
-				attribute vec3 color;
+				attribute float u;
+				attribute vec4 color;
 				varying vec2 vUv;
 				varying vec4 vColor4;
 				`,
 			fragGlobal: `
 				varying vec2 vUv;
 				varying vec4 vColor4;
+				uniform vec3 uColor;
+				uniform float lineWidth;
+				uniform vec2 resolution;
+				uniform sampler2D TEX;
 				`,
 		}
 
@@ -554,13 +531,13 @@ export class GLinePointMatr extends MatrPoint {
 			},
 		})
 
-		const vs = getVS(this.level)
-		const fs = getFS(this.level)
+		const vs = getVS(_config.level)
+		const fs = getFS(_config.level)
 
-		this.vertGlobal += '\n' + vs.preVert
+		this.vertGlobal += '\n' + (vs.preVert || '')
 		this.vertGeometry = vs.vertGeometry
 		this.vertOutput = vs.vertOutput
-		this.fragGlobal += '\n' + fs.preFrag
+		this.fragGlobal = fs.preFrag || ''
 		this.fragOutput = fs.fragColor
 	}
 }

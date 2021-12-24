@@ -21,6 +21,9 @@ import {
 	MatrPoint,
 	MatrSprite,
 	Mesh,
+	TextureData,
+	ImageData,
+	Sampler,
 } from '@gs.i/frontend-sdk'
 
 import {
@@ -259,48 +262,23 @@ export function generateScene(config: Config = {}): Mesh {
 // export function updateScene(root: MeshDataType, config: Config): MeshDataType {}
 
 export function getMesh(config: Config): Mesh {
-	if (Math.random() < 1.0) {
+	if (Math.random() < 0.2) {
 		return buildGLine({
 			scale: config.scale || 100,
 			lines: 2,
-			linePoints: 10,
+			linePoints: 6,
 			resolution: config.resolution || [1000, 1000],
 		})
 	}
 
 	const geom = getRandomBuilder()(config.scale ?? 1, config)
-	let usePBR = config.usePBR
-	if (usePBR && config.ditherOptions) usePBR = Math.random() > 0.3
-	let matr: MatrPbr | MatrUnlit
-	if (usePBR) {
-		matr = new MatrPbr({
-			baseColorFactor: {
-				r: Math.random(),
-				g: Math.random(),
-				b: Math.random(),
-			},
-			emissiveFactor: {
-				r: Math.random() * 0.2,
-				g: Math.random() * 0.2,
-				b: Math.random() * 0.2,
-			},
-			metallicFactor: 0.1 + Math.random() * 0.8,
-			roughnessFactor: 0.1 + Math.random() * 0.8,
-		})
-	} else {
-		matr = new MatrUnlit({
-			baseColorFactor: {
-				r: Math.random(),
-				g: Math.random(),
-				b: Math.random(),
-			},
-		})
-	}
+	const matr = getMatr(config)
 
 	const mesh = new Mesh({
 		geometry: geom,
 		material: matr,
 	})
+
 	return mesh
 }
 
@@ -310,7 +288,7 @@ export function getGeom(config: Config): GeomDataType {
 
 export function getMatr(config: Config): MatrBaseDataType {
 	let usePBR = config.usePBR
-	if (usePBR && config.ditherOptions) usePBR = Math.random() > 0.3
+	if (usePBR && config.ditherOptions) usePBR = Math.random() > 0.5
 
 	if (usePBR) {
 		return new MatrPbr({
@@ -326,6 +304,16 @@ export function getMatr(config: Config): MatrBaseDataType {
 			},
 			metallicFactor: 0.1 + Math.random() * 0.8,
 			roughnessFactor: 0.1 + Math.random() * 0.8,
+			baseColorTexture:
+				Math.random() > 0.5
+					? new TextureData(
+							{
+								imageSource:
+									'https://img.alicdn.com/imgextra/i3/O1CN01RbMgmM1DWAzg60GCD_!!6000000000223-0-tps-1024-1024.jpg',
+							},
+							{}
+					  )
+					: undefined,
 		})
 	} else {
 		return new MatrUnlit({
@@ -334,6 +322,16 @@ export function getMatr(config: Config): MatrBaseDataType {
 				g: Math.random(),
 				b: Math.random(),
 			},
+			baseColorTexture:
+				Math.random() > 0.5
+					? new TextureData(
+							{
+								imageSource:
+									'https://img.alicdn.com/imgextra/i3/O1CN01RbMgmM1DWAzg60GCD_!!6000000000223-0-tps-1024-1024.jpg',
+							},
+							{}
+					  )
+					: undefined,
 		})
 	}
 }
@@ -381,20 +379,25 @@ function buildGLine(options = { scale: 100, lines: 2, linePoints: 3, resolution:
 	const { scale, lines, linePoints, resolution } = options
 	// gline
 	const gline = new GLine({
-		level: 2,
+		level: Math.random() > 0.5 ? 2 : 4,
 		dynamic: true,
 		u: true,
 		color: { r: 1, g: 0.4, b: 0.1 },
-		opacity: 1.0,
-		lineWidth: 100.0,
+		opacity: Math.random(),
+		lineWidth: scale / 20.0,
 		usePerspective: false,
 		resolution: { x: resolution[0], y: resolution[1] },
-		useColors: true,
-		texture: undefined,
-		// texture: {
-		// 	image: { uri: 'https://img.alicdn.com/tfs/TB1fNL.awDD8KJjy0FdXXcjvXXa-24-527.png' },
-		// 	sampler: {},
-		// },
+		useColors: Math.random() > 0.5,
+		texture:
+			Math.random() > 0.5
+				? new TextureData(
+						{
+							imageSource:
+								'https://img.alicdn.com/imgextra/i2/O1CN01ffcMiO1cHr2q8UYnx_!!6000000003576-2-tps-6-968.png',
+						},
+						{}
+				  )
+				: undefined,
 		pointSize: 10,
 		infinity: 99999999.999,
 		depthTest: true,
@@ -412,7 +415,7 @@ function buildGLine(options = { scale: 100, lines: 2, linePoints: 3, resolution:
 		const lineColors: number[] = []
 		for (let point = 0; point < linePoints; point++) {
 			linePositions.push(Math.random() * scale, Math.random() * scale, Math.random() * scale)
-			lineColors.push(Math.random(), Math.random(), Math.random(), 1.0)
+			lineColors.push(Math.random(), Math.random(), Math.random(), Math.random())
 		}
 		positions.push(linePositions)
 		colors.push(lineColors)

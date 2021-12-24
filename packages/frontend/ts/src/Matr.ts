@@ -158,7 +158,16 @@ export class MatrPbr extends MatrBase {
 
 	name = 'MatrPbr'
 
-	extensions: MatrPbrDataType['extensions']
+	extensions: Required<Exclude<MatrPbrDataType['extensions'], undefined>> = {
+		EXT_matr_advanced: {},
+		EXT_matr_programmable: {
+			language: 'GLSL300',
+			defines: {},
+			uniforms: {},
+			extension: '',
+		},
+		EXT_matr_programmable_pbr: {},
+	}
 
 	constructor(params: Partial<MatrPbr> = {}) {
 		super(params)
@@ -172,6 +181,16 @@ export class MatrUnlit extends MatrBase {
 	}
 
 	name = 'MatrUnlit'
+
+	extensions: Required<Exclude<MatrUnlitDataType['extensions'], undefined>> = {
+		EXT_matr_advanced: {},
+		EXT_matr_programmable: {
+			language: 'GLSL300',
+			defines: {},
+			uniforms: {},
+			extension: '',
+		},
+	}
 
 	constructor(params: Partial<MatrUnlit> = {}) {
 		super(params)
@@ -188,7 +207,16 @@ export class MatrPoint extends MatrBase {
 
 	vertPointGeometry?: string
 
-	extensions: MatrPointDataType['extensions']
+	extensions: Required<Exclude<MatrPointDataType['extensions'], undefined>> = {
+		EXT_matr_advanced: {},
+		EXT_matr_programmable: {
+			language: 'GLSL300',
+			defines: {},
+			uniforms: {},
+			extension: '',
+		},
+		EXT_matr_programmable_point: {},
+	}
 
 	constructor(params: Partial<MatrPointDataType> = {}) {
 		super(params)
@@ -206,7 +234,17 @@ export class MatrSprite extends MatrBase {
 
 	name = 'MatrSprite'
 
-	extensions: MatrSpriteDataType['extensions']
+	extensions: Required<Exclude<MatrSpriteDataType['extensions'], undefined>> = {
+		EXT_matr_advanced: {},
+		EXT_matr_programmable: {
+			language: 'GLSL300',
+			defines: {},
+			uniforms: {},
+			extension: '',
+		},
+		EXT_matr_programmable_sprite: {},
+		EXT_sprite_attributes: {},
+	}
 
 	constructor(params: Partial<MatrSpriteDataType> = {}) {
 		super(params)
