@@ -338,6 +338,32 @@ typescript 事到如今已经积累了大量的历史遗留问题和设计缺陷
 
 ts 官方推荐的方案， 写出来不合逻辑，但是生成的代码是正确的（前提是你生成的一定是.js后缀名）
 
+### Bounding 的继承问题
+
+按照 three.js 和 gltf2 的设计，bounds只存在在 geometry 和 attribute 上，因此只有 renderable object 拥有 bounding volume。
+因此 culling 只能检查所有的 renderable object，不能检查 枝干节点（inode），bounds 范围不包含 children，parent 的 culling 也不会影响 children 的 culling。
+
+这是一种简单直白的方案，但是 object 的 visibility 是继承的（父节点的 visible=false 会导致所有子节点不可见），culling 却不继承。
+如果渲染引擎没有留出其他不继承的 visibility 判断接口，将很难从外部进行 culling（除非改变树结构）。
+
+#### 可能的解决方案
+
+- 使用 BVH 而非 geometry bounds 进行 culling 计算
+
+BVH 的生成实现在 processor-bounds 中，生成耗时比较长，很难进行缓存（需要判断整个子树的变化），每帧更新是非常不划算的。主要原因是所有的 aabb 都要在 world space 中，而 box 进行 world matrix transform 需要对8个顶点分别变换并取新的bbox。
+
+因此，BVH 只应该用在能生成 BVH 的场合，例如静态场景的优化。不能作为解决问题的前置条件。
+
+- 修改树形状，解除 cull-able 物体的父子关系
+
+可以局部修改，将 renderable object 和 inode 分离开，由于几乎所有渲染引擎都允许 renderable object 拥有自己的 children，因此不方便在 IR 中要求 inode 不可渲染（or maybe we can？）。
+
+也可以将整个输出打平，更有利于性能优化，也更符合 “不继承” 的行为。
+
+- 要求用户保证 geometry bounds 包含 children 的 geometry bounds
+
+语义上可以这样要求，但是如果子元素会动，这个要求将变得不可实现，schema 中不应该出现明确不可实现智能ignore掉的标准。
+
 ---
 
 [a][link-a]
