@@ -146,7 +146,8 @@ export const defaultConfig = {
 	// spec options
 
 	useSprite: false,
-	usePoint: false,
+	useGLine: true,
+	usePoint: true,
 	useLine: false,
 
 	//
@@ -264,7 +265,7 @@ export function generateScene(config: Config = {}): Mesh {
 // export function updateScene(root: MeshDataType, config: Config): MeshDataType {}
 
 export function getMesh(config: Config): Mesh {
-	if (Math.random() < 0.15) {
+	if (config.useGLine && Math.random() < 0.15) {
 		return buildGLine({
 			scale: config.scale || 100,
 			lines: 2,
@@ -272,7 +273,7 @@ export function getMesh(config: Config): Mesh {
 			resolution: config.resolution || [1000, 1000],
 		})
 	}
-	if (Math.random() < 0.15) {
+	if (config.usePoint && Math.random() < 0.15) {
 		return buildPoints(config.scale)
 	}
 

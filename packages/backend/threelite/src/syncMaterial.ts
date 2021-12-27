@@ -113,39 +113,4 @@ export function syncMaterial(
 			threeMatr.defines = convDefines(threeMatr.defines, extProgramable.defines)
 		}
 	}
-
-	// uniforms
-	{
-		if (extProgramable?.uniforms) {
-			// it should be a shaderMaterial
-			const threeUniforms = threeMatr['uniforms'] || {}
-			threeMatr['uniforms'] = threeUniforms
-
-			const uniforms = extProgramable.uniforms
-
-			Object.keys(uniforms).forEach((key) => {
-				const uniform = uniforms[key]
-
-				if (threeUniforms[key] === undefined) threeUniforms[key] = {}
-
-				if (isTexture(uniform.value)) {
-					// it should be cached before
-					const threeTexture = cache.get(uniform.value) as ThreeTexture
-					threeUniforms[key].value = threeTexture
-				} else if (isCubeTexture(uniform.value)) {
-					// 👀
-					throw 'CUBE TEXTURE UNIFORM NOT IMPLEMENTED'
-				} else {
-					// @note No need to transform value into three.js classes
-					// 		three.js and GL2 do not care the Type of uniform values.
-					// 		uniform types are decided by the compiled shaders.
-					// 		uploader functions do accept basic data type as values.
-					// 		as long as matrices are arrays, vectors are xyz\rgb\arrays,
-					// 		it will be fine.
-
-					threeUniforms[key].value = uniform.value
-				}
-			})
-		}
-	}
 }
