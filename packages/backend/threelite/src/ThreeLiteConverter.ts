@@ -147,6 +147,15 @@ export const DefaultConfig = {
 	autoDisposeThreeObject: true,
 
 	/**
+	 * whether to **try to** keep the shape of output scene graph
+	 * - by default the output scene will be flattened and optimized
+	 * - keep this disabled for best performance
+	 * - enable this doesn't promise the output tree has exactly same shape of input
+	 * - this may change the behaver of bounding and culling
+	 */
+	keepTopology: false,
+
+	/**
 	 * @note safe to share globally @simon
 	 */
 	matrixProcessor: defaultMatrixProcessor,
@@ -475,17 +484,28 @@ export class ThreeLiteConverter implements Converter {
 			// 	}
 			// })
 
-			for (let i = 0; i < flatScene.length; i++) {
-				const node = flatScene[i]
-				const parent = node.parent
+			if (this.config.keepTopology) {
+				for (let i = 0; i < flatScene.length; i++) {
+					const node = flatScene[i]
+					const parent = node.parent
+					// skip root node
+					if (parent) {
+						// @note parent is cached before
+						const parentThree = this._threeMesh.get(parent) as Object3D
+						const currentThree = this.convMesh(node)
+						// clear current children to handle removed nodes
+						currentThree.children = []
+						parentThree.children.push(currentThree)
+					}
+				}
+			} else {
 				// skip root node
-				if (parent) {
-					// @note parent is cached before
-					const parentThree = this._threeMesh.get(parent) as Object3D
+				for (let i = 1; i < flatScene.length; i++) {
+					const node = flatScene[i]
 					const currentThree = this.convMesh(node)
-					// clear current children to handle removed nodes
 					currentThree.children = []
-					parentThree.children.push(currentThree)
+					// clear current children to handle removed nodes
+					rootThree.children.push(currentThree)
 				}
 			}
 
