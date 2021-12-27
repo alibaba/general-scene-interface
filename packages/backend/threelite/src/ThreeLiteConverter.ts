@@ -431,10 +431,10 @@ export class ThreeLiteConverter implements Converter {
 				// skip root node
 				for (let i = 1; i < flatScene.length; i++) {
 					const node = flatScene[i]
-					if (isRenderableMesh(node)) {
-						const currentThree = this.convMesh(node)
-						// currentThree.children = [] // it should always be empty, not need to empty it every time
-						// clear current children to handle removed nodes
+					const currentThree = this.convMesh(node)
+					// clear current children to handle removed nodes
+					// currentThree.children = [] // it should always be empty, not need to empty it every time
+					if (isRenderableMesh(node) && currentThree.visible) {
 						rootThree.children.push(currentThree)
 					}
 				}
