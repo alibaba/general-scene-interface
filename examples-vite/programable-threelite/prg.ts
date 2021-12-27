@@ -1,28 +1,52 @@
 import { generateScene } from '@gs.i/utils-random-scene'
 import { ThreeLiteConverter } from '@gs.i/backend-threelite'
 import { IndicatorProcessor } from '@gs.i/processor-indicator'
-// import { traverseBFS } from '@gs.i/utils-traverse'
 
-import {
-	renderer,
-	timeline,
-	camera,
-	cameraControl,
-	cameraProxy,
-	WIDTH,
-	HEIGHT,
-} from '../__utils/LiteRenderer'
+import { renderer, timeline, camera, cameraProxy, WIDTH, HEIGHT } from '../__utils/LiteRenderer'
 import { scene as threeScene } from '../__utils/LiteScene'
+import { isRenderableMesh } from '@gs.i/schema-scene'
 
 {
 	const scene = generateScene({
 		// scale: 10000,
-		count: 100,
-		depth: 10,
-		useAnimation: true,
+		count: 16,
+		depth: 1,
+		useAnimation: false,
+		useGLine: false,
+		// usePoint: false,
 		resolution: [WIDTH, HEIGHT],
 	})
 	console.log(scene)
+
+	scene.children.forEach((node) => {
+		if (isRenderableMesh(node)) {
+			node.material.extensions = {
+				EXT_matr_programmable: {
+					language: 'GLSL300',
+					extension: '',
+					defines: {},
+					uniforms: {
+						time: { value: 0 },
+					},
+					global: `
+					uniform float time;
+					`,
+					vertGeometry: `
+					position.z += sin(position.x * 0.2 + time * 0.001) * 20.0;
+					`,
+				},
+			}
+
+			timeline.add({
+				duration: Infinity,
+				onUpdate: (t, p) => {
+					const uniforms = node.material.extensions?.EXT_matr_programmable?.uniforms as any
+					uniforms.time.value = t
+					node.material['uniformsNeedUpdate'] = true
+				},
+			})
+		}
+	})
 
 	const indicator = new IndicatorProcessor({
 		// hideOriginal: true,
@@ -36,28 +60,9 @@ import { scene as threeScene } from '../__utils/LiteScene'
 	console.log(conv)
 	window['conv'] = conv
 
-	// traverseBFS(scene, () => {})
-
-	setInterval(() => {
-		const v = Math.sin(performance.now() * 0.001) * 0.5 + 1.0
-		// scene.transform.scale.x = v
-		// scene.transform.scale.y = v
-		// scene.transform.scale.z = v
-
-		// let m = Array.from(scene.children.values())[0]
-		// m = Array.from(m.children.values())[0]
-		// m = Array.from(m.children.values())[0]
-		// m = Array.from(m.children.values())[0]
-
-		// console.log('Local', conv.config.matrixProcessor.getLocalMatrix(m))
-		// console.log('World', conv.config.matrixProcessor.getWorldMatrix(m))
-	}, 30)
-
 	// debugger
 	const threeMesh = conv.convert(scene)
 	console.log(threeMesh)
-
-	// console.log(cameraControl)
 
 	threeScene.add(threeMesh)
 	timeline.add({
