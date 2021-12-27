@@ -243,10 +243,6 @@ export class ThreeLiteConverter implements Converter {
 	 * @note refresh every `convert`
 	 */
 	private _cachedResources = getResourcesFlat([]) // init with a empty node
-	// private _ar0 = []
-	// private _ar1 = []
-	// private _ar2 = []
-	// private _ar3 = []
 	// private _cachedSnapshot: SnapShot
 
 	/**
@@ -308,7 +304,7 @@ export class ThreeLiteConverter implements Converter {
 		// update all the matrices
 		this.matrixProcessor.updateMatrixFlat(flatScene)
 
-		// // update bvh bounds
+		// update bvh bounds
 		// this.boundingProcessor.updateBVHFlat(flatScene)
 
 		// check resources that require special handling
@@ -335,65 +331,12 @@ export class ThreeLiteConverter implements Converter {
 			// 	textures: diffSetsFast(this._cachedResources.textures, resources.textures),
 			// }
 
-			// const materials = this._ar0
-			// const geometries = this._ar1
-			// const attributes = this._ar2
-			// const textures = this._ar3
-			// materials.length = 0
-			// geometries.length = 0
-			// attributes.length = 0
-			// textures.length = 0
-
-			// const removed = {
-			// 	materials: diffSetsFastAndToArray(
-			// 		this._cachedResources.materials,
-			// 		resources.materials,
-			// 		this._ar0
-			// 	),
-			// 	geometries: diffSetsFastAndToArray(
-			// 		this._cachedResources.geometries,
-			// 		resources.geometries,
-			// 		this._ar1
-			// 	),
-			// 	attributes: diffSetsFastAndToArray(
-			// 		this._cachedResources.attributes,
-			// 		resources.attributes,
-			// 		this._ar2
-			// 	),
-			// 	textures: diffSetsFastAndToArray(
-			// 		this._cachedResources.textures,
-			// 		resources.textures,
-			// 		this._ar3
-			// 	),
-			// }
-
 			const removed = {
 				materials: this._cachedResources.materials,
 				geometries: this._cachedResources.geometries,
 				attributes: this._cachedResources.attributes,
 				textures: this._cachedResources.textures,
 			}
-
-			// create newly added resources
-			// &
-			// update resources
-			// &
-			// put everything in cache
-
-			// for (let i = 0; i < textures.length; i++) {
-			// 	const texture = textures[i]
-			// 	if (isCubeTexture(texture)) throw 'CubeTexture not implemented yet'
-			// 	this.convTexture(texture)
-			// }
-			// for (let i = 0; i < attributes.length; i++) {
-			// 	this.convAttr(attributes[i])
-			// }
-			// for (let i = 0; i < geometries.length; i++) {
-			// 	this.convGeom(geometries[i])
-			// }
-			// for (let i = 0; i < materials.length; i++) {
-			// 	this.convMatr(materials[i])
-			// }
 
 			resources.textures.forEach((texture) => {
 				if (isCubeTexture(texture)) throw 'CubeTexture not implemented yet'
@@ -420,9 +363,6 @@ export class ThreeLiteConverter implements Converter {
 					this._threeTex.get(texture)?.dispose()
 				})
 				// @note three only dispose geom
-				// removed.attributes.forEach((attribute) => {
-				// 	this._threeAttr.get(attribute)?.dispose()
-				// })
 				removed.geometries.forEach((geometry) => {
 					this._threeGeom.get(geometry)?.dispose()
 				})
@@ -472,18 +412,6 @@ export class ThreeLiteConverter implements Converter {
 			const rootThree = this.convMesh(root)
 			rootThree.children = []
 			// pre-order traversal, parents are handled before children
-			// traverse(root, (node, parent) => {
-			// 	// console.log('handle node')
-			// 	// skip root node
-			// 	if (parent) {
-			// 		// @note parent is cached before
-			// 		const parentThree = this._threeMesh.get(parent) as Object3D
-			// 		const currentThree = this.convMesh(node)
-			// 		// clear current children to handle removed nodes
-			// 		currentThree.children = []
-			// 		parentThree.children.push(currentThree)
-			// 	}
-			// })
 
 			if (this.config.keepTopology) {
 				for (let i = 0; i < flatScene.length; i++) {
@@ -505,7 +433,7 @@ export class ThreeLiteConverter implements Converter {
 					const node = flatScene[i]
 					if (isRenderableMesh(node)) {
 						const currentThree = this.convMesh(node)
-						currentThree.children = []
+						// currentThree.children = [] // it should always be empty, not need to empty it every time
 						// clear current children to handle removed nodes
 						rootThree.children.push(currentThree)
 					}
@@ -597,10 +525,10 @@ export class ThreeLiteConverter implements Converter {
 			threeMesh.visible = gsiMesh.visible && (gsiMesh.parent?.visible ?? true) // inherit visibility
 
 			// @note three doesn't use localMatrix at all. it's only for generating worldMatrix.
-			// threeMesh.matrix.elements = this.config.matrixProcessor.getLocalMatrix(gsiMesh)
+			// // threeMesh.matrix.elements = this.config.matrixProcessor.getLocalMatrix(gsiMesh)
 
 			// @note use cached matrices instead of dirty-checking every time.
-			// threeMesh.matrixWorld.elements = this.config.matrixProcessor.getWorldMatrix(gsiMesh)
+			// // threeMesh.matrixWorld.elements = this.config.matrixProcessor.getWorldMatrix(gsiMesh)
 
 			const matrix = this.config.matrixProcessor.getCachedWorldMatrix(gsiMesh)
 			if (matrix) {
@@ -1031,11 +959,6 @@ export class ThreeLiteConverter implements Converter {
 			committedVersion = gsiTexture.image.version
 			this._committedTex.set(gsiTexture, committedVersion)
 		}
-		// if (gsiTexture.image.version === -1) {
-		// 	threeTexture.needsUpdate = true
-		// } else {
-		// 	threeTexture.version = gsiTexture.image.version
-		// }
 
 		// sync parameters
 
@@ -1119,14 +1042,6 @@ export function getResources(root?: MeshDataType) {
 				if (mesh.material.extensions?.EXT_matr_programmable?.uniforms) {
 					const uniforms = mesh.material.extensions.EXT_matr_programmable.uniforms
 
-					// @note this is a little bit slower than Object.values
-					// Object.keys(uniforms).forEach((key) => {
-					// 	const uniformValue = uniforms[key].value
-					// 	if (isTexture(uniformValue) || isCubeTexture(uniformValue)) {
-					// 		textures.add(uniformValue)
-					// 	}
-					// })
-
 					const values = Object.values(uniforms)
 					for (let i = 0; i < values.length; i++) {
 						const uniformValue = values[i].value
@@ -1138,10 +1053,6 @@ export function getResources(root?: MeshDataType) {
 
 				// attributes
 				{
-					// @note this is a little bit slower than Object.values
-					// Object.keys(mesh.geometry.attributes).forEach((key) => {
-					// 	attributes.add(mesh.geometry.attributes[key])
-					// })
 					const values = Object.values(mesh.geometry.attributes)
 					for (let i = 0; i < values.length; i++) {
 						attributes.add(values[i])
