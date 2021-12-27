@@ -497,6 +497,7 @@ export class ThreeLiteConverter implements Converter {
 
 	/**
 	 * @note run after all the geometries and materials are cached
+	 * @note require parent to be handled before child, only work for top-down traversal
 	 */
 	private convMesh(gsiMesh: MeshDataType): RenderableObject3D | Object3D {
 		let threeMesh = this._threeMesh.get(gsiMesh) as RenderableObject3D | Object3D
@@ -570,7 +571,7 @@ export class ThreeLiteConverter implements Converter {
 				}
 			}
 
-			threeMesh.visible = gsiMesh.visible
+			threeMesh.visible = gsiMesh.visible && (gsiMesh.parent?.visible ?? true) // inherit visibility
 
 			// @note three doesn't use localMatrix at all. it's only for generating worldMatrix.
 			// threeMesh.matrix.elements = this.config.matrixProcessor.getLocalMatrix(gsiMesh)
