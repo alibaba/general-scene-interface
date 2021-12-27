@@ -126,3 +126,38 @@ export function flatten(node?: MeshDataType) {
 
 	return result
 }
+/**
+ * flatten a DAG into array in branch-first-search order (level be level)
+ * @param node
+ * @returns
+ */
+export function flattenBFS(root: MeshDataType) {
+	const levels = [] as MeshDataType[]
+
+	// level 0
+	let prevLevel = [root] as MeshDataType[]
+	levels.push(root)
+
+	// safe loop
+	const MAX_TREE_DEPTH = 2048
+	for (let level = 1; level < MAX_TREE_DEPTH; level++) {
+		// generate level
+		const currLevel = [] as MeshDataType[]
+		for (let i = 0; i < prevLevel.length; i++) {
+			const node = prevLevel[i]
+			node.children.forEach((child) => {
+				currLevel.push(child)
+				levels.push(child)
+			})
+		}
+
+		if (currLevel.length === 0) {
+			break
+		} else {
+			prevLevel = currLevel
+			// levels.push(prevLevel.slice())
+		}
+	}
+
+	return levels
+}

@@ -17,9 +17,9 @@ import { scene as threeScene } from '../__utils/LiteScene'
 {
 	const scene = generateScene({
 		// scale: 10000,
-		count: 64,
+		count: 4000,
 		depth: 10,
-		useAnimation: true,
+		// useAnimation: true,
 		resolution: [WIDTH, HEIGHT],
 	})
 	console.log(scene)

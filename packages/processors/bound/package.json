@@ -24,6 +24,7 @@
 		"@gs.i/processor-base": "^0.1.0-alpha",
 		"@gs.i/processor-matrix": "^0.1.0-alpha",
 		"@gs.i/utils-traverse": "^0.1.0-alpha",
+		"@gs.i/utils-math": "^0.0.0-beta",
 		"@gs.i/schema-scene": "^0.1.0-alpha"
 	},
 	"devDependencies": {

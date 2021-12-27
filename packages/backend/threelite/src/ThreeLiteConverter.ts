@@ -36,7 +36,7 @@ import { MatProcessor } from '@gs.i/processor-matrix'
 import { BoundingProcessor } from '@gs.i/processor-bound'
 import { CullingProcessor } from '@gs.i/processor-culling'
 import { diffSetsFast, diffSetsFastAndToArray, GraphProcessor } from '@gs.i/processor-graph'
-import { traverse, flatten } from '@gs.i/utils-traverse'
+import { traverse, flatten, flattenBFS } from '@gs.i/utils-traverse'
 
 import { syncMaterial } from './syncMaterial'
 import { syncTexture } from './syncTexture'
@@ -68,7 +68,9 @@ const defaultMatrixProcessor = new MatProcessor()
 /**
  * @note safe to share globally @simon
  */
-const defaultBoundingProcessor = new BoundingProcessor()
+const defaultBoundingProcessor = new BoundingProcessor({
+	matrixProcessor: defaultMatrixProcessor,
+})
 /**
  * @note safe to share globally @simon
  */
@@ -94,15 +96,15 @@ export const DefaultConfig = {
 	 * - if you don't transform the converted THREE.Object3D, you should leave this disabled
 	 *
 	 * #### if you keep this disabled (by default):
-	 * - Object3D.{position,quaternion,scale} will be initial values (0,0,0 or 1,1,1) and should not be used
-	 * - Object3D.matrix will be calculated from gsi-matrix-processor
+	 * - Object3D.{matrix,position,quaternion,scale} will be initial values (0,0,0 or 1,1,1 or identity matrix) and should not be used
+	 * - Object3D.matrixWorld will be calculated from gsi-matrix-processor
 	 * - Object3D.matrixAutoUpdate will be set to `false`, so that three.js won't automatically update the matrix from initial values.
 	 * - if you use `Object3D.updateMatrixWorld(true)` (force update), all matrices will be wrong
 	 * - if you use `Object3D.updateMatrix()` (manual update), that matrix will be wrong
 	 *
 	 * #### if you enable this:
 	 * - Object3D.{position,quaternion,scale} will be set correctly
-	 * - Object3D.matrix will be left undefined
+	 * - Object3D.matrix and Object3D.matrixWorld will be left as initial values
 	 * - everything else will be handled by three the usual way.
 	 *
 	 * #### so:
@@ -291,9 +293,13 @@ export class ThreeLiteConverter implements Converter {
 		// 		optimize with flatten tree
 		// 		it's quite expensive to traverse a tree multiple times
 		const flatScene = flatten(root)
+		// const flatScene = flattenBFS(root)
 
 		// update all the matrices
-		this.config.matrixProcessor.updateMatrixFlat(flatScene)
+		this.matrixProcessor.updateMatrixFlat(flatScene)
+
+		// // update bvh bounds
+		// this.boundingProcessor.updateBVHFlat(flatScene)
 
 		// check resources that require special handling
 		// #resource-stage
