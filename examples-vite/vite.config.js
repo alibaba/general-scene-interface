@@ -10,6 +10,10 @@ module.exports = defineConfig({
 	server: {
 		host: '0.0.0.0',
 		cors: true,
+		watch: {
+			// without this, vite will watch all files in node_modules
+			ignored: ['!**/node_modules/@gs.i/**'],
+		},
 	},
 })
 

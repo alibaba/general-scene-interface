@@ -211,6 +211,7 @@ export class MatProcessor extends Processor {
 
 	/**
 	 * flat version of {@link updateMatrix}
+	 * @note flatScene must be pre-order or BFS, can not be post-order
 	 */
 	updateMatrixFlat(flatScene: MeshDataType[]) {
 		for (let i = 0; i < flatScene.length; i++) {

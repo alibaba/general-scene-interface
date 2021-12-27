@@ -181,6 +181,14 @@ export class CullingProcessor extends Processor {
 
 		return cache.culling
 	}
+
+	/**
+	 * check if a mesh is culled by the frustum, using bvh bounds
+	 * @returns true if Culled (not visible, shouldn't render)
+	 */
+	// isBVHFrustumCulled(mesh: MeshDataType): boolean {
+
+	// }
 }
 
 class SchemaNotValid extends TypeError {
