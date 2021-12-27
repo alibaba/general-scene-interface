@@ -148,10 +148,11 @@ export const DefaultConfig = {
 
 	/**
 	 * whether to **try to** keep the shape of output scene graph
-	 * - by default the output scene will be flattened and optimized
+	 * - by default the output scene will be flattened and optimized,
+	 * 	 useless inode(non-renderable nodes) will be removed from output scene graph
 	 * - keep this disabled for best performance
-	 * - enable this doesn't promise the output tree has exactly same shape of input
-	 * - this may change the behaver of bounding and culling
+	 * - enabling this doesn't promise the output tree has exactly same shape of input
+	 * - TODO enabling this may change some behavers of bounding and culling
 	 */
 	keepTopology: false,
 
@@ -502,10 +503,12 @@ export class ThreeLiteConverter implements Converter {
 				// skip root node
 				for (let i = 1; i < flatScene.length; i++) {
 					const node = flatScene[i]
-					const currentThree = this.convMesh(node)
-					currentThree.children = []
-					// clear current children to handle removed nodes
-					rootThree.children.push(currentThree)
+					if (isRenderableMesh(node)) {
+						const currentThree = this.convMesh(node)
+						currentThree.children = []
+						// clear current children to handle removed nodes
+						rootThree.children.push(currentThree)
+					}
 				}
 			}
 
