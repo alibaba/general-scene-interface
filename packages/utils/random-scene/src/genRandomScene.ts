@@ -24,6 +24,8 @@ import {
 	TextureData,
 	ImageData,
 	Sampler,
+	Geom,
+	Attr,
 } from '@gs.i/frontend-sdk'
 
 import {
@@ -262,13 +264,16 @@ export function generateScene(config: Config = {}): Mesh {
 // export function updateScene(root: MeshDataType, config: Config): MeshDataType {}
 
 export function getMesh(config: Config): Mesh {
-	if (Math.random() < 0.2) {
+	if (Math.random() < 0.15) {
 		return buildGLine({
 			scale: config.scale || 100,
 			lines: 2,
 			linePoints: 6,
 			resolution: config.resolution || [1000, 1000],
 		})
+	}
+	if (Math.random() < 0.15) {
+		return buildPoints(config.scale)
 	}
 
 	const geom = getRandomBuilder()(config.scale ?? 1, config)
@@ -375,6 +380,9 @@ export function getTransform(
 	return transform
 }
 
+/**
+ * generate random GLine segments
+ */
 function buildGLine(options = { scale: 100, lines: 2, linePoints: 3, resolution: [1000, 1000] }) {
 	const { scale, lines, linePoints, resolution } = options
 	// gline
@@ -424,4 +432,39 @@ function buildGLine(options = { scale: 100, lines: 2, linePoints: 3, resolution:
 	geom.updateData({ positions, colors })
 
 	return gline
+}
+
+function buildPoints(scale = 100) {
+	const count = Math.round(Math.random() * 30)
+	const positions: number[] = []
+	for (let i = 0; i < count; i++) {
+		positions.push(Math.random() * scale - scale / 2)
+		positions.push(Math.random() * scale - scale / 2)
+		positions.push(Math.random() * scale - scale / 2)
+	}
+
+	const points = new Mesh()
+	points.geometry = new Geom({ mode: 'POINTS' })
+	points.geometry.attributes.position = new Attr(new Float32Array(positions), 3)
+
+	points.material = new MatrPoint({
+		size: Math.random() * scale * 0.2 + 1,
+		baseColorFactor: {
+			r: Math.random(),
+			g: Math.random(),
+			b: Math.random(),
+		},
+		baseColorTexture:
+			Math.random() > 0.5
+				? new TextureData(
+						{
+							imageSource:
+								'https://img.alicdn.com/imgextra/i3/O1CN01RbMgmM1DWAzg60GCD_!!6000000000223-0-tps-1024-1024.jpg',
+						},
+						{}
+				  )
+				: undefined,
+	})
+
+	return points
 }
