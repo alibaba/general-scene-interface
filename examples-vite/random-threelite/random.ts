@@ -20,6 +20,8 @@ import { scene as threeScene } from '../__utils/LiteScene'
 		count: 100,
 		depth: 10,
 		useAnimation: true,
+		useSprite: true,
+		usePoint: false,
 		resolution: [WIDTH, HEIGHT],
 	})
 	console.log(scene)

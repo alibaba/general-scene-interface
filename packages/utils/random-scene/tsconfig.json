@@ -23,6 +23,9 @@
 		},
 		{
 			"path": "../../frontend/gline"
+		},
+		{
+			"path": "../../frontend/sprite"
 		}
 	]
 }

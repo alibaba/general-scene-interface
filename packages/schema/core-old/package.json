@@ -1,6 +1,5 @@
 {
 	"name": "@gs.i/schema",
-	"private": true,
 	"version": "0.0.0-beta",
 	"description": "",
 	"main": "dist/index.js",

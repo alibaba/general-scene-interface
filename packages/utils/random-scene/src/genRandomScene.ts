@@ -40,6 +40,7 @@ import {
 } from '@gs.i/utils-geom-builders'
 
 import { GLine } from '@gs.i/frontend-gline'
+import { Sprite } from '@gs.i/frontend-sprite'
 
 const builderAlias = [
 	(scale: Double, config: Config) =>
@@ -276,6 +277,12 @@ export function getMesh(config: Config): Mesh {
 	if (config.usePoint && Math.random() < 0.15) {
 		return buildPoints(config.scale)
 	}
+	if (config.useSprite && Math.random() < 0.15) {
+		return buildSprite({
+			scale: config.scale || 100,
+			count: 10,
+		})
+	}
 
 	const geom = getRandomBuilder()(config.scale ?? 1, config)
 	const matr = getMatr(config)
@@ -466,4 +473,64 @@ function buildPoints(scale = 100) {
 	})
 
 	return points
+}
+
+function buildSprite(config = { scale: 100, count: 10 }) {
+	const { scale, count } = config
+	const positions: number[] = []
+	for (let i = 0; i < count; i++) {
+		positions.push(Math.random() * scale - scale / 2)
+		positions.push(Math.random() * scale - scale / 2)
+		positions.push(Math.random() * scale - scale / 2)
+	}
+
+	const offsets: number[] = []
+	for (let i = 0; i < count; i++) {
+		offsets.push(Math.random(), Math.random())
+	}
+
+	const scales: number[] = []
+	for (let i = 0; i < count; i++) {
+		scales.push(10 + Math.random() * 40)
+	}
+
+	const rotations: number[] = []
+	for (let i = 0; i < count; i++) {
+		rotations.push(Math.random() * Math.PI)
+	}
+
+	const useAttributeTransform = Math.random() > 0.5
+	const sprite = new Sprite({
+		sizeAttenuation: true,
+		uniformScale: { x: 50, y: 50 },
+		uniformOffset: { x: Math.random(), y: Math.random() },
+		uniformRotation: Math.random() * Math.PI,
+		useAttributeTransform,
+		dynamic: false,
+		disposable: false,
+		baseColorFactor: {
+			r: Math.random(),
+			g: Math.random(),
+			b: Math.random(),
+		},
+		baseColorTexture:
+			Math.random() > 0.5
+				? new TextureData(
+						{
+							imageSource:
+								'https://img.alicdn.com/imgextra/i3/O1CN01RbMgmM1DWAzg60GCD_!!6000000000223-0-tps-1024-1024.jpg',
+						},
+						{}
+				  )
+				: undefined,
+	})
+
+	sprite.updateData({
+		positions,
+		offsets,
+		scales,
+		rotations,
+	})
+
+	return sprite
 }

@@ -73,6 +73,9 @@
 		},
 		{
 			"path": "../packages/utils/random-scene"
+		},
+		{
+			"path": "../packages/frontend/sprite"
 		}
 	]
 }

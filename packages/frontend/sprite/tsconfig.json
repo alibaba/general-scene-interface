@@ -17,6 +17,9 @@
 		},
 		{
 			"path": "../ts"
+		},
+		{
+			"path": "../../utils/geometry"
 		}
 	]
 }
