@@ -19,10 +19,11 @@
 		"v": ""
 	},
 	"dependencies": {
+		"@gs.i/schema": "^0.0.0-beta",
 		"@gs.i/schema-scene": "^0.1.0-alpha",
-		"@gs.i/schema-ext-scene": "^0.0.0-beta",
 		"@gs.i/utils-math": "^0.0.0-beta",
 		"@gs.i/schema-converter": "^0.1.0-alpha",
+		"@gs.i/schema-ext-scene": "^0.0.0-beta",
 		"@gs.i/utils-geom-builders": "^0.1.0-alpha",
 		"@gs.i/utils-geometry": "^0.1.0-alpha",
 		"@gs.i/utils-gltf2": "^0.1.0-alpha",

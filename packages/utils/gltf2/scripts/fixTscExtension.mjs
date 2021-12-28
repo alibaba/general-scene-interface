@@ -65,7 +65,7 @@ async function editFile(file) {
 				moduleName.endsWith('.bin')
 			)
 		) {
-			console.log('find:', match)
+			// console.log('find:', match)
 			// 本地引用需要添加后缀名
 			// 检查被引用的模块是否存在
 
@@ -95,7 +95,7 @@ async function editFile(file) {
 			const newModuleName = moduleName + extension
 
 			const replacement = before + newModuleName + after
-			console.log('---->', replacement)
+			// console.log('---->', replacement)
 			return replacement
 		} else {
 			return match

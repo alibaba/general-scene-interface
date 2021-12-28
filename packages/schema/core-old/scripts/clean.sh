@@ -5,6 +5,6 @@
 
 pwd
 
-rm -f ./tsconfig.tsbuildinfo && rm -rf ./dist
+rm -rf tsconfig.build.tsbuildinfo && rm -f ./tsconfig.tsbuildinfo && rm -rf ./dist && rm -rf .cached-built-head
 
-echo "warn: A rebuild is nessesary!"
+# echo "warn: A rebuild is nessesary!"
