@@ -53,7 +53,9 @@ const DefaultData = {
 /**
  * Buffer长度不应该需要用户管理，应该自动根据需要扩大，只扩大不缩小
  */
-
+/**
+ * @deprecated
+ */
 export class GLineGeom implements GeomDataType {
 	mode: 'TRIANGLES' | 'LINES' | 'POINTS' | 'SPRITE'
 	attributes: { [key: string]: AttributeDataType }

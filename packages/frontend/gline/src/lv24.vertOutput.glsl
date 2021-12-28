@@ -111,5 +111,5 @@ result.xy += offset.xy;
 glPosition = result; // gl 自动进行perspective division转换为真正的屏幕坐标
 
 #ifdef USE_COLORS
-    vColor4 = color;
+    vColor4 = color / 255.0;
 #endif

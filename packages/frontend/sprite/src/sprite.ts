@@ -10,8 +10,15 @@ import {
 	TypedArray,
 	AttributeDataType,
 	MatrSpriteDataType,
+	BBox,
+	BSphere,
+	Transform2,
+	ColorRGB,
+	TextureType,
 } from '@gs.i/schema-scene'
-import { Box3, Sphere, Vector2, Vector3 } from '@gs.i/utils-math'
+import { Box3, Sphere, Vector3 } from '@gs.i/utils-math'
+import { Mesh, MatrSprite } from '@gs.i/frontend-sdk'
+import { SpriteData, SpriteGeom } from './SpriteGeom'
 
 const sqrt2 = 1.414214
 const infinityBox = new Box3().set(
@@ -19,10 +26,131 @@ const infinityBox = new Box3().set(
 	new Vector3(+Infinity, +Infinity, +Infinity)
 )
 
-export function generateGsiSpriteInfo(
-	geom: GeomDataType,
-	matr: MatrSpriteDataType | undefined
-): void {
+export interface SpriteConfig {
+	/**
+	 *
+	 */
+	sizeAttenuation: boolean
+
+	/**
+	 * Whether to use attribute transforms (offset/scale/rotation)
+	 */
+	useAttributeTransform: boolean
+
+	/**
+	 * @default {r:1, g:1, b: 1}
+	 */
+	baseColorFactor?: ColorRGB
+
+	/**
+	 *
+	 */
+	baseColorTexture?: TextureType
+
+	/**
+	 *
+	 */
+	transform?: Transform2
+
+	/**
+	 *
+	 */
+	depthTest?: boolean
+
+	/**
+	 *
+	 */
+	dynamic?: boolean
+
+	/**
+	 *
+	 */
+	disposable?: boolean
+}
+
+export const defaultConfig: SpriteConfig = {
+	sizeAttenuation: false,
+	useAttributeTransform: false,
+	depthTest: true,
+	dynamic: false,
+	disposable: false,
+}
+
+/**
+ * GSI Sprite
+ */
+export class Sprite extends Mesh {
+	readonly config: SpriteConfig
+	geometry: SpriteGeom
+	material: MatrSprite
+
+	constructor(config: Partial<SpriteConfig>) {
+		super()
+		this.config = {
+			...defaultConfig,
+			...config,
+		}
+		this.geometry = new SpriteGeom(this.config)
+		this.material = new MatrSprite({
+			sizeAttenuation: this.config.sizeAttenuation,
+			baseColorFactor: this.config.baseColorFactor,
+			baseColorTexture: this.config.baseColorTexture,
+			transform: this.config.transform,
+		})
+		this.material.extensions = {
+			EXT_matr_programmable_sprite: {
+				vertSpriteGeometry: '',
+			},
+			EXT_sprite_attributes: {
+				offset: 'aOffset',
+				scale: 'aScale',
+				rotation: 'aRotation',
+			},
+			EXT_matr_advanced: {
+				depthTest: this.config.depthTest,
+			},
+			EXT_matr_programmable: {
+				language: 'GLSL100',
+				extension: '',
+				defines: {},
+				uniforms: {},
+			},
+		}
+	}
+
+	updateData(
+		data: SpriteData,
+		bounds: {
+			box?: BBox
+			sphere?: BSphere
+		} = {}
+	) {
+		return this.geometry.updateData(data, bounds)
+	}
+
+	updateSubData(
+		data: Partial<SpriteData>,
+		/**
+		 * sprite count offset
+		 */
+		offset: number,
+		/**
+		 * sprite count length
+		 */
+		length: number,
+		/**
+		 * user input bounds
+		 */
+		bounds: {
+			box?: BBox
+			sphere?: BSphere
+		} = {}
+	) {
+		return this.geometry.updateSubData(data, offset, length, bounds)
+	}
+}
+
+function generateGsiSpriteInfo(geom: GeomDataType, matr: MatrSpriteDataType | undefined): void {
 	if (geom.mode !== 'SPRITE' || !matr) {
 		console.error('Geometry type is not `SPRITE` or Material is not valid, do nothing')
 		return

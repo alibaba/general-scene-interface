@@ -386,13 +386,15 @@ export function getTransform(
  */
 function buildGLine(options = { scale: 100, lines: 2, linePoints: 3, resolution: [1000, 1000] }) {
 	const { scale, lines, linePoints, resolution } = options
-	// gline
 	const gline = new GLine({
 		level: Math.random() > 0.5 ? 2 : 4,
 		dynamic: true,
 		u: true,
-		color: { r: 1, g: 0.4, b: 0.1 },
-		opacity: Math.random(),
+		positionsDisposable: true,
+		colorsDisposable: true,
+		color: { r: Math.random(), g: Math.random(), b: Math.random() },
+		transparent: true,
+		opacity: 0.2 + Math.random() * 0.8,
 		lineWidth: scale / 20.0,
 		usePerspective: false,
 		resolution: { x: resolution[0], y: resolution[1] },
@@ -411,11 +413,7 @@ function buildGLine(options = { scale: 100, lines: 2, linePoints: 3, resolution:
 		infinity: 99999999.999,
 		depthTest: true,
 		renderOrder: 0,
-		// transparent: false,
-		// alphaTest: 0.3,
 	})
-	const geom = gline.geometry
-	const matr = gline.material
 
 	const positions: number[][] = []
 	const colors: number[][] = []
@@ -424,13 +422,13 @@ function buildGLine(options = { scale: 100, lines: 2, linePoints: 3, resolution:
 		const lineColors: number[] = []
 		for (let point = 0; point < linePoints; point++) {
 			linePositions.push(Math.random() * scale, Math.random() * scale, Math.random() * scale)
-			lineColors.push(Math.random(), Math.random(), Math.random(), Math.random())
+			lineColors.push(Math.random(), Math.random(), Math.random(), 0.2 + Math.random() * 0.8)
 		}
 		positions.push(linePositions)
 		colors.push(lineColors)
 	}
 
-	geom.updateData({ positions, colors })
+	gline.updateData({ positions, colors })
 
 	return gline
 }

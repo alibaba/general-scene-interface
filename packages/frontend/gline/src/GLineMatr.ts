@@ -128,7 +128,7 @@ export class GLineMatr extends MatrUnlit {
 				USE_PERSPECTIVE: _config.usePerspective ?? false,
 				USE_COLORS: _config.useColors ?? false,
 				USE_TEXTURE: _config.texture && true,
-				USE_ALPHA_TEST: _config.alphaTest !== undefined && _config.alphaTest > 0,
+				// USE_ALPHA_TEST: _config.alphaTest !== undefined && _config.alphaTest > 0,
 			},
 			uniforms: {
 				uColor: { value: _config.color ?? { x: 0.5, y: 0.5, z: 0.5 } },

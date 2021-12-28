@@ -180,7 +180,7 @@ export interface Transform2Matrix extends Versioned {
 	rotation?: never
 	scale?: never
 	/**
-	 * @default [1, 0, 0, 0, 1, 0, 0, 0, 1] // identity 3x3 matrix
+	 * @default {number[]} [1, 0, 0, 0, 1, 0, 0, 0, 1] // identity 3x3 matrix
 	 */
 	matrix: Matrix
 }

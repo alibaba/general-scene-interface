@@ -1,9 +1,10 @@
+import { TypedArray } from '@gs.i/schema-scene'
 /**
  * Copyright (C) 2021 Alibaba Group Holding Limited
  * All rights reserved.
  */
 
-import { GeomDataType, AttributeDataType, isDISPOSED, BBox, BSphere } from '@gs.i/schema-scene'
+import { GeomDataType, isDISPOSED, BBox, BSphere, DISPOSED } from '@gs.i/schema-scene'
 import { Geom, Attr } from '@gs.i/frontend-sdk'
 import { Vector3, Box3, Sphere } from '@gs.i/utils-math'
 import * as GeomUtil from './GeomUtil'
@@ -33,6 +34,13 @@ export interface GLineGeomConfig {
 	 */
 	infinity: number
 
+	/**
+	 * Whether the geometry attributes can be disposed after uploading to GPU
+	 */
+	positionsDisposable: boolean
+
+	colorsDisposable: boolean
+
 	// maxPointsCount: number
 	// color: true,
 }
@@ -42,6 +50,8 @@ export const DefaultGeomConfig: GLineGeomConfig = {
 	dynamic: true,
 	u: true,
 	infinity: 99999999.999,
+	positionsDisposable: false,
+	colorsDisposable: false,
 	// maxPointsCount: 1,
 	// color: true,
 }
@@ -106,82 +116,8 @@ export class GLineGeom extends Geom {
 		}
 
 		this._bufferPointCount = 0
-
-		// this.data = DEFAULT_DATE;
 		this.segments = GeomUtil.getSegments([])
 		this.segmentProperty = GeomUtil.getSegmentProperty(this.segments)
-
-		// this.updateData(DefaultData)
-		// this._makeBuffers();
-		// this._makeAttributes();
-	}
-
-	// 仅当Buffer不存在或者体积需要放大时才重新创建Buffer
-	// @NOTE 由于mag是不应该变化的，这里没有必要区分position和其他
-	private _makeBuffers() {
-		const pointCount = this.segmentProperty.pointCount
-		const mag = this.config.mag
-
-		this.buffers.position = new Float32Array((pointCount * 3 + 2 * 3) * mag)
-		// @NOTE: GL2 支持 int
-		this.buffers.side = new Float32Array(pointCount * mag)
-		// 下面的不是必需的，但是会影响updateConfig判断进而严重影响代码整洁
-		this.buffers.u = new Float32Array(pointCount * mag)
-		this.buffers.color = new Float32Array(pointCount * 4 * mag)
-
-		if (!this.usePoint) {
-			this.buffers.index = new Uint32Array((pointCount - 1) * 2 * 3)
-		} else {
-			// 画线和三角形时，默认值全是0，因为重合点会导致图元坍塌
-			// 然而画点是没有坍塌问题，只能主动移除绘制区域
-			// NOTE: 应该交给外部处理，GLine给什么画什么
-			// this.buffers.position.fill(this.config.infinity)
-		}
-	}
-
-	private _makeAttributes() {
-		const pointCount = this.segmentProperty.pointCount
-		const mag = this.config.mag
-		const BPE = Float32Array.BYTES_PER_ELEMENT // 每个元素的字节长度
-		const vLength = pointCount * 3 * mag // 每个数组数据长度
-
-		// @done @NOTE 这里一开始的BufferView是错误的，没有去掉头尾的Buffer
-		const prevArray = new Float32Array(this.buffers.position.buffer, 0, vLength)
-		const currArray = new Float32Array(this.buffers.position.buffer, 3 * mag * BPE, vLength)
-		const nextArray = new Float32Array(this.buffers.position.buffer, 3 * mag * 2 * BPE, vLength)
-
-		this.attributes.prev = new Attr(prevArray, 3, false, 'STATIC_DRAW')
-		this.attributes.curr = new Attr(currArray, 3, false, 'STATIC_DRAW')
-		this.attributes.next = new Attr(nextArray, 3, false, 'STATIC_DRAW')
-		this.attributes.color = new Attr(this.buffers.color, 4, false, 'STATIC_DRAW')
-		this.attributes.side = new Attr(this.buffers.side, 1, false, 'STATIC_DRAW')
-		this.attributes.u = new Attr(this.buffers.u, 1, false, 'STATIC_DRAW')
-		!this.usePoint && (this.indices = new Attr(this.buffers.index, 1, false, 'STATIC_DRAW'))
-
-		this.attributes.prev.disposable = false
-		this.attributes.curr.disposable = false
-		this.attributes.next.disposable = false
-		this.attributes.color.disposable = false
-		this.attributes.side.disposable = false
-		this.attributes.u.disposable = false
-		!this.usePoint && (this.indices.disposable = false)
-
-		// 动态属性
-		if (this.config.dynamic) {
-			this.attributes.curr.usage = 'DYNAMIC_DRAW'
-			this.attributes.prev.usage = 'DYNAMIC_DRAW'
-			this.attributes.next.usage = 'DYNAMIC_DRAW'
-			this.attributes.color.usage = 'DYNAMIC_DRAW'
-			this.attributes.side.usage = 'DYNAMIC_DRAW'
-			this.attributes.u.usage = 'DYNAMIC_DRAW'
-			!this.usePoint && (this.indices.usage = 'DYNAMIC_DRAW')
-		}
-
-		if (this.usePoint) {
-			// 无index的情况下，THREE和GL2通过position的长度来判断drawCount
-			/** @NOTE */
-			this.attributes.position = this.attributes.curr
-		}
 	}
 
 	/**
@@ -204,7 +140,7 @@ export class GLineGeom extends Geom {
 
 	/**
 	 * 分片更新数据
-	 * @DONE 如果连续传入多次subdata，需要合并updateRange
+	 * @DONE 如果连续传入多次sub data，需要合并updateRange
 	 */
 	updateSubData(
 		data,
@@ -226,8 +162,8 @@ export class GLineGeom extends Geom {
 		if (length < 1) {
 			return
 		}
-		if (length > this._bufferPointCount) {
-			console.error('buffer溢出')
+		if (length + offset > this._bufferPointCount) {
+			console.error('buffer length overflow')
 			return
 		}
 
@@ -265,22 +201,13 @@ export class GLineGeom extends Geom {
 				newCount = newRight - newStart
 			}
 
-			// console.log(data, offset, length, newOffset, newCount);
-
-			// this.attributes.curr.count = pointCount * mag
 			this.attributes.curr.version++
 			this.attributes.curr.updateRanges = [{ start: newStart, count: newCount }]
 
-			// this.attributes.prev.count = pointCount * mag
 			this.attributes.prev.version++
-			// this.attributes.prev.updateRange.offset = newStart
-			// this.attributes.prev.updateRange.count = newCount
 			this.attributes.prev.updateRanges = [{ start: newStart, count: newCount }]
 
-			// this.attributes.next.count = pointCount * mag
 			this.attributes.next.version++
-			// this.attributes.next.updateRange.offset = newStart
-			// this.attributes.next.updateRange.count = newCount
 			this.attributes.next.updateRanges = [{ start: newStart, count: newCount }]
 
 			// Update bbox/bsphere
@@ -300,7 +227,9 @@ export class GLineGeom extends Geom {
 			if (mag === 1) {
 				updateVertex = GeomUtil.updateVertexTurbo41
 			}
-			updateVertex(this.attributes.color.array, dimReduce(data.colors), offset, length)
+			const flatColors = dimReduce(data.colors)
+			const uint8Colors = flatColors.map((val) => Math.round(val * 255))
+			updateVertex(this.attributes.color.array, uint8Colors, offset, length)
 
 			// 合并updateRange
 			let newStart, newCount
@@ -319,8 +248,6 @@ export class GLineGeom extends Geom {
 				newCount = newRight - newStart
 			}
 
-			// this.attributes.color.count = pointCount * mag
-			// this.attributes.color.needsUpdate = true
 			this.attributes.color.version++
 			this.attributes.color.updateRanges = [{ start: newStart, count: newCount }]
 		}
@@ -379,21 +306,6 @@ export class GLineGeom extends Geom {
 			this.attributes.curr.version++
 			this.attributes.prev.version++
 			this.attributes.next.version++
-
-			// this.attributes.curr.count = pointCount * mag
-			// this.attributes.curr.needsUpdate = true
-			// this.attributes.curr.updateRange.offset = newOffset;
-			// this.attributes.curr.updateRange.count = newCount;
-
-			// this.attributes.prev.count = pointCount * mag
-			// this.attributes.prev.needsUpdate = true
-			// this.attributes.prev.updateRange.offset = newOffset;
-			// this.attributes.prev.updateRange.count = newCount;
-
-			// this.attributes.next.count = pointCount * mag
-			// this.attributes.next.needsUpdate = true
-			// this.attributes.next.updateRange.offset = newOffset;
-			// this.attributes.next.updateRange.count = newCount;
 		}
 
 		if (arrayIsNotEmpty(data.colors)) {
@@ -516,72 +428,114 @@ export class GLineGeom extends Geom {
 				),
 			sphere: bounds.sphere ?? new Sphere(new Vector3(), Infinity),
 		}
+	}
 
-		// const box = this.boundingBox ?? new Box3()
-		// const v = new Vector3()
-		// for (let i = 0; i < positions.length; i++) {
-		// 	const posArr = positions[i]
-		// 	for (let j = 0; j < posArr.length; j += 3) {
-		// 		v.set(posArr[j + 0], posArr[j + 1], posArr[j + 2])
-		// 		box.expandByPoint(v)
-		// 	}
-		// }
-		// const size = new Vector3()
-		// box.getSize(size)
-		// if (size.x === 0 && size.y === 0 && size.z === 0) {
-		// 	this.boundingBox = InfinityBox.clone()
-		// 	return
-		// }
-		// this.boundingBox = box
+	// 仅当Buffer不存在或者体积需要放大时才重新创建Buffer
+	// @NOTE 由于mag是不应该变化的，这里没有必要区分position和其他
+	private _makeBuffers() {
+		const pointCount = this.segmentProperty.pointCount
+		const mag = this.config.mag
 
-		// if (!this.boundingBox) {
-		// 	this.updateBBox(positions)
-		// }
-		// const bbox = this.boundingBox as BBox
-		// const sphere = new Sphere()
-		// const v = new Vector3()
-		// let maxRadiusSq = 0
+		this.buffers.position = new Float32Array((pointCount * 3 + 2 * 3) * mag)
 
-		// const center = sphere.center
-		// center
-		// 	.set(bbox.min.x + bbox.max.x, bbox.min.y + bbox.max.y, bbox.min.z + bbox.max.z)
-		// 	.multiplyScalar(0.5)
+		// @NOTE: GL2 支持 int
+		// @NOTE side values are between [-10, 30], use an Int8Array is enough
+		// this.buffers.side = new Float32Array(pointCount * mag)
+		this.buffers.side = new Int8Array(pointCount * mag)
 
-		// for (let i = 0; i < positions.length; i++) {
-		// 	const posArr = positions[i]
-		// 	for (let j = 0; j < posArr.length; j += 3) {
-		// 		v.set(posArr[j + 0], posArr[j + 1], posArr[j + 2])
-		// 		// Try to find sphere radius less than BBox diagonal
-		// 		maxRadiusSq = Math.max(maxRadiusSq, center.distanceToSquared(v))
-		// 	}
-		// }
+		// 下面的不是必需的，但是会影响updateConfig判断进而严重影响代码整洁
+		this.buffers.u = new Float32Array(pointCount * mag)
+		// this.buffers.color = new Float32Array(pointCount * 4 * mag)
+		this.buffers.color = new Uint8Array(pointCount * 4 * mag)
 
-		// const min = new Vector3().copy(bbox.min as Vector3)
-		// const max = new Vector3().copy(bbox.max as Vector3)
-		// const boxDiag = min.distanceTo(max) * 0.5
+		const maxIndex = pointCount * mag
+		if (!this.usePoint) {
+			const indexLen = (pointCount - 1) * 2 * 3
+			if (maxIndex > 65535) {
+				this.buffers.index = new Uint32Array(indexLen)
+			} else if (maxIndex > 255) {
+				this.buffers.index = new Uint16Array(indexLen)
+			} else {
+				this.buffers.index = new Uint8Array(indexLen)
+			}
+		} else {
+			// 画线和三角形时，默认值全是0，因为重合点会导致图元坍塌
+			// 然而画点是没有坍塌问题，只能主动移除绘制区域
+			// NOTE: 应该交给外部处理，GLine给什么画什么
+			// this.buffers.position.fill(this.config.infinity)
+		}
+	}
 
-		// // Choose the smaller one: box diagonal, sphere radius
-		// sphere.radius = Math.min(Math.sqrt(maxRadiusSq), boxDiag)
-		// if (sphere.radius <= 0) {
-		// 	this.boundingSphere = InfinitySphere.clone()
-		// 	return
-		// }
-		// this.boundingSphere = sphere
+	private _makeAttributes() {
+		const pointCount = this.segmentProperty.pointCount
+		const mag = this.config.mag
+		const BPE = Float32Array.BYTES_PER_ELEMENT // 每个元素的字节长度
+		const vLength = pointCount * 3 * mag // 每个数组数据长度
+
+		// @done @NOTE 这里一开始的BufferView是错误的，没有去掉头尾的Buffer
+		const prevArray = new Float32Array(this.buffers.position.buffer, 0, vLength)
+		const currArray = new Float32Array(this.buffers.position.buffer, 3 * mag * BPE, vLength)
+		const nextArray = new Float32Array(this.buffers.position.buffer, 3 * mag * 2 * BPE, vLength)
+
+		this.attributes.prev = new Attr(prevArray, 3, false, 'STATIC_DRAW')
+		this.attributes.curr = new Attr(currArray, 3, false, 'STATIC_DRAW')
+		this.attributes.next = new Attr(nextArray, 3, false, 'STATIC_DRAW')
+		this.attributes.color = new Attr(this.buffers.color, 4, false, 'STATIC_DRAW')
+		this.attributes.side = new Attr(this.buffers.side, 1, false, 'STATIC_DRAW')
+		this.attributes.u = new Attr(this.buffers.u, 1, false, 'STATIC_DRAW')
+		!this.usePoint && (this.indices = new Attr(this.buffers.index, 1, false, 'STATIC_DRAW'))
+
+		// 动态属性
+		if (this.config.dynamic) {
+			this.attributes.curr.usage = 'DYNAMIC_DRAW'
+			this.attributes.prev.usage = 'DYNAMIC_DRAW'
+			this.attributes.next.usage = 'DYNAMIC_DRAW'
+			this.attributes.color.usage = 'DYNAMIC_DRAW'
+			this.attributes.side.usage = 'DYNAMIC_DRAW'
+			this.attributes.u.usage = 'DYNAMIC_DRAW'
+			!this.usePoint && (this.indices.usage = 'DYNAMIC_DRAW')
+		}
+
+		// disposable
+		const positionDisposable = this.config.positionsDisposable
+		const colorDisposable = this.config.colorsDisposable
+		this.attributes.prev.disposable = positionDisposable
+		this.attributes.curr.disposable = positionDisposable
+		this.attributes.next.disposable = positionDisposable
+		this.attributes.color.disposable = colorDisposable
+		this.attributes.side.disposable = positionDisposable
+		this.attributes.u.disposable = positionDisposable
+		!this.usePoint && (this.indices.disposable = positionDisposable)
+		if (positionDisposable) {
+			this.buffers.position = DISPOSED
+			this.buffers.side = DISPOSED
+			this.buffers.u = DISPOSED
+			this.buffers.index = DISPOSED
+		}
+		if (colorDisposable) {
+			this.buffers.color = DISPOSED
+		}
+
+		if (this.usePoint) {
+			// 无index的情况下，THREE和GL2通过position的长度来判断drawCount
+			/** @NOTE */
+			this.attributes.position = this.attributes.curr
+		}
 	}
 }
 
 // 数组降维
-function dimReduce(array) {
+function dimReduce(array: (any[] | TypedArray)[]) {
 	// if (array[0] === undefined) {
 	//     console.warn('尝试更新空数组');
 	//     return array;
 	// }
 
-	let linearArray
+	let linearArray: any[]
 	if (Array.isArray(array[0])) {
-		linearArray = concatTurbo(array)
-	} else if (array[0].BYTES_PER_ELEMENT) {
-		linearArray = concatTypedArray(array)
+		linearArray = concatTurbo(array as any[][])
+	} else if (array[0]['BYTES_PER_ELEMENT']) {
+		linearArray = concatTypedArray(array as TypedArray[])
 	} else {
 		linearArray = array
 	}
@@ -601,7 +555,11 @@ function concatTurbo(arrays: any[][]) {
 	return result
 }
 
-function concatTypedArray(arrays) {
+function concatTypedArray(arrays: TypedArray[]) {
+	if (arrays.length === 0) {
+		throw 'Array has no elements'
+	}
+
 	let length = 0
 	const offsets = [0]
 	arrays.forEach((array) => {
@@ -609,7 +567,8 @@ function concatTypedArray(arrays) {
 		offsets.push(length)
 	})
 
-	const result = new arrays[0].constructor(length)
+	const constructor = arrays[0].constructor as any
+	const result = new constructor(length)
 	for (let i = 0; i < arrays.length; i++) {
 		result.set(arrays[i], offsets[i])
 	}

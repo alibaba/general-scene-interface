@@ -90,7 +90,7 @@ export class IndicatorProcessor extends Processor {
 				indicator.name = 'Indicator:BSphere'
 				indicator.geometry = genBSphereWireframe(
 					this.config.boundingProcessor.getGeomBoundingSphere(geometry),
-					24
+					12
 				)
 				indicator.material = new MatrUnlit({
 					baseColorFactor: HSVtoRGB(Math.random(), 1, 1),

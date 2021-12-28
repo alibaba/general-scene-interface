@@ -6,7 +6,7 @@
 import { Mesh } from '@gs.i/frontend-sdk'
 import { GLineGeom } from './GLineGeom'
 import { GLineMatr, GLinePointMatr } from './GLineMatr'
-import { ColorRGB, TextureType, Vec2 } from '@gs.i/schema-scene'
+import { BBox, BSphere, ColorRGB, TextureType, Vec2 } from '@gs.i/schema-scene'
 
 export interface DefaultGLineConfig {
 	/**
@@ -60,7 +60,15 @@ export interface DefaultGLineConfig {
 	 */
 	depthTest?: boolean
 
-	alphaTest?: number
+	/**
+	 * Dispose positions/u/indices attributes after uploading to GPU
+	 */
+	positionsDisposable?: boolean
+
+	/**
+	 * Dispose colors attribute after uploading to GPU
+	 */
+	colorsDisposable?: boolean
 
 	renderOrder?: number
 }
@@ -76,6 +84,8 @@ export const DefaultConfig: DefaultGLineConfig = {
 	resolution: { x: 500, y: 500 },
 	useColors: false,
 	texture: undefined,
+	positionsDisposable: false,
+	colorsDisposable: false,
 	pointSize: 5,
 	depthTest: true,
 	renderOrder: 0,
@@ -93,6 +103,7 @@ export class GLine extends Mesh {
 
 	material: GLineMatr | GLinePointMatr
 	geometry: GLineGeom
+
 	extensions: Exclude<Mesh['extensions'], undefined> = {}
 
 	constructor(props: DefaultGLineConfig) {
@@ -125,6 +136,34 @@ export class GLine extends Mesh {
 		} else {
 			this.material = new GLineMatr(this.config)
 		}
+	}
+
+	updateData(
+		data,
+		bounds: {
+			box?: BBox
+			sphere?: BSphere
+		} = {}
+	) {
+		if (this.geometry) {
+			return this.geometry.updateData(data, bounds)
+		}
+		throw new Error('GLine - no geometry found')
+	}
+
+	updateSubData(
+		data,
+		offset,
+		length,
+		bounds: {
+			box?: BBox
+			sphere?: BSphere
+		} = {}
+	) {
+		if (this.geometry) {
+			return this.geometry.updateSubData(data, offset, length, bounds)
+		}
+		throw new Error('GLine - no geometry found')
 	}
 
 	static get Geometry() {

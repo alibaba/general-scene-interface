@@ -85,7 +85,7 @@ export const DefaultConfig: DefaultGLineConfig = {
 /**
  * GLine
  * 继承GSI-Mesh, 可以直接被加入gsi场景中
- * @extends Mesh
+ * @deprecated
  */
 export class GLine extends Mesh {
 	config: any

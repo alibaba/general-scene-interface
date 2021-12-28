@@ -19,6 +19,9 @@ const infinityBox = new Box3().set(
 	new Vector3(+Infinity, +Infinity, +Infinity)
 )
 
+/**
+ * @deprecated
+ */
 export function generateGsiSpriteInfo(
 	geom: GeomDataType,
 	matr: MatrSpriteDataType | undefined

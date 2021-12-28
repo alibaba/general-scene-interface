@@ -96,6 +96,7 @@ const MatrProps = {
 
 /**
  * GLineMaterial
+ * @deprecated
  */
 export class GLineMatr implements MatrUnlitDataType {
 	get type() {
