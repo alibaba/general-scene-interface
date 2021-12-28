@@ -396,7 +396,7 @@ function buildGLine(options = { scale: 100, lines: 2, linePoints: 3, resolution:
 		transparent: true,
 		opacity: 0.2 + Math.random() * 0.8,
 		lineWidth: scale / 20.0,
-		usePerspective: false,
+		usePerspective: Math.random() > 0.5,
 		resolution: { x: resolution[0], y: resolution[1] },
 		useColors: Math.random() > 0.5,
 		texture:

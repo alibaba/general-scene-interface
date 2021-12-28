@@ -98,23 +98,23 @@ export class Sprite extends Mesh {
 			transform: this.config.transform,
 		})
 		this.material.extensions = {
-			EXT_matr_programmable_sprite: {
-				vertSpriteGeometry: '',
-			},
-			EXT_sprite_attributes: {
-				offset: 'aOffset',
-				scale: 'aScale',
-				rotation: 'aRotation',
-			},
+			EXT_matr_programmable_sprite: {},
+			EXT_sprite_attributes: {},
 			EXT_matr_advanced: {
 				depthTest: this.config.depthTest,
 			},
 			EXT_matr_programmable: {
-				language: 'GLSL100',
+				language: 'GLSL300',
 				extension: '',
 				defines: {},
 				uniforms: {},
 			},
+		}
+		if (this.config.useAttributeTransform) {
+			this.material.extensions.EXT_sprite_attributes.offset = 'aOffset'
+			this.material.extensions.EXT_sprite_attributes.scale = 'aScale'
+			this.material.extensions.EXT_sprite_attributes.rotation = 'aRotation'
+			this.material.extensions.EXT_matr_programmable_sprite.vertSpriteGeometry = ``
 		}
 	}
 
