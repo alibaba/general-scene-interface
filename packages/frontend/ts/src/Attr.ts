@@ -3,11 +3,21 @@
  * All rights reserved.
  */
 
-import { TypedArray, AttributeDataType, DISPOSED, isDISPOSED } from '@gs.i/schema-scene'
+import {
+	TypedArray,
+	AttributeBaseDataType,
+	AttributeVec3DataType,
+	AttributeVec2DataType,
+	AttributeScalarDataType,
+	AttributeVec4DataType,
+	DISPOSED,
+	isDISPOSED,
+} from '@gs.i/schema-scene'
 import { specifyAttribute } from '@gs.i/utils-specify'
 
-export interface Attr extends AttributeDataType {}
-export class Attr implements AttributeDataType {
+export interface Attr<T extends AttributeBaseDataType['itemSize']> extends AttributeBaseDataType {}
+export class Attr<T extends AttributeBaseDataType['itemSize']> implements AttributeBaseDataType {
+	itemSize: T
 	/**
 	 * array.length / itemSize
 	 */
@@ -31,7 +41,7 @@ export class Attr implements AttributeDataType {
 
 	constructor(
 		array: TypedArray,
-		itemSize: AttributeDataType['itemSize'],
+		itemSize: T,
 		normalized = false,
 		usage: 'STATIC_DRAW' | 'DYNAMIC_DRAW' = 'STATIC_DRAW'
 	) {
@@ -48,7 +58,7 @@ export class Attr implements AttributeDataType {
  * TODO delete this
  * @deprecated
  */
-export function isAttrExisting(attr: AttributeDataType | undefined) {
+export function isAttrExisting(attr: AttributeBaseDataType | undefined) {
 	if (!attr) return false
 	if (isDISPOSED(attr.array) || attr.count === 0) return false
 	return true

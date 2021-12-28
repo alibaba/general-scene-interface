@@ -57,7 +57,7 @@ export interface Programable {
 	 * @glsl uniform TYPE name;
 	 * @default {}
 	 */
-	uniforms: { [name: string]: UniformDataType }
+	uniforms: { [name: string]: UniformDataType | undefined }
 
 	/**
 	 * attributes declaration

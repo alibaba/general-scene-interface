@@ -6,6 +6,10 @@ uniform vec2 uSize;
 varying vec2 vUv;
 uniform mat3 uvTransform;
 #include <common>
+// fix three.js
+#ifndef USE_UV
+#define USE_UV
+#endif
 // #include <uv_pars_fragment>
 #include <map_pars_fragment>
 #include <alphamap_pars_fragment>

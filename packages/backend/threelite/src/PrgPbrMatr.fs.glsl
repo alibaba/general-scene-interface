@@ -16,6 +16,10 @@ varying vec3 vViewPosition;
 #include <packing>
 // #include <dithering_pars_fragment>
 #include <color_pars_fragment>
+// fix three.js
+#ifndef USE_UV
+#define USE_UV
+#endif
 #include <uv_pars_fragment>
 #include <uv2_pars_fragment>
 #include <map_pars_fragment>

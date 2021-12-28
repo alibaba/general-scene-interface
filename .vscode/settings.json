@@ -14,9 +14,9 @@
 	"[typescript]": {
 		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	},
-	"[glsl]": {
-		"editor.defaultFormatter": "xaver.clang-format"
-	},
+	// "[glsl]": {
+	// 	"editor.defaultFormatter": "xaver.clang-format"
+	// },
 	"[c]": {
 		"editor.defaultFormatter": "xaver.clang-format"
 	},

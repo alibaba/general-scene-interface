@@ -11,6 +11,7 @@ import {
 	isDISPOSED,
 	TypedArray,
 	AttributeDataType,
+	AttributeScalarDataType,
 } from '@gs.i/schema-scene'
 import { Box3, Sphere, Vector3 } from '@gs.i/utils-math'
 
@@ -223,7 +224,7 @@ export function mergeGeometries(geometries: GeomDataType[]): GeomDataType | unde
 	for (const key in target.attributes) {
 		if (Object.prototype.hasOwnProperty.call(target.attributes, key)) {
 			const attr = target.attributes[key]
-			attributes.set(key, [attr])
+			attr && attributes.set(key, [attr])
 		}
 	}
 
@@ -235,12 +236,16 @@ export function mergeGeometries(geometries: GeomDataType[]): GeomDataType | unde
 
 		indices.push(geom.indices as AttributeDataType)
 		attributes.forEach((v, k) => {
-			v.push(geom.attributes[k])
+			const a = geom.attributes[k]
+			a && v.push(a)
 		})
 	}
 
 	// 合并
-	result.indices = mergeIndices(indices, attributes.get('position') as AttributeDataType[])
+	result.indices = mergeIndices(
+		indices,
+		attributes.get('position') as AttributeDataType[]
+	) as AttributeScalarDataType
 	attributes.forEach((v, k) => {
 		result.attributes[k] = mergeAttributes(v)
 	})

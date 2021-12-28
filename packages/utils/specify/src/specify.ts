@@ -183,7 +183,7 @@ export function specifyGeometry(geom: LooseGeomDataType): GeomDataType {
 		const key = keys[i]
 		const attribute = geom.attributes[key]
 
-		specifyAttribute(attribute, key)
+		if (attribute) specifyAttribute(attribute, key)
 	}
 
 	if (geom.indices) {

@@ -38,7 +38,7 @@ export type LooseGeomDataType = Replace<
 		 * attributes data
 		 */
 		attributes: {
-			[name: string]: LooseAttribute
+			[name: string]: LooseAttribute | undefined
 		}
 		/**
 		 * index
