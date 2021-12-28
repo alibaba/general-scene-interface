@@ -1,6 +1,10 @@
 uniform float size;
 uniform float scale;
 #include <common>
+// fix three.js
+#ifndef USE_UV
+#define USE_UV
+#endif
 #include <color_pars_vertex>
 #include <fog_pars_vertex>
 #include <morphtarget_pars_vertex>

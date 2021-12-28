@@ -5,6 +5,10 @@ attribute float corner;
 varying vec2 vUv;
 uniform mat3 uvTransform;
 #include <common>
+// fix three.js
+#ifndef USE_UV
+#define USE_UV
+#endif
 #include <fog_pars_vertex>
 #include <logdepthbuf_pars_vertex>
 #include <clipping_planes_pars_vertex>

@@ -1,4 +1,8 @@
 #include <common>
+// fix three.js
+#ifndef USE_UV
+#define USE_UV
+#endif
 #include <uv_pars_vertex>
 #include <uv2_pars_vertex>
 #include <envmap_pars_vertex>

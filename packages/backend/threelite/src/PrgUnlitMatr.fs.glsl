@@ -4,6 +4,10 @@ uniform float opacity;
 	varying vec3 vNormal;
 #endif
 #include <common>
+// fix three.js
+#ifndef USE_UV
+#define USE_UV
+#endif
 #include <color_pars_fragment>
 #include <uv_pars_fragment>
 #include <uv2_pars_fragment>
