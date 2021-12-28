@@ -51,16 +51,16 @@ export function convSphereToBSphere(sphere: Sphere): BSphere {
 	}
 }
 
-export function computeBBox(geometry: GeomDataType): BBox {
+export function computeBBox(geometry: GeomDataType, positionAttrName = 'position'): BBox {
 	const box = new Box3()
 	const v = new Vector3()
-	if (
-		geometry.attributes.position &&
-		!isDISPOSED(geometry.attributes.position.array) &&
-		geometry.attributes.position.array.length > 0
-	) {
-		const positions = geometry.attributes.position.array
-		const itemSize = geometry.attributes.position.itemSize
+	const attr = geometry.attributes[positionAttrName]
+	if (!attr) {
+		throw new Error(`Invalid position attribute name: ${positionAttrName}`)
+	}
+	if (attr && !isDISPOSED(attr.array) && attr.array.length > 0) {
+		const positions = attr.array
+		const itemSize = attr.itemSize
 		for (let i = 0, l = positions.length; i < l; i += itemSize) {
 			box.expandByPoint(v.fromArray(positions, i))
 		}
@@ -76,9 +76,9 @@ export function computeBBox(geometry: GeomDataType): BBox {
 	return convBox3ToBBox(box)
 }
 
-export function computeBSphere(geometry: GeomDataType): BSphere {
-	const efficientBSphere = fastEstimateBSphere(geometry)
-	const boxBSphere = estimateBSphereFromBBox(geometry)
+export function computeBSphere(geometry: GeomDataType, positionAttrName = 'position'): BSphere {
+	const efficientBSphere = fastEstimateBSphere(geometry, positionAttrName)
+	const boxBSphere = estimateBSphereFromBBox(geometry, positionAttrName)
 	if (efficientBSphere.radius < boxBSphere.radius) {
 		return efficientBSphere
 	} else {
@@ -90,8 +90,9 @@ export function computeBSphere(geometry: GeomDataType): BSphere {
  * AN EFFICIENT BOUNDING SPHERE by Jack Ritter
  * @link http://inis.jinr.ru/sl/vol1/CMC/Graphics_Gems_1,ed_A.Glassner.pdf - Page 301
  */
-function fastEstimateBSphere(geometry: GeomDataType): BSphere {
-	if (!geometry.attributes.position || isDISPOSED(geometry.attributes.position.array)) {
+function fastEstimateBSphere(geometry: GeomDataType, positionAttrName = 'position'): BSphere {
+	const attr = geometry.attributes[positionAttrName]
+	if (!attr || isDISPOSED(attr.array)) {
 		// console.warn('Geometry does not have position attribute, generating an infinity sphere')
 		return convSphereToBSphere(infinitySphere())
 	}
@@ -106,8 +107,8 @@ function fastEstimateBSphere(geometry: GeomDataType): BSphere {
 	const v = new Vector3()
 
 	// first pass
-	const positions = geometry.attributes.position.array
-	const itemSize = geometry.attributes.position.itemSize
+	const positions = attr.array
+	const itemSize = attr.itemSize
 	for (let i = 0, l = positions.length; i < l; i += itemSize) {
 		v.fromArray(positions, i)
 		if (v.x < minX.x) minX.copy(v)
@@ -156,12 +157,13 @@ function fastEstimateBSphere(geometry: GeomDataType): BSphere {
 	return convSphereToBSphere(sphere)
 }
 
-function estimateBSphereFromBBox(geometry: GeomDataType): BSphere {
+function estimateBSphereFromBBox(geometry: GeomDataType, positionAttrName = 'position'): BSphere {
 	const sphere = new Sphere()
 	const center = sphere.center
 	const v = new Vector3()
+	const attr = geometry.attributes[positionAttrName]
 
-	if (!geometry.attributes.position || isDISPOSED(geometry.attributes.position.array)) {
+	if (!attr || isDISPOSED(attr.array)) {
 		sphere.center.set(0, 0, 0)
 		sphere.radius = Infinity
 		return convBSphereToSphere(sphere)
@@ -190,7 +192,7 @@ function estimateBSphereFromBBox(geometry: GeomDataType): BSphere {
 
 	// try to find sphere radius less than BBox diagonal
 	let maxRadiusSq = 0
-	const positions = geometry.attributes.position.array
+	const positions = attr.array
 	for (let i = 0, il = positions.length; i < il; i += 3) {
 		v.fromArray(positions, i)
 		maxRadiusSq = Math.max(maxRadiusSq, center.distanceToSquared(v))

@@ -1,3 +1,4 @@
+import { computeBBox, computeBSphere } from '@gs.i/utils-geometry'
 import { Geom, Attr } from '@gs.i/frontend-sdk'
 import { BBox, BSphere, isDISPOSED, GeomDataType } from '@gs.i/schema-scene'
 
@@ -6,22 +7,30 @@ export interface SpriteGeomConfig {
 	 * Dynamic attributes
 	 */
 	dynamic: boolean
+
 	/**
 	 * Whether to use offset/scale/rotation attributes
 	 */
-	transformAttributes: boolean
+	useAttributeTransform: boolean
+
+	/**
+	 *
+	 */
+	disposable: boolean
+
 	/**
 	 * { key: attribute name, value: item size per vertex }
 	 * @TODO
 	 */
-	customAttributes: {
+	customAttributes?: {
 		[name: string]: number
 	}
 }
 
 export const defaultConfig: SpriteGeomConfig = {
 	dynamic: false,
-	transformAttributes: false,
+	useAttributeTransform: false,
+	disposable: false,
 	customAttributes: {},
 }
 
@@ -119,14 +128,14 @@ export class SpriteGeom extends Geom {
 		}
 
 		const { count, maxIndex, initialized } = this._spritesInfo
-		const { dynamic, transformAttributes } = this.config
+		const { dynamic, useAttributeTransform } = this.config
 		const { positions, offsets, scales, rotations } = data
 
-		if ((offsets || scales || rotations) && !transformAttributes) {
-			throw new Error(
-				'GSI::Sprite - Cannot update transforms data with config.transformAttributes set to false'
-			)
-		}
+		// if ((offsets || scales || rotations) && !transformAttributes) {
+		// 	throw new Error(
+		// 		'GSI::Sprite - Cannot update transforms data with config.transformAttributes set to false'
+		// 	)
+		// }
 
 		const posAttr = this.attributes.position
 		const offsetAttr = this.attributes.aOffset
@@ -259,15 +268,19 @@ export class SpriteGeom extends Geom {
 
 		if (bounds.box) {
 			this.extensions.EXT_geometry_bounds.box = bounds.box
+		} else {
+			// this.extensions.EXT_geometry_bounds.box = computeBBox(this)
 		}
 
 		if (bounds.sphere) {
 			this.extensions.EXT_geometry_bounds.sphere = bounds.sphere
+		} else {
+			// this.extensions.EXT_geometry_bounds.sphere = computeBSphere(this)
 		}
 	}
 
 	private _initSpritesInfo(data: SpriteData) {
-		const count = data.positions.length
+		const count = data.positions.length / 3
 		const maxIndex = count * this.VERTICES_PER_SPRITE
 		this._spritesInfo = {
 			count,
@@ -278,19 +291,27 @@ export class SpriteGeom extends Geom {
 
 	private _createAttributes() {
 		const { count, maxIndex } = this._spritesInfo
-		const { dynamic, transformAttributes } = this.config
+		const { dynamic, useAttributeTransform } = this.config
 		const vertices = count * this.VERTICES_PER_SPRITE
 
 		const positions = new Float32Array(vertices * 3)
-		this.attributes.position = new Attr(
+		const corners = new Float32Array(vertices)
+
+		this.attributes['position'] = new Attr(
 			positions,
 			3,
 			false,
 			dynamic ? 'DYNAMIC_DRAW' : 'STATIC_DRAW'
 		)
+		this.attributes['position'].disposable = false
 
-		const corners = new Float32Array(vertices)
-		this.attributes.corner = new Attr(corners, 1, false, dynamic ? 'DYNAMIC_DRAW' : 'STATIC_DRAW')
+		this.attributes['corner'] = new Attr(
+			corners,
+			1,
+			false,
+			dynamic ? 'DYNAMIC_DRAW' : 'STATIC_DRAW'
+		)
+		this.attributes['corner'].disposable = false
 
 		let indicesConstructor
 		if (maxIndex > 65535) {
@@ -304,23 +325,34 @@ export class SpriteGeom extends Geom {
 		const indices = new indicesConstructor(count * 6)
 		this.indices = new Attr(indices, 1, false, dynamic ? 'DYNAMIC_DRAW' : 'STATIC_DRAW')
 
-		if (transformAttributes) {
+		if (useAttributeTransform) {
 			const offsets = new Float32Array(vertices * 2)
 			const scales = new Float32Array(vertices * 2)
 			const rotations = new Float32Array(vertices)
-			this.attributes.aOffset = new Attr(
+
+			this.attributes['aOffset'] = new Attr(
 				offsets,
 				2,
 				false,
 				dynamic ? 'DYNAMIC_DRAW' : 'STATIC_DRAW'
 			)
-			this.attributes.aScale = new Attr(scales, 2, false, dynamic ? 'DYNAMIC_DRAW' : 'STATIC_DRAW')
-			this.attributes.aRotation = new Attr(
+			this.attributes['aOffset'].disposable = false
+
+			this.attributes['aScale'] = new Attr(
+				scales,
+				2,
+				false,
+				dynamic ? 'DYNAMIC_DRAW' : 'STATIC_DRAW'
+			)
+			this.attributes['aScale'].disposable = false
+
+			this.attributes['aRotation'] = new Attr(
 				rotations,
 				1,
 				false,
 				dynamic ? 'DYNAMIC_DRAW' : 'STATIC_DRAW'
 			)
+			this.attributes['aRotation'].disposable = false
 		}
 	}
 }
