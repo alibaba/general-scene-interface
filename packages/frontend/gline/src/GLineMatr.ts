@@ -178,7 +178,6 @@ export class GLineMatr extends MatrUnlit {
 				attribute vec4 color;
 				`
 				this.extensions.EXT_matr_programmable.global = `
-				varying vec2 vUv;
 				varying vec4 vColor4;
 				uniform vec3 uColor;
 				uniform float lineWidth;
@@ -199,7 +198,6 @@ export class GLineMatr extends MatrUnlit {
 				attribute vec4 color;
 				`
 				this.extensions.EXT_matr_programmable.global = `
-				varying vec2 vUv;
 				varying vec4 vColor4;
 				uniform vec3 uColor;
 				uniform float lineWidth;
@@ -235,7 +233,8 @@ export class GLineMatr extends MatrUnlit {
 					return _config[key]
 				},
 				set(val) {
-					uniforms[UniformsProps[key]].value = val
+					const uniform = uniforms[UniformsProps[key]]
+					if (uniform) uniform.value = val
 					_config[key] = val
 				},
 			})
@@ -252,7 +251,7 @@ export class GLineMatr extends MatrUnlit {
 					},
 					set(val) {
 						if (val) {
-							uniforms['TEX'].value = val
+							if (uniforms['TEX']) uniforms['TEX'].value = val
 							defines[DefinesProps[key]] = !!val
 						} else {
 							delete uniforms[key]
@@ -439,7 +438,8 @@ export class GLinePointMatr extends MatrPoint {
 					return _config[key]
 				},
 				set(val) {
-					uniforms[UniformsProps[key]].value = val
+					const uniform = uniforms[UniformsProps[key]]
+					if (uniform) uniform.value = val
 					_config[key] = val
 				},
 			})
@@ -456,7 +456,7 @@ export class GLinePointMatr extends MatrPoint {
 					},
 					set(val) {
 						if (val) {
-							uniforms['TEX'].value = val
+							if (uniforms['TEX']) uniforms['TEX'].value = val
 							defines[DefinesProps[key]] = !!val
 						} else {
 							delete uniforms[key]

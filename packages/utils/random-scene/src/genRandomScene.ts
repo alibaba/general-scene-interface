@@ -532,7 +532,5 @@ function buildSprite(config = { scale: 100, count: 10 }) {
 		rotations,
 	})
 
-	console.log(sprite)
-
 	return sprite
 }

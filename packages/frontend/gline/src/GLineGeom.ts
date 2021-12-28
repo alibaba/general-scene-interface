@@ -1,4 +1,9 @@
-import { TypedArray } from '@gs.i/schema-scene'
+import {
+	AttributeDataType,
+	AttributeVec2DataType,
+	AttributeVec3DataType,
+	TypedArray,
+} from '@gs.i/schema-scene'
 /**
  * Copyright (C) 2021 Alibaba Group Holding Limited
  * All rights reserved.
@@ -70,9 +75,15 @@ export class GLineGeom extends Geom {
 	 * extend Geom properties
 	 */
 	attributes: {
-		[name: string]: Attr
+		curr: Attr<3>
+		prev: Attr<3>
+		next: Attr<3>
+		color: Attr<4>
+		side: Attr<1>
+		u: Attr<1>
+		position: Attr<3>
 	}
-	indices: Attr
+	indices: Attr<1>
 	extensions: Exclude<GeomDataType['extensions'], undefined> = {}
 
 	/**

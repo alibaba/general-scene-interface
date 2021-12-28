@@ -49,13 +49,13 @@ export class SpriteGeom extends Geom {
 	readonly config: SpriteGeomConfig
 	readonly VERTICES_PER_SPRITE = 4
 
-	indices: Attr
+	indices: Attr<1>
 	attributes: {
-		position: Attr
-		corner: Attr
-		aOffset?: Attr
-		aScale?: Attr
-		aRotation?: Attr
+		position: Attr<3>
+		corner: Attr<1>
+		aOffset?: Attr<2>
+		aScale?: Attr<2>
+		aRotation?: Attr<1>
 	} & Geom['attributes']
 	extensions: Exclude<GeomDataType['extensions'], undefined> = {
 		EXT_geometry_bounds: {
