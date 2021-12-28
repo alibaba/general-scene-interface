@@ -52,7 +52,8 @@ export function generateGsiSpriteInfo(
 	const attrNames = Object.keys(geom.attributes)
 	for (let i = attrNames.length; i >= 0; i--) {
 		const attr = attrNames[i]
-		if (attr === 'position' || !geom.attributes[attr] || isDISPOSED(geom.attributes[attr].array)) {
+		const attrValue = geom.attributes[attr]
+		if (attr === 'position' || !attrValue || isDISPOSED(attrValue.array)) {
 			attrNames.splice(i, 1)
 		}
 	}
@@ -86,18 +87,20 @@ export function generateGsiSpriteInfo(
 	const spritepos = new Float32Array(3 * count * 4)
 	const indices = 6 * count > 65535 ? new Uint32Array(6 * count) : new Uint16Array(6 * count)
 	const customAttrs = attrNames.map((name) => {
-		const constructor = Object.getPrototypeOf(geom.attributes[name].array).constructor
+		const attrValue = geom.attributes[name]
+		if (!attrValue) return
+		const constructor = Object.getPrototypeOf(attrValue.array).constructor
 		if (!constructor) {
 			console.error('GL2Converter::SpriteGeometry cannot get custom attribute array constructor')
 			return
 		}
-		const itemSize = geom.attributes[name].itemSize
+		const itemSize = attrValue.itemSize
 		return {
 			name: name,
 			itemSize: itemSize,
 			array: new constructor(count * itemSize * 4) as TypedArray,
-			normalized: geom.attributes[name].normalized,
-			usage: geom.attributes[name].usage,
+			normalized: attrValue.normalized,
+			usage: attrValue.usage,
 		}
 	})
 	for (let i = 0; i < count; i++) {
@@ -154,7 +157,7 @@ export function generateGsiSpriteInfo(
 
 			const values = new Array(itemSize)
 			for (let j = 0; j < itemSize; j++) {
-				values[j] = geom.attributes[name].array[itemOffset + j]
+				values[j] = attr.array[itemOffset + j]
 			}
 
 			for (let icorner = 0; icorner < 4; icorner++) {

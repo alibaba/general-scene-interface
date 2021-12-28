@@ -585,12 +585,16 @@ export class ThreeLiteConverter implements Converter {
 			threeGeometry.index = null
 
 			// re-assign
-			for (const key in gsiGeom.attributes) {
-				const gsiAttr = gsiGeom.attributes[key]
-				// @note it is safe to assume that attributes were handled during #resource-stage
-				const threeAttribute = this._threeAttr.get(gsiAttr) as BufferAttribute
+			const keys = Object.keys(gsiGeom.attributes)
+			for (let i = 0; i < keys.length; i++) {
+				const key = keys[i]
 
-				threeGeometry.attributes[key] = threeAttribute
+				const gsiAttr = gsiGeom.attributes[key]
+				if (gsiAttr) {
+					// @note it is safe to assume that attributes were handled during #resource-stage
+					const threeAttribute = this._threeAttr.get(gsiAttr) as BufferAttribute
+					threeGeometry.attributes[key] = threeAttribute
+				}
 			}
 
 			if (gsiGeom.indices) {
@@ -907,6 +911,8 @@ export class ThreeLiteConverter implements Converter {
 				Object.keys(uniforms).forEach((key) => {
 					const uniform = uniforms[key]
 
+					if (!uniform) return
+
 					if (threeUniforms[key] === undefined) threeUniforms[key] = {}
 
 					if (isTexture(uniform.value)) {
@@ -1078,8 +1084,8 @@ export function getResources(root?: MeshDataType) {
 
 					const values = Object.values(uniforms)
 					for (let i = 0; i < values.length; i++) {
-						const uniformValue = values[i].value
-						if (isTexture(uniformValue) || isCubeTexture(uniformValue)) {
+						const uniformValue = values[i]?.value
+						if (uniformValue && (isTexture(uniformValue) || isCubeTexture(uniformValue))) {
 							textures.add(uniformValue)
 						}
 					}
@@ -1089,7 +1095,8 @@ export function getResources(root?: MeshDataType) {
 				{
 					const values = Object.values(mesh.geometry.attributes)
 					for (let i = 0; i < values.length; i++) {
-						attributes.add(values[i])
+						const attributeValue = values[i]
+						if (attributeValue) attributes.add(attributeValue)
 					}
 					if (mesh.geometry.indices) attributes.add(mesh.geometry.indices)
 				}
@@ -1155,8 +1162,8 @@ export function getResourcesFlat(flatScene: MeshDataType[]) {
 
 				const values = Object.values(uniforms)
 				for (let i = 0; i < values.length; i++) {
-					const uniformValue = values[i].value
-					if (isTexture(uniformValue) || isCubeTexture(uniformValue)) {
+					const uniformValue = values[i]?.value
+					if (uniformValue && (isTexture(uniformValue) || isCubeTexture(uniformValue))) {
 						textures.add(uniformValue)
 					}
 				}
@@ -1170,7 +1177,8 @@ export function getResourcesFlat(flatScene: MeshDataType[]) {
 				// })
 				const values = Object.values(mesh.geometry.attributes)
 				for (let i = 0; i < values.length; i++) {
-					attributes.add(values[i])
+					const attributeValue = values[i]
+					if (attributeValue) attributes.add(attributeValue)
 				}
 				if (mesh.geometry.indices) attributes.add(mesh.geometry.indices)
 			}

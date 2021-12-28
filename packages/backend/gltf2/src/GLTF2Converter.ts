@@ -314,19 +314,14 @@ export class GLTF2Convertor implements Converter {
 				}
 
 				for (const name in geom.attributes) {
-					if (
-						Object.prototype.hasOwnProperty.call(geom.attributes, name) &&
-						geom.attributes[name]
-					) {
+					const attributeData = geom.attributes[name]
+					if (Object.prototype.hasOwnProperty.call(geom.attributes, name) && attributeData) {
 						// 复用 attribute
-						if (this._accessorsCache.has(geom.attributes[name])) {
+						if (this._accessorsCache.has(attributeData)) {
 							const gltfAttrName = attrNameThreeToGltf(name)
-							primitive.attributes[gltfAttrName] = this._accessorsCache.get(
-								geom.attributes[name]
-							) as number
+							primitive.attributes[gltfAttrName] = this._accessorsCache.get(attributeData) as number
 						} else {
 							const accessorIndex = result.accessors.length
-							const attributeData = geom.attributes[name]
 
 							if (!isTypedArray(attributeData.array)) {
 								throw new Error('缺少必要的 attribute.array :' + name)

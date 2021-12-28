@@ -25,6 +25,8 @@ export interface GeomDataType {
 
 	/**
 	 * attributes data
+	 * @note only standard attributes here
+	 * @note custom attributes should be put in {@link GeomDataType.extensions} and start with "_"
 	 */
 	attributes: {
 		/**
@@ -78,22 +80,34 @@ export interface GeomDataType {
 		 * - uv2~8
 		 */
 
-		// position?: AttributeDataType
-		// normal?: AttributeDataType
-		// uv?: AttributeDataType
-		// uv2?: AttributeDataType
-		// color?: AttributeDataType
+		position?: AttributeVec3DataType
+		normal?: AttributeVec3DataType
+		uv?: AttributeVec2DataType
+		uv2?: AttributeVec2DataType
+		color?: AttributeVec3DataType | AttributeVec4DataType
 
-		// 自定义材质
-		[name: string]: AttributeDataType
+		[name: string]: AttributeDataType | undefined
 	}
 
 	/**
 	 * 索引
 	 */
-	indices?: AttributeDataType
+	indices?: AttributeScalarDataType
 
 	extensions?: {
+		/**
+		 * custom attributes
+		 * @note you need to add attribute declarations in material extension vertGlobal
+		 */
+		// EXT_attributes?: {
+		// 	position: never
+		// 	normal: never
+		// 	uv: never
+		// 	uv2: never
+		// 	color: never
+		// 	[name: string]: AttributeDataType | undefined
+		// }
+
 		/**
 		 * User specified bounding for this geometry.
 		 * - Not necessary because static geometry bounds are calculated when used.
@@ -129,13 +143,44 @@ export interface GeomDataType {
 	extras?: any
 }
 
+// const a: GeomDataType = {
+// 	attributes: {
+// 		position:{},
+// 		a:{}
+// 	},
+// 	extensions: {
+// 		EXT_attributes: {
+// 			aa: {},
+// 			position: {}
+// 		},
+// 	},
+// }
+
 /**
  * attribute 数据
  * @todo gltf offset
  * @todo stride (interpolation)
  * @todo instanced
  */
-export interface AttributeDataType extends Versioned {
+export type AttributeDataType =
+	| AttributeVec3DataType
+	| AttributeVec2DataType
+	| AttributeScalarDataType
+	| AttributeVec4DataType
+
+export interface AttributeVec4DataType extends AttributeBaseDataType {
+	itemSize: 4
+}
+export interface AttributeVec3DataType extends AttributeBaseDataType {
+	itemSize: 3
+}
+export interface AttributeVec2DataType extends AttributeBaseDataType {
+	itemSize: 2
+}
+export interface AttributeScalarDataType extends AttributeBaseDataType {
+	itemSize: 1
+}
+export interface AttributeBaseDataType extends Versioned {
 	/**
 	 * attribute name
 	 */
