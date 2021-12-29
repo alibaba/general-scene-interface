@@ -33,24 +33,19 @@ void main() {
 	#include <morphtarget_vertex>
 	GSI_FUNC_vertGeometry( transformed, modelMatrix, modelViewMatrix, projectionMatrix );
 
-	vec4 glPosition;
 	vec4 mvPosition = vec4( transformed, 1.0 );
-	#ifdef USE_INSTANCING
-		mvPosition = instanceMatrix * mvPosition;
-	#endif
+#ifdef USE_INSTANCING
+	mvPosition = instanceMatrix * mvPosition;
+#endif
 	mvPosition = modelViewMatrix * mvPosition;
-	GSI_FUNC_vertOutput( mvPosition, modelViewMatrix, projectionMatrix, glPosition );
-	if (glPosition.w != 0.0) {
-		gl_Position = glPosition;
-	} else {
-		gl_Position = projectionMatrix * mvPosition;
-	}
+	gl_Position = projectionMatrix * mvPosition;
+	GSI_FUNC_vertOutput( mvPosition, modelViewMatrix, projectionMatrix, gl_Position );
 	
 	gl_PointSize = size;
-	#ifdef USE_SIZEATTENUATION
-		bool isPerspective = isPerspectiveMatrix( projectionMatrix );
-		if ( isPerspective ) gl_PointSize *= ( scale / - mvPosition.z );
-	#endif
+#ifdef USE_SIZEATTENUATION
+	bool isPerspective = isPerspectiveMatrix( projectionMatrix );
+	if ( isPerspective ) gl_PointSize *= ( scale / - mvPosition.z );
+#endif
 	GSI_FUNC_pointSize(gl_PointSize);
 	#include <logdepthbuf_vertex>
 	#include <clipping_planes_vertex>
