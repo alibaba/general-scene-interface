@@ -30,9 +30,6 @@
 			"path": "../packages/utils/gltf2"
 		},
 		{
-			"path": "../packages/utils/sprite"
-		},
-		{
 			"path": "../packages/utils/traverse"
 		},
 		{

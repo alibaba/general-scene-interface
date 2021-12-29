@@ -16,7 +16,6 @@ import {
 	MatrPbrDataType,
 	MatrUnlitDataType,
 	MatrPointDataType,
-	MatrSpriteDataType,
 	MatrBaseDataType,
 	ColorRGB,
 	GL_STATIC_DRAW,
@@ -58,7 +57,6 @@ import {
 	CanvasTexture,
 	DataTexture,
 } from 'three-lite'
-import { PrgSpriteMaterial } from './PrgSpriteMaterial'
 import { sealTransform } from './utils'
 
 /**
@@ -465,11 +463,6 @@ export class ThreeLiteConverter implements Converter {
 						threeMesh['drawMode'] = TrianglesDrawMode
 						break
 
-					case 'SPRITE':
-						threeMesh['isMesh'] = true
-						threeMesh['drawMode'] = TrianglesDrawMode
-						break
-
 					case 'POINTS':
 						threeMesh['isPoints'] = true
 						break
@@ -771,9 +764,6 @@ export class ThreeLiteConverter implements Converter {
 				case 'pbr':
 					threeMatr = new PrgStandardMaterial(gsiMatr as MatrPbrDataType)
 					break
-				case 'sprite':
-					threeMatr = new PrgSpriteMaterial(gsiMatr as MatrSpriteDataType)
-					break
 				default:
 					throw 'Unsupported GSI::Material Type: ' + gsiMatr['type']
 				// threeMatr = new PrgBasicMaterial(gsiMatr as MatrUnlitDataType)
@@ -862,23 +852,6 @@ export class ThreeLiteConverter implements Converter {
 				pointThreeMatr.map = matr.baseColorTexture
 					? (this._threeTex.get(matr.baseColorTexture) as ThreeTexture)
 					: null
-				break
-			}
-
-			case 'sprite': {
-				const threeM = threeMatr as PrgSpriteMaterial
-				const matr = gsiMatr as MatrSpriteDataType
-				threeM.uniforms.opacity.value = matr.opacity
-				// TODO @FIXME redesigned sprite transform
-				// threeM.uniforms['uCenter'].value.copy(matr.center as Vector2)
-				// threeM.uniforms['uSize'].value.copy(matr.size as Vector2)
-				// threeM.uniforms['uRotation'].value = matr.rotation
-				threeM.uniforms['diffuse'].value = this.convColor(matr.baseColorFactor)
-				threeM.map = matr.baseColorTexture
-					? (this._threeTex.get(matr.baseColorTexture) as ThreeTexture)
-					: null
-				// TODO @浅寻 bad naming
-				threeM.defines['USE_SIZEATTENUATION'] = !!matr.sizeAttenuation
 				break
 			}
 
@@ -1231,4 +1204,4 @@ const texLoader = new TextureLoader()
  * - better use this than MatrBaseDataType to make switch case work
  * @simon
  */
-type GsiMatr = MatrSpriteDataType | MatrPointDataType | MatrUnlitDataType | MatrPbrDataType
+type GsiMatr = MatrPointDataType | MatrUnlitDataType | MatrPbrDataType

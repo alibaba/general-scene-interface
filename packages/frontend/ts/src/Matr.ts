@@ -9,7 +9,6 @@ import {
 	MatrPbrDataType,
 	MatrUnlitDataType,
 	MatrPointDataType,
-	MatrSpriteDataType,
 	UniformDataType,
 	ShaderType,
 	Programable,
@@ -219,34 +218,6 @@ export class MatrPoint extends MatrBase {
 	}
 
 	constructor(params: Partial<MatrPointDataType> = {}) {
-		super(params)
-	}
-}
-
-//
-export interface MatrSprite extends MatrSpriteDataType, MatrBase {}
-export class MatrSprite extends MatrBase {
-	get type() {
-		return 'sprite' as const
-	}
-
-	vertSpriteGeometry?: string
-
-	name = 'MatrSprite'
-
-	extensions: Required<Exclude<MatrSpriteDataType['extensions'], undefined>> = {
-		EXT_matr_advanced: {},
-		EXT_matr_programmable: {
-			language: 'GLSL300',
-			defines: {},
-			uniforms: {},
-			extension: '',
-		},
-		EXT_matr_programmable_sprite: {},
-		EXT_sprite_attributes: {},
-	}
-
-	constructor(params: Partial<MatrSpriteDataType> = {}) {
 		super(params)
 	}
 }

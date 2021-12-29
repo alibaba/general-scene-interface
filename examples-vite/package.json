@@ -17,7 +17,6 @@
 		"@gs.i/utils-geom-builders": "^0.1.0-alpha",
 		"@gs.i/utils-geometry": "^0.1.0-alpha",
 		"@gs.i/utils-gltf2": "^0.1.0-alpha",
-		"@gs.i/utils-sprite": "^0.1.0-alpha",
 		"@gs.i/utils-traverse": "^0.1.0-alpha",
 		"@gs.i/utils-wireframe": "^0.1.0-alpha",
 		"@gs.i/processor-base": "^0.1.0-alpha",

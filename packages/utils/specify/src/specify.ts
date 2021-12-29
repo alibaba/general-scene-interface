@@ -20,7 +20,6 @@ import {
 	LooseMatrPbrDataType,
 	LooseMatrUnlitDataType,
 	LooseMatrPointDataType,
-	LooseMatrSpriteDataType,
 	LooseAttribute,
 	LooseGeomDataType,
 	LooseSamplerDataType,
@@ -140,17 +139,6 @@ export function specifyMaterial(matr: LooseMatrBase): MatrBaseDataType {
 		if (matr.baseColorFactor === undefined) matr.baseColorFactor = { r: 1, g: 1, b: 1 }
 		if (matr.size === undefined) matr.size = 10
 		if (matr.sizeAttenuation === undefined) matr.sizeAttenuation = false
-
-		if (matr.baseColorTexture) specifyTexture(matr.baseColorTexture)
-
-		// return matr as MatrBaseDataType
-	}
-
-	if (isMatrSpriteDataType(matr)) {
-		if (matr.baseColorFactor === undefined) matr.baseColorFactor = { r: 1, g: 1, b: 1 }
-		// if (matr.size === undefined) matr.size = 10
-		if (matr.sizeAttenuation === undefined) matr.sizeAttenuation = false
-		if (matr.transform === undefined) matr.transform = genDefaultTransform2()
 
 		if (matr.baseColorTexture) specifyTexture(matr.baseColorTexture)
 
@@ -352,10 +340,6 @@ export function isMatrUnlitDataType(v: LooseMatrBase): v is LooseMatrUnlitDataTy
 
 export function isMatrPointDataType(v: LooseMatrBase): v is LooseMatrPointDataType {
 	return v.type === 'point'
-}
-
-export function isMatrSpriteDataType(v: LooseMatrBase): v is LooseMatrSpriteDataType {
-	return v.type === 'sprite'
 }
 
 export function isRenderableMesh(v: LooseMeshDataType): v is RenderableMesh {
