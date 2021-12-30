@@ -3,7 +3,7 @@
 # DO NOT EDIT
 # AUTO COPIED FROM ROOT/shared
 
-pwd
+# pwd
 
 rm -rf tsconfig.build.tsbuildinfo && rm -f ./tsconfig.tsbuildinfo && rm -rf ./dist && rm -rf .cached-built-head
 

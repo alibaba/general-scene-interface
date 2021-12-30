@@ -43,9 +43,6 @@
 			"path": "../optimize"
 		},
 		{
-			"path": "../raycast"
-		},
-		{
 			"path": "../traverse"
 		},
 		{
@@ -71,6 +68,9 @@
 		},
 		{
 			"path": "../../processors/culling"
+		},
+		{
+			"path": "../../processors/raycast"
 		},
 		{
 			"path": "../../backend/threelite"
