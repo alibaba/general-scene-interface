@@ -5,14 +5,14 @@
 
 import {
 	MeshDataType,
+	RenderableMesh,
 	AttributeDataType,
 	isDISPOSED,
 	TypedArray,
-	MatrSpriteDataType,
 	BSphere,
 	BBox,
 	Vec3,
-} from '@gs.i/schema'
+} from '@gs.i/schema-scene'
 import { Ray, Box3, Sphere, Vector2, Vector3, Matrix4, Quaternion, Euler } from '@gs.i/utils-math'
 
 export type RaycastInfo = {
@@ -138,14 +138,13 @@ export class Raycaster {
 	/**
 	 * @note early stop algorithm 遇到第一个intersect triangle时即返回
 	 *
-	 * @param {MeshDataType} mesh
 	 * @param {boolean} [backfaceCulling=true] Set to false to check both front & back triangles
 	 * @param {boolean} [allInters=false] By default the method will stop when first intersection is found, set allInters = true to get all intersections sorted from near to far
 	 * @return {*}  {RaycastInfo}
 	 * @memberof Raycaster
 	 */
 	intersectTriangleMesh(
-		mesh: MeshDataType,
+		mesh: RenderableMesh,
 		backfaceCulling = true,
 		allInters = false
 	): RaycastInfo {

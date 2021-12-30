@@ -10,10 +10,19 @@
 	"exclude": ["dist"],
 	"references": [
 		{
-			"path": "../../schema/core-old"
+			"path": "../../schema/core"
 		},
 		{
-			"path": "../math"
+			"path": "../base"
+		},
+		{
+			"path": "../bound"
+		},
+		{
+			"path": "../matrix"
+		},
+		{
+			"path": "../../utils/math"
 		}
 	]
 }
