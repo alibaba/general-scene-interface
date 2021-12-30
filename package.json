@@ -17,6 +17,7 @@
 			"**/@gs.i/gl2-renderer",
 			"**/@gs.i/three-lite-renderer/**",
 			"**/@gs.i/three-lite-renderer",
+			"**/@gs.i/utils-transform",
 			"**/three-lite/**",
 			"**/three-lite",
 			"**/@gs.i/examples/**",
