@@ -21,22 +21,11 @@
 import { MatrBaseDataType } from './Matr'
 import { GeomDataType } from './Geom'
 import { Int, Transform3 } from './basic'
+import { LuminousEXT } from './Luminous'
 
 /**
- * Mesh object for scene tree construction
- * @limit 单 geometry，单 material
+ * nodes in the scene graph
  */
-
-export type MeshDataType = RenderableMesh | Node
-
-export interface RenderableMesh extends Node {
-	// geometry / mesh
-	geometry: GeomDataType
-
-	// material
-	material: MatrBaseDataType
-}
-
 export interface Node {
 	/**
 	 * 物体名，调试使用
@@ -68,6 +57,23 @@ export interface Node {
 	 * * circular reference is not allowed
 	 */
 	parent?: MeshDataType
+
+	extras?: any
+
+	extensions?: {
+		[key: string]: any
+	}
+}
+
+/**
+ * renderable nodes with geometries and materials
+ */
+export interface RenderableMesh extends Node {
+	// geometry / mesh
+	geometry: GeomDataType
+
+	// material
+	material: MatrBaseDataType
 
 	extensions?: {
 		/**
@@ -109,9 +115,18 @@ export interface Node {
 			 */
 			frustumCulling?: boolean
 		}
-
-		[key: string]: any
-	}
-
-	extras?: any
+	} & Node['extensions']
 }
+
+export interface Luminous extends Node {
+	isLuminous: true
+
+	extensions?: {
+		EXT_luminous?: LuminousEXT
+	} & Node['extensions']
+}
+
+/**
+ * Mesh object for scene tree construction
+ */
+export type MeshDataType = RenderableMesh | Node | Luminous

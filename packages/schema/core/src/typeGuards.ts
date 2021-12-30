@@ -1,3 +1,4 @@
+import { Luminous } from './Mesh'
 /**
  * TS Type Guards
  */
@@ -59,6 +60,9 @@ export function isMatrPointDataType(v: MatrBaseDataType): v is MatrPointDataType
 }
 export function isRenderableMesh(v: MeshDataType): v is RenderableMesh {
 	return v['geometry'] && v['material']
+}
+export function isLuminous(v: MeshDataType): v is Luminous {
+	return v['isLuminous']
 }
 
 export function isTransform3Matrix(v: Transform3): v is Transform3Matrix {
