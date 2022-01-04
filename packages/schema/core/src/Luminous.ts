@@ -24,15 +24,15 @@ export interface LightBase<T extends LightTypes> {
 	/**
 	 * for readability
 	 */
-	name?: string
+	name: string
 	/**
 	 * @default {r:1, g:1, b:1}
 	 */
-	color?: ColorRGB
+	color: ColorRGB
 	/**
 	 * @default 1
 	 */
-	intensity?: number
+	intensity: number
 	/**
 	 * a hint for renderers to filter the objects that will affected by this light
 	 *
@@ -40,7 +40,7 @@ export interface LightBase<T extends LightTypes> {
 	 *
 	 * @default infinity
 	 */
-	range?: number
+	range: number
 }
 
 export interface PointLight extends LightBase<'point'> {}

@@ -10,6 +10,8 @@ import {
 	RenderableMesh,
 	Node,
 	Transform3TRS,
+	Luminous,
+	LuminousEXT,
 } from '@gs.i/schema-scene'
 import { Vector3, Euler, Quaternion } from '@gs.i/utils-math'
 
@@ -67,6 +69,22 @@ export class Mesh {
 	 */
 	getWorldMatrix(): number[] {
 		return defaultMatrixProcessor.getWorldMatrix(this)
+	}
+}
+
+export class PointLight extends Mesh implements Luminous {
+	name = 'PointLight'
+	constructor(params: Partial<LuminousEXT> = {}) {
+		super()
+		this.extensions = {
+			EXT_luminous: {
+				type: 'point',
+				color: params.color,
+				intensity: params.intensity,
+				range: params.range,
+			},
+		}
+		specifyMesh(this)
 	}
 }
 

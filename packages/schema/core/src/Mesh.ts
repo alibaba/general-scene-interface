@@ -119,8 +119,6 @@ export interface RenderableMesh extends Node {
 }
 
 export interface Luminous extends Node {
-	isLuminous: true
-
 	extensions?: {
 		EXT_luminous?: LuminousEXT
 	} & Node['extensions']

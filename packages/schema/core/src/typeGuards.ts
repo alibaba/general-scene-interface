@@ -1,4 +1,3 @@
-import { Luminous } from './Mesh'
 /**
  * TS Type Guards
  */
@@ -19,7 +18,7 @@ import { MatrPointDataType, MatrUnlitDataType, MatrPbrDataType, MatrBaseDataType
 import { Texture, CubeTexture } from './Texture'
 import { UniformDataType } from './Programable'
 
-import { RenderableMesh, MeshDataType } from './Mesh'
+import { RenderableMesh, MeshDataType, Luminous } from './Mesh'
 
 export function isColorRGB(a: any): a is ColorRGB {
 	if (a && a.r !== undefined && a.g !== undefined && a.b !== undefined) {
@@ -62,7 +61,7 @@ export function isRenderableMesh(v: MeshDataType): v is RenderableMesh {
 	return v['geometry'] && v['material']
 }
 export function isLuminous(v: MeshDataType): v is Luminous {
-	return v['isLuminous']
+	return v.extensions?.EXT_luminous !== undefined
 }
 
 export function isTransform3Matrix(v: Transform3): v is Transform3Matrix {

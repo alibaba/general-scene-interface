@@ -2,6 +2,8 @@ import {
 	MeshDataType,
 	RenderableMesh,
 	MatrBaseDataType,
+	Luminous,
+	LuminousEXT,
 	// MatrUnlitDataType,
 	// MatrPbrDataType,
 	// MatrPointDataType,
@@ -54,7 +56,7 @@ export function specifyTree(root: LooseMeshDataType): MeshDataType {
  * - **not** includes its children.
  * @param LooseMesh
  */
-export function specifyMesh(node: LooseMeshDataType, parent?: LooseMeshDataType): MeshDataType {
+export function specifyNode(node: LooseMeshDataType, parent?: LooseMeshDataType): MeshDataType {
 	// const cached = this.cache.get(node)
 	// if (cached) return cached
 
@@ -72,10 +74,22 @@ export function specifyMesh(node: LooseMeshDataType, parent?: LooseMeshDataType)
 	if (isRenderableMesh(node)) {
 		specifyMaterial(node.material)
 		specifyGeometry(node.geometry)
+	} else if (isLuminous(node)) {
+		const l = node.extensions.EXT_luminous as LuminousEXT
+		if (l.type === undefined) throw new SchemaNotValid('EXT_luminous.type is necessary.')
+		if (l.name === undefined) l.name = 'untitled-luminous'
+		if (l.color === undefined) l.color = { r: 1, g: 1, b: 1 }
+		if (l.intensity === undefined) l.intensity = 1
+		if (l.range === undefined) l.range = Infinity
 	}
 
 	return node as MeshDataType
 }
+
+/**
+ * @deprecated use specifyNode instead
+ */
+export const specifyMesh = specifyNode
 
 /**
  * specify a material, including its standard textures, not including custom textures in programable ext.
@@ -344,4 +358,7 @@ export function isMatrPointDataType(v: LooseMatrBase): v is LooseMatrPointDataTy
 
 export function isRenderableMesh(v: LooseMeshDataType): v is RenderableMesh {
 	return v['geometry'] && v['material']
+}
+export function isLuminous(v: LooseMeshDataType): v is Luminous {
+	return v.extensions?.EXT_luminous !== undefined
 }

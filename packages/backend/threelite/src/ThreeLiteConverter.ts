@@ -28,6 +28,8 @@ import {
 	isTypedArray,
 	isRenderableMesh,
 	isDISPOSED,
+	isLuminous,
+	LuminousEXT,
 } from '@gs.i/schema-scene'
 
 import type { Converter } from '@gs.i/schema-converter'
@@ -56,6 +58,8 @@ import {
 	Color,
 	CanvasTexture,
 	DataTexture,
+	Light,
+	PointLight,
 } from 'three-lite'
 import { sealTransform } from './utils'
 
@@ -253,7 +257,7 @@ export class ThreeLiteConverter implements Converter {
 	// private _threeObjects = new WeakMap<any, any>()
 	// TODO separate renderable mesh and node for performance
 	// private _threeObject3ds = new WeakMap<MeshDataType, Object3D>()
-	private _threeMesh = new WeakMap<MeshDataType, RenderableObject3D | Object3D>()
+	private _threeObject = new WeakMap<MeshDataType, RenderableObject3D | Object3D | Light>()
 	private _threeGeom = new WeakMap<GeomDataType, BufferGeometry>()
 	private _threeAttr = new WeakMap<AttributeDataType, BufferAttribute>()
 	private _threeTex = new WeakMap<Texture | CubeTexture, ThreeTexture>()
@@ -407,7 +411,7 @@ export class ThreeLiteConverter implements Converter {
 		// - use pre-order traversal to make sure all the parents are created before added to
 
 		{
-			const rootThree = this.convMesh(root)
+			const rootThree = this.convNode(root)
 			rootThree.children = []
 			// pre-order traversal, parents are handled before children
 
@@ -418,8 +422,8 @@ export class ThreeLiteConverter implements Converter {
 					// skip root node
 					if (parent) {
 						// @note parent is cached before
-						const parentThree = this._threeMesh.get(parent) as Object3D
-						const currentThree = this.convMesh(node)
+						const parentThree = this._threeObject.get(parent) as Object3D
+						const currentThree = this.convNode(node)
 						// clear current children to handle removed nodes
 						currentThree.children = []
 						parentThree.children.push(currentThree)
@@ -429,10 +433,10 @@ export class ThreeLiteConverter implements Converter {
 				// skip root node
 				for (let i = 1; i < flatScene.length; i++) {
 					const node = flatScene[i]
-					const currentThree = this.convMesh(node)
+					const currentThree = this.convNode(node)
 					// clear current children to handle removed nodes
 					// currentThree.children = [] // it should always be empty, not need to empty it every time
-					if (isRenderableMesh(node) && currentThree.visible) {
+					if ((isRenderableMesh(node) || isLuminous(node)) && currentThree.visible) {
 						rootThree.children.push(currentThree)
 					}
 				}
@@ -448,41 +452,50 @@ export class ThreeLiteConverter implements Converter {
 	 * @note run after all the geometries and materials are cached
 	 * @note require parent to be handled before child, only work for top-down traversal
 	 */
-	private convMesh(gsiMesh: MeshDataType): RenderableObject3D | Object3D {
-		let threeMesh = this._threeMesh.get(gsiMesh) as RenderableObject3D | Object3D
+	private convNode(gsiNode: MeshDataType): RenderableObject3D | Object3D {
+		let threeObject = this._threeObject.get(gsiNode) as RenderableObject3D | Object3D
 
 		// create
-		if (!threeMesh) {
-			if (isRenderableMesh(gsiMesh)) {
-				threeMesh = new RenderableObject3D()
+		if (!threeObject) {
+			if (isRenderableMesh(gsiNode)) {
+				threeObject = new RenderableObject3D()
 
 				// Assign mode
-				switch (gsiMesh.geometry.mode) {
+				switch (gsiNode.geometry.mode) {
 					case 'TRIANGLES':
-						threeMesh['isMesh'] = true
-						threeMesh['drawMode'] = TrianglesDrawMode
+						threeObject['isMesh'] = true
+						threeObject['drawMode'] = TrianglesDrawMode
 						break
 
 					case 'POINTS':
-						threeMesh['isPoints'] = true
+						threeObject['isPoints'] = true
 						break
 
 					case 'LINES':
-						threeMesh['isLine'] = true
-						threeMesh['isLineSegments'] = true
+						threeObject['isLine'] = true
+						threeObject['isLineSegments'] = true
 						break
 
 					default:
-						throw 'Invalid value for GSIGeom.mode: ' + gsiMesh.geometry.mode
+						throw 'Invalid value for GSIGeom.mode: ' + gsiNode.geometry.mode
 				}
 				this.info.renderableCount++
+			} else if (isLuminous(gsiNode)) {
+				const luminousEXT = gsiNode.extensions?.EXT_luminous as LuminousEXT
+				if (luminousEXT.type === 'point') {
+					threeObject = new PointLight()
+					threeObject.name = luminousEXT.name
+					threeObject['decay'] = 2 // gltf2: "follow the inverse square law"
+				} else {
+					throw new Error('three-lite conv:: light type not implemented(' + luminousEXT.type + ')')
+				}
 			} else {
-				threeMesh = new Object3D()
+				threeObject = new Object3D()
 			}
 
 			if (!this.config.decomposeMatrix) {
 				// @note avoid user mistakes, if matrix is handled by gsi processor, three.js methods should be disabled
-				sealTransform(threeMesh)
+				sealTransform(threeObject)
 			} else {
 				// TODO implement this!
 				// decompose the matrix at creation, or just set TRS if given
@@ -492,60 +505,67 @@ export class ThreeLiteConverter implements Converter {
 			}
 
 			if (this.config.overrideFrustumCulling) {
-				threeMesh.frustumCulled = false
+				threeObject.frustumCulled = false
 			}
 
 			// update cache
-			this._threeMesh.set(gsiMesh, threeMesh)
+			this._threeObject.set(gsiNode, threeObject)
 		}
 		// sync
 		{
-			if (isRenderableMesh(gsiMesh)) {
-				// threeMesh is a RenderableObject3D
+			if (isRenderableMesh(gsiNode)) {
+				// threeObject is a RenderableObject3D
 
-				const geometry = this._threeGeom.get(gsiMesh.geometry) as BufferGeometry
-				const material = this._threeMatr.get(gsiMesh.material) as Material
+				const geometry = this._threeGeom.get(gsiNode.geometry) as BufferGeometry
+				const material = this._threeMatr.get(gsiNode.material) as Material
 
-				threeMesh['material'] = material
-				threeMesh['geometry'] = geometry
+				threeObject['material'] = material
+				threeObject['geometry'] = geometry
 
-				if (gsiMesh.geometry.attributes.uv) {
+				if (gsiNode.geometry.attributes.uv) {
 					// @note it's safe to assume `defines` was created above
 					;(material['defines'] as any).GSI_USE_UV = true
 				}
+			} else if (isLuminous(gsiNode)) {
+				const luminousEXT = gsiNode.extensions?.EXT_luminous as LuminousEXT
+
+				const threeLight = threeObject as PointLight
+				threeLight.color.copy(luminousEXT.color as Color)
+				threeLight.intensity = luminousEXT.intensity
+				threeLight.distance = luminousEXT.range
 			}
 
-			threeMesh.visible = gsiMesh.visible && (gsiMesh.parent?.visible ?? true) // inherit visibility
+			threeObject.visible = gsiNode.visible && (gsiNode.parent?.visible ?? true) // inherit visibility
 
 			// @note three doesn't use localMatrix at all. it's only for generating worldMatrix.
-			// // threeMesh.matrix.elements = this.config.matrixProcessor.getLocalMatrix(gsiMesh)
+			// // threeObject.matrix.elements = this.config.matrixProcessor.getLocalMatrix(gsiNode)
 
 			// @note use cached matrices instead of dirty-checking every time.
-			// // threeMesh.matrixWorld.elements = this.config.matrixProcessor.getWorldMatrix(gsiMesh)
+			// // threeObject.matrixWorld.elements = this.config.matrixProcessor.getWorldMatrix(gsiNode)
 
-			const matrix = this.config.matrixProcessor.getCachedWorldMatrix(gsiMesh)
+			const matrix = this.config.matrixProcessor.getCachedWorldMatrix(gsiNode)
 			if (matrix) {
-				threeMesh.matrixWorld.elements = matrix
+				threeObject.matrixWorld.elements = matrix
 			} else {
 				console.warn(
-					`Conv-threelite:: WorldMatrix of ${gsiMesh.name} is not cached. ` +
+					`Conv-threelite:: WorldMatrix of ${gsiNode.name} is not cached. ` +
 						`Will fall back to dirty-checking. ` +
 						`The scene-graph may have changed during this conversion.`
 				)
-				threeMesh.matrixWorld.elements = this.config.matrixProcessor.getWorldMatrix(gsiMesh)
+				threeObject.matrixWorld.elements = this.config.matrixProcessor.getWorldMatrix(gsiNode)
 			}
 		}
 
 		// culling
 		// TODO set .visible false will cull all its children
-		if (this.config.overrideFrustumCulling && isRenderableMesh(gsiMesh) && gsiMesh.visible) {
-			if (this.config.cullingProcessor.isFrustumCulled(gsiMesh)) {
+		if (this.config.overrideFrustumCulling && isRenderableMesh(gsiNode) && gsiNode.visible) {
+			if (this.config.cullingProcessor.isFrustumCulled(gsiNode)) {
 				this.info.culledCount++
-				threeMesh.visible = false
+				threeObject.visible = false
 			}
 		}
 
-		return threeMesh
+		return threeObject
 	}
 
 	/**
@@ -1001,7 +1021,7 @@ export class ThreeLiteConverter implements Converter {
 
 	dispose() {
 		this._cachedResources = getResourcesFlat([]) // init with a empty node
-		this._threeMesh = new WeakMap()
+		this._threeObject = new WeakMap()
 		this._threeGeom = new WeakMap()
 		this._threeAttr = new WeakMap()
 		this._threeTex = new WeakMap()

@@ -12,6 +12,7 @@ import {
 	GeomDataType,
 	MatrBaseDataType,
 	isRenderableMesh,
+	Luminous,
 } from '@gs.i/schema-scene'
 import { specifyTree } from '@gs.i/utils-specify'
 import {
@@ -25,6 +26,7 @@ import {
 	Sampler,
 	Geom,
 	Attr,
+	PointLight,
 } from '@gs.i/frontend-sdk'
 
 import {
@@ -149,6 +151,7 @@ export const defaultConfig = {
 	useGLine: true,
 	usePoint: true,
 	useLine: false,
+	usePointLight: true,
 
 	//
 
@@ -264,7 +267,10 @@ export function generateScene(config: Config = {}): Mesh {
 
 // export function updateScene(root: MeshDataType, config: Config): MeshDataType {}
 
-export function getMesh(config: Config): Mesh {
+export function getMesh(config: Config): Mesh | PointLight {
+	if (config.usePointLight && Math.random() < 0.07) {
+		return buildPointLight()
+	}
 	if (config.useGLine && Math.random() < 0.15) {
 		return buildGLine({
 			scale: config.scale || 100,
@@ -532,4 +538,27 @@ function buildSprite(config = { scale: 100, count: 10 }) {
 	})
 
 	return sprite
+}
+function buildPointLight() {
+	const wrapper = new Mesh()
+	const indicator = new Mesh()
+	const color = {
+		r: Math.random(),
+		g: Math.random(),
+		b: Math.random(),
+	}
+	indicator.material = new MatrUnlit({
+		baseColorFactor: color,
+	})
+	indicator.geometry = buildSphere({ radius: 20 })
+	const l = new PointLight({
+		color: color,
+		intensity: 5,
+		range: 1000,
+	})
+
+	wrapper.add(indicator)
+	wrapper.add(l)
+
+	return wrapper
 }

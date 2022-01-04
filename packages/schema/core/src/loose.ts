@@ -11,7 +11,7 @@ import { MatrPointDataType, MatrUnlitDataType, MatrPbrDataType, MatrBaseDataType
 
 import { TextureType, CubeTextureType, ImageDataType, SamplerDataType } from './Texture'
 
-import { MeshDataType, RenderableMesh, Node } from './Mesh'
+import { MeshDataType, RenderableMesh, Node, Luminous } from './Mesh'
 // geometry -------------------------------------
 
 /**
@@ -107,7 +107,13 @@ export type LooseRenderableMesh = Replace<
 		children?: Set<LooseMeshDataType>
 	}
 >
-export type LooseMeshDataType = LooseRenderableMesh | LooseNode
+export type LooseLuminous = Replace<
+	Luminous,
+	{
+		extensions: { EXT_luminous: OnlyRequire<Luminous['extensions']['EXT_luminous'], 'type'> }
+	}
+>
+export type LooseMeshDataType = LooseRenderableMesh | LooseNode | LooseLuminous
 
 // helper -------------------------------------
 
