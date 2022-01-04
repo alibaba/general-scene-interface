@@ -1,5 +1,14 @@
 # changelog
 
+## 2021-12-29
+
+Only IR changes are listed.
+
+- Change programable slot `vertOutput` context. 
+  - Make modelViewPosition readonly. 
+  - Input actual glPosition.
+- Add programable member `vertexModified` to explicitly indicate if the position has been modified in shader programs.
+
 ## 2021-12-14
 
 Only schema-scene changes are listed.

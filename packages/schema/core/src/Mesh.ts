@@ -21,22 +21,11 @@
 import { MatrBaseDataType } from './Matr'
 import { GeomDataType } from './Geom'
 import { Int, Transform3 } from './basic'
+import { LuminousEXT } from './Luminous'
 
 /**
- * Mesh object for scene tree construction
- * @limit 单 geometry，单 material
+ * nodes in the scene graph
  */
-
-export type MeshDataType = RenderableMesh | Node
-
-export interface RenderableMesh extends Node {
-	// geometry / mesh
-	geometry: GeomDataType
-
-	// material
-	material: MatrBaseDataType
-}
-
 export interface Node {
 	/**
 	 * 物体名，调试使用
@@ -52,14 +41,39 @@ export interface Node {
 	/**
 	 * 将 transform 定义在 node 中，和 mesh 节点分离
 	 * {@link https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#transformations}
+	 *
+	 * the transformation of this mesh
 	 */
-	// transform
 	transform: Transform3
 
-	// sub
+	/**
+	 * children of this node
+	 */
 	children: Set<MeshDataType>
 
+	/**
+	 * * parent reference should be set once put in a tree,
+	 * * root nodes don't have a parent
+	 * * circular reference is not allowed
+	 */
 	parent?: MeshDataType
+
+	extras?: any
+
+	extensions?: {
+		[key: string]: any
+	}
+}
+
+/**
+ * renderable nodes with geometries and materials
+ */
+export interface RenderableMesh extends Node {
+	// geometry / mesh
+	geometry: GeomDataType
+
+	// material
+	material: MatrBaseDataType
 
 	extensions?: {
 		/**
@@ -86,6 +100,10 @@ export interface Node {
 			 */
 			renderOrder?: Int
 		}
+
+		/**
+		 * advanced control for mesh rendering techniques.
+		 */
 		EXT_mesh_advanced?: {
 			/**
 			 * Whether to enable camera frustum culling.
@@ -97,8 +115,18 @@ export interface Node {
 			 */
 			frustumCulling?: boolean
 		}
-		[key: string]: any
-	}
-
-	extras?: any
+	} & Node['extensions']
 }
+
+export interface Luminous extends Node {
+	isLuminous: true
+
+	extensions?: {
+		EXT_luminous?: LuminousEXT
+	} & Node['extensions']
+}
+
+/**
+ * Mesh object for scene tree construction
+ */
+export type MeshDataType = RenderableMesh | Node | Luminous

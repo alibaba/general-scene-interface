@@ -49,6 +49,8 @@ export class SpriteGeom extends Geom {
 	readonly config: SpriteGeomConfig
 	readonly VERTICES_PER_SPRITE = 4
 
+	readonly mode = 'TRIANGLES'
+
 	indices: Attr<1>
 	attributes: {
 		position: Attr<3>

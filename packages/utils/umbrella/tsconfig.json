@@ -10,16 +10,22 @@
 	"exclude": ["dist"],
 	"references": [
 		{
-			"path": "../../schema/core"
+			"path": "../../schema/core-old"
 		},
 		{
-			"path": "../../schema/ext-scene"
+			"path": "../../schema/core"
 		},
 		{
 			"path": "../math"
 		},
 		{
+			"path": "../../backend/gl2"
+		},
+		{
 			"path": "../../schema/converter"
+		},
+		{
+			"path": "../../schema/ext-scene"
 		},
 		{
 			"path": "../geom-builders"
@@ -28,16 +34,13 @@
 			"path": "../geometry"
 		},
 		{
+			"path": "../gline"
+		},
+		{
 			"path": "../gltf2"
 		},
 		{
-			"path": "../raycast"
-		},
-		{
-			"path": "../sprite"
-		},
-		{
-			"path": "../transform"
+			"path": "../optimize"
 		},
 		{
 			"path": "../traverse"
@@ -46,16 +49,7 @@
 			"path": "../wireframe"
 		},
 		{
-			"path": "../../backend/gl2"
-		},
-		{
 			"path": "../../processors/base"
-		},
-		{
-			"path": "../gline"
-		},
-		{
-			"path": "../optimize"
 		},
 		{
 			"path": "../specify"
@@ -74,6 +68,9 @@
 		},
 		{
 			"path": "../../processors/culling"
+		},
+		{
+			"path": "../../processors/raycast"
 		},
 		{
 			"path": "../../backend/threelite"

@@ -19,7 +19,6 @@ import {
 	MatrPbr,
 	MatrUnlit,
 	MatrPoint,
-	MatrSprite,
 	Mesh,
 	TextureData,
 	ImageData,

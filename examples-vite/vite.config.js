@@ -8,6 +8,7 @@ module.exports = defineConfig({
 		entries: getDemoEntries(),
 	},
 	server: {
+		open: true,
 		host: '0.0.0.0',
 		cors: true,
 		watch: {

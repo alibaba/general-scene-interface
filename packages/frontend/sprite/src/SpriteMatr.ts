@@ -53,7 +53,7 @@ export class SpriteMatr extends MatrUnlit {
 			extensions.EXT_matr_programmable.uniforms.uOffset = { value: uniformOffset ?? { x: 0, y: 0 } }
 			extensions.EXT_matr_programmable.uniforms.uScale = { value: uniformScale ?? { x: 1, y: 1 } }
 			extensions.EXT_matr_programmable.uniforms.uRotation = { value: uniformRotation ?? 0 }
-			extensions.EXT_matr_programmable.global = `
+			extensions.EXT_matr_programmable.global = /* glsl */ `
             uniform vec2 uOffset;
             uniform vec2 uScale;
             uniform float uRotation;
@@ -69,20 +69,20 @@ export class SpriteMatr extends MatrUnlit {
 		extensions.EXT_matr_advanced.depthWrite = this.config.depthWrite
 
 		// shader codes
-		extensions.EXT_matr_programmable.vertGlobal = `
+		extensions.EXT_matr_programmable.vertGlobal = /* glsl */ `
         attribute float corner;
         attribute vec2 aOffset;
         attribute vec2 aScale;
         attribute float aRotation;
         `
-		extensions.EXT_matr_programmable.vertGeometry = `
+		extensions.EXT_matr_programmable.vertGeometry = /* glsl */ `
         if (corner == 0.0) { uv = vec2( 0.0, 0.0 ); }
         if (corner == 1.0) { uv = vec2( 1.0, 0.0 ); }
         if (corner == 2.0) { uv = vec2( 1.0, 1.0 ); }
         if (corner == 3.0) { uv = vec2( 0.0, 1.0 ); }
         `
-		extensions.EXT_matr_programmable.vertOutput = `
-        vec2 vert;
+		extensions.EXT_matr_programmable.vertOutput = /* glsl */ `
+    	vec2 vert;
         if (corner == 0.0) { vert = vec2( -0.5, -0.5 ); }
         if (corner == 1.0) { vert = vec2( 0.5, -0.5 ); }
         if (corner == 2.0) { vert = vec2( 0.5, 0.5 ); }
@@ -110,8 +110,9 @@ export class SpriteMatr extends MatrUnlit {
 	    rotatedPosition.x = cosVal * alignedPosition.x - sinVal * alignedPosition.y;
 	    rotatedPosition.y = sinVal * alignedPosition.x + cosVal * alignedPosition.y;
         modelViewPosition.xy += rotatedPosition;
+		glPosition = projectionMatrix * modelViewPosition;
         `
-		extensions.EXT_matr_programmable.fragOutput = `
+		extensions.EXT_matr_programmable.fragOutput = /* glsl */ `
         // fragColor = vec4(vUv.x, vUv.y, 0.0, 1.0);
         `
 	}

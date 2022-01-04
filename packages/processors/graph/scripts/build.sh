@@ -4,6 +4,8 @@
 # AUTO COPIED FROM ROOT/shared
 
 build () {
+	set -e
+	
 	echo building
 
 	# npx tsc --project tsconfig.build.json
@@ -29,6 +31,8 @@ build () {
 	else
 		rm -f ./dist/.cached-built-head
 	fi
+
+	set +e
 }
 
 if [ -e ./dist/.cached-built-head ]

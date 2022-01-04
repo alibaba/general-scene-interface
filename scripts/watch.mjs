@@ -85,7 +85,7 @@ const impactGraph = {}
 }
 
 // console.log('impactGraph', impactGraph)
-{
+if (!FAST_MODE) {
 	for (const name of Object.keys(impactGraph)) {
 		console.log(
 			colors.cyan(

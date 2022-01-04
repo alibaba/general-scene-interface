@@ -106,6 +106,8 @@ try {
 	execSync(`lerna link `, { stdio: 'inherit' })
 
 	// # should not hoist local packages
+	// @note will cause error when a @gs.i/package is removed repo but installed as a dep
+	// @note these kind of package needs to be put in nohoist
 	execSync(`rm -rf ./node_modules/@gs.i`, { stdio: 'inherit' })
 } catch (error) {
 	console.error(error)

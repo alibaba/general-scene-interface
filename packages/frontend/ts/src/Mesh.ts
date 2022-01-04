@@ -16,7 +16,7 @@ import { Vector3, Euler, Quaternion } from '@gs.i/utils-math'
 import { specifyMesh } from '@gs.i/utils-specify'
 import { defaultMatrixProcessor } from './defaultProcessors'
 
-export interface Mesh extends RenderableMesh, Node {}
+export interface Mesh extends RenderableMesh {}
 export class Mesh {
 	name = 'Mesh'
 

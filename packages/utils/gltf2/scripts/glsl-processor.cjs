@@ -39,10 +39,7 @@ files.forEach((file) => {
 					console.error(err)
 					return
 				}
-				console.log(
-					'\x1b[32m%s\x1b[0m',
-					`[glsl-processor] - File ${file} has been translated to ./dist/${file + ext}`
-				)
+				console.log('\x1b[32m%s\x1b[0m', `[glsl-processor] - ${file}`)
 			})
 		})
 		count++

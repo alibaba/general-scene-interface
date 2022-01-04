@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-import { TextureType, CubeTextureType } from '@gs.i/schema'
+import { TextureType, CubeTextureType } from '@gs.i/schema-scene'
 import { Antialias } from './Antialias'
 import { AmbientLight, DirLight, PointLight } from './Light'
 import { Postprocessing } from './Postprocessing'
@@ -44,7 +44,7 @@ export interface SceneProps {
 	/**
 	 * 抗锯齿
 	 */
-	readonly antialias?: Antialias
+	antialias?: Antialias
 
 	/**
 	 * @todo

@@ -1,13 +1,4 @@
-import {
-	MatrBaseDataType,
-	isTexture,
-	isCubeTexture,
-	MatrPbrDataType,
-	MatrUnlitDataType,
-	MatrPointDataType,
-	MatrSpriteDataType,
-	Texture,
-} from '@gs.i/schema-scene'
+import { MatrBaseDataType, Texture } from '@gs.i/schema-scene'
 import {
 	Material,
 	Texture as ThreeTexture,

@@ -60,6 +60,16 @@ export interface Programable {
 	uniforms: { [name: string]: UniformDataType | undefined }
 
 	/**
+	 * whether this material modifies geometry data in shaders, if true, should not do raycasting in CPU side.
+	 * @default false
+	 * @note enable this in these circumstances:
+	 * - vertex positions of this object is modified in shader
+	 * - visibility of this object is modified in shader
+	 * - you have a better method to pick this material than standard raycasting
+	 */
+	vertexModified?: boolean
+
+	/**
 	 * attributes declaration
 	 * @glsl attribute TYPE name;
 	 */
@@ -102,14 +112,15 @@ export interface Programable {
 	vertGeometry?: string
 
 	/**
-	 * vertex shader的最终输出结果阶段，可以对gl_Position做最终修改
-	 * 若在此处修改了 glPosition (注意没有下划线)，渲染管线会在后续直接使用此处的输出结果
-	 * @NOTE If glPosition is computed manually here, it MUST be returned manually as well.
+	 * vertex shader的最终输出结果阶段，输出 varyings，并可以对gl_Position做最终修改
 	 *
-	 * @param vec3 modelViewPosition - [modifiable]
+	 * Output stage of vertex shader. glPosition are given and modifiable.
+	 *
+	 * @param vec3 modelViewPosition - [readonly]
 	 * @param mat4 modelViewMatrix - [readonly]
 	 * @param mat4 projectionMatrix - [readonly]
 	 * @param vec4 glPosition - [modifiable]
+	 * @context all global variables including varyings, uniforms, attributes, etc
 	 */
 	vertOutput?: string
 

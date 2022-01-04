@@ -21,7 +21,7 @@ export interface GeomDataType {
 	 * - const GLenum TRIANGLE_FAN                   = 0x0006;
 	 * @default TRIANGLES
 	 */
-	mode: 'TRIANGLES' | 'LINES' | 'POINTS' | 'SPRITE'
+	mode: 'TRIANGLES' | 'LINES' | 'POINTS'
 
 	/**
 	 * attributes data

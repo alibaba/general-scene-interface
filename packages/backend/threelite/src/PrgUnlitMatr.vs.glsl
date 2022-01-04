@@ -45,35 +45,30 @@ void main() {
 	#include <color_vertex>
 	#include <skinbase_vertex>
 	#include <beginnormal_vertex>
-	#ifdef USE_ENVMAP
+#ifdef USE_ENVMAP
 	#include <morphnormal_vertex>
 	#include <skinnormal_vertex>
-	#endif
+#endif
 	#include <begin_vertex>
 	#include <morphtarget_vertex>
 	#include <skinning_vertex>
-    #if defined( USE_MAP ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( USE_SPECULARMAP ) || defined( USE_ALPHAMAP ) || defined( USE_EMISSIVEMAP ) || defined( USE_ROUGHNESSMAP ) || defined( USE_METALNESSMAP )
+#if defined( USE_MAP ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( USE_SPECULARMAP ) || defined( USE_ALPHAMAP ) || defined( USE_EMISSIVEMAP ) || defined( USE_ROUGHNESSMAP ) || defined( USE_METALNESSMAP )
 	GSI_FUNC_vertGeometry( transformed, objectNormal, vUv, modelMatrix, modelViewMatrix, projectionMatrix, normalMatrix );
-	#elif defined( GSI_USE_UV )
+#elif defined( GSI_USE_UV )
 	vec2 _gsi_var_uv = uv;
 	GSI_FUNC_vertGeometry( transformed, objectNormal, _gsi_var_uv, modelMatrix, modelViewMatrix, projectionMatrix, normalMatrix );
-	#else
+#else
 	vec2 fakeuv = vec2(0.0);
 	GSI_FUNC_vertGeometry( transformed, objectNormal, fakeuv, modelMatrix, modelViewMatrix, projectionMatrix, normalMatrix );
-	#endif
+#endif
 	#include <defaultnormal_vertex>
-	vec4 glPosition;
 	vec4 mvPosition = vec4( transformed, 1.0 );
-	#ifdef USE_INSTANCING
-		mvPosition = instanceMatrix * mvPosition;
-	#endif
+#ifdef USE_INSTANCING
+	mvPosition = instanceMatrix * mvPosition;
+#endif
 	mvPosition = modelViewMatrix * mvPosition;
-	GSI_FUNC_vertOutput( mvPosition, modelViewMatrix, projectionMatrix, glPosition );
-	if (glPosition.w != 0.0) {
-		gl_Position = glPosition;
-	} else {
-		gl_Position = projectionMatrix * mvPosition;
-	}
+	gl_Position = projectionMatrix * mvPosition;
+	GSI_FUNC_vertOutput( mvPosition, modelViewMatrix, projectionMatrix, gl_Position );
 	#include <logdepthbuf_vertex>
 	#include <worldpos_vertex>
 	#include <clipping_planes_vertex>

@@ -1,3 +1,4 @@
+import { Luminous } from './Mesh'
 /**
  * TS Type Guards
  */
@@ -13,13 +14,7 @@ import {
 	Transform2Matrix,
 	Transform2,
 } from './basic'
-import {
-	MatrSpriteDataType,
-	MatrPointDataType,
-	MatrUnlitDataType,
-	MatrPbrDataType,
-	MatrBaseDataType,
-} from './Matr'
+import { MatrPointDataType, MatrUnlitDataType, MatrPbrDataType, MatrBaseDataType } from './Matr'
 
 import { Texture, CubeTexture } from './Texture'
 import { UniformDataType } from './Programable'
@@ -63,11 +58,11 @@ export function isMatrUnlitDataType(v: MatrBaseDataType): v is MatrUnlitDataType
 export function isMatrPointDataType(v: MatrBaseDataType): v is MatrPointDataType {
 	return v.type === 'point'
 }
-export function isMatrSpriteDataType(v: MatrBaseDataType): v is MatrSpriteDataType {
-	return v.type === 'sprite'
-}
 export function isRenderableMesh(v: MeshDataType): v is RenderableMesh {
 	return v['geometry'] && v['material']
+}
+export function isLuminous(v: MeshDataType): v is Luminous {
+	return v['isLuminous']
 }
 
 export function isTransform3Matrix(v: Transform3): v is Transform3Matrix {

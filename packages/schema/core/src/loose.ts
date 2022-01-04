@@ -7,13 +7,7 @@
 
 import { GeomDataType, AttributeDataType } from './Geom'
 
-import {
-	MatrSpriteDataType,
-	MatrPointDataType,
-	MatrUnlitDataType,
-	MatrPbrDataType,
-	MatrBaseDataType,
-} from './Matr'
+import { MatrPointDataType, MatrUnlitDataType, MatrPbrDataType, MatrBaseDataType } from './Matr'
 
 import { TextureType, CubeTextureType, ImageDataType, SamplerDataType } from './Texture'
 
@@ -90,10 +84,6 @@ export type LooseMatrUnlitDataType = OnlyRequire<
 >
 export type LooseMatrPointDataType = OnlyRequire<
 	ReplaceShared<MatrPointDataType, _LooseTextures>,
-	'type'
->
-export type LooseMatrSpriteDataType = OnlyRequire<
-	ReplaceShared<MatrSpriteDataType, _LooseTextures>,
 	'type'
 >
 
