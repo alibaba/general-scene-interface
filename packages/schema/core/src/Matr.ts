@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-import { ColorRGB, Double, Transform2, Versioned } from './basic'
+import { ColorRGB, Double, Versioned } from './basic'
 import { Texture } from './Texture'
 import { Programable, ProgramablePbr } from './Programable'
 
