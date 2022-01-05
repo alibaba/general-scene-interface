@@ -39,7 +39,6 @@
 		"test": "cd test && npm test",
 		"publish": "npx lerna publish"
 	},
-	"pre-commit": [],
 	"devDependencies": {
 		"@typescript-eslint/eslint-plugin": "5.8.0",
 		"@typescript-eslint/parser": "5.8.0",
@@ -47,7 +46,6 @@
 		"eslint-config-prettier": "8.3.0",
 		"husky": "^7.0.2",
 		"lerna": "^4.0.0",
-		"pre-commit": "^1.2.2",
 		"rimraf": "^3.0.2",
 		"typescript": "^4.5.4",
 		"shelljs": "^0.8.4",

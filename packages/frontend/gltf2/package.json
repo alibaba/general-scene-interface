@@ -22,11 +22,12 @@
 	"dependencies": {
 		"@gs.i/frontend-sdk": "^0.1.0-alpha",
 		"@gs.i/schema-scene": "^0.1.0-alpha",
-		"@gs.i/utils-specify": "^0.1.0-alpha",
 		"@gs.i/utils-gltf2": "^0.1.0-alpha",
-		"@gs.i/utils-math": "^0.0.0-beta"
+		"@gs.i/utils-math": "^0.0.0-beta",
+		"@gs.i/utils-specify": "^0.1.0-alpha"
 	},
 	"devDependencies": {
 		"typescript": ">4.4.0"
-	}
+	},
+	"gitHead": "e1175ff07eaabcbd8dfe8553c501842d14853571"
 }
