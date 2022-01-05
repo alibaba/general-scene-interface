@@ -5,9 +5,9 @@
  * @TODO may cause circular importing, should be fine but still not good-looking
  */
 
-import { Geom, Attribute } from './Geom'
+import { Geometry, Attribute } from './Geom'
 
-import { MatrPoint, MatrUnlit, MatrPbr, MatrBase } from './Matr'
+import { PointMaterial, UnlitMaterial, PbrMaterial, MaterialBase } from './Matr'
 
 import { Texture, Image, Sampler } from './Texture'
 
@@ -27,7 +27,7 @@ export type LooseAttribute = OnlyRequire<Attribute, 'array'>
  */
 // export type LooseGeom = Partial<Omit<Geom, 'attributes' | 'indices'>> & LooseAttributes
 export type LooseGeom = Replace<
-	Geom,
+	Geometry,
 	{
 		/**
 		 * attributes data
@@ -74,10 +74,11 @@ type _LooseTextures = {
 	occlusionTexture?: LooseTexture
 }
 
-export type LooseMatrBase = OnlyRequire<MatrBase, 'type'>
-export type LooseMatrPbr = OnlyRequire<ReplaceShared<MatrPbr, _LooseTextures>, 'type'>
-export type LooseMatrUnlit = OnlyRequire<ReplaceShared<MatrUnlit, _LooseTextures>, 'type'>
-export type LooseMatrPoint = OnlyRequire<ReplaceShared<MatrPoint, _LooseTextures>, 'type'>
+export type LooseMaterialBase = OnlyRequire<MaterialBase, 'type'>
+export type LoosePbrMaterial = OnlyRequire<ReplaceShared<PbrMaterial, _LooseTextures>, 'type'>
+export type LooseUnlitMaterial = OnlyRequire<ReplaceShared<UnlitMaterial, _LooseTextures>, 'type'>
+export type LoosePointMaterial = OnlyRequire<ReplaceShared<PointMaterial, _LooseTextures>, 'type'>
+export type LooseMaterial = LoosePbrMaterial | LooseUnlitMaterial | LoosePointMaterial
 
 // const test: LooseMatrPbr = {
 // 	type: 'pbr',
@@ -94,7 +95,7 @@ export type LooseRenderableNode = Replace<
 	RenderableNode,
 	{
 		geometry: LooseGeom
-		material: LooseMatrBase
+		material: LooseMaterialBase
 		parent?: LooseNodeLike
 		children?: Set<LooseNodeLike>
 	}

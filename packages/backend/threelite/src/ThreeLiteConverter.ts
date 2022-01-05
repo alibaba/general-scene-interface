@@ -7,16 +7,9 @@ import { PrgStandardMaterial } from './PrgStandardMaterial'
 import { PrgBasicMaterial } from './PrgBasicMaterial'
 import { PrgPointMaterial } from './PrgPointMaterial'
 
-import {
-	MeshDataType,
-	GeomDataType,
+import IR, {
 	Texture,
 	CubeTexture,
-	AttributeDataType,
-	MatrPbrDataType,
-	MatrUnlitDataType,
-	MatrPointDataType,
-	MatrBaseDataType,
 	ColorRGB,
 	constants,
 	Int,
@@ -25,7 +18,7 @@ import {
 	isTexture,
 	isCubeTexture,
 	isTypedArray,
-	isRenderableMesh,
+	isRenderable,
 	isDISPOSED,
 	isLuminous,
 	LuminousEXT,
@@ -257,18 +250,18 @@ export class ThreeLiteConverter implements Converter {
 	// @note optimize for hidden classes
 	// private _threeObjects = new WeakMap<any, any>()
 	// TODO separate renderable mesh and node for performance
-	// private _threeObject3ds = new WeakMap<MeshDataType, Object3D>()
-	private _threeObject = new WeakMap<MeshDataType, RenderableObject3D | Object3D | Light>()
-	private _threeGeom = new WeakMap<GeomDataType, BufferGeometry>()
-	private _threeAttr = new WeakMap<AttributeDataType, BufferAttribute>()
+	// private _threeObject3ds = new WeakMap<IR.NodeLike, Object3D>()
+	private _threeObject = new WeakMap<IR.NodeLike, RenderableObject3D | Object3D | Light>()
+	private _threeGeom = new WeakMap<IR.Geometry, BufferGeometry>()
+	private _threeAttr = new WeakMap<IR.Attribute, BufferAttribute>()
 	private _threeTex = new WeakMap<Texture | CubeTexture, ThreeTexture>()
-	// TODO use GsiMatr instead because MatrBaseDataType can not be used alone
-	private _threeMatr = new WeakMap<GsiMatr | MatrBaseDataType, Material>()
+	// TODO use IR.Material instead because IR.MatrBase can not be used alone
+	private _threeMatr = new WeakMap<IR.Material | IR.MaterialBase, Material>()
 	private _threeColor = new WeakMap<ColorRGB, Color>()
 
 	// private _committedVersions = new WeakMap<any, number>()
-	private _committedAttr = new WeakMap<AttributeDataType, Int>()
-	// private _committedMatr = new WeakMap<GsiMatr | MatrBaseDataType, Int>()
+	private _committedAttr = new WeakMap<IR.Attribute, Int>()
+	// private _committedMatr = new WeakMap<IR.Material | IR.MatrBase, Int>()
 	private _committedTex = new WeakMap<Texture | CubeTexture, Int>()
 
 	// #endregion
@@ -287,7 +280,7 @@ export class ThreeLiteConverter implements Converter {
 		// this._cachedSnapshot = this.config.graphProcessor.snapshot() // init with a empty node
 	}
 
-	convert(root: MeshDataType): Object3D {
+	convert(root: IR.NodeLike): Object3D {
 		/**
 		 * @note It is not the most efficient way to get all the changed components and pre-handle them
 		 * 		 It is quicker to just handle everything during one traversal
@@ -437,7 +430,7 @@ export class ThreeLiteConverter implements Converter {
 					const currentThree = this.convNode(node)
 					// clear current children to handle removed nodes
 					// currentThree.children = [] // it should always be empty, not need to empty it every time
-					if ((isRenderableMesh(node) || isLuminous(node)) && currentThree.visible) {
+					if ((isRenderable(node) || isLuminous(node)) && currentThree.visible) {
 						rootThree.children.push(currentThree)
 					}
 				}
@@ -453,12 +446,12 @@ export class ThreeLiteConverter implements Converter {
 	 * @note run after all the geometries and materials are cached
 	 * @note require parent to be handled before child, only work for top-down traversal
 	 */
-	private convNode(gsiNode: MeshDataType): RenderableObject3D | Object3D {
+	private convNode(gsiNode: IR.NodeLike): RenderableObject3D | Object3D {
 		let threeObject = this._threeObject.get(gsiNode) as RenderableObject3D | Object3D
 
 		// create
 		if (!threeObject) {
-			if (isRenderableMesh(gsiNode)) {
+			if (isRenderable(gsiNode)) {
 				threeObject = new RenderableObject3D()
 
 				// Assign mode
@@ -514,7 +507,7 @@ export class ThreeLiteConverter implements Converter {
 		}
 		// sync
 		{
-			if (isRenderableMesh(gsiNode)) {
+			if (isRenderable(gsiNode)) {
 				// threeObject is a RenderableObject3D
 
 				const geometry = this._threeGeom.get(gsiNode.geometry) as BufferGeometry
@@ -559,7 +552,7 @@ export class ThreeLiteConverter implements Converter {
 
 		// culling
 		// TODO set .visible false will cull all its children
-		if (this.config.overrideFrustumCulling && isRenderableMesh(gsiNode) && gsiNode.visible) {
+		if (this.config.overrideFrustumCulling && isRenderable(gsiNode) && gsiNode.visible) {
 			if (this.config.cullingProcessor.isFrustumCulled(gsiNode)) {
 				this.info.culledCount++
 				threeObject.visible = false
@@ -572,7 +565,7 @@ export class ThreeLiteConverter implements Converter {
 	/**
 	 * @note run after all the attributes are cached
 	 */
-	private convGeom(gsiGeom: GeomDataType): BufferGeometry {
+	private convGeom(gsiGeom: IR.Geometry): BufferGeometry {
 		let threeGeometry = this._threeGeom.get(gsiGeom) as BufferGeometry
 
 		// create
@@ -656,7 +649,7 @@ export class ThreeLiteConverter implements Converter {
 		return threeGeometry
 	}
 
-	private convAttr(gsiAttr: AttributeDataType): BufferAttribute {
+	private convAttr(gsiAttr: IR.Attribute): BufferAttribute {
 		let threeAttribute = this._threeAttr.get(gsiAttr) as BufferAttribute
 		let committedVersion = this._committedAttr.get(gsiAttr) as Int
 
@@ -764,7 +757,7 @@ export class ThreeLiteConverter implements Converter {
 	/**
 	 * @note run after all the textures are cached
 	 */
-	private convMatr(gsiMatr: GsiMatr) {
+	private convMatr(gsiMatr: IR.Material) {
 		let threeMatr = this._threeMatr.get(gsiMatr) as Material
 		// let committedVersion = this._committedMatr.get(gsiMatr) as Int
 
@@ -774,20 +767,20 @@ export class ThreeLiteConverter implements Converter {
 				// @note just throw
 				// case 'basic':
 				// 	console.error('Use MatrUnlit instead of MatrBasic')
-				// 	threeMatr = new PrgBasicMaterial(gsiMatr as MatrUnlitDataType)
+				// 	threeMatr = new PrgBasicMaterial(gsiMatr as IR.MatrUnlit)
 				// 	break
 				case 'point':
-					threeMatr = new PrgPointMaterial(gsiMatr as MatrPointDataType)
+					threeMatr = new PrgPointMaterial(gsiMatr as IR.PointMaterial)
 					break
 				case 'unlit':
-					threeMatr = new PrgBasicMaterial(gsiMatr as MatrUnlitDataType)
+					threeMatr = new PrgBasicMaterial(gsiMatr as IR.UnlitMaterial)
 					break
 				case 'pbr':
-					threeMatr = new PrgStandardMaterial(gsiMatr as MatrPbrDataType)
+					threeMatr = new PrgStandardMaterial(gsiMatr as IR.PbrMaterial)
 					break
 				default:
 					throw 'Unsupported GSI::Material Type: ' + gsiMatr['type']
-				// threeMatr = new PrgBasicMaterial(gsiMatr as MatrUnlitDataType)
+				// threeMatr = new PrgBasicMaterial(gsiMatr as IR.MatrUnlit)
 			}
 
 			// @note better performance to just sync threeMatr.version
@@ -854,7 +847,7 @@ export class ThreeLiteConverter implements Converter {
 
 			case 'unlit': {
 				const unlitThreeMatr = threeMatr as PrgBasicMaterial
-				const matr = gsiMatr as MatrUnlitDataType
+				const matr = gsiMatr as IR.UnlitMaterial
 
 				unlitThreeMatr.color = this.convColor(matr.baseColorFactor)
 				unlitThreeMatr.map = matr.baseColorTexture
@@ -864,7 +857,7 @@ export class ThreeLiteConverter implements Converter {
 			}
 
 			case 'point': {
-				const matr = gsiMatr as MatrPointDataType
+				const matr = gsiMatr as IR.PointMaterial
 				const pointThreeMatr = threeMatr as PrgPointMaterial
 
 				pointThreeMatr.size = matr.size
@@ -1018,7 +1011,7 @@ export class ThreeLiteConverter implements Converter {
 
 	// #endregion
 
-	// recovery(node: MeshDataType) {}
+	// recovery(node: IR.NodeLike) {}
 
 	dispose() {
 		this._cachedResources = getResourcesFlat([]) // init with a empty node
@@ -1026,7 +1019,7 @@ export class ThreeLiteConverter implements Converter {
 		this._threeGeom = new WeakMap()
 		this._threeAttr = new WeakMap()
 		this._threeTex = new WeakMap()
-		// TODO use GsiMatr instead because MatrBaseDataType can not be used alone
+		// TODO use IR.Material instead because IR.MatrBase can not be used alone
 		this._threeMatr = new WeakMap()
 		this._threeColor = new WeakMap()
 
@@ -1044,22 +1037,22 @@ export class ThreeLiteConverter implements Converter {
  *
  * @deprecated use getResourcesFlat
  */
-export function getResources(root?: MeshDataType) {
+export function getResources(root?: IR.NodeLike) {
 	// programs
-	const materials = new Set<GsiMatr>()
+	const materials = new Set<IR.Material>()
 	// vao
-	const geometries = new Set<GeomDataType>()
+	const geometries = new Set<IR.Geometry>()
 	// buffers
-	const attributes = new Set<AttributeDataType>()
+	const attributes = new Set<IR.Attribute>()
 	// texture / framebuffer / samplers
 	const textures = new Set<Texture | CubeTexture>()
 
 	// @TODO uniform buffers
 
 	if (root) {
-		traverse(root, (mesh: MeshDataType) => {
-			if (isRenderableMesh(mesh)) {
-				materials.add(mesh.material as GsiMatr)
+		traverse(root, (mesh: IR.NodeLike) => {
+			if (isRenderable(mesh)) {
+				materials.add(mesh.material as IR.Material)
 				geometries.add(mesh.geometry)
 
 				// textures
@@ -1114,13 +1107,13 @@ export function getResources(root?: MeshDataType) {
  * also it's better to modify remote resources pre-frame than mid-frame to avoid stalling.
  *
  */
-export function getResourcesFlat(flatScene: MeshDataType[]) {
+export function getResourcesFlat(flatScene: IR.NodeLike[]) {
 	// programs
-	const materials = new Set<GsiMatr>()
+	const materials = new Set<IR.Material>()
 	// vao
-	const geometries = new Set<GeomDataType>()
+	const geometries = new Set<IR.Geometry>()
 	// buffers
-	const attributes = new Set<AttributeDataType>()
+	const attributes = new Set<IR.Attribute>()
 	// texture / framebuffer / samplers
 	const textures = new Set<Texture | CubeTexture>()
 
@@ -1128,8 +1121,8 @@ export function getResourcesFlat(flatScene: MeshDataType[]) {
 
 	for (let i = 0; i < flatScene.length; i++) {
 		const mesh = flatScene[i]
-		if (isRenderableMesh(mesh)) {
-			materials.add(mesh.material as GsiMatr)
+		if (isRenderable(mesh)) {
+			materials.add(mesh.material as IR.Material)
 			geometries.add(mesh.geometry)
 
 			// textures
@@ -1219,10 +1212,3 @@ export class RenderableObject3D extends Object3D {
  */
 const texLoader = new TextureLoader()
 // texLoader.setCrossOrigin('')
-
-/**
- * union type of all gsi materials
- * - better use this than MatrBaseDataType to make switch case work
- * @simon
- */
-type GsiMatr = MatrPointDataType | MatrUnlitDataType | MatrPbrDataType

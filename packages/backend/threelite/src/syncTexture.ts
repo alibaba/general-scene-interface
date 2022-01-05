@@ -1,4 +1,4 @@
-import { Texture } from '@gs.i/schema-scene'
+import IR, { Texture } from '@gs.i/schema-scene'
 import {
 	Texture as ThreeTexture,
 	NearestFilter,

@@ -3,18 +3,7 @@
  * All rights reserved.
  */
 
-import {
-	MatrBaseDataType,
-	MatrPbrDataType,
-	MatrUnlitDataType,
-	MatrPointDataType,
-	UniformDataType,
-	Programable,
-	ProgramablePbr,
-	ColorRGB,
-	Double,
-	TextureType,
-} from '@gs.i/schema-scene'
+import IR from '@gs.i/schema-scene'
 
 import { specifyMaterial } from '@gs.i/utils-specify'
 
@@ -37,7 +26,7 @@ const prgProperties = [
 /**
  * 筛选 proxy 中真正的 property 位置，使用这种方式来把所有 extensions 中的 key 映射到 matr 类上
  */
-function getObject(target: MatrBaseDataType, property) {
+function getObject(target: IR.MaterialBase, property) {
 	let o: any
 	if (Reflect.has(target, property)) {
 		o = target
@@ -77,12 +66,12 @@ function getObject(target: MatrBaseDataType, property) {
 	return o || {}
 }
 
-interface MatrBase extends MatrBaseDataType, Programable {}
-class MatrBase implements MatrBaseDataType {
+interface MatrBase extends IR.MaterialBase, IR.Programable {}
+class MatrBase implements IR.MaterialBase {
 	// legacy
 
 	/**
-	 * @deprecated use {@link MatrBaseDataType.opacity}
+	 * @deprecated use {@link IR.MaterialBase.opacity}
 	 */
 	get alphaCutoff() {
 		return this.opacity
@@ -92,7 +81,7 @@ class MatrBase implements MatrBaseDataType {
 	}
 
 	/**
-	 * @deprecated use {@link MatrBaseDataType.extensions EXT_matr_advanced}
+	 * @deprecated use {@link IR.MaterialBase.extensions EXT_matr_advanced}
 	 */
 	get depthTest() {
 		return this.extensions?.EXT_matr_advanced?.depthTest
@@ -105,7 +94,7 @@ class MatrBase implements MatrBaseDataType {
 	}
 
 	/**
-	 * @deprecated use {@link MatrBaseDataType.extensions EXT_matr_advanced}
+	 * @deprecated use {@link IR.MaterialBase.extensions EXT_matr_advanced}
 	 */
 	get depthWrite() {
 		return this.extensions?.EXT_matr_advanced?.depthWrite
@@ -143,19 +132,19 @@ class MatrBase implements MatrBaseDataType {
 
 				return true
 			},
-		}) as MatrBase & Programable
+		}) as MatrBase & IR.Programable
 	}
 }
 
-export interface MatrPbr extends MatrPbrDataType, MatrBase, ProgramablePbr {}
-export class MatrPbr extends MatrBase {
+export interface PbrMaterial extends IR.PbrMaterial, MatrBase, IR.ProgramablePbr {}
+export class PbrMaterial extends MatrBase {
 	get type() {
 		return 'pbr' as const
 	}
 
 	name = 'MatrPbr'
 
-	extensions: Required<Exclude<MatrPbrDataType['extensions'], undefined>> = {
+	extensions: Required<Exclude<IR.PbrMaterial['extensions'], undefined>> = {
 		EXT_matr_advanced: {},
 		EXT_matr_programmable: {
 			language: 'GLSL300',
@@ -166,20 +155,24 @@ export class MatrPbr extends MatrBase {
 		EXT_matr_programmable_pbr: {},
 	}
 
-	constructor(params: Partial<MatrPbr> = {}) {
+	constructor(params: Partial<PbrMaterial> = {}) {
 		super(params)
 	}
 }
+/**
+ * @deprecated renamed to {@link PbrMaterial}
+ */
+export const MatrPbr = PbrMaterial
 
-export interface MatrUnlit extends MatrBase, MatrUnlitDataType {}
-export class MatrUnlit extends MatrBase {
+export interface UnlitMaterial extends MatrBase, IR.UnlitMaterial {}
+export class UnlitMaterial extends MatrBase {
 	get type() {
 		return 'unlit' as const
 	}
 
 	name = 'MatrUnlit'
 
-	extensions: Required<Exclude<MatrUnlitDataType['extensions'], undefined>> = {
+	extensions: Required<Exclude<IR.UnlitMaterial['extensions'], undefined>> = {
 		EXT_matr_advanced: {},
 		EXT_matr_programmable: {
 			language: 'GLSL300',
@@ -189,13 +182,17 @@ export class MatrUnlit extends MatrBase {
 		},
 	}
 
-	constructor(params: Partial<MatrUnlit> = {}) {
+	constructor(params: Partial<UnlitMaterial> = {}) {
 		super(params)
 	}
 }
+/**
+ * @deprecated renamed to {@link UnlitMaterial}
+ */
+export const MatrUnlit = UnlitMaterial
 
-export interface MatrPoint extends MatrPointDataType, MatrBase {}
-export class MatrPoint extends MatrBase {
+export interface PointMaterial extends IR.PointMaterial, MatrBase {}
+export class PointMaterial extends MatrBase {
 	get type() {
 		return 'point' as const
 	}
@@ -204,7 +201,7 @@ export class MatrPoint extends MatrBase {
 
 	vertPointGeometry?: string
 
-	extensions: Required<Exclude<MatrPointDataType['extensions'], undefined>> = {
+	extensions: Required<Exclude<IR.PointMaterial['extensions'], undefined>> = {
 		EXT_matr_advanced: {},
 		EXT_matr_programmable: {
 			language: 'GLSL300',
@@ -215,7 +212,11 @@ export class MatrPoint extends MatrBase {
 		EXT_matr_programmable_point: {},
 	}
 
-	constructor(params: Partial<MatrPointDataType> = {}) {
+	constructor(params: Partial<IR.PointMaterial> = {}) {
 		super(params)
 	}
 }
+/**
+ * @deprecated renamed to {@link PointMaterial}
+ */
+export const MatrPoint = PointMaterial

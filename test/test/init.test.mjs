@@ -3,9 +3,9 @@ import { specifyMesh } from '@gs.i/utils-specify'
 import chai from 'chai'
 const expect = chai.expect
 
-// import { LooseMeshDataType } from '@gs.i/schema-scene'
+// import { LooseNodeLike } from '@gs.i/schema-scene'
 /**
- * @type LooseMeshDataType
+ * @type LooseNodeLike
  */
 const mockData = {
 	// transform: {},

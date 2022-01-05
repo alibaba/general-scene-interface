@@ -3,7 +3,7 @@
  * @note moved from @gs.i/utils-optimize
  */
 
-import { MeshDataType, isRenderableMesh, Int, BBox, RenderableMesh } from '@gs.i/schema-scene'
+import IR, { isRenderable, Int, RenderableNode } from '@gs.i/schema-scene'
 import { Processor, TraverseType } from '@gs.i/processor-base'
 import { Frustum, Euler, Quaternion, Vector3, Matrix4, Box3, Sphere } from '@gs.i/utils-math'
 
@@ -67,7 +67,7 @@ export class CullingProcessor extends Processor {
 	/**
 	 * cache
 	 */
-	private _frustumCache = new WeakMap<RenderableMesh, CullingCache>()
+	private _frustumCache = new WeakMap<RenderableNode, CullingCache>()
 
 	/**
 	 * Helper vars
@@ -131,8 +131,8 @@ export class CullingProcessor extends Processor {
 	 * @todo how to deal with non-leaf nodes
 	 * @returns true if Culled (not visible, shouldn't render)
 	 */
-	isFrustumCulled(mesh: RenderableMesh, worldMatrix?: number[]): boolean {
-		if (!isRenderableMesh(mesh)) {
+	isFrustumCulled(mesh: RenderableNode, worldMatrix?: number[]): boolean {
+		if (!isRenderable(mesh)) {
 			console.warn('this method only handle visible renderable meshes')
 			return NotCulled
 		}

@@ -12,7 +12,7 @@ import { Programable, ProgramablePbr } from './Programable'
  * gltf 中没有相关定义
  * {@link https://threejs.org/docs/#api/zh/materials/PointsMaterial}
  */
-export interface MatrPoint extends MatrBase {
+export interface PointMaterial extends MaterialBase {
 	readonly type: 'point'
 
 	/**
@@ -41,7 +41,7 @@ export interface MatrPoint extends MatrBase {
 		EXT_matr_programmable_point?: {
 			vertPointGeometry?: string
 		}
-	} & MatrBase['extensions']
+	} & MaterialBase['extensions']
 }
 
 /**
@@ -52,7 +52,7 @@ export interface MatrPoint extends MatrBase {
  *
  * {@link https://github.com/KhronosGroup/glTF/blob/master/extensions/2.0/Khronos/KHR_materials_unlit/README.md}
  */
-export interface MatrUnlit extends MatrBase {
+export interface UnlitMaterial extends MaterialBase {
 	readonly type: 'unlit'
 
 	/**
@@ -71,7 +71,7 @@ export interface MatrUnlit extends MatrBase {
  * {@link https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#reference-pbrmetallicroughness}
  * {@link https://threejs.org/docs/#api/en/materials/MeshStandardMaterial}
  */
-export interface MatrPbr extends MatrBase {
+export interface PbrMaterial extends MaterialBase {
 	readonly type: 'pbr'
 
 	// pbr
@@ -104,7 +104,7 @@ export interface MatrPbr extends MatrBase {
 
 	extensions?: {
 		EXT_matr_programmable_pbr?: ProgramablePbr
-	} & MatrBase['extensions']
+	} & MaterialBase['extensions']
 }
 
 // let a = {} as MatrPbr
@@ -118,7 +118,7 @@ export interface MatrPbr extends MatrBase {
  * {@link https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#materials}
  * {@link https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#material}
  */
-export interface MatrBase extends Versioned {
+export interface MaterialBase extends Versioned {
 	readonly type: string
 
 	/**
@@ -264,3 +264,9 @@ export interface MatrBase extends Versioned {
 	 */
 	extras?: any
 }
+
+/**
+ * union type of all gsi materials
+ * @simon
+ */
+export type Material = PointMaterial | UnlitMaterial | PbrMaterial

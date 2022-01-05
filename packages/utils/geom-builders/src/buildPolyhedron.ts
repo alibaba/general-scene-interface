@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-import { AttributeDataType, GeomDataType } from '@gs.i/schema-scene'
+import { Attribute, Geometry } from '@gs.i/schema-scene'
 import { Box3, Sphere, Vector2, Vector3 } from '@gs.i/utils-math'
 
 export const DefaultParams = {
@@ -22,7 +22,7 @@ export function buildPolyhedron(params: {
 	detail: number
 	normal: boolean
 	uv: boolean
-}): GeomDataType {
+}): Geometry {
 	params = {
 		...DefaultParams,
 		...params,
@@ -258,7 +258,7 @@ export function buildPolyhedron(params: {
 
 	// build non-indexed geometry
 
-	const position: AttributeDataType = {
+	const position: Attribute = {
 		array: new Float32Array(vertexBuffer),
 		itemSize: 3,
 		count: vertexBuffer.length / 3,
@@ -270,7 +270,7 @@ export function buildPolyhedron(params: {
 
 	box.getBoundingSphere(sphere)
 
-	const geom: GeomDataType = {
+	const geom: Geometry = {
 		mode: 'TRIANGLES' as const,
 		attributes: {
 			position: position,

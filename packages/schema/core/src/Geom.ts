@@ -10,7 +10,7 @@ import { UpdateRanges, TypedArray, BBox, BSphere, DISPOSED, Versioned, Int } fro
  * @todo morph
  * {@link https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#primitive}
  */
-export interface Geom {
+export interface Geometry {
 	/**
 	 * - const GLenum POINTS                         = 0x0000;
 	 * - const GLenum LINES                          = 0x0001;
@@ -26,7 +26,7 @@ export interface Geom {
 	/**
 	 * attributes data
 	 * @note only standard attributes here
-	 * @note custom attributes should be put in {@link Geom.extensions} and start with "_"
+	 * @note custom attributes should be put in {@link Geometry.extensions} and start with "_"
 	 */
 	attributes: {
 		/**
@@ -80,11 +80,11 @@ export interface Geom {
 		 * - uv2~8
 		 */
 
-		position?: AttributeVec3
-		normal?: AttributeVec3
-		uv?: AttributeVec2
-		uv2?: AttributeVec2
-		color?: AttributeVec3 | AttributeVec4
+		position?: Vec3Attribute
+		normal?: Vec3Attribute
+		uv?: Vec2Attribute
+		uv2?: Vec2Attribute
+		color?: Vec3Attribute | Vec4Attribute
 
 		[name: string]: Attribute | undefined
 	}
@@ -92,7 +92,7 @@ export interface Geom {
 	/**
 	 * 索引
 	 */
-	indices?: AttributeScalar
+	indices?: ScalarAttribute
 
 	extensions?: {
 		/**
@@ -162,18 +162,18 @@ export interface Geom {
  * @todo stride (interpolation)
  * @todo instanced
  */
-export type Attribute = AttributeVec3 | AttributeVec2 | AttributeScalar | AttributeVec4
+export type Attribute = Vec3Attribute | Vec2Attribute | ScalarAttribute | Vec4Attribute
 
-export interface AttributeVec4 extends AttributeBase {
+export interface Vec4Attribute extends AttributeBase {
 	itemSize: 4
 }
-export interface AttributeVec3 extends AttributeBase {
+export interface Vec3Attribute extends AttributeBase {
 	itemSize: 3
 }
-export interface AttributeVec2 extends AttributeBase {
+export interface Vec2Attribute extends AttributeBase {
 	itemSize: 2
 }
-export interface AttributeScalar extends AttributeBase {
+export interface ScalarAttribute extends AttributeBase {
 	itemSize: 1
 }
 export interface AttributeBase extends Versioned {

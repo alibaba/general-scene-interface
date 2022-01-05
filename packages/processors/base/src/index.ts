@@ -1,4 +1,4 @@
-import { MeshDataType, LooseMeshDataType } from '@gs.i/schema-scene'
+import IR from '@gs.i/schema-scene'
 import { traverse, traversePostOrder } from '@gs.i/utils-traverse'
 
 export interface IProcessor {
@@ -29,7 +29,7 @@ export interface IProcessor {
 	readonly canEditTree: boolean
 }
 
-export class Processor<Input extends LooseMeshDataType = MeshDataType> implements IProcessor {
+export class Processor<Input extends IR.LooseNodeLike = IR.NodeLike> implements IProcessor {
 	type = 'Processor'
 
 	/**
@@ -71,9 +71,9 @@ export class Processor<Input extends LooseMeshDataType = MeshDataType> implement
 	 */
 	traverse(mesh: Input) {
 		if ((this.traverseType & TraverseType.PreOrder) === TraverseType.PreOrder) {
-			traverse(mesh as MeshDataType, this.processNode.bind(this))
+			traverse(mesh as IR.NodeLike, this.processNode.bind(this))
 		} else if ((this.traverseType & TraverseType.PostOrder) === TraverseType.PostOrder) {
-			traversePostOrder(mesh as MeshDataType, this.processNode.bind(this))
+			traversePostOrder(mesh as IR.NodeLike, this.processNode.bind(this))
 		} else if (this.traverseType === TraverseType.None) {
 			console.warn(`This processor (${this.type}) does not traverse, skipped`)
 		} else {
@@ -84,7 +84,7 @@ export class Processor<Input extends LooseMeshDataType = MeshDataType> implement
 	/**
 	 * process the node only. ignore it's children
 	 */
-	processNode(mesh: MeshDataType, parent?: MeshDataType) {
+	processNode(mesh: IR.NodeLike, parent?: IR.NodeLike) {
 		console.warn(`processor (${this.type}) .processNode is not implemented.`)
 	}
 

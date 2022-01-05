@@ -10,7 +10,7 @@ import vsVertOutput from './lv24.vertOutput.glsl'
 import nativeVertGeometry from './lv1.vertGeometry.glsl'
 import pointsVertGeometry from './lv0.vertGeometry.glsl'
 import FS from './fs.glsl'
-import { ColorRGB, MatrPointDataType, Vec2, TextureType, Programable } from '@gs.i/schema-scene'
+import { ColorRGB, Vec2, Texture } from '@gs.i/schema-scene'
 
 export interface GLineMatrConfig {
 	/**
@@ -39,7 +39,7 @@ export interface GLineMatrConfig {
 
 	transparent?: boolean
 
-	texture?: TextureType
+	texture?: Texture
 
 	pointSize?: number
 

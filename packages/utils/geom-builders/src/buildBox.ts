@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-import { AttributeDataType, GeomDataType } from '@gs.i/schema-scene'
+import { Attribute, Geometry } from '@gs.i/schema-scene'
 
 export const DefaultParams = {
 	width: 1,
@@ -27,7 +27,7 @@ export function buildBox(
 		normal: boolean
 		uv: boolean
 	}> = {}
-): GeomDataType {
+): Geometry {
 	const finalParam = {
 		...DefaultParams,
 		...params,
@@ -145,7 +145,7 @@ export function buildBox(
 
 	// build geometry
 
-	const position: AttributeDataType = {
+	const position: Attribute = {
 		array: new Float32Array(vertices),
 		itemSize: 3,
 		count: vertices.length / 3,
@@ -155,7 +155,7 @@ export function buildBox(
 		disposable: true,
 	}
 
-	const indicesAttr: AttributeDataType = {
+	const indicesAttr: Attribute = {
 		array: maxIndex < 65536 ? new Uint16Array(indices) : new Uint32Array(indices),
 		itemSize: 1,
 		count: indices.length,
@@ -165,7 +165,7 @@ export function buildBox(
 		disposable: true,
 	}
 
-	const geom: GeomDataType = {
+	const geom: Geometry = {
 		mode: 'TRIANGLES' as const,
 		attributes: {
 			position: position,

@@ -3,18 +3,13 @@
  * All rights reserved.
  */
 
-import type {
-	MeshDataType,
-	MatrBaseDataType,
-	AttributeDataType,
+import IR, {
+	Attribute,
 	ColorRGB,
 	TypedArray,
-	LooseMeshDataType,
-} from '@gs.i/schema-scene'
-
-import {
-	isMatrPbrDataType,
-	isMatrUnlitDataType,
+	LooseNodeLike,
+	isMatrPbr,
+	isMatrUnlit,
 	isColorRGB,
 	isTypedArray,
 	isRenderableMesh,
@@ -94,10 +89,10 @@ export class GLTF2Convertor implements Converter {
 	 */
 	readonly type = 'GLTF2'
 
-	_meshesCache = new WeakMap<MeshDataType, number>()
-	_materialsCache = new WeakMap<MatrBaseDataType, number>()
-	_accessorsCache = new WeakMap<AttributeDataType, number>()
-	_nodesCache = new WeakMap<MeshDataType, number>()
+	_meshesCache = new WeakMap<IR.NodeLike, number>()
+	_materialsCache = new WeakMap<IR.MaterialBase, number>()
+	_accessorsCache = new WeakMap<Attribute, number>()
+	_nodesCache = new WeakMap<IR.NodeLike, number>()
 	_texturesCache = new WeakMap()
 
 	private config: typeof DefaultConfig
@@ -114,18 +109,18 @@ export class GLTF2Convertor implements Converter {
 	 * @param root
 	 * @returns
 	 */
-	convertLoose(root: LooseMeshDataType): GLM {
-		traverse(root as MeshDataType, (gsiMesh: MeshDataType) => {
+	convertLoose(root: LooseNodeLike): GLM {
+		traverse(root as IR.NodeLike, (gsiMesh: IR.NodeLike) => {
 			specifyMesh(gsiMesh)
 		})
 
-		return this.convert(root as MeshDataType)
+		return this.convert(root as IR.NodeLike)
 	}
 
 	/**
 	 * 转换成 gltf2 内存格式
 	 */
-	convert(root: MeshDataType): GLM {
+	convert(root: IR.NodeLike): GLM {
 		// 初始化
 
 		const result = new GLM()
@@ -163,7 +158,7 @@ export class GLTF2Convertor implements Converter {
 		// 第二遍生成 node 树（添加 children）
 		// 之所以要分两遍是因为第一次遍历的时候不知道 children 的 index
 		// TODO 通过广度优先来简化成一次
-		traverse(root, (gsiMesh: MeshDataType) => {
+		traverse(root, (gsiMesh: IR.NodeLike) => {
 			const node: GLTF.Node = {
 				matrix: this.config.matrixProcessor.getLocalMatrix(gsiMesh),
 				// children: [],
@@ -205,7 +200,7 @@ export class GLTF2Convertor implements Converter {
 					primitive.material = this._materialsCache.get(matr)
 				} else {
 					let material: GLTF.Material
-					if (isMatrPbrDataType(matr)) {
+					if (isMatrPbr(matr)) {
 						material = {
 							name: matr.name,
 							pbrMetallicRoughness: {
@@ -219,7 +214,7 @@ export class GLTF2Convertor implements Converter {
 							// emissiveTexture: { index: 1, texCoord: 1, },
 							emissiveFactor: convColor(matr.emissiveFactor),
 						}
-					} else if (isMatrUnlitDataType(matr)) {
+					} else if (isMatrUnlit(matr)) {
 						// https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_unlit
 						material = {
 							name: matr.name,
@@ -373,7 +368,7 @@ export class GLTF2Convertor implements Converter {
 				}
 			}
 		})
-		traverse(root, (gsiMesh: MeshDataType) => {
+		traverse(root, (gsiMesh: IR.NodeLike) => {
 			const nodeIndex = this._nodesCache.get(gsiMesh) as number
 			const node = result.nodes[nodeIndex]
 
@@ -678,7 +673,7 @@ function convColor(gsiColor: ColorRGB | string): number[] {
 	}
 }
 
-function traverse(mesh: MeshDataType, f: (mesh: MeshDataType) => void) {
+function traverse(mesh: IR.NodeLike, f: (mesh: IR.NodeLike) => void) {
 	f(mesh)
 	if (mesh.children) {
 		mesh.children.forEach((child) => {

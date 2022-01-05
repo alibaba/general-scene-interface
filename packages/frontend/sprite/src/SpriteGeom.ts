@@ -1,6 +1,6 @@
 import { computeBBox, computeBSphere } from '@gs.i/utils-geometry'
 import { Geom, Attr } from '@gs.i/frontend-sdk'
-import { BBox, BSphere, isDISPOSED, GeomDataType } from '@gs.i/schema-scene'
+import IR, { BBox, BSphere, isDISPOSED } from '@gs.i/schema-scene'
 
 export interface SpriteGeomConfig {
 	/**
@@ -59,7 +59,7 @@ export class SpriteGeom extends Geom {
 		aScale?: Attr<2>
 		aRotation?: Attr<1>
 	} & Geom['attributes']
-	extensions: Exclude<GeomDataType['extensions'], undefined> = {
+	extensions: Exclude<IR.Geometry['extensions'], undefined> = {
 		EXT_geometry_bounds: {
 			box: {
 				min: { x: -Infinity, y: -Infinity, z: -Infinity },

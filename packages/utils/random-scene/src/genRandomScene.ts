@@ -2,18 +2,7 @@
  * Random scene generator
  */
 
-import {
-	LooseMeshDataType,
-	MeshDataType,
-	Node,
-	Int,
-	Double,
-	Transform3TRS,
-	GeomDataType,
-	MatrBaseDataType,
-	isRenderableMesh,
-	Luminous,
-} from '@gs.i/schema-scene'
+import IR, { BaseNode, Int, Double } from '@gs.i/schema-scene'
 import { specifyTree } from '@gs.i/utils-specify'
 import {
 	AutoVersionTransform3,
@@ -21,9 +10,7 @@ import {
 	MatrUnlit,
 	MatrPoint,
 	Mesh,
-	TextureData,
-	ImageData,
-	Sampler,
+	Texture,
 	Geom,
 	Attr,
 	PointLight,
@@ -182,7 +169,7 @@ export function generateScene(config: Config = {}): Mesh {
 
 	// how to build a tree that has specified depth and leaf count
 
-	const trunk = [root] as Node[]
+	const trunk = [root] as BaseNode[]
 
 	const depth = config.depth || 1
 
@@ -300,11 +287,11 @@ export function getMesh(config: Config): Mesh | PointLight {
 	return mesh
 }
 
-export function getGeom(config: Config): GeomDataType {
+export function getGeom(config: Config): IR.Geometry {
 	return getRandomBuilder()(config.scale ?? 1, config)
 }
 
-export function getMatr(config: Config): MatrBaseDataType {
+export function getMatr(config: Config): IR.MaterialBase {
 	let usePBR = config.usePBR
 	if (usePBR && config.ditherOptions) usePBR = Math.random() > 0.5
 
@@ -324,7 +311,7 @@ export function getMatr(config: Config): MatrBaseDataType {
 			roughnessFactor: 0.1 + Math.random() * 0.8,
 			baseColorTexture:
 				Math.random() > 0.5
-					? new TextureData(
+					? new Texture(
 							{
 								imageSource:
 									'https://img.alicdn.com/imgextra/i3/O1CN01RbMgmM1DWAzg60GCD_!!6000000000223-0-tps-1024-1024.jpg',
@@ -342,7 +329,7 @@ export function getMatr(config: Config): MatrBaseDataType {
 			},
 			baseColorTexture:
 				Math.random() > 0.5
-					? new TextureData(
+					? new Texture(
 							{
 								imageSource:
 									'https://img.alicdn.com/imgextra/i3/O1CN01RbMgmM1DWAzg60GCD_!!6000000000223-0-tps-1024-1024.jpg',
@@ -413,7 +400,7 @@ function buildGLine(options = { scale: 100, lines: 2, linePoints: 3, resolution:
 		useColors: Math.random() > 0.5,
 		texture:
 			Math.random() > 0.5
-				? new TextureData(
+				? new Texture(
 						{
 							imageSource:
 								'https://img.alicdn.com/imgextra/i2/O1CN01ffcMiO1cHr2q8UYnx_!!6000000003576-2-tps-6-968.png',
@@ -467,7 +454,7 @@ function buildPoints(scale = 100) {
 		},
 		baseColorTexture:
 			Math.random() > 0.5
-				? new TextureData(
+				? new Texture(
 						{
 							imageSource:
 								'https://img.alicdn.com/imgextra/i3/O1CN01RbMgmM1DWAzg60GCD_!!6000000000223-0-tps-1024-1024.jpg',
@@ -520,7 +507,7 @@ function buildSprite(config = { scale: 100, count: 10 }) {
 		},
 		baseColorTexture:
 			Math.random() > 0.5
-				? new TextureData(
+				? new Texture(
 						{
 							imageSource:
 								'https://img.alicdn.com/imgextra/i3/O1CN01RbMgmM1DWAzg60GCD_!!6000000000223-0-tps-1024-1024.jpg',

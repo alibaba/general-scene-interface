@@ -5,26 +5,27 @@
 import {
 	AttributeBase,
 	CubeTexture,
-	Geom,
+	Geometry,
 	Texture,
 	Attribute,
-	AttributeVec3,
-	AttributeVec2,
-	AttributeScalar,
-	AttributeVec4,
+	Vec3Attribute,
+	Vec2Attribute,
+	ScalarAttribute,
+	Vec4Attribute,
 	Image,
 	Sampler,
 	Uniform,
-	MatrPoint,
-	MatrUnlit,
-	MatrPbr,
-	MatrBase,
+	PointMaterial,
+	UnlitMaterial,
+	PbrMaterial,
+	MaterialBase,
 	LooseGeom,
 	LooseSampler,
 	LooseImage,
-	LooseMatrPbr,
-	LooseMatrUnlit,
-	LooseMatrPoint,
+	LooseMaterialBase,
+	LoosePbrMaterial,
+	LooseUnlitMaterial,
+	LoosePointMaterial,
 	isMatrPbr,
 	isMatrUnlit,
 	isMatrPoint,
@@ -43,7 +44,7 @@ import {
 /**
  * @deprecated use {@link Geom} as `IR.Geom` instead
  */
-export type GeomDataType = Geom
+export type GeomDataType = Geometry
 
 /**
  * @deprecated use {@link AttributeBase} as `IR.AttributeBase` instead
@@ -78,25 +79,25 @@ export type CubeTextureType = CubeTexture
  */
 export type AttributeDataType = Attribute
 /**
- * @deprecated use {@link AttributeVec3} as `IR.AttributeVec3` instead
- * @alias AttributeVec3
+ * @deprecated use {@link Vec3Attribute} as `IR.Vec3Attribute` instead
+ * @alias Vec3Attribute
  */
-export type AttributeVec3DataType = AttributeVec3
+export type AttributeVec3DataType = Vec3Attribute
 /**
- * @deprecated use {@link AttributeVec2} as `IR.AttributeVec2` instead
- * @alias AttributeVec2
+ * @deprecated use {@link Vec2Attribute} as `IR.Vec2Attribute` instead
+ * @alias Vec2Attribute
  */
-export type AttributeVec2DataType = AttributeVec2
+export type AttributeVec2DataType = Vec2Attribute
 /**
- * @deprecated use {@link AttributeScalar} as `IR.AttributeScalar` instead
- * @alias AttributeScalar
+ * @deprecated use {@link ScalarAttribute} as `IR.ScalarAttribute` instead
+ * @alias ScalarAttribute
  */
-export type AttributeScalarDataType = AttributeScalar
+export type AttributeScalarDataType = ScalarAttribute
 /**
- * @deprecated use {@link AttributeVec4} as `IR.AttributeVec4` instead
- * @alias AttributeVec4
+ * @deprecated use {@link Vec4Attribute} as `IR.Vec4Attribute` instead
+ * @alias Vec4Attribute
  */
-export type AttributeVec4DataType = AttributeVec4
+export type AttributeVec4DataType = Vec4Attribute
 
 /**
  * @deprecated use {@link Image} as `IR.Image` instead
@@ -119,22 +120,22 @@ export type UniformDataType = Uniform
  * @deprecated use {@link MatrPoint} as `IR.MatrPoint` instead
  * @alias MatrPoint
  */
-export type MatrPointDataType = MatrPoint
+export type MatrPointDataType = PointMaterial
 /**
  * @deprecated use {@link MatrUnlit} as `IR.MatrUnlit` instead
  * @alias MatrUnlit
  */
-export type MatrUnlitDataType = MatrUnlit
+export type MatrUnlitDataType = UnlitMaterial
 /**
- * @deprecated use {@link MatrPbr} as `IR.MatrPbr` instead
- * @alias MatrPbr
+ * @deprecated use {@link PbrMaterial} as `IR.PbrMaterial` instead
+ * @alias PbrMaterial
  */
-export type MatrPbrDataType = MatrPbr
+export type MatrPbrDataType = PbrMaterial
 /**
- * @deprecated use {@link MatrBase} as `IR.MatrBase` instead
- * @alias MatrBase
+ * @deprecated use {@link MaterialBase} as `IR.MaterialBase` instead
+ * @alias MaterialBase
  */
-export type MatrBaseDataType = MatrBase
+export type MatrBaseDataType = MaterialBase
 
 /**
  * @deprecated use {@link NodeLike} as `IR.NodeLike` instead
@@ -183,20 +184,20 @@ export type LooseImageDataType = LooseImage
  */
 export type LooseTextureType = LooseTexture
 /**
- * @deprecated use {@link LooseMatrPbr} as `IR.LooseMatrPbr` instead
- * @alias LooseMatrPbr
+ * @deprecated use {@link LoosePbrMaterial} as `IR.LoosePbrMaterial` instead
+ * @alias LoosePbrMaterial
  */
-export type LooseMatrPbrDataType = LooseMatrPbr
+export type LooseMatrPbrDataType = LoosePbrMaterial
 /**
- * @deprecated use {@link LooseMatrUnlit} as `IR.LooseMatrUnlit` instead
- * @alias LooseMatrUnlit
+ * @deprecated use {@link LooseUnlitMaterial} as `IR.LooseUnlitMaterial` instead
+ * @alias LooseUnlitMaterial
  */
-export type LooseMatrUnlitDataType = LooseMatrUnlit
+export type LooseMatrUnlitDataType = LooseUnlitMaterial
 /**
- * @deprecated use {@link LooseMatrPoint} as `IR.LooseMatrPoint` instead
- * @alias LooseMatrPoint
+ * @deprecated use {@link LoosePointMaterial} as `IR.LoosePointMaterial` instead
+ * @alias LoosePointMaterial
  */
-export type LooseMatrPointDataType = LooseMatrPoint
+export type LooseMatrPointDataType = LoosePointMaterial
 
 /**
  * @deprecated use {@link LooseRenderableNode} as `IR.LooseRenderableNode` instead

@@ -1,51 +1,13 @@
-import {
-	MeshDataType,
-	RenderableMesh,
-	MatrBaseDataType,
-	Luminous,
-	LuminousEXT,
-	// MatrUnlitDataType,
-	// MatrPbrDataType,
-	// MatrPointDataType,
-	// MatrSpriteDataType,
-	Texture,
-	ImageDataType,
-	SamplerDataType,
-	GeomDataType,
-	AttributeDataType,
-	Transform3,
-	Transform2,
-	DISPOSED,
-
-	// loose types
-	LooseMatrBase,
-	LooseMatrPbrDataType,
-	LooseMatrUnlitDataType,
-	LooseMatrPointDataType,
-	LooseAttribute,
-	LooseGeomDataType,
-	LooseSamplerDataType,
-	LooseImageDataType,
-	LooseTextureType,
-	// LooseNode,
-	// LooseRenderableMesh,
-	LooseMeshDataType,
-
-	//
-	isTransform3Matrix,
-	// isTransform3TRS,
-	// isTransform2Matrix,
-	// isTransform2TRS,
-} from '@gs.i/schema-scene'
+import IR from '@gs.i/schema-scene'
 
 import { traverse } from '@gs.i/utils-traverse'
 
-export function specifyTree(root: LooseMeshDataType): MeshDataType {
-	traverse(root as MeshDataType, (node) => {
-		specifyMesh(node)
+export function specifyTree(root: IR.LooseNodeLike): IR.NodeLike {
+	traverse(root as IR.NodeLike, (node) => {
+		specifyNode(node)
 	})
 
-	return root as MeshDataType
+	return root as IR.NodeLike
 }
 
 /**
@@ -56,11 +18,11 @@ export function specifyTree(root: LooseMeshDataType): MeshDataType {
  * - **not** includes its children.
  * @param LooseMesh
  */
-export function specifyNode(node: LooseMeshDataType, parent?: LooseMeshDataType): MeshDataType {
+export function specifyNode(node: IR.LooseNodeLike, parent?: IR.LooseNodeLike): IR.NodeLike {
 	// const cached = this.cache.get(node)
 	// if (cached) return cached
 
-	if (parent) node.parent = parent as MeshDataType | undefined
+	if (parent) node.parent = parent as IR.NodeLike | undefined
 
 	if (node.name === undefined) node.name = 'unnamed mesh'
 	if (node.extensions === undefined) node.extensions = {}
@@ -71,11 +33,11 @@ export function specifyNode(node: LooseMeshDataType, parent?: LooseMeshDataType)
 	if (node.transform === undefined) node.transform = genDefaultTransform3()
 	specifyTransform3(node.transform)
 
-	if (isRenderableMesh(node)) {
+	if (isRenderable(node)) {
 		specifyMaterial(node.material)
 		specifyGeometry(node.geometry)
-	} else if (isLuminous(node)) {
-		const l = node.extensions.EXT_luminous as LuminousEXT
+	} else if (isLuminousNode(node)) {
+		const l = node.extensions.EXT_luminous as IR.LuminousEXT
 		if (l.type === undefined) throw new SchemaNotValid('EXT_luminous.type is necessary.')
 		if (l.name === undefined) l.name = 'untitled-luminous'
 		if (l.color === undefined) l.color = { r: 1, g: 1, b: 1 }
@@ -83,7 +45,7 @@ export function specifyNode(node: LooseMeshDataType, parent?: LooseMeshDataType)
 		if (l.range === undefined) l.range = Infinity
 	}
 
-	return node as MeshDataType
+	return node as IR.NodeLike
 }
 
 /**
@@ -96,7 +58,7 @@ export const specifyMesh = specifyNode
  * @param matr
  * @returns
  */
-export function specifyMaterial(matr: LooseMatrBase): MatrBaseDataType {
+export function specifyMaterial(matr: IR.LooseMaterialBase): IR.MaterialBase {
 	/**
 	 * common
 	 */
@@ -161,7 +123,7 @@ export function specifyMaterial(matr: LooseMatrBase): MatrBaseDataType {
 
 	// un-recognized matr type
 
-	return matr as MatrBaseDataType
+	return matr as IR.MaterialBase
 }
 
 /**
@@ -169,7 +131,7 @@ export function specifyMaterial(matr: LooseMatrBase): MatrBaseDataType {
  * @param geom
  * @returns
  */
-export function specifyGeometry(geom: LooseGeomDataType): GeomDataType {
+export function specifyGeometry(geom: IR.LooseGeom): IR.Geometry {
 	if (geom.mode === undefined) geom.mode = 'TRIANGLES'
 	if (geom.extensions === undefined) geom.extensions = {}
 
@@ -192,10 +154,10 @@ export function specifyGeometry(geom: LooseGeomDataType): GeomDataType {
 		specifyAttribute(geom.indices, 'indices')
 	}
 
-	return geom as GeomDataType
+	return geom as IR.Geometry
 }
 
-export function specifyAttribute(attribute: LooseAttribute, name = ''): AttributeDataType {
+export function specifyAttribute(attribute: IR.LooseAttribute, name = ''): IR.Attribute {
 	if (attribute.array === undefined)
 		throw new SchemaNotValid(`attribute[${name}] .array can not be undefined`)
 
@@ -203,7 +165,7 @@ export function specifyAttribute(attribute: LooseAttribute, name = ''): Attribut
 		throw new SchemaNotValid(`attribute[${name}] .itemSize can not be undefined`)
 
 	if (attribute.count === undefined) {
-		if (attribute.array === DISPOSED)
+		if (attribute.array === IR.DISPOSED)
 			throw new SchemaNotValid(`attribute[${name}] .array can not be DISPOSED before actually used`)
 
 		attribute.count = attribute.array.length / attribute.itemSize
@@ -216,7 +178,7 @@ export function specifyAttribute(attribute: LooseAttribute, name = ''): Attribut
 
 	if (attribute.extensions === undefined) attribute.extensions = {}
 
-	return attribute as AttributeDataType
+	return attribute as IR.Attribute
 }
 
 /**
@@ -224,7 +186,7 @@ export function specifyAttribute(attribute: LooseAttribute, name = ''): Attribut
  * @param t
  * @returns
  */
-export function specifyTexture(t: LooseTextureType): Texture {
+export function specifyTexture(t: IR.LooseTexture): IR.Texture {
 	if (t.image === undefined) throw new SchemaNotValid(`texture.image can not be undefined`)
 
 	specifyImage(t.image)
@@ -237,10 +199,10 @@ export function specifyTexture(t: LooseTextureType): Texture {
 	if (t.extensions === undefined) t.extensions = {}
 	if (t.extras === undefined) t.extras = {}
 
-	return t as Texture
+	return t as IR.Texture
 }
 
-export function specifyImage(i: LooseImageDataType): ImageDataType {
+export function specifyImage(i: IR.LooseImage): IR.Image {
 	if (i.version === undefined) i.version = 0
 
 	// verify image data source
@@ -287,10 +249,10 @@ export function specifyImage(i: LooseImageDataType): ImageDataType {
 		throw new SchemaNotValid(`texture.image doesn't have any image data source`)
 	}
 
-	return i as ImageDataType
+	return i as IR.Image
 }
 
-export function specifySampler(s: LooseSamplerDataType): SamplerDataType {
+export function specifySampler(s: IR.LooseSampler): IR.Sampler {
 	if (s.magFilter === undefined) s.magFilter = 'NEAREST'
 	if (s.minFilter === undefined) s.minFilter = 'NEAREST'
 	if (s.wrapS === undefined) s.wrapS = 'CLAMP_TO_EDGE'
@@ -298,14 +260,14 @@ export function specifySampler(s: LooseSamplerDataType): SamplerDataType {
 	if (s.anisotropy === undefined) s.anisotropy = 0
 	if (s.extensions === undefined) s.extensions = {}
 	if (s.extras === undefined) s.extras = {}
-	return s as SamplerDataType
+	return s as IR.Sampler
 }
 
 /**
  * specify transform
  */
-export function specifyTransform3(transform: Transform3) {
-	if (isTransform3Matrix(transform)) {
+export function specifyTransform3(transform: IR.Transform3) {
+	if (IR.isTransform3Matrix(transform)) {
 		if (transform.position || transform.quaternion || transform.rotation || transform.scale) {
 			throw new SchemaNotValid(
 				'mesh.transform either has .matrix or TRS(.position .rotation etc.), can not have both.'
@@ -335,30 +297,30 @@ function genDefaultTransform3() {
 	return {
 		version: -1,
 		matrix: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
-	} as Transform3
+	} as IR.Transform3
 }
 function genDefaultTransform2() {
 	return {
 		version: -1,
 		matrix: [1, 0, 0, 0, 1, 0, 0, 0, 1],
-	} as Transform2
+	} as IR.Transform2
 }
 
-export function isMatrPbrDataType(v: LooseMatrBase): v is LooseMatrPbrDataType {
+export function isMatrPbrDataType(v: IR.LooseMaterialBase): v is IR.LoosePbrMaterial {
 	return v.type === 'pbr'
 }
 
-export function isMatrUnlitDataType(v: LooseMatrBase): v is LooseMatrUnlitDataType {
+export function isMatrUnlitDataType(v: IR.LooseMaterialBase): v is IR.LooseUnlitMaterial {
 	return v.type === 'unlit'
 }
 
-export function isMatrPointDataType(v: LooseMatrBase): v is LooseMatrPointDataType {
+export function isMatrPointDataType(v: IR.LooseMaterialBase): v is IR.LoosePointMaterial {
 	return v.type === 'point'
 }
 
-export function isRenderableMesh(v: LooseMeshDataType): v is RenderableMesh {
+export function isRenderable(v: IR.LooseNodeLike): v is IR.RenderableNode {
 	return v['geometry'] && v['material']
 }
-export function isLuminous(v: LooseMeshDataType): v is Luminous {
+export function isLuminousNode(v: IR.LooseNodeLike): v is IR.LuminousNode {
 	return v.extensions?.EXT_luminous !== undefined
 }

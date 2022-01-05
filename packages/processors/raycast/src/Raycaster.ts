@@ -3,11 +3,11 @@
  * @note moved from @gs.i/utils-optimize
  */
 
-import {
+import IR, {
 	Vec3,
-	isRenderableMesh,
+	isRenderable,
 	BBox,
-	RenderableMesh,
+	RenderableNode,
 	BSphere,
 	isDISPOSED,
 	TypedArray,
@@ -138,11 +138,8 @@ export class Raycaster extends Processor {
 	 * @param {boolean} [allInters=false] By default the method will stop when first intersection is found, set allInters = true to get all intersections sorted from near to far
 	 * @note update this mesh's matrix before calling this
 	 */
-	raycast(mesh: RenderableMesh, allInters = false): RaycastInfo {
-		if (
-			!isRenderableMesh(mesh) ||
-			mesh.material.extensions?.EXT_matr_programmable?.vertexModified
-		) {
+	raycast(mesh: RenderableNode, allInters = false): RaycastInfo {
+		if (!isRenderable(mesh) || mesh.material.extensions?.EXT_matr_programmable?.vertexModified) {
 			return { hit: false, hittable: false, intersections: [] }
 		}
 
@@ -163,7 +160,7 @@ export class Raycaster extends Processor {
 	 *
 	 * @param {boolean} [allInters=false] By default the method will stop when first intersection is found, set allInters = true to get all intersections sorted from near to far
 	 */
-	private intersectTriangleMesh(mesh: RenderableMesh, allInters = false): RaycastInfo {
+	private intersectTriangleMesh(mesh: RenderableNode, allInters = false): RaycastInfo {
 		const result: RaycastInfo = {
 			hit: false,
 			intersections: [],
@@ -281,14 +278,14 @@ export class Raycaster extends Processor {
 	 * @param {number} threshold The maximum picking distance for this line mesh
 	 * @param {boolean} [allInters=false] By default the method will stop when first intersection is found, set allInters = true to get all intersections sorted from near to far
 	 */
-	private intersectLineMesh(mesh: RenderableMesh, allInters = false): RaycastInfo {
+	private intersectLineMesh(mesh: RenderableNode, allInters = false): RaycastInfo {
 		throw 'NOT IMPLEMENTED'
 	}
 	/**
 	 * @param {number} threshold The maximum picking distance for this line mesh
 	 * @param {boolean} [allInters=false] By default the method will stop when first intersection is found, set allInters = true to get all intersections sorted from near to far
 	 */
-	private intersectPointMesh(mesh: RenderableMesh, allInters = false): RaycastInfo {
+	private intersectPointMesh(mesh: RenderableNode, allInters = false): RaycastInfo {
 		throw 'NOT IMPLEMENTED'
 	}
 }

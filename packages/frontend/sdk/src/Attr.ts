@@ -3,20 +3,11 @@
  * All rights reserved.
  */
 
-import {
-	TypedArray,
-	AttributeBaseDataType,
-	AttributeVec3DataType,
-	AttributeVec2DataType,
-	AttributeScalarDataType,
-	AttributeVec4DataType,
-	DISPOSED,
-	isDISPOSED,
-} from '@gs.i/schema-scene'
+import IR, { TypedArray, DISPOSED, isDISPOSED } from '@gs.i/schema-scene'
 import { specifyAttribute } from '@gs.i/utils-specify'
 
-export interface Attr<T extends AttributeBaseDataType['itemSize']> extends AttributeBaseDataType {}
-export class Attr<T extends AttributeBaseDataType['itemSize']> implements AttributeBaseDataType {
+export interface Attr<T extends IR.AttributeBase['itemSize']> extends IR.AttributeBase {}
+export class Attr<T extends IR.AttributeBase['itemSize']> implements IR.AttributeBase {
 	itemSize: T
 	/**
 	 * array.length / itemSize
@@ -58,7 +49,7 @@ export class Attr<T extends AttributeBaseDataType['itemSize']> implements Attrib
  * TODO delete this
  * @deprecated
  */
-export function isAttrExisting(attr: AttributeBaseDataType | undefined) {
+export function isAttrExisting(attr: IR.AttributeBase | undefined) {
 	if (!attr) return false
 	if (isDISPOSED(attr.array) || attr.count === 0) return false
 	return true

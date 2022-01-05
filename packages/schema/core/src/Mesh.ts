@@ -18,8 +18,8 @@
  * TODO naming is kinda confusing
  */
 
-import { MatrBase } from './Matr'
-import { Geom } from './Geom'
+import { MaterialBase } from './Matr'
+import { Geometry } from './Geom'
 import { Int, Transform3 } from './basic'
 import { LuminousEXT } from './Luminous'
 
@@ -70,10 +70,10 @@ export interface BaseNode {
  */
 export interface RenderableNode extends BaseNode {
 	// geometry / mesh
-	geometry: Geom
+	geometry: Geometry
 
 	// material
-	material: MatrBase
+	material: MaterialBase
 
 	extensions?: {
 		/**

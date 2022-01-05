@@ -13,7 +13,7 @@ import {
 	Transform2Matrix,
 	Transform2,
 } from './basic'
-import { MatrPoint, MatrUnlit, MatrPbr, MatrBase } from './Matr'
+import { PointMaterial, UnlitMaterial, PbrMaterial, MaterialBase } from './Matr'
 
 import { Texture, CubeTexture } from './Texture'
 import { Uniform } from './Programable'
@@ -48,13 +48,13 @@ export function isDISPOSED(v: any): v is DISPOSED {
 	return v === '__DISPOSED__'
 }
 
-export function isMatrPbr(v: MatrBase): v is MatrPbr {
+export function isMatrPbr(v: MaterialBase): v is PbrMaterial {
 	return v.type === 'pbr'
 }
-export function isMatrUnlit(v: MatrBase): v is MatrUnlit {
+export function isMatrUnlit(v: MaterialBase): v is UnlitMaterial {
 	return v.type === 'unlit'
 }
-export function isMatrPoint(v: MatrBase): v is MatrPoint {
+export function isMatrPoint(v: MaterialBase): v is PointMaterial {
 	return v.type === 'point'
 }
 export function isRenderable(v: NodeLike): v is RenderableNode {
