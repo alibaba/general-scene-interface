@@ -4,7 +4,7 @@
  */
 
 import { ColorRGB, Double, Transform2, Versioned } from './basic'
-import { TextureType } from './Texture'
+import { Texture } from './Texture'
 import { Programable, ProgramablePbr } from './Programable'
 
 /**
@@ -12,7 +12,7 @@ import { Programable, ProgramablePbr } from './Programable'
  * gltf 中没有相关定义
  * {@link https://threejs.org/docs/#api/zh/materials/PointsMaterial}
  */
-export interface MatrPointDataType extends MatrBaseDataType {
+export interface MatrPoint extends MatrBase {
 	readonly type: 'point'
 
 	/**
@@ -35,13 +35,13 @@ export interface MatrPointDataType extends MatrBaseDataType {
 	 * @default {r:1, g:1, b: 1}
 	 */
 	baseColorFactor: ColorRGB
-	baseColorTexture?: TextureType
+	baseColorTexture?: Texture
 
 	extensions?: {
 		EXT_matr_programmable_point?: {
 			vertPointGeometry?: string
 		}
-	} & MatrBaseDataType['extensions']
+	} & MatrBase['extensions']
 }
 
 /**
@@ -52,14 +52,14 @@ export interface MatrPointDataType extends MatrBaseDataType {
  *
  * {@link https://github.com/KhronosGroup/glTF/blob/master/extensions/2.0/Khronos/KHR_materials_unlit/README.md}
  */
-export interface MatrUnlitDataType extends MatrBaseDataType {
+export interface MatrUnlit extends MatrBase {
 	readonly type: 'unlit'
 
 	/**
 	 * @default {r:1, g:1, b: 1}
 	 */
 	baseColorFactor: ColorRGB
-	baseColorTexture?: TextureType
+	baseColorTexture?: Texture
 }
 
 /**
@@ -71,7 +71,7 @@ export interface MatrUnlitDataType extends MatrBaseDataType {
  * {@link https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#reference-pbrmetallicroughness}
  * {@link https://threejs.org/docs/#api/en/materials/MeshStandardMaterial}
  */
-export interface MatrPbrDataType extends MatrBaseDataType {
+export interface MatrPbr extends MatrBase {
 	readonly type: 'pbr'
 
 	// pbr
@@ -96,18 +96,18 @@ export interface MatrPbrDataType extends MatrBaseDataType {
 	/**
 	 * @todo three 中没有这个贴图，需要 conv 主动实现
 	 */
-	metallicRoughnessTexture?: TextureType
-	baseColorTexture?: TextureType
-	emissiveTexture?: TextureType
-	normalTexture?: TextureType
-	occlusionTexture?: TextureType
+	metallicRoughnessTexture?: Texture
+	baseColorTexture?: Texture
+	emissiveTexture?: Texture
+	normalTexture?: Texture
+	occlusionTexture?: Texture
 
 	extensions?: {
 		EXT_matr_programmable_pbr?: ProgramablePbr
-	} & MatrBaseDataType['extensions']
+	} & MatrBase['extensions']
 }
 
-// let a = {} as MatrPbrDataType
+// let a = {} as MatrPbr
 // a.extensions?.EXT_matr_advanced
 // a.extensions?.EXT_matr_programmable
 // a.extensions?.EXT_matr_programmable_pbr
@@ -118,7 +118,7 @@ export interface MatrPbrDataType extends MatrBaseDataType {
  * {@link https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#materials}
  * {@link https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#material}
  */
-export interface MatrBaseDataType extends Versioned {
+export interface MatrBase extends Versioned {
 	readonly type: string
 
 	/**

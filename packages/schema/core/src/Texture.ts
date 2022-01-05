@@ -22,37 +22,22 @@ import { TypedArray, Matrix, Versioned } from './basic'
  * Texture
  */
 export interface Texture {
-	sampler: SamplerDataType
-	image: ImageDataType
+	sampler: Sampler
+	image: Image
 	transform: Matrix
 	extensions?: { [key: string]: any }
 	extras?: any
 }
-/**
- * @deprecated use Texture instead
- * @alias Texture
- */
-export type TextureData = Texture
-/**
- * @deprecated use Texture instead
- * @alias Texture
- */
-export type TextureType = Texture
 
 /**
  * CubeTexture
  */
 export interface CubeTexture {
-	sampler: SamplerDataType
-	images: ImageDataType[]
+	sampler: Sampler
+	images: Image[]
 	extensions?: { [key: string]: any }
 	extras?: any
 }
-/**
- * @deprecated use CubeTexture instead
- * @alias CubeTexture
- */
-export type CubeTextureType = CubeTexture
 
 /**
  * @note glTF2 标准没有提及 format 和 innerFormat
@@ -66,7 +51,7 @@ export type CubeTextureType = CubeTexture
  * - else if has `.uri`, must not have `.extensions.EXT_image.HTMLImage`
  * - else must have `.extensions.EXT_image.HTMLImage`
  */
-export interface ImageDataType extends Versioned {
+export interface Image extends Versioned {
 	/**
 	 * 图片数据
 	 *
@@ -123,7 +108,7 @@ export interface ImageDataType extends Versioned {
  * Sampler 定义
  * 按照 webgpu 和 webgl2 的设计，把 sampler 和 texture data 分离开，兼容 webgl1
  */
-export interface SamplerDataType {
+export interface Sampler {
 	/**
 	 * @default 'NEAREST'
 	 * {@link https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#samplermagfilter}

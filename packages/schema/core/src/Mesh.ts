@@ -18,15 +18,15 @@
  * TODO naming is kinda confusing
  */
 
-import { MatrBaseDataType } from './Matr'
-import { GeomDataType } from './Geom'
+import { MatrBase } from './Matr'
+import { Geom } from './Geom'
 import { Int, Transform3 } from './basic'
 import { LuminousEXT } from './Luminous'
 
 /**
  * nodes in the scene graph
  */
-export interface Node {
+export interface BaseNode {
 	/**
 	 * 物体名，调试使用
 	 * - For readability only
@@ -49,14 +49,14 @@ export interface Node {
 	/**
 	 * children of this node
 	 */
-	children: Set<MeshDataType>
+	children: Set<NodeLike>
 
 	/**
 	 * * parent reference should be set once put in a tree,
 	 * * root nodes don't have a parent
 	 * * circular reference is not allowed
 	 */
-	parent?: MeshDataType
+	parent?: NodeLike
 
 	extras?: any
 
@@ -68,12 +68,12 @@ export interface Node {
 /**
  * renderable nodes with geometries and materials
  */
-export interface RenderableMesh extends Node {
+export interface RenderableNode extends BaseNode {
 	// geometry / mesh
-	geometry: GeomDataType
+	geometry: Geom
 
 	// material
-	material: MatrBaseDataType
+	material: MatrBase
 
 	extensions?: {
 		/**
@@ -115,16 +115,16 @@ export interface RenderableMesh extends Node {
 			 */
 			frustumCulling?: boolean
 		}
-	} & Node['extensions']
+	} & BaseNode['extensions']
 }
 
-export interface Luminous extends Node {
+export interface LuminousNode extends BaseNode {
 	extensions?: {
 		EXT_luminous?: LuminousEXT
-	} & Node['extensions']
+	} & BaseNode['extensions']
 }
 
 /**
  * Mesh object for scene tree construction
  */
-export type MeshDataType = RenderableMesh | Node | Luminous
+export type NodeLike = RenderableNode | BaseNode | LuminousNode

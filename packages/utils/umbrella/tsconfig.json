@@ -76,7 +76,7 @@
 			"path": "../../backend/threelite"
 		},
 		{
-			"path": "../../frontend/ts"
+			"path": "../../frontend/sdk"
 		},
 		{
 			"path": "../../frontend/gline"

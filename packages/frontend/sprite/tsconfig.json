@@ -16,7 +16,7 @@
 			"path": "../../utils/math"
 		},
 		{
-			"path": "../ts"
+			"path": "../sdk"
 		},
 		{
 			"path": "../../utils/geometry"

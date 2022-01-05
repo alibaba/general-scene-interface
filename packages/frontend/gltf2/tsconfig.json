@@ -10,7 +10,7 @@
 	"exclude": ["dist"],
 	"references": [
 		{
-			"path": "../ts"
+			"path": "../sdk"
 		},
 		{
 			"path": "../../schema/core"

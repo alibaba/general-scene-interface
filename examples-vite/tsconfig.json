@@ -63,7 +63,7 @@
 			"path": "../packages/processors/culling"
 		},
 		{
-			"path": "../packages/frontend/ts"
+			"path": "../packages/frontend/sdk"
 		},
 		{
 			"path": "../packages/frontend/gltf2"
