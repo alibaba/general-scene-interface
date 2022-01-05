@@ -21,10 +21,11 @@
 	},
 	"dependencies": {
 		"@gs.i/processor-base": "^0.2.0-alpha",
-		"@gs.i/utils-traverse": "^0.2.0-alpha",
-		"@gs.i/schema-scene": "^0.2.0-alpha"
+		"@gs.i/schema-scene": "^0.2.0-alpha",
+		"@gs.i/utils-traverse": "^0.2.0-alpha"
 	},
 	"devDependencies": {
 		"typescript": ">4.4.0"
-	}
+	},
+	"gitHead": "fcffb58565bc8dd5b122dc81812d3907e3753c73"
 }
