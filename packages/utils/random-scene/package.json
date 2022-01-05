@@ -1,6 +1,6 @@
 {
 	"name": "@gs.i/utils-random-scene",
-	"version": "0.1.0-alpha",
+	"version": "0.2.0-alpha",
 	"description": "",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
@@ -20,12 +20,12 @@
 		"v": "node -v && tsc -v"
 	},
 	"dependencies": {
-		"@gs.i/schema-scene": "^0.1.0-alpha",
-		"@gs.i/utils-specify": "^0.1.0-alpha",
-		"@gs.i/frontend-sdk": "^0.1.0-alpha",
-		"@gs.i/utils-geom-builders": "^0.1.0-alpha",
-		"@gs.i/frontend-gline": "^0.1.0-alpha",
-		"@gs.i/frontend-sprite": "0.1.0-alpha"
+		"@gs.i/schema-scene": "^0.2.0-alpha",
+		"@gs.i/utils-specify": "^0.2.0-alpha",
+		"@gs.i/frontend-sdk": "^0.2.0-alpha",
+		"@gs.i/utils-geom-builders": "^0.2.0-alpha",
+		"@gs.i/frontend-gline": "^0.2.0-alpha",
+		"@gs.i/frontend-sprite": "0.2.0-alpha"
 	},
 	"devDependencies": {
 		"typescript": ">4.4.0"
