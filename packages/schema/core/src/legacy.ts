@@ -137,8 +137,8 @@ export type MatrPbrDataType = MatrPbr
 export type MatrBaseDataType = MatrBase
 
 /**
- * @deprecated use {@link Node} as `IR.Node` instead
- * @alias Node
+ * @deprecated use {@link NodeLike} as `IR.NodeLike` instead
+ * @alias NodeLike
  */
 export type MeshDataType = NodeLike
 

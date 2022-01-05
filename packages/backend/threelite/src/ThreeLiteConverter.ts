@@ -18,8 +18,7 @@ import {
 	MatrPointDataType,
 	MatrBaseDataType,
 	ColorRGB,
-	GL_STATIC_DRAW,
-	GL_DYNAMIC_DRAW,
+	constants,
 	Int,
 	//
 	DISPOSED,
@@ -31,6 +30,8 @@ import {
 	isLuminous,
 	LuminousEXT,
 } from '@gs.i/schema-scene'
+
+const { GL_STATIC_DRAW, GL_DYNAMIC_DRAW } = constants
 
 import type { Converter } from '@gs.i/schema-converter'
 import { MatProcessor } from '@gs.i/processor-matrix'

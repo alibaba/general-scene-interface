@@ -4,13 +4,11 @@
  */
 
 import {
-	readonly,
 	MatrBaseDataType,
 	MatrPbrDataType,
 	MatrUnlitDataType,
 	MatrPointDataType,
 	UniformDataType,
-	ShaderType,
 	Programable,
 	ProgramablePbr,
 	ColorRGB,
