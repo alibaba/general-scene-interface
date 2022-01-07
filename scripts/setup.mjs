@@ -75,7 +75,7 @@ await Promise.all(
 	})
 )
 
-// remove optinal dependents from package.json
+// remove optional dependents from package.json
 await Promise.all(
 	packageALL.map(async (pkg) => {
 		const pjsonPath = path.resolve(pkg.location, 'package.json')
@@ -84,7 +84,7 @@ await Promise.all(
 		const originalJson = JSON.parse(pjson)
 
 		if (originalJson.optionalDependencies) {
-			console.log('fix package optinal dep: ', pkg.name)
+			console.log('fix package optional dep: ', pkg.name)
 
 			// NOTE can not be {} or yarn will throw
 			delete originalJson.optionalDependencies

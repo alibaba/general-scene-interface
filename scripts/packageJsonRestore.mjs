@@ -90,7 +90,7 @@ try {
 } catch (error) {
 	console.error(error)
 	console.warn(
-		`You need to restore package.json manally! Call packageJsonRestore.mjs with the same id.`
+		`You need to restore package.json manually! Call packageJsonRestore.mjs with the same id.`
 	)
 }
 
