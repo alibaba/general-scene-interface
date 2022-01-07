@@ -7,35 +7,31 @@ import { PrgStandardMaterial } from './PrgStandardMaterial'
 import { PrgBasicMaterial } from './PrgBasicMaterial'
 import { PrgPointMaterial } from './PrgPointMaterial'
 
-import {
-	MeshDataType,
-	GeomDataType,
+import IR, {
 	Texture,
 	CubeTexture,
-	AttributeDataType,
-	MatrPbrDataType,
-	MatrUnlitDataType,
-	MatrPointDataType,
-	MatrBaseDataType,
 	ColorRGB,
-	GL_STATIC_DRAW,
-	GL_DYNAMIC_DRAW,
+	constants,
 	Int,
 	//
 	DISPOSED,
 	isTexture,
 	isCubeTexture,
 	isTypedArray,
-	isRenderableMesh,
+	isRenderable,
 	isDISPOSED,
+	isLuminous,
+	LuminousEXT,
 } from '@gs.i/schema-scene'
+
+const { GL_STATIC_DRAW, GL_DYNAMIC_DRAW } = constants
 
 import type { Converter } from '@gs.i/schema-converter'
 import { MatProcessor } from '@gs.i/processor-matrix'
 import { BoundingProcessor } from '@gs.i/processor-bound'
 import { CullingProcessor } from '@gs.i/processor-culling'
-import { diffSetsFast, diffSetsFastAndToArray, GraphProcessor } from '@gs.i/processor-graph'
-import { traverse, flatten, flattenBFS } from '@gs.i/utils-traverse'
+import { GraphProcessor } from '@gs.i/processor-graph'
+import { traverse, flatten } from '@gs.i/utils-traverse'
 
 import { syncMaterial } from './syncMaterial'
 import { syncTexture } from './syncTexture'
@@ -56,6 +52,8 @@ import {
 	Color,
 	CanvasTexture,
 	DataTexture,
+	Light,
+	PointLight,
 } from 'three-lite'
 import { sealTransform } from './utils'
 
@@ -252,18 +250,18 @@ export class ThreeLiteConverter implements Converter {
 	// @note optimize for hidden classes
 	// private _threeObjects = new WeakMap<any, any>()
 	// TODO separate renderable mesh and node for performance
-	// private _threeObject3ds = new WeakMap<MeshDataType, Object3D>()
-	private _threeMesh = new WeakMap<MeshDataType, RenderableObject3D | Object3D>()
-	private _threeGeom = new WeakMap<GeomDataType, BufferGeometry>()
-	private _threeAttr = new WeakMap<AttributeDataType, BufferAttribute>()
+	// private _threeObject3ds = new WeakMap<IR.NodeLike, Object3D>()
+	private _threeObject = new WeakMap<IR.NodeLike, RenderableObject3D | Object3D | Light>()
+	private _threeGeom = new WeakMap<IR.Geometry, BufferGeometry>()
+	private _threeAttr = new WeakMap<IR.Attribute, BufferAttribute>()
 	private _threeTex = new WeakMap<Texture | CubeTexture, ThreeTexture>()
-	// TODO use GsiMatr instead because MatrBaseDataType can not be used alone
-	private _threeMatr = new WeakMap<GsiMatr | MatrBaseDataType, Material>()
+	// TODO use IR.Material instead because IR.MatrBase can not be used alone
+	private _threeMatr = new WeakMap<IR.Material | IR.MaterialBase, Material>()
 	private _threeColor = new WeakMap<ColorRGB, Color>()
 
 	// private _committedVersions = new WeakMap<any, number>()
-	private _committedAttr = new WeakMap<AttributeDataType, Int>()
-	// private _committedMatr = new WeakMap<GsiMatr | MatrBaseDataType, Int>()
+	private _committedAttr = new WeakMap<IR.Attribute, Int>()
+	// private _committedMatr = new WeakMap<IR.Material | IR.MatrBase, Int>()
 	private _committedTex = new WeakMap<Texture | CubeTexture, Int>()
 
 	// #endregion
@@ -282,7 +280,7 @@ export class ThreeLiteConverter implements Converter {
 		// this._cachedSnapshot = this.config.graphProcessor.snapshot() // init with a empty node
 	}
 
-	convert(root: MeshDataType): Object3D {
+	convert(root: IR.NodeLike): Object3D {
 		/**
 		 * @note It is not the most efficient way to get all the changed components and pre-handle them
 		 * 		 It is quicker to just handle everything during one traversal
@@ -407,7 +405,7 @@ export class ThreeLiteConverter implements Converter {
 		// - use pre-order traversal to make sure all the parents are created before added to
 
 		{
-			const rootThree = this.convMesh(root)
+			const rootThree = this.convNode(root)
 			rootThree.children = []
 			// pre-order traversal, parents are handled before children
 
@@ -418,8 +416,8 @@ export class ThreeLiteConverter implements Converter {
 					// skip root node
 					if (parent) {
 						// @note parent is cached before
-						const parentThree = this._threeMesh.get(parent) as Object3D
-						const currentThree = this.convMesh(node)
+						const parentThree = this._threeObject.get(parent) as Object3D
+						const currentThree = this.convNode(node)
 						// clear current children to handle removed nodes
 						currentThree.children = []
 						parentThree.children.push(currentThree)
@@ -429,10 +427,10 @@ export class ThreeLiteConverter implements Converter {
 				// skip root node
 				for (let i = 1; i < flatScene.length; i++) {
 					const node = flatScene[i]
-					const currentThree = this.convMesh(node)
+					const currentThree = this.convNode(node)
 					// clear current children to handle removed nodes
 					// currentThree.children = [] // it should always be empty, not need to empty it every time
-					if (isRenderableMesh(node) && currentThree.visible) {
+					if ((isRenderable(node) || isLuminous(node)) && currentThree.visible) {
 						rootThree.children.push(currentThree)
 					}
 				}
@@ -448,41 +446,50 @@ export class ThreeLiteConverter implements Converter {
 	 * @note run after all the geometries and materials are cached
 	 * @note require parent to be handled before child, only work for top-down traversal
 	 */
-	private convMesh(gsiMesh: MeshDataType): RenderableObject3D | Object3D {
-		let threeMesh = this._threeMesh.get(gsiMesh) as RenderableObject3D | Object3D
+	private convNode(gsiNode: IR.NodeLike): RenderableObject3D | Object3D {
+		let threeObject = this._threeObject.get(gsiNode) as RenderableObject3D | Object3D
 
 		// create
-		if (!threeMesh) {
-			if (isRenderableMesh(gsiMesh)) {
-				threeMesh = new RenderableObject3D()
+		if (!threeObject) {
+			if (isRenderable(gsiNode)) {
+				threeObject = new RenderableObject3D()
 
 				// Assign mode
-				switch (gsiMesh.geometry.mode) {
+				switch (gsiNode.geometry.mode) {
 					case 'TRIANGLES':
-						threeMesh['isMesh'] = true
-						threeMesh['drawMode'] = TrianglesDrawMode
+						threeObject['isMesh'] = true
+						threeObject['drawMode'] = TrianglesDrawMode
 						break
 
 					case 'POINTS':
-						threeMesh['isPoints'] = true
+						threeObject['isPoints'] = true
 						break
 
 					case 'LINES':
-						threeMesh['isLine'] = true
-						threeMesh['isLineSegments'] = true
+						threeObject['isLine'] = true
+						threeObject['isLineSegments'] = true
 						break
 
 					default:
-						throw 'Invalid value for GSIGeom.mode: ' + gsiMesh.geometry.mode
+						throw 'Invalid value for GSIGeom.mode: ' + gsiNode.geometry.mode
 				}
 				this.info.renderableCount++
+			} else if (isLuminous(gsiNode)) {
+				const luminousEXT = gsiNode.extensions?.EXT_luminous as LuminousEXT
+				if (luminousEXT.type === 'point') {
+					threeObject = new PointLight()
+					threeObject.name = luminousEXT.name
+					threeObject['decay'] = 2 // gltf2: "follow the inverse square law"
+				} else {
+					throw new Error('three-lite conv:: light type not implemented(' + luminousEXT.type + ')')
+				}
 			} else {
-				threeMesh = new Object3D()
+				threeObject = new Object3D()
 			}
 
 			if (!this.config.decomposeMatrix) {
 				// @note avoid user mistakes, if matrix is handled by gsi processor, three.js methods should be disabled
-				sealTransform(threeMesh)
+				sealTransform(threeObject)
 			} else {
 				// TODO implement this!
 				// decompose the matrix at creation, or just set TRS if given
@@ -492,66 +499,73 @@ export class ThreeLiteConverter implements Converter {
 			}
 
 			if (this.config.overrideFrustumCulling) {
-				threeMesh.frustumCulled = false
+				threeObject.frustumCulled = false
 			}
 
 			// update cache
-			this._threeMesh.set(gsiMesh, threeMesh)
+			this._threeObject.set(gsiNode, threeObject)
 		}
 		// sync
 		{
-			if (isRenderableMesh(gsiMesh)) {
-				// threeMesh is a RenderableObject3D
+			if (isRenderable(gsiNode)) {
+				// threeObject is a RenderableObject3D
 
-				const geometry = this._threeGeom.get(gsiMesh.geometry) as BufferGeometry
-				const material = this._threeMatr.get(gsiMesh.material) as Material
+				const geometry = this._threeGeom.get(gsiNode.geometry) as BufferGeometry
+				const material = this._threeMatr.get(gsiNode.material) as Material
 
-				threeMesh['material'] = material
-				threeMesh['geometry'] = geometry
+				threeObject['material'] = material
+				threeObject['geometry'] = geometry
 
-				if (gsiMesh.geometry.attributes.uv) {
+				if (gsiNode.geometry.attributes.uv) {
 					// @note it's safe to assume `defines` was created above
 					;(material['defines'] as any).GSI_USE_UV = true
 				}
+			} else if (isLuminous(gsiNode)) {
+				const luminousEXT = gsiNode.extensions?.EXT_luminous as LuminousEXT
+
+				const threeLight = threeObject as PointLight
+				threeLight.color.copy(luminousEXT.color as Color)
+				threeLight.intensity = luminousEXT.intensity
+				threeLight.distance = luminousEXT.range
 			}
 
-			threeMesh.visible = gsiMesh.visible && (gsiMesh.parent?.visible ?? true) // inherit visibility
+			threeObject.visible = gsiNode.visible && (gsiNode.parent?.visible ?? true) // inherit visibility
 
 			// @note three doesn't use localMatrix at all. it's only for generating worldMatrix.
-			// // threeMesh.matrix.elements = this.config.matrixProcessor.getLocalMatrix(gsiMesh)
+			// // threeObject.matrix.elements = this.config.matrixProcessor.getLocalMatrix(gsiNode)
 
 			// @note use cached matrices instead of dirty-checking every time.
-			// // threeMesh.matrixWorld.elements = this.config.matrixProcessor.getWorldMatrix(gsiMesh)
+			// // threeObject.matrixWorld.elements = this.config.matrixProcessor.getWorldMatrix(gsiNode)
 
-			const matrix = this.config.matrixProcessor.getCachedWorldMatrix(gsiMesh)
+			const matrix = this.config.matrixProcessor.getCachedWorldMatrix(gsiNode)
 			if (matrix) {
-				threeMesh.matrixWorld.elements = matrix
+				threeObject.matrixWorld.elements = matrix
 			} else {
 				console.warn(
-					`Conv-threelite:: WorldMatrix of ${gsiMesh.name} is not cached. ` +
+					`Conv-threelite:: WorldMatrix of ${gsiNode.name} is not cached. ` +
 						`Will fall back to dirty-checking. ` +
 						`The scene-graph may have changed during this conversion.`
 				)
-				threeMesh.matrixWorld.elements = this.config.matrixProcessor.getWorldMatrix(gsiMesh)
+				threeObject.matrixWorld.elements = this.config.matrixProcessor.getWorldMatrix(gsiNode)
 			}
 		}
 
 		// culling
 		// TODO set .visible false will cull all its children
-		if (this.config.overrideFrustumCulling && isRenderableMesh(gsiMesh) && gsiMesh.visible) {
-			if (this.config.cullingProcessor.isFrustumCulled(gsiMesh)) {
+		if (this.config.overrideFrustumCulling && isRenderable(gsiNode) && gsiNode.visible) {
+			if (this.config.cullingProcessor.isFrustumCulled(gsiNode)) {
 				this.info.culledCount++
-				threeMesh.visible = false
+				threeObject.visible = false
 			}
 		}
 
-		return threeMesh
+		return threeObject
 	}
 
 	/**
 	 * @note run after all the attributes are cached
 	 */
-	private convGeom(gsiGeom: GeomDataType): BufferGeometry {
+	private convGeom(gsiGeom: IR.Geometry): BufferGeometry {
 		let threeGeometry = this._threeGeom.get(gsiGeom) as BufferGeometry
 
 		// create
@@ -635,7 +649,7 @@ export class ThreeLiteConverter implements Converter {
 		return threeGeometry
 	}
 
-	private convAttr(gsiAttr: AttributeDataType): BufferAttribute {
+	private convAttr(gsiAttr: IR.Attribute): BufferAttribute {
 		let threeAttribute = this._threeAttr.get(gsiAttr) as BufferAttribute
 		let committedVersion = this._committedAttr.get(gsiAttr) as Int
 
@@ -743,7 +757,7 @@ export class ThreeLiteConverter implements Converter {
 	/**
 	 * @note run after all the textures are cached
 	 */
-	private convMatr(gsiMatr: GsiMatr) {
+	private convMatr(gsiMatr: IR.Material) {
 		let threeMatr = this._threeMatr.get(gsiMatr) as Material
 		// let committedVersion = this._committedMatr.get(gsiMatr) as Int
 
@@ -753,20 +767,20 @@ export class ThreeLiteConverter implements Converter {
 				// @note just throw
 				// case 'basic':
 				// 	console.error('Use MatrUnlit instead of MatrBasic')
-				// 	threeMatr = new PrgBasicMaterial(gsiMatr as MatrUnlitDataType)
+				// 	threeMatr = new PrgBasicMaterial(gsiMatr as IR.MatrUnlit)
 				// 	break
 				case 'point':
-					threeMatr = new PrgPointMaterial(gsiMatr as MatrPointDataType)
+					threeMatr = new PrgPointMaterial(gsiMatr as IR.PointMaterial)
 					break
 				case 'unlit':
-					threeMatr = new PrgBasicMaterial(gsiMatr as MatrUnlitDataType)
+					threeMatr = new PrgBasicMaterial(gsiMatr as IR.UnlitMaterial)
 					break
 				case 'pbr':
-					threeMatr = new PrgStandardMaterial(gsiMatr as MatrPbrDataType)
+					threeMatr = new PrgStandardMaterial(gsiMatr as IR.PbrMaterial)
 					break
 				default:
 					throw 'Unsupported GSI::Material Type: ' + gsiMatr['type']
-				// threeMatr = new PrgBasicMaterial(gsiMatr as MatrUnlitDataType)
+				// threeMatr = new PrgBasicMaterial(gsiMatr as IR.MatrUnlit)
 			}
 
 			// @note better performance to just sync threeMatr.version
@@ -833,7 +847,7 @@ export class ThreeLiteConverter implements Converter {
 
 			case 'unlit': {
 				const unlitThreeMatr = threeMatr as PrgBasicMaterial
-				const matr = gsiMatr as MatrUnlitDataType
+				const matr = gsiMatr as IR.UnlitMaterial
 
 				unlitThreeMatr.color = this.convColor(matr.baseColorFactor)
 				unlitThreeMatr.map = matr.baseColorTexture
@@ -843,7 +857,7 @@ export class ThreeLiteConverter implements Converter {
 			}
 
 			case 'point': {
-				const matr = gsiMatr as MatrPointDataType
+				const matr = gsiMatr as IR.PointMaterial
 				const pointThreeMatr = threeMatr as PrgPointMaterial
 
 				pointThreeMatr.size = matr.size
@@ -997,15 +1011,15 @@ export class ThreeLiteConverter implements Converter {
 
 	// #endregion
 
-	// recovery(node: MeshDataType) {}
+	// recovery(node: IR.NodeLike) {}
 
 	dispose() {
 		this._cachedResources = getResourcesFlat([]) // init with a empty node
-		this._threeMesh = new WeakMap()
+		this._threeObject = new WeakMap()
 		this._threeGeom = new WeakMap()
 		this._threeAttr = new WeakMap()
 		this._threeTex = new WeakMap()
-		// TODO use GsiMatr instead because MatrBaseDataType can not be used alone
+		// TODO use IR.Material instead because IR.MatrBase can not be used alone
 		this._threeMatr = new WeakMap()
 		this._threeColor = new WeakMap()
 
@@ -1023,22 +1037,22 @@ export class ThreeLiteConverter implements Converter {
  *
  * @deprecated use getResourcesFlat
  */
-export function getResources(root?: MeshDataType) {
+export function getResources(root?: IR.NodeLike) {
 	// programs
-	const materials = new Set<GsiMatr>()
+	const materials = new Set<IR.Material>()
 	// vao
-	const geometries = new Set<GeomDataType>()
+	const geometries = new Set<IR.Geometry>()
 	// buffers
-	const attributes = new Set<AttributeDataType>()
+	const attributes = new Set<IR.Attribute>()
 	// texture / framebuffer / samplers
 	const textures = new Set<Texture | CubeTexture>()
 
 	// @TODO uniform buffers
 
 	if (root) {
-		traverse(root, (mesh: MeshDataType) => {
-			if (isRenderableMesh(mesh)) {
-				materials.add(mesh.material as GsiMatr)
+		traverse(root, (mesh: IR.NodeLike) => {
+			if (isRenderable(mesh)) {
+				materials.add(mesh.material as IR.Material)
 				geometries.add(mesh.geometry)
 
 				// textures
@@ -1093,13 +1107,13 @@ export function getResources(root?: MeshDataType) {
  * also it's better to modify remote resources pre-frame than mid-frame to avoid stalling.
  *
  */
-export function getResourcesFlat(flatScene: MeshDataType[]) {
+export function getResourcesFlat(flatScene: IR.NodeLike[]) {
 	// programs
-	const materials = new Set<GsiMatr>()
+	const materials = new Set<IR.Material>()
 	// vao
-	const geometries = new Set<GeomDataType>()
+	const geometries = new Set<IR.Geometry>()
 	// buffers
-	const attributes = new Set<AttributeDataType>()
+	const attributes = new Set<IR.Attribute>()
 	// texture / framebuffer / samplers
 	const textures = new Set<Texture | CubeTexture>()
 
@@ -1107,8 +1121,8 @@ export function getResourcesFlat(flatScene: MeshDataType[]) {
 
 	for (let i = 0; i < flatScene.length; i++) {
 		const mesh = flatScene[i]
-		if (isRenderableMesh(mesh)) {
-			materials.add(mesh.material as GsiMatr)
+		if (isRenderable(mesh)) {
+			materials.add(mesh.material as IR.Material)
 			geometries.add(mesh.geometry)
 
 			// textures
@@ -1198,10 +1212,3 @@ export class RenderableObject3D extends Object3D {
  */
 const texLoader = new TextureLoader()
 // texLoader.setCrossOrigin('')
-
-/**
- * union type of all gsi materials
- * - better use this than MatrBaseDataType to make switch case work
- * @simon
- */
-type GsiMatr = MatrPointDataType | MatrUnlitDataType | MatrPbrDataType

@@ -6,7 +6,7 @@
 import { Mesh } from '@gs.i/frontend-sdk'
 import { GLineGeom } from './GLineGeom'
 import { GLineMatr, GLinePointMatr } from './GLineMatr'
-import { BBox, BSphere, ColorRGB, TextureType, Vec2 } from '@gs.i/schema-scene'
+import { BBox, BSphere, ColorRGB, Texture, Vec2 } from '@gs.i/schema-scene'
 
 export interface DefaultGLineConfig {
 	/**
@@ -45,7 +45,7 @@ export interface DefaultGLineConfig {
 	 */
 	u?: boolean
 
-	texture?: TextureType
+	texture?: Texture
 
 	pointSize?: number
 

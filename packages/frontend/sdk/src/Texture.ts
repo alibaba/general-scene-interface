@@ -3,13 +3,13 @@
  * All rights reserved.
  */
 
-import { ImageDataType, SamplerDataType, TextureType, Int } from '@gs.i/schema-scene'
+import { IR, Int } from '@gs.i/schema-scene'
 import { specifyTexture, specifyImage, specifySampler } from '@gs.i/utils-specify'
 
-export interface ImageData extends ImageDataType {}
-export class ImageData {
+export interface Image extends IR.Image {}
+export class Image {
 	/**
-	 * @deprecated Use {@link ImageDataType.extensions}
+	 * @deprecated Use {@link Image.extensions}
 	 */
 	public get flipY() {
 		return this.extensions?.EXT_image?.flipY
@@ -23,11 +23,7 @@ export class ImageData {
 
 	constructor(params: {
 		imageSource: Exclude<
-			| ImageDataType['data']
-			| ImageDataType['uri']
-			| HTMLImageElement
-			| HTMLCanvasElement
-			| HTMLVideoElement,
+			IR.Image['data'] | IR.Image['uri'] | HTMLImageElement | HTMLCanvasElement | HTMLVideoElement,
 			undefined
 		>
 		width?: Int
@@ -52,9 +48,14 @@ export class ImageData {
 	}
 }
 
-export interface Sampler extends SamplerDataType {}
+/**
+ * @deprecated
+ */
+export const ImageData = Image
+
+export interface Sampler extends IR.Sampler {}
 export class Sampler {
-	constructor(params: Partial<SamplerDataType> = {}) {
+	constructor(params: Partial<Sampler> = {}) {
 		for (const key of Object.keys(params)) {
 			const v = params[key]
 			if (v !== undefined) {
@@ -66,15 +67,20 @@ export class Sampler {
 	}
 }
 
-export interface TextureData extends TextureType {}
-export class TextureData {
+export interface Texture extends IR.Texture {}
+export class Texture {
 	constructor(
-		image: ConstructorParameters<typeof ImageData>[0],
+		image: ConstructorParameters<typeof Image>[0],
 		sampler: ConstructorParameters<typeof Sampler>[0]
 	) {
 		this.sampler = new Sampler(sampler)
-		this.image = new ImageData(image)
+		this.image = new Image(image)
 
 		specifyTexture(this)
 	}
 }
+
+/**
+ * @deprecated
+ */
+export const TextureData = Texture

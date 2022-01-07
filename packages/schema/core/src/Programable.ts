@@ -4,7 +4,7 @@
  */
 
 import { ColorRGB, Vec2, Vec3, Vec4 } from './basic'
-import { CubeTextureType, TextureType } from './Texture'
+import { CubeTexture, Texture } from './Texture'
 
 /**
  * ### 可编程材质接口
@@ -57,7 +57,7 @@ export interface Programable {
 	 * @glsl uniform TYPE name;
 	 * @default {}
 	 */
-	uniforms: { [name: string]: UniformDataType | undefined }
+	uniforms: { [name: string]: Uniform | undefined }
 
 	/**
 	 * whether this material modifies geometry data in shaders, if true, should not do raycasting in CPU side.
@@ -73,13 +73,13 @@ export interface Programable {
 	 * attributes declaration
 	 * @glsl attribute TYPE name;
 	 */
-	// attributes: { [name: string]: ShaderType }
+	// attributes: { [name: string]: Shader }
 
 	/**
 	 * varying declaration
 	 * @glsl varying TYPE name;
 	 */
-	// varyings: { [name: string]: ShaderType }
+	// varyings: { [name: string]: Shader }
 
 	/**
 	 * global scope shader codes (out side of main function)
@@ -174,12 +174,12 @@ export interface ProgramablePbr {
 /**
  * @example vec2 vec3 float sampler2D ...
  */
-export type ShaderType = string
+export type Shader = string
 
-export type UniformDataType = {
+export type Uniform = {
 	/**
 	 * 数值、对象或Texture
 	 * 增加了数组对象
 	 */
-	value: number | Vec2 | Vec3 | Vec4 | ColorRGB | TextureType | CubeTextureType | number[]
+	value: number | Vec2 | Vec3 | Vec4 | ColorRGB | Texture | CubeTexture | number[]
 }

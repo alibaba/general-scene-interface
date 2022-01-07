@@ -4,7 +4,7 @@
  */
 
 import { MeshBasicMaterial, UniformsUtils, ShaderLib } from 'three-lite'
-import { MatrUnlitDataType, Programable } from '@gs.i/schema-scene'
+import IR, { UnlitMaterial, Programable } from '@gs.i/schema-scene'
 // import { genPreShaderCode } from './utils'
 import vs from './PrgUnlitMatr.vs.glsl'
 import fs from './PrgUnlitMatr.fs.glsl'
@@ -56,7 +56,7 @@ export class PrgBasicMaterial extends MeshBasicMaterial {
 
 	glslVersion = null
 
-	constructor(gsiMatr: MatrUnlitDataType) {
+	constructor(gsiMatr: UnlitMaterial) {
 		super()
 		// this.setValues(gsiMatr as any) // Set parent class parameters
 

@@ -5,28 +5,29 @@
  * @TODO may cause circular importing, should be fine but still not good-looking
  */
 
-import { GeomDataType, AttributeDataType } from './Geom'
+import { Geometry, Attribute } from './Geom'
 
-import { MatrPointDataType, MatrUnlitDataType, MatrPbrDataType, MatrBaseDataType } from './Matr'
+import { PointMaterial, UnlitMaterial, PbrMaterial, MaterialBase } from './Matr'
 
-import { TextureType, CubeTextureType, ImageDataType, SamplerDataType } from './Texture'
+import { Texture, Image, Sampler } from './Texture'
 
-import { MeshDataType, RenderableMesh, Node } from './Mesh'
+import { RenderableNode, LuminousNode, BaseNode } from './Mesh'
+import { LuminousEXT } from './Luminous'
 // geometry -------------------------------------
 
 /**
- * @see {@link AttributeDataType}
+ * @see {@link Attribute}
  */
-export type LooseAttribute = OnlyRequire<AttributeDataType, 'array'>
+export type LooseAttribute = OnlyRequire<Attribute, 'array'>
 
-// const test: LooseAttributeDataType = {}
+// const test: LooseAttribute = {}
 
 /**
- * @see {@link GeomDataType}
+ * @see {@link Geom}
  */
-// export type LooseGeomDataType = Partial<Omit<GeomDataType, 'attributes' | 'indices'>> & LooseAttributes
-export type LooseGeomDataType = Replace<
-	GeomDataType,
+// export type LooseGeom = Partial<Omit<Geom, 'attributes' | 'indices'>> & LooseAttributes
+export type LooseGeom = Replace<
+	Geometry,
 	{
 		/**
 		 * attributes data
@@ -41,7 +42,7 @@ export type LooseGeomDataType = Replace<
 	}
 >
 
-// const test: LooseGeomDataType = {
+// const test: LooseGeom = {
 // 	attributes: {
 // 		a: {
 // 			array: new Float32Array(10),
@@ -52,62 +53,60 @@ export type LooseGeomDataType = Replace<
 
 // texture -------------------------------------
 
-export type LooseSamplerDataType = Partial<SamplerDataType>
-export type LooseImageDataType = Partial<ImageDataType>
-export type LooseTextureType = Replace<
-	TextureType,
-	{ image: LooseImageDataType; sampler: Partial<SamplerDataType> | undefined }
+export type LooseSampler = Partial<Sampler>
+export type LooseImage = Partial<Image>
+export type LooseTexture = Replace<
+	Texture,
+	{ image: LooseImage; sampler: Partial<Sampler> | undefined }
 >
 
-// const text : LooseTextureType = {
+// const text : LooseTexture = {
 // 	image: {}
 // }
 
 // material -------------------------------------
 
 type _LooseTextures = {
-	metallicRoughnessTexture?: LooseTextureType
-	baseColorTexture?: LooseTextureType
-	emissiveTexture?: LooseTextureType
-	normalTexture?: LooseTextureType
-	occlusionTexture?: LooseTextureType
+	metallicRoughnessTexture?: LooseTexture
+	baseColorTexture?: LooseTexture
+	emissiveTexture?: LooseTexture
+	normalTexture?: LooseTexture
+	occlusionTexture?: LooseTexture
 }
 
-export type LooseMatrBase = OnlyRequire<MatrBaseDataType, 'type'>
-export type LooseMatrPbrDataType = OnlyRequire<
-	ReplaceShared<MatrPbrDataType, _LooseTextures>,
-	'type'
->
-export type LooseMatrUnlitDataType = OnlyRequire<
-	ReplaceShared<MatrUnlitDataType, _LooseTextures>,
-	'type'
->
-export type LooseMatrPointDataType = OnlyRequire<
-	ReplaceShared<MatrPointDataType, _LooseTextures>,
-	'type'
->
+export type LooseMaterialBase = OnlyRequire<MaterialBase, 'type'>
+export type LoosePbrMaterial = OnlyRequire<ReplaceShared<PbrMaterial, _LooseTextures>, 'type'>
+export type LooseUnlitMaterial = OnlyRequire<ReplaceShared<UnlitMaterial, _LooseTextures>, 'type'>
+export type LoosePointMaterial = OnlyRequire<ReplaceShared<PointMaterial, _LooseTextures>, 'type'>
+export type LooseMaterial = LoosePbrMaterial | LooseUnlitMaterial | LoosePointMaterial
 
-// const test: LooseMatrPbrDataType = {
+// const test: LooseMatrPbr = {
 // 	type: 'pbr',
 // 	metallicRoughnessTexture: { image: {} },
 // }
 
 // mesh -------------------------------------
 
-export type LooseNode = Replace<
-	Node,
-	{ parent?: LooseMeshDataType; children?: Set<LooseMeshDataType> }
+export type LooseBaseNode = Replace<
+	BaseNode,
+	{ parent?: LooseNodeLike; children?: Set<LooseNodeLike> }
 >
-export type LooseRenderableMesh = Replace<
-	RenderableMesh,
+export type LooseRenderableNode = Replace<
+	RenderableNode,
 	{
-		geometry: LooseGeomDataType
-		material: LooseMatrBase
-		parent?: LooseMeshDataType
-		children?: Set<LooseMeshDataType>
+		geometry: LooseGeom
+		material: LooseMaterialBase
+		parent?: LooseNodeLike
+		children?: Set<LooseNodeLike>
 	}
 >
-export type LooseMeshDataType = LooseRenderableMesh | LooseNode
+export type LooseLuminousNode = Replace<
+	LuminousNode,
+	{
+		extensions: { EXT_luminous: OnlyRequire<LuminousEXT, 'type'> }
+	}
+>
+export type LooseNodeLike = LooseRenderableNode | LooseBaseNode | LooseLuminousNode
 
 // helper -------------------------------------
 
@@ -126,4 +125,4 @@ type ReplaceShared<T extends object, M extends object> = Partial<
 
 // export type Replace<T extends object, K extends keyof T = keyof T, N extends object> =
 
-// const test: LooseAttributeDataType = {}
+// const test: LooseAttribute = {}

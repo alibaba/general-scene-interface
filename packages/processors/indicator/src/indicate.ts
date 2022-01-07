@@ -1,13 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import {
-	MeshDataType,
-	GeomDataType,
-	Int,
-	BBox,
-	BSphere,
-	isRenderableMesh,
-	ColorRGB,
-} from '@gs.i/schema-scene'
+import IR, { isRenderable } from '@gs.i/schema-scene'
 import { Processor, TraverseType } from '@gs.i/processor-base'
 
 import { genBBoxWireframe, genBSphereWireframe, genGeomWireframe } from '@gs.i/utils-wireframe'
@@ -71,8 +63,8 @@ export class IndicatorProcessor extends Processor {
 		}
 	}
 
-	override processNode(mesh: MeshDataType, parent?: MeshDataType) {
-		if (isRenderableMesh(mesh)) {
+	override processNode(mesh: IR.NodeLike, parent?: IR.NodeLike) {
+		if (isRenderable(mesh)) {
 			const geometry = mesh.geometry
 			if (this.config.useBBox) {
 				const indicator = new Mesh()

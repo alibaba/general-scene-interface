@@ -1,4 +1,3 @@
-import { Luminous } from './Mesh'
 /**
  * TS Type Guards
  */
@@ -14,12 +13,12 @@ import {
 	Transform2Matrix,
 	Transform2,
 } from './basic'
-import { MatrPointDataType, MatrUnlitDataType, MatrPbrDataType, MatrBaseDataType } from './Matr'
+import { PointMaterial, UnlitMaterial, PbrMaterial, MaterialBase } from './Matr'
 
 import { Texture, CubeTexture } from './Texture'
-import { UniformDataType } from './Programable'
+import { Uniform } from './Programable'
 
-import { RenderableMesh, MeshDataType } from './Mesh'
+import { RenderableNode, NodeLike, LuminousNode } from './Mesh'
 
 export function isColorRGB(a: any): a is ColorRGB {
 	if (a && a.r !== undefined && a.g !== undefined && a.b !== undefined) {
@@ -49,20 +48,20 @@ export function isDISPOSED(v: any): v is DISPOSED {
 	return v === '__DISPOSED__'
 }
 
-export function isMatrPbrDataType(v: MatrBaseDataType): v is MatrPbrDataType {
+export function isMatrPbr(v: MaterialBase): v is PbrMaterial {
 	return v.type === 'pbr'
 }
-export function isMatrUnlitDataType(v: MatrBaseDataType): v is MatrUnlitDataType {
+export function isMatrUnlit(v: MaterialBase): v is UnlitMaterial {
 	return v.type === 'unlit'
 }
-export function isMatrPointDataType(v: MatrBaseDataType): v is MatrPointDataType {
+export function isMatrPoint(v: MaterialBase): v is PointMaterial {
 	return v.type === 'point'
 }
-export function isRenderableMesh(v: MeshDataType): v is RenderableMesh {
+export function isRenderable(v: NodeLike): v is RenderableNode {
 	return v['geometry'] && v['material']
 }
-export function isLuminous(v: MeshDataType): v is Luminous {
-	return v['isLuminous']
+export function isLuminous(v: NodeLike): v is LuminousNode {
+	return v.extensions?.EXT_luminous !== undefined
 }
 
 export function isTransform3Matrix(v: Transform3): v is Transform3Matrix {
@@ -78,7 +77,7 @@ export function isTransform2TRS(v: Transform2): v is Transform2TRS {
 	return v.matrix === undefined
 }
 
-export function isTexture(v: UniformDataType['value']): v is Texture {
+export function isTexture(v: Uniform['value']): v is Texture {
 	return (
 		(v as Texture).sampler?.magFilter !== undefined &&
 		(v as Texture).sampler?.wrapS !== undefined &&
@@ -86,7 +85,7 @@ export function isTexture(v: UniformDataType['value']): v is Texture {
 	)
 }
 
-export function isCubeTexture(v: UniformDataType['value']): v is CubeTexture {
+export function isCubeTexture(v: Uniform['value']): v is CubeTexture {
 	return (
 		(v as CubeTexture).sampler?.magFilter !== undefined &&
 		(v as CubeTexture).sampler?.wrapS !== undefined &&

@@ -1,15 +1,10 @@
-import {
-	AttributeDataType,
-	AttributeVec2DataType,
-	AttributeVec3DataType,
-	TypedArray,
-} from '@gs.i/schema-scene'
+import { TypedArray } from '@gs.i/schema-scene'
 /**
  * Copyright (C) 2021 Alibaba Group Holding Limited
  * All rights reserved.
  */
 
-import { GeomDataType, isDISPOSED, BBox, BSphere, DISPOSED } from '@gs.i/schema-scene'
+import { IR, isDISPOSED, BBox, BSphere, DISPOSED } from '@gs.i/schema-scene'
 import { Geom, Attr } from '@gs.i/frontend-sdk'
 import { Vector3, Box3, Sphere } from '@gs.i/utils-math'
 import * as GeomUtil from './GeomUtil'
@@ -84,7 +79,7 @@ export class GLineGeom extends Geom {
 		position: Attr<3>
 	}
 	indices: Attr<1>
-	extensions: Exclude<GeomDataType['extensions'], undefined> = {}
+	extensions: Exclude<IR.Geometry['extensions'], undefined> = {}
 
 	/**
 	 * GLineGeom properties

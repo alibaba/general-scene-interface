@@ -1,4 +1,4 @@
-import { MatrBaseDataType, Texture } from '@gs.i/schema-scene'
+import IR, { MaterialBase, Texture } from '@gs.i/schema-scene'
 import {
 	Material,
 	Texture as ThreeTexture,
@@ -17,7 +17,7 @@ import { box3Equals, convDefines, elementsEquals, sphereEquals, SupportedExtensi
  * @note these parameters only sync when the material needs update. NOT EVERY FRAME!
  */
 export function syncMaterial(
-	gsiMatr: MatrBaseDataType,
+	gsiMatr: MaterialBase,
 	/** it's actually ShaderMaterial but three.js ShaderMaterial type declaration is kinda funky. won't rely on it anyway*/
 	threeMatr: Material,
 	cache: WeakMap<Texture, ThreeTexture>

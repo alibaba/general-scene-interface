@@ -1,4 +1,4 @@
-import { MeshDataType } from '@gs.i/schema-scene'
+import IR from '@gs.i/schema-scene'
 
 /**
  * traverse a scene graph and process all the nodes
@@ -9,9 +9,9 @@ import { MeshDataType } from '@gs.i/schema-scene'
  * @param parent
  */
 export function traverse(
-	node: MeshDataType,
-	handler: (node: MeshDataType, parent?: MeshDataType) => any,
-	parent?: MeshDataType
+	node: IR.NodeLike,
+	handler: (node: IR.NodeLike, parent?: IR.NodeLike) => any,
+	parent?: IR.NodeLike
 ) {
 	if (node === undefined || node === null) return
 
@@ -31,9 +31,9 @@ export function traverse(
 export const traversePreOrder = traverse
 
 export function traversePostOrder(
-	node: MeshDataType,
-	handler: (node: MeshDataType, parent?: MeshDataType) => any,
-	parent?: MeshDataType
+	node: IR.NodeLike,
+	handler: (node: IR.NodeLike, parent?: IR.NodeLike) => any,
+	parent?: IR.NodeLike
 ) {
 	if (node === undefined || node === null) return
 
@@ -47,18 +47,18 @@ export function traversePostOrder(
 /**
  * parse tree into levels, used by BFS
  */
-export function genLevels(root: MeshDataType) {
-	const levels = [] as MeshDataType[][]
+export function genLevels(root: IR.NodeLike) {
+	const levels = [] as IR.NodeLike[][]
 
 	// level 0
-	let prevLevel = [root] as MeshDataType[]
+	let prevLevel = [root] as IR.NodeLike[]
 	levels.push(prevLevel.slice())
 
 	// safe loop
 	const MAX_TREE_DEPTH = 2048
 	for (let level = 1; level < MAX_TREE_DEPTH; level++) {
 		// generate level
-		const currLevel = [] as MeshDataType[]
+		const currLevel = [] as IR.NodeLike[]
 		for (let i = 0; i < prevLevel.length; i++) {
 			const node = prevLevel[i]
 			node.children.forEach((child) => {
@@ -77,7 +77,7 @@ export function genLevels(root: MeshDataType) {
 	return levels
 }
 
-export function traverseBFS(root: MeshDataType, handler: (node: MeshDataType) => any) {
+export function traverseBFS(root: IR.NodeLike, handler: (node: IR.NodeLike) => any) {
 	if (root === undefined || root === null) return
 
 	const levels = genLevels(root)
@@ -93,7 +93,7 @@ export function traverseBFS(root: MeshDataType, handler: (node: MeshDataType) =>
 	}
 }
 
-export function traverseBFSBottomUp(root: MeshDataType, handler: (node: MeshDataType) => any) {
+export function traverseBFSBottomUp(root: IR.NodeLike, handler: (node: IR.NodeLike) => any) {
 	if (root === undefined || root === null) return
 
 	const levels = genLevels(root)
@@ -114,8 +114,8 @@ export function traverseBFSBottomUp(root: MeshDataType, handler: (node: MeshData
  * @param node
  * @returns
  */
-export function flatten(node?: MeshDataType) {
-	const result = [] as MeshDataType[]
+export function flatten(node?: IR.NodeLike) {
+	const result = [] as IR.NodeLike[]
 
 	if (node) {
 		traverse(node, (_node, parent) => {
@@ -131,18 +131,18 @@ export function flatten(node?: MeshDataType) {
  * @param node
  * @returns
  */
-export function flattenBFS(root: MeshDataType) {
-	const levels = [] as MeshDataType[]
+export function flattenBFS(root: IR.NodeLike) {
+	const levels = [] as IR.NodeLike[]
 
 	// level 0
-	let prevLevel = [root] as MeshDataType[]
+	let prevLevel = [root] as IR.NodeLike[]
 	levels.push(root)
 
 	// safe loop
 	const MAX_TREE_DEPTH = 2048
 	for (let level = 1; level < MAX_TREE_DEPTH; level++) {
 		// generate level
-		const currLevel = [] as MeshDataType[]
+		const currLevel = [] as IR.NodeLike[]
 		for (let i = 0; i < prevLevel.length; i++) {
 			const node = prevLevel[i]
 			node.children.forEach((child) => {

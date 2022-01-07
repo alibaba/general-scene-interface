@@ -10,7 +10,7 @@
 	"exclude": ["dist"],
 	"references": [
 		{
-			"path": "../../frontend/ts"
+			"path": "../../frontend/sdk"
 		},
 		{
 			"path": "../../schema/core-old"

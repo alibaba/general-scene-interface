@@ -16,7 +16,7 @@
 			"path": "../../utils/geometry"
 		},
 		{
-			"path": "../../frontend/ts"
+			"path": "../../frontend/sdk"
 		},
 		{
 			"path": "../base"

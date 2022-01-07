@@ -4,7 +4,7 @@
  */
 
 import { PointsMaterial, UniformsUtils, ShaderLib } from 'three-lite'
-import { MatrPointDataType, Programable } from '@gs.i/schema-scene'
+import IR, { Programable } from '@gs.i/schema-scene'
 // import { genPreShaderCode } from './utils'
 import vs from './PrgPointMatr.vs.glsl'
 import fs from './PrgPointMatr.fs.glsl'
@@ -56,7 +56,7 @@ export class PrgPointMaterial extends PointsMaterial {
 
 	glslVersion = null
 
-	constructor(gsiMatr: MatrPointDataType) {
+	constructor(gsiMatr: IR.PointMaterial) {
 		super()
 		// this.setValues(gsiMatr as any) // Set parent class parameters
 

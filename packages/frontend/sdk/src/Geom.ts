@@ -3,11 +3,11 @@
  * All rights reserved.
  */
 
-import { GeomDataType } from '@gs.i/schema-scene'
+import IR from '@gs.i/schema-scene'
 import { specifyGeometry } from '@gs.i/utils-specify'
 
-export interface Geom extends GeomDataType {} // this do member declarations for you
-export class Geom implements GeomDataType {
+export interface Geom extends IR.Geometry {} // this do member declarations for you
+export class Geom implements IR.Geometry {
 	/**
 	 * boundingBox
 	 * @deprecated use processor-bound to improve performance.
@@ -51,7 +51,7 @@ export class Geom implements GeomDataType {
 		this.extensions.EXT_geometry_range.drawRange = v
 	}
 
-	constructor(params: Partial<GeomDataType> = {}) {
+	constructor(params: Partial<IR.Geometry> = {}) {
 		this.attributes = {}
 		for (const key of Object.keys(params)) {
 			const v = params[key]

@@ -4,17 +4,10 @@
  */
 
 /* eslint-disable array-element-newline */
-import {
-	BBox,
-	BSphere,
-	GeomDataType,
-	isDISPOSED,
-	TypedArray,
-	AttributeDataType,
-} from '@gs.i/schema-scene'
+import { BBox, BSphere, Geometry, isDISPOSED, TypedArray, Attribute } from '@gs.i/schema-scene'
 import { Vector3 } from '@gs.i/utils-math'
 
-export function genBBoxWireframe(bbox: BBox): GeomDataType {
+export function genBBoxWireframe(bbox: BBox): Geometry {
 	const min = bbox.min
 	const max = bbox.max
 
@@ -32,7 +25,7 @@ export function genBBoxWireframe(bbox: BBox): GeomDataType {
 	// prettier-ignore
 	const indices = [ 0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7 ]
 
-	const geom: GeomDataType = {
+	const geom: Geometry = {
 		mode: 'LINES',
 		attributes: {
 			position: {
@@ -62,7 +55,7 @@ export function genBBoxWireframe(bbox: BBox): GeomDataType {
 	return geom
 }
 
-export function genBSphereWireframe(bsphere: BSphere, segments = 12): GeomDataType {
+export function genBSphereWireframe(bsphere: BSphere, segments = 12): Geometry {
 	const center = bsphere.center
 	const radius = bsphere.radius
 	const phiLength = Math.PI * 2
@@ -115,7 +108,7 @@ export function genBSphereWireframe(bsphere: BSphere, segments = 12): GeomDataTy
 		}
 	}
 
-	const geom: GeomDataType = {
+	const geom: Geometry = {
 		mode: 'LINES',
 		attributes: {
 			position: {
@@ -142,7 +135,7 @@ export function genBSphereWireframe(bsphere: BSphere, segments = 12): GeomDataTy
 	return geom
 }
 
-export function genGeomWireframe(geom: GeomDataType): GeomDataType {
+export function genGeomWireframe(geom: Geometry): Geometry {
 	if (!geom.attributes.position) {
 		throw 'Geometry.attributes does not have position or has been disposed'
 	}
@@ -154,7 +147,7 @@ export function genGeomWireframe(geom: GeomDataType): GeomDataType {
 	}
 
 	const idxArr: number[] = []
-	const posAttr: AttributeDataType = {
+	const posAttr: Attribute = {
 		array: position.array.slice() as TypedArray,
 		itemSize: position.itemSize,
 		count: position.count,
@@ -184,7 +177,7 @@ export function genGeomWireframe(geom: GeomDataType): GeomDataType {
 		}
 	}
 
-	const wireframe: GeomDataType = {
+	const wireframe: Geometry = {
 		mode: 'LINES',
 		attributes: {
 			position: posAttr,

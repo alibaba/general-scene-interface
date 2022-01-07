@@ -10,7 +10,7 @@ import { UpdateRanges, TypedArray, BBox, BSphere, DISPOSED, Versioned, Int } fro
  * @todo morph
  * {@link https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#primitive}
  */
-export interface GeomDataType {
+export interface Geometry {
 	/**
 	 * - const GLenum POINTS                         = 0x0000;
 	 * - const GLenum LINES                          = 0x0001;
@@ -26,7 +26,7 @@ export interface GeomDataType {
 	/**
 	 * attributes data
 	 * @note only standard attributes here
-	 * @note custom attributes should be put in {@link GeomDataType.extensions} and start with "_"
+	 * @note custom attributes should be put in {@link Geometry.extensions} and start with "_"
 	 */
 	attributes: {
 		/**
@@ -80,19 +80,19 @@ export interface GeomDataType {
 		 * - uv2~8
 		 */
 
-		position?: AttributeVec3DataType
-		normal?: AttributeVec3DataType
-		uv?: AttributeVec2DataType
-		uv2?: AttributeVec2DataType
-		color?: AttributeVec3DataType | AttributeVec4DataType
+		position?: Vec3Attribute
+		normal?: Vec3Attribute
+		uv?: Vec2Attribute
+		uv2?: Vec2Attribute
+		color?: Vec3Attribute | Vec4Attribute
 
-		[name: string]: AttributeDataType | undefined
+		[name: string]: Attribute | undefined
 	}
 
 	/**
 	 * 索引
 	 */
-	indices?: AttributeScalarDataType
+	indices?: ScalarAttribute
 
 	extensions?: {
 		/**
@@ -105,7 +105,7 @@ export interface GeomDataType {
 		// 	uv: never
 		// 	uv2: never
 		// 	color: never
-		// 	[name: string]: AttributeDataType | undefined
+		// 	[name: string]: Attribute | undefined
 		// }
 
 		/**
@@ -143,7 +143,7 @@ export interface GeomDataType {
 	extras?: any
 }
 
-// const a: GeomDataType = {
+// const a: Geom = {
 // 	attributes: {
 // 		position:{},
 // 		a:{}
@@ -162,25 +162,21 @@ export interface GeomDataType {
  * @todo stride (interpolation)
  * @todo instanced
  */
-export type AttributeDataType =
-	| AttributeVec3DataType
-	| AttributeVec2DataType
-	| AttributeScalarDataType
-	| AttributeVec4DataType
+export type Attribute = Vec3Attribute | Vec2Attribute | ScalarAttribute | Vec4Attribute
 
-export interface AttributeVec4DataType extends AttributeBaseDataType {
+export interface Vec4Attribute extends AttributeBase {
 	itemSize: 4
 }
-export interface AttributeVec3DataType extends AttributeBaseDataType {
+export interface Vec3Attribute extends AttributeBase {
 	itemSize: 3
 }
-export interface AttributeVec2DataType extends AttributeBaseDataType {
+export interface Vec2Attribute extends AttributeBase {
 	itemSize: 2
 }
-export interface AttributeScalarDataType extends AttributeBaseDataType {
+export interface ScalarAttribute extends AttributeBase {
 	itemSize: 1
 }
-export interface AttributeBaseDataType extends Versioned {
+export interface AttributeBase extends Versioned {
 	/**
 	 * attribute name
 	 */

@@ -16,7 +16,7 @@
 			"path": "../specify"
 		},
 		{
-			"path": "../../frontend/ts"
+			"path": "../../frontend/sdk"
 		},
 		{
 			"path": "../geom-builders"

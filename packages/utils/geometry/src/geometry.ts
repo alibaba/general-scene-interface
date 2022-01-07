@@ -7,11 +7,11 @@
 import {
 	BBox,
 	BSphere,
-	GeomDataType,
+	Geometry,
 	isDISPOSED,
 	TypedArray,
-	AttributeDataType,
-	AttributeScalarDataType,
+	Attribute,
+	ScalarAttribute,
 } from '@gs.i/schema-scene'
 import { Box3, Sphere, Vector3 } from '@gs.i/utils-math'
 
@@ -52,7 +52,7 @@ export function convSphereToBSphere(sphere: Sphere): BSphere {
 	}
 }
 
-export function computeBBox(geometry: GeomDataType, positionAttrName = 'position'): BBox {
+export function computeBBox(geometry: Geometry, positionAttrName = 'position'): BBox {
 	const box = new Box3()
 	const v = new Vector3()
 	const attr = geometry.attributes[positionAttrName]
@@ -77,7 +77,7 @@ export function computeBBox(geometry: GeomDataType, positionAttrName = 'position
 	return convBox3ToBBox(box)
 }
 
-export function computeBSphere(geometry: GeomDataType, positionAttrName = 'position'): BSphere {
+export function computeBSphere(geometry: Geometry, positionAttrName = 'position'): BSphere {
 	const efficientBSphere = fastEstimateBSphere(geometry, positionAttrName)
 	const boxBSphere = estimateBSphereFromBBox(geometry, positionAttrName)
 	if (efficientBSphere.radius < boxBSphere.radius) {
@@ -91,7 +91,7 @@ export function computeBSphere(geometry: GeomDataType, positionAttrName = 'posit
  * AN EFFICIENT BOUNDING SPHERE by Jack Ritter
  * @link http://inis.jinr.ru/sl/vol1/CMC/Graphics_Gems_1,ed_A.Glassner.pdf - Page 301
  */
-function fastEstimateBSphere(geometry: GeomDataType, positionAttrName = 'position'): BSphere {
+function fastEstimateBSphere(geometry: Geometry, positionAttrName = 'position'): BSphere {
 	const attr = geometry.attributes[positionAttrName]
 	if (!attr || isDISPOSED(attr.array)) {
 		// console.warn('Geometry does not have position attribute, generating an infinity sphere')
@@ -158,7 +158,7 @@ function fastEstimateBSphere(geometry: GeomDataType, positionAttrName = 'positio
 	return convSphereToBSphere(sphere)
 }
 
-function estimateBSphereFromBBox(geometry: GeomDataType, positionAttrName = 'position'): BSphere {
+function estimateBSphereFromBBox(geometry: Geometry, positionAttrName = 'position'): BSphere {
 	const sphere = new Sphere()
 	const center = sphere.center
 	const v = new Vector3()
@@ -203,7 +203,7 @@ function estimateBSphereFromBBox(geometry: GeomDataType, positionAttrName = 'pos
 	return convBSphereToSphere(sphere)
 }
 
-export function mergeGeometries(geometries: GeomDataType[]): GeomDataType | undefined {
+export function mergeGeometries(geometries: Geometry[]): Geometry | undefined {
 	if (!geometries || geometries.length === 0) {
 		return
 	}
@@ -211,16 +211,16 @@ export function mergeGeometries(geometries: GeomDataType[]): GeomDataType | unde
 	const target = geometries[0]
 
 	// 合并结果
-	const result: GeomDataType = {
+	const result: Geometry = {
 		mode: target.mode,
 		attributes: {},
 	}
 
 	// 所有数据按顺序整理到一起
-	const attributes: Map<string, AttributeDataType[]> = new Map()
-	const indices: AttributeDataType[] = []
+	const attributes: Map<string, Attribute[]> = new Map()
+	const indices: Attribute[] = []
 
-	indices.push(target.indices as AttributeDataType)
+	indices.push(target.indices as Attribute)
 	for (const key in target.attributes) {
 		if (Object.prototype.hasOwnProperty.call(target.attributes, key)) {
 			const attr = target.attributes[key]
@@ -234,7 +234,7 @@ export function mergeGeometries(geometries: GeomDataType[]): GeomDataType | unde
 		// TODO 合并 extensions extras
 		// TODO 处理 drawRange
 
-		indices.push(geom.indices as AttributeDataType)
+		indices.push(geom.indices as Attribute)
 		attributes.forEach((v, k) => {
 			const a = geom.attributes[k]
 			a && v.push(a)
@@ -244,8 +244,8 @@ export function mergeGeometries(geometries: GeomDataType[]): GeomDataType | unde
 	// 合并
 	result.indices = mergeIndices(
 		indices,
-		attributes.get('position') as AttributeDataType[]
-	) as AttributeScalarDataType
+		attributes.get('position') as Attribute[]
+	) as ScalarAttribute
 	attributes.forEach((v, k) => {
 		result.attributes[k] = mergeAttributes(v)
 	})
@@ -253,7 +253,7 @@ export function mergeGeometries(geometries: GeomDataType[]): GeomDataType | unde
 	return result
 }
 
-function mergeAttributes(attributes: AttributeDataType[]) {
+function mergeAttributes(attributes: Attribute[]) {
 	const target = attributes[0]
 
 	let arrayLength = 0
@@ -269,7 +269,7 @@ function mergeAttributes(attributes: AttributeDataType[]) {
 		pointer = arrayLength
 	}
 
-	const result: AttributeDataType = {
+	const result: Attribute = {
 		array: new (getTypedArrayConstructor(target.array as TypedArray))(arrayLength),
 		itemSize: target.itemSize,
 		count,
@@ -288,7 +288,7 @@ function mergeAttributes(attributes: AttributeDataType[]) {
 	return result
 }
 
-function mergeIndices(attributes: AttributeDataType[], positions: AttributeDataType[]) {
+function mergeIndices(attributes: Attribute[], positions: Attribute[]) {
 	const target = attributes[0]
 
 	let arrayLength = 0
@@ -308,7 +308,7 @@ function mergeIndices(attributes: AttributeDataType[], positions: AttributeDataT
 		positionOffsetLast += positions[i].array.length / positions[i].itemSize
 	}
 
-	const result: AttributeDataType = {
+	const result: Attribute = {
 		array: new (getTypedArrayConstructor(target.array as TypedArray))(arrayLength),
 		itemSize: target.itemSize,
 		count,

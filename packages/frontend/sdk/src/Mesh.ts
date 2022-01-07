@@ -3,25 +3,18 @@
  * All rights reserved.
  */
 
-import {
-	MatrBaseDataType,
-	GeomDataType,
-	MeshDataType,
-	RenderableMesh,
-	Node,
-	Transform3TRS,
-} from '@gs.i/schema-scene'
-import { Vector3, Euler, Quaternion } from '@gs.i/utils-math'
+import IR from '@gs.i/schema-scene'
+import { Vector3, Euler } from '@gs.i/utils-math'
 
-import { specifyMesh } from '@gs.i/utils-specify'
+import { specifyNode } from '@gs.i/utils-specify'
 import { defaultMatrixProcessor } from './defaultProcessors'
 
-export interface Mesh extends RenderableMesh {}
+export interface Mesh extends IR.RenderableNode {}
 export class Mesh {
 	name = 'Mesh'
 
 	/**
-	 * @deprecated use {@link MatrBaseDataType.extensions EXT_mesh_order}
+	 * @deprecated use {@link IR.MaterialBase.extensions EXT_mesh_order}
 	 * @deprecated rely on mechanism of renderers, may act very differently for different backends
 	 * @deprecated do not use if you want this to work with different renderers
 	 */
@@ -37,7 +30,7 @@ export class Mesh {
 
 	transform = new AutoVersionTransform3()
 
-	constructor(params: Partial<Omit<RenderableMesh, 'transform'>> = {}) {
+	constructor(params: Partial<Omit<IR.RenderableNode, 'transform'>> = {}) {
 		for (const key of Object.keys(params)) {
 			const v = params[key]
 			if (v !== undefined) {
@@ -45,16 +38,16 @@ export class Mesh {
 			}
 		}
 
-		specifyMesh(this)
+		specifyNode(this)
 	}
 
-	add(child: MeshDataType) {
-		if (child.parent) throw new Error('A RenderableMesh can only be added once.')
+	add(child: IR.NodeLike) {
+		if (child.parent) throw new Error('A IR.RenderableNode can only be added once.')
 		this.children.add(child)
 		child.parent = this
 	}
 
-	remove(child: MeshDataType) {
+	remove(child: IR.NodeLike) {
 		if (child.parent !== this) throw new Error('Not your child.')
 		this.children.delete(child)
 		delete child.parent
@@ -70,12 +63,28 @@ export class Mesh {
 	}
 }
 
+export class PointLight extends Mesh implements IR.LuminousNode {
+	name = 'PointLight'
+	constructor(params: Partial<IR.LuminousEXT> = {}) {
+		super()
+		this.extensions = {
+			EXT_luminous: {
+				type: 'point',
+				color: params.color,
+				intensity: params.intensity,
+				range: params.range,
+			},
+		}
+		specifyNode(this)
+	}
+}
+
 /**
  * A Transform3 that automatically marked as dirty when you changed any property
  * @note it is recommended to increase `.version` manually when you change something
  * @note this class is for folks who don't have the habit to mark something dirty explicitly
  */
-export class AutoVersionTransform3 implements Transform3TRS {
+export class AutoVersionTransform3 implements IR.Transform3TRS {
 	version = 0
 
 	readonly rotation: Euler
@@ -120,9 +129,9 @@ export class AutoVersionTransform3 implements Transform3TRS {
 	}
 }
 
-export function isBufferGeometry(geom?: GeomDataType): boolean {
+export function isBufferGeometry(geom?: IR.Geometry): boolean {
 	return geom && geom['isBufferGeometry']
 }
-export function isThreeMaterial(matr?: MatrBaseDataType): boolean {
+export function isThreeMaterial(matr?: IR.MaterialBase): boolean {
 	return matr && matr['isMaterial']
 }

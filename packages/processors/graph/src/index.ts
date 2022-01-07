@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import { MeshDataType, Int } from '@gs.i/schema-scene'
+import IR, { Int } from '@gs.i/schema-scene'
 import { Processor, TraverseType } from '@gs.i/processor-base'
 import { traverse, flatten } from '@gs.i/utils-traverse'
 
@@ -49,9 +49,9 @@ export class GraphProcessor extends Processor {
 	 * hash the sub tree of the given node
 	 * - used for checking if the tree structure changed
 	 */
-	hash(root: MeshDataType): TreeHash {
+	hash(root: IR.NodeLike): TreeHash {
 		let result = ''
-		let currParent: MeshDataType | undefined = undefined
+		let currParent: IR.NodeLike | undefined = undefined
 		traverse(root, (node, parent) => {
 			if (parent === currParent) {
 				// same parent
@@ -72,10 +72,10 @@ export class GraphProcessor extends Processor {
 	 * hash the position of the given node
 	 * - used for checking if the node position changed
 	 */
-	hashPosition(node: MeshDataType): PositionHash {
+	hashPosition(node: IR.NodeLike): PositionHash {
 		const upstreamPath = [this.getID(node)]
 
-		const curr: MeshDataType = node
+		const curr: IR.NodeLike = node
 		while (curr.parent) {
 			upstreamPath.push(this.getID(curr.parent))
 		}
@@ -88,7 +88,7 @@ export class GraphProcessor extends Processor {
 	 * take a snapshot of the tree structure
 	 * - used to find out which parts of the tree changed
 	 */
-	snapshot(root?: MeshDataType, keepRef = false): SnapShot {
+	snapshot(root?: IR.NodeLike, keepRef = false): SnapShot {
 		const result: SnapShot = {
 			values: new Set(),
 			references: new Map(),
@@ -117,7 +117,7 @@ export class GraphProcessor extends Processor {
 	/**
 	 * @note did not sort children, kept the order of adding
 	 */
-	flatten(root: MeshDataType): MeshDataType[] {
+	flatten(root: IR.NodeLike): IR.NodeLike[] {
 		return flatten(root)
 	}
 }

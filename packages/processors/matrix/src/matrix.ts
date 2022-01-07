@@ -1,11 +1,4 @@
-import {
-	MeshDataType,
-	Transform3,
-	isTransform3Matrix,
-	Int,
-	Double,
-	TypedArray,
-} from '@gs.i/schema-scene'
+import IR, { Transform3, isTransform3Matrix, Int, Double, TypedArray } from '@gs.i/schema-scene'
 import { Processor, TraverseType } from '@gs.i/processor-base'
 
 import { Euler, Quaternion, Vector3, Matrix4 } from '@gs.i/utils-math'
@@ -65,12 +58,12 @@ export class MatProcessor extends Processor {
 	 * 所有 id 都从 WeakMap 得到，一个 key 在一个实例中的 id 是唯一的
 	 */
 	private _counter = 0
-	private _ids = new WeakMap<MeshDataType, Int>()
+	private _ids = new WeakMap<IR.NodeLike, Int>()
 
 	private _cacheLocalMatrix = new WeakMap<Transform3, LocalMatrixCache>()
 	private _cacheWorldMatrix = new WeakMap<Transform3, WorldMatrixCache>()
 
-	private _path = [] as MeshDataType[]
+	private _path = [] as IR.NodeLike[]
 
 	/**
 	 * get latest world matrix and update cache, with dirty-checking
@@ -78,7 +71,7 @@ export class MatProcessor extends Processor {
 	 * - you can always get the correct matrix no matter when or what you did to the scene graph
 	 */
 	// * be very careful if you want to optimize this method
-	getWorldMatrix(node: MeshDataType): number[] {
+	getWorldMatrix(node: IR.NodeLike): number[] {
 		// root as a special case
 
 		if (!node.parent) {
@@ -87,9 +80,9 @@ export class MatProcessor extends Processor {
 
 		// path from leaf to root
 		// @note path.length >= 2
-		const path: MeshDataType[] = this._path
+		const path: IR.NodeLike[] = this._path
 		path.length = 0
-		let curr: MeshDataType | undefined = node
+		let curr: IR.NodeLike | undefined = node
 
 		// @note for safety and perf
 		// @result a little bit better ?
@@ -205,7 +198,7 @@ export class MatProcessor extends Processor {
 	 * this will update cached matrices for all the nodes of the sub tree
 	 * @param root
 	 */
-	updateMatrix(root: MeshDataType) {
+	updateMatrix(root: IR.NodeLike) {
 		traversePreOrder(root, this.updateMatrixShallow.bind(this))
 	}
 
@@ -213,7 +206,7 @@ export class MatProcessor extends Processor {
 	 * flat version of {@link updateMatrix}
 	 * @note flatScene must be pre-order or BFS, can not be post-order
 	 */
-	updateMatrixFlat(flatScene: MeshDataType[]) {
+	updateMatrixFlat(flatScene: IR.NodeLike[]) {
 		for (let i = 0; i < flatScene.length; i++) {
 			const node = flatScene[i]
 			const parent = node.parent
@@ -227,7 +220,7 @@ export class MatProcessor extends Processor {
 	 * @param node
 	 * @param parent
 	 */
-	private updateMatrixShallow(node: MeshDataType, parent?: MeshDataType) {
+	private updateMatrixShallow(node: IR.NodeLike, parent?: IR.NodeLike) {
 		if (parent) {
 			const curr = node
 
@@ -313,7 +306,7 @@ export class MatProcessor extends Processor {
 	 * get cached world matrix
 	 * @note only use this if you are sure the tree has been updated and nothing has changed
 	 */
-	getCachedWorldMatrix(node: MeshDataType): number[] | undefined {
+	getCachedWorldMatrix(node: IR.NodeLike): number[] | undefined {
 		return this._cacheWorldMatrix.get(node.transform)?.matrix
 	}
 
@@ -323,7 +316,7 @@ export class MatProcessor extends Processor {
 	 * @note typescript baned `object` so there is no proper type to use 😮‍💨
 	 * @returns
 	 */
-	getID(node: MeshDataType): Int {
+	getID(node: IR.NodeLike): Int {
 		let id = this._ids.get(node)
 		if (id === undefined) {
 			id = this._counter++
@@ -333,7 +326,7 @@ export class MatProcessor extends Processor {
 		return id
 	}
 
-	getLocalMatrix(node: MeshDataType): number[] {
+	getLocalMatrix(node: IR.NodeLike): number[] {
 		const transform = node.transform
 
 		/**

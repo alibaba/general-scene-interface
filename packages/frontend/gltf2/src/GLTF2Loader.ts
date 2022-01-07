@@ -4,7 +4,7 @@ import { specifyGeometry } from '@gs.i/utils-specify'
  * All rights reserved.
  */
 
-import * as IR from '@gs.i/schema-scene' // type only, will be deleted after compiled
+import IR from '@gs.i/schema-scene' // type only, will be deleted after compiled
 import { Quaternion } from '@gs.i/utils-math'
 
 import { specifyTree } from '@gs.i/utils-specify'
@@ -37,14 +37,14 @@ import {
 const quaternion = new Quaternion()
 
 export class GLTF2Loader {
-	private _meshesCache: IR.LooseMeshDataType[] = []
-	private _materialsCache: IR.LooseMatrBase[] = []
+	private _meshesCache: IR.LooseNodeLike[] = []
+	private _materialsCache: IR.LooseMaterialBase[] = []
 	private _accessorsCache: IR.LooseAttribute[] = []
-	private _nodesCache: IR.LooseMeshDataType[] = []
+	private _nodesCache: IR.LooseNodeLike[] = []
 
-	private _texturesCache: IR.LooseTextureType[] = []
+	private _texturesCache: IR.LooseTexture[] = []
 
-	parse(glm: GLM): IR.LooseMeshDataType {
+	parse(glm: GLM): IR.LooseNodeLike {
 		this._meshesCache = []
 		this._materialsCache = []
 		this._accessorsCache = []
@@ -62,7 +62,7 @@ export class GLTF2Loader {
 
 		// texture
 		glm.textures?.forEach((texture) => {
-			const gsiSampler: IR.LooseSamplerDataType = {}
+			const gsiSampler: IR.LooseSampler = {}
 			if (texture.sampler) {
 				const gltfSampler = glm.samplers[texture.sampler]
 				gsiSampler.magFilter = SamplerEnumToString[gltfSampler.magFilter || 9728]
@@ -71,7 +71,7 @@ export class GLTF2Loader {
 				gsiSampler.wrapT = SamplerEnumToString[gltfSampler.wrapT || 10497]
 			}
 
-			const gsiImage: IR.LooseImageDataType = {}
+			const gsiImage: IR.LooseImage = {}
 
 			if (texture.source !== undefined) {
 				const image: GLTF.Image = glm.images[texture.source]
@@ -102,7 +102,7 @@ export class GLTF2Loader {
 				throw new Error('texture 缺少 source(image 数据)')
 			}
 
-			const gsiTexture: IR.LooseTextureType = {
+			const gsiTexture: IR.LooseTexture = {
 				image: gsiImage,
 				sampler: gsiSampler,
 			}
@@ -149,7 +149,7 @@ export class GLTF2Loader {
 
 		// materials
 		glm.materials.forEach((material) => {
-			let matr: IR.LooseMatrBase
+			let matr: IR.LooseMaterialBase
 			// unlit 材质
 			// TODO 其他 extension 材质
 			if (material.extensions && material.extensions.KHR_materials_unlit) {
@@ -173,7 +173,7 @@ export class GLTF2Loader {
 					},
 					opacity: baseColorFactor[3],
 					baseColorTexture,
-				} as IR.LooseMatrUnlitDataType
+				} as IR.LooseUnlitMaterial
 			} else {
 				// PBR 材质
 				const baseColorFactor = material.pbrMetallicRoughness?.baseColorFactor || [1, 1, 1, 1]
@@ -246,7 +246,7 @@ export class GLTF2Loader {
 					normalTexture,
 					emissiveTexture,
 					occlusionTexture,
-				} as IR.LooseMatrPbrDataType
+				} as IR.LoosePbrMaterial
 			}
 
 			if (material.name) {
@@ -262,7 +262,7 @@ export class GLTF2Loader {
 		// mesh/group
 		//第一遍，创建所有 gsiMesh
 		glm.nodes.forEach((node) => {
-			const gsiMesh: IR.LooseMeshDataType = {
+			const gsiMesh: IR.LooseNodeLike = {
 				children: new Set(),
 			}
 
@@ -309,7 +309,7 @@ export class GLTF2Loader {
 			if (node.mesh !== undefined) {
 				// 这是个 GSI mesh
 
-				const gsiRenderableMesh = gsiMesh as IR.LooseRenderableMesh
+				const gsiRenderableMesh = gsiMesh as IR.LooseRenderableNode
 
 				const mesh = glm.meshes[node.mesh]
 				const primitive = mesh.primitives[0]
@@ -355,7 +355,7 @@ export class GLTF2Loader {
 				} else {
 					// gltf2: 如果没有分配，则使用 默认 material
 					// https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#default-material
-					gsiRenderableMesh.material = { type: 'unlit' } as IR.LooseMatrUnlitDataType
+					gsiRenderableMesh.material = { type: 'unlit' } as IR.LooseUnlitMaterial
 				}
 			}
 
@@ -372,21 +372,21 @@ export class GLTF2Loader {
 				node.children.forEach((childNodeIndex) => {
 					const child = this._meshesCache[childNodeIndex]
 
-					;(gsiMesh.children as Set<IR.LooseMeshDataType>).add(child)
+					;(gsiMesh.children as Set<IR.LooseNodeLike>).add(child)
 					// child.parent = gsiMesh // will be done by specifier
 				})
 			}
 		})
 
-		const result = { children: new Set() } as IR.LooseNode
+		const result = { children: new Set() } as IR.LooseBaseNode
 		glm.scenes[0].nodes?.forEach((nodeIndex) => {
 			const mesh = this._meshesCache[nodeIndex]
 
-			;(result.children as Set<IR.LooseMeshDataType>).add(mesh)
+			;(result.children as Set<IR.LooseNodeLike>).add(mesh)
 		})
 
 		// specify the whole scene
-		specifyTree(result as IR.MeshDataType)
+		specifyTree(result as IR.LooseNodeLike)
 
 		return result
 	}

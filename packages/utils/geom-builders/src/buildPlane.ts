@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-import { AttributeDataType, GeomDataType } from '@gs.i/schema-scene'
+import { Attribute, Geometry } from '@gs.i/schema-scene'
 import { Box3, Sphere, Vector3 } from '@gs.i/utils-math'
 
 export const DefaultParams = {
@@ -24,7 +24,7 @@ export function buildPlane(
 		normal: boolean
 		uv: boolean
 	}> = {}
-): GeomDataType {
+): Geometry {
 	const finalParams = {
 		...DefaultParams,
 		...params,
@@ -97,7 +97,7 @@ export function buildPlane(
 
 	// build geometry
 
-	const position: AttributeDataType = {
+	const position: Attribute = {
 		array: new Float32Array(vertices),
 		itemSize: 3,
 		count: vertices.length / 3,
@@ -107,7 +107,7 @@ export function buildPlane(
 		disposable: true,
 	}
 
-	const indicesAttr: AttributeDataType = {
+	const indicesAttr: Attribute = {
 		array: maxIndex < 65536 ? new Uint16Array(indices) : new Uint32Array(indices),
 		itemSize: 1,
 		count: indices.length,
@@ -120,7 +120,7 @@ export function buildPlane(
 	// box.getBoundingSphere(sphere)
 	sphere.radius = Math.sqrt(radiusSq)
 
-	const geom: GeomDataType = {
+	const geom: Geometry = {
 		mode: 'TRIANGLES' as const,
 		attributes: {
 			position: position,

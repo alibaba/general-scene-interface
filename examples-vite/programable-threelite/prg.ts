@@ -4,7 +4,7 @@ import { IndicatorProcessor } from '@gs.i/processor-indicator'
 
 import { renderer, timeline, camera, cameraProxy, WIDTH, HEIGHT } from '../__utils/LiteRenderer'
 import { scene as threeScene } from '../__utils/LiteScene'
-import { isRenderableMesh } from '@gs.i/schema-scene'
+import IR, { isRenderable } from '@gs.i/schema-scene'
 
 {
 	const scene = generateScene({
@@ -19,7 +19,7 @@ import { isRenderableMesh } from '@gs.i/schema-scene'
 	console.log(scene)
 
 	scene.children.forEach((node) => {
-		if (isRenderableMesh(node)) {
+		if (isRenderable(node)) {
 			node.material.extensions = {
 				EXT_matr_programmable: {
 					language: 'GLSL300',
