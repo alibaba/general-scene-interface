@@ -68,9 +68,11 @@ for (const pkg of packages) {
 		const references = tsconfig.references || []
 
 		// 过滤 dependents 中的本地包
-		const localDepPkgs = Object.keys(dependents).filter((pkgName) => {
-			return localPkgNames.includes(pkgName)
-		})
+		const localDepPkgs = Object.keys(dependents)
+			.filter((pkgName) => {
+				return localPkgNames.includes(pkgName)
+			})
+			.sort()
 
 		// 生成相对路径
 

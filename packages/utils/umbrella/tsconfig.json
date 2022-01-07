@@ -10,22 +10,58 @@
 	"exclude": ["dist"],
 	"references": [
 		{
-			"path": "../../schema/core-old"
-		},
-		{
-			"path": "../../schema/core"
-		},
-		{
-			"path": "../math"
-		},
-		{
 			"path": "../../backend/gl2"
+		},
+		{
+			"path": "../../backend/gltf2"
+		},
+		{
+			"path": "../../backend/threelite"
+		},
+		{
+			"path": "../../frontend/gline"
+		},
+		{
+			"path": "../../frontend/gltf2"
+		},
+		{
+			"path": "../../frontend/sdk"
+		},
+		{
+			"path": "../../frontend/sprite"
+		},
+		{
+			"path": "../../processors/base"
+		},
+		{
+			"path": "../../processors/bound"
+		},
+		{
+			"path": "../../processors/culling"
+		},
+		{
+			"path": "../../processors/graph"
+		},
+		{
+			"path": "../../processors/indicator"
+		},
+		{
+			"path": "../../processors/matrix"
+		},
+		{
+			"path": "../../processors/raycast"
+		},
+		{
+			"path": "../../schema/core-old"
 		},
 		{
 			"path": "../../schema/converter"
 		},
 		{
 			"path": "../../schema/ext-scene"
+		},
+		{
+			"path": "../../schema/core"
 		},
 		{
 			"path": "../geom-builders"
@@ -40,58 +76,22 @@
 			"path": "../gltf2"
 		},
 		{
+			"path": "../math"
+		},
+		{
 			"path": "../optimize"
+		},
+		{
+			"path": "../random-scene"
+		},
+		{
+			"path": "../specify"
 		},
 		{
 			"path": "../traverse"
 		},
 		{
 			"path": "../wireframe"
-		},
-		{
-			"path": "../../processors/base"
-		},
-		{
-			"path": "../specify"
-		},
-		{
-			"path": "../../processors/graph"
-		},
-		{
-			"path": "../../processors/matrix"
-		},
-		{
-			"path": "../../processors/bound"
-		},
-		{
-			"path": "../../backend/gltf2"
-		},
-		{
-			"path": "../../processors/culling"
-		},
-		{
-			"path": "../../processors/raycast"
-		},
-		{
-			"path": "../../backend/threelite"
-		},
-		{
-			"path": "../../frontend/sdk"
-		},
-		{
-			"path": "../../frontend/gline"
-		},
-		{
-			"path": "../../frontend/gltf2"
-		},
-		{
-			"path": "../../frontend/sprite"
-		},
-		{
-			"path": "../../processors/indicator"
-		},
-		{
-			"path": "../random-scene"
 		}
 	]
 }

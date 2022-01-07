@@ -16,13 +16,13 @@
 			"path": "../../schema/core"
 		},
 		{
-			"path": "../../utils/specify"
-		},
-		{
 			"path": "../../utils/gltf2"
 		},
 		{
 			"path": "../../utils/math"
+		},
+		{
+			"path": "../../utils/specify"
 		}
 	]
 }

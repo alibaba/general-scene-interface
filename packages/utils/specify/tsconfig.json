@@ -10,10 +10,10 @@
 	"exclude": ["dist"],
 	"references": [
 		{
-			"path": "../traverse"
+			"path": "../../schema/core"
 		},
 		{
-			"path": "../../schema/core"
+			"path": "../traverse"
 		}
 	]
 }

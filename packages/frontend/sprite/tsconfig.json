@@ -10,16 +10,16 @@
 	"exclude": ["dist"],
 	"references": [
 		{
-			"path": "../../schema/core"
-		},
-		{
-			"path": "../../utils/math"
-		},
-		{
 			"path": "../sdk"
 		},
 		{
+			"path": "../../schema/core"
+		},
+		{
 			"path": "../../utils/geometry"
+		},
+		{
+			"path": "../../utils/math"
 		}
 	]
 }
