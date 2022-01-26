@@ -28,6 +28,8 @@ npx lerna -v # v4.x recommended
 
 Should not see any error. If something goes wrong (probably caused by a registry). Run `npm run clean` and try it again.
 
+> If you are in China. You may want to change registry to a mirror. `yarn config set registry https://registry.npmmirror.com/`
+
 - build packages
 
 `npm run build`
