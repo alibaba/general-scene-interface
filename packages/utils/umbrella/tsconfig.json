@@ -25,6 +25,9 @@
 			"path": "../../frontend/gltf2"
 		},
 		{
+			"path": "../../frontend/materials"
+		},
+		{
 			"path": "../../frontend/sdk"
 		},
 		{
@@ -62,6 +65,9 @@
 		},
 		{
 			"path": "../../schema/core"
+		},
+		{
+			"path": "../thick-line-builder"
 		},
 		{
 			"path": "../geom-builders"

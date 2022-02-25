@@ -9,13 +9,22 @@
 	"exclude": ["dist", "node_modules", "packages"],
 	"references": [
 		{
+			"path": "../packages/backend/gl2"
+		},
+		{
 			"path": "../packages/backend/gltf2"
 		},
 		{
 			"path": "../packages/backend/threelite"
 		},
 		{
+			"path": "../packages/frontend/gline"
+		},
+		{
 			"path": "../packages/frontend/gltf2"
+		},
+		{
+			"path": "../packages/frontend/materials"
 		},
 		{
 			"path": "../packages/frontend/sdk"
@@ -42,6 +51,12 @@
 			"path": "../packages/processors/matrix"
 		},
 		{
+			"path": "../packages/processors/raycast"
+		},
+		{
+			"path": "../packages/schema/core-old"
+		},
+		{
 			"path": "../packages/schema/converter"
 		},
 		{
@@ -51,16 +66,25 @@
 			"path": "../packages/schema/core"
 		},
 		{
+			"path": "../packages/utils/thick-line-builder"
+		},
+		{
 			"path": "../packages/utils/geom-builders"
 		},
 		{
 			"path": "../packages/utils/geometry"
 		},
 		{
+			"path": "../packages/utils/gline"
+		},
+		{
 			"path": "../packages/utils/gltf2"
 		},
 		{
 			"path": "../packages/utils/math"
+		},
+		{
+			"path": "../packages/utils/optimize"
 		},
 		{
 			"path": "../packages/utils/random-scene"
