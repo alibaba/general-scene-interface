@@ -1,6 +1,6 @@
 # Thick Line Builder
 
-Extend line strings into triangle meshes with **uv**, dynamic width and **miter/bevel joint**.
+Extend line strings into triangle meshes with **uv**, dynamic width and **miter/bevel/round joint**.
 
 This generates "noodle-like" meshes, with no thickness, that always face the positive z-axis.
 
