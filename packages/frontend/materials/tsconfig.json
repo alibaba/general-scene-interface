@@ -1,0 +1,40 @@
+{
+	"extends": "./tsconfig.base.json",
+	"compilerOptions": {
+		"rootDir": "src",
+		"outDir": "dist",
+		"composite": true,
+		"incremental": true
+	},
+	"include": ["src", "typings"],
+	"exclude": ["dist"],
+	"references": [
+		{
+			"path": "../sdk"
+		},
+		{
+			"path": "../../processors/bound"
+		},
+		{
+			"path": "../../processors/culling"
+		},
+		{
+			"path": "../../processors/graph"
+		},
+		{
+			"path": "../../processors/matrix"
+		},
+		{
+			"path": "../../schema/core"
+		},
+		{
+			"path": "../../utils/geom-builders"
+		},
+		{
+			"path": "../../utils/math"
+		},
+		{
+			"path": "../../utils/specify"
+		}
+	]
+}
