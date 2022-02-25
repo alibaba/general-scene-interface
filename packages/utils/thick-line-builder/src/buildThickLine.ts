@@ -9,6 +9,8 @@ import { Geometry } from '@gs.i/schema-scene'
 
 import { mergeGeometries, computeBBox, computeBSphere } from '@gs.i/utils-geometry'
 
+import { buildEmpty } from '@gs.i/utils-geom-builders'
+
 export type Point2D = { x: number; y: number }
 export type Polyline2D = readonly Point2D[]
 export type MultiPolyline2D = readonly Point2D[][]
@@ -57,8 +59,8 @@ export type Config = Partial<typeof defaultConfig> & {
 	getWidth?: (percent: number) => number
 }
 
-export function buildThickLine(polyline: Polyline2D, config: Config): Geometry | undefined {
-	if (polyline.length === 0) return
+export function buildThickLine(polyline: Polyline2D, config: Config): Geometry {
+	if (polyline.length === 0) return buildEmpty()
 
 	const _config = {
 		...defaultConfig,
@@ -118,7 +120,12 @@ export function buildThickLine(polyline: Polyline2D, config: Config): Geometry |
 			// middle
 			const dirPrev = normalize(subPoints(curr, prev))
 			const dirNext = normalize(subPoints(next, curr))
+
+			// geometry error: reverse direction back. skip the whole joint
+			if (isZero(addPoints(dirPrev, dirNext))) continue
+
 			const dir = normalize(addPoints(dirPrev, dirNext))
+
 			// TODO: check here
 
 			// @note 直角三角形 斜边上的高分成的两个小三角形与原三角形相似
@@ -217,15 +224,40 @@ export function buildThickLine(polyline: Polyline2D, config: Config): Geometry |
 					const bevelStartND = turnRight(dirPrev)
 					const bevelEndND = turnRight(dirNext)
 					// lerp in polar coord sys
-					const thetaBevelStart = Math.atan2(bevelStartND.y, bevelStartND.x)
-					const thetaBevelEnd = Math.atan2(bevelEndND.y, bevelEndND.x)
+					let thetaBevelStart = Math.atan2(bevelStartND.y, bevelStartND.x)
+					let thetaBevelEnd = Math.atan2(bevelEndND.y, bevelEndND.x)
+
+					// 使用优弧
+					if (Math.abs(thetaBevelEnd - thetaBevelStart) > Math.PI) {
+						// -pi~pi => 0~2pi
+						if (thetaBevelStart < 0) {
+							thetaBevelStart += 2 * Math.PI
+						}
+						if (thetaBevelEnd < 0) {
+							thetaBevelEnd += 2 * Math.PI
+						}
+					}
+
+					// console.log('thetaBevelStart', thetaBevelStart)
+					// console.log('thetaBevelEnd', thetaBevelEnd)
 
 					const segments = Math.ceil(
 						Math.abs(thetaBevelEnd - thetaBevelStart) / _config.maxSegmentRadian
 					)
+
+					// @note segment is zero when collinear. 如果两条线平行，segments 为 0
+					// in this case, skip this joint (do not add any tie)
+					if (segments === 0) continue
+
 					for (let i = 0; i <= segments; i++) {
 						const total = thetaBevelEnd - thetaBevelStart
-						const theta = thetaBevelStart + total * (i / segments)
+						let theta = thetaBevelStart + total * (i / segments)
+
+						// 0~2pi => -pi~pi
+						if (theta > Math.PI) {
+							theta -= 2 * Math.PI
+						}
+
 						const dir = { x: width * Math.cos(theta), y: width * Math.sin(theta) }
 						const bevelPoint = addPoints(curr, dir)
 						crossties.push({
@@ -242,15 +274,40 @@ export function buildThickLine(polyline: Polyline2D, config: Config): Geometry |
 					const bevelStartND = turnLeft(dirPrev)
 					const bevelEndND = turnLeft(dirNext)
 					// lerp in polar coord sys
-					const thetaBevelStart = Math.atan2(bevelStartND.y, bevelStartND.x)
-					const thetaBevelEnd = Math.atan2(bevelEndND.y, bevelEndND.x)
+					let thetaBevelStart = Math.atan2(bevelStartND.y, bevelStartND.x)
+					let thetaBevelEnd = Math.atan2(bevelEndND.y, bevelEndND.x)
+
+					// 使用优弧
+					if (Math.abs(thetaBevelEnd - thetaBevelStart) > Math.PI) {
+						// -pi~pi => 0~2pi
+						if (thetaBevelStart < 0) {
+							thetaBevelStart += 2 * Math.PI
+						}
+						if (thetaBevelEnd < 0) {
+							thetaBevelEnd += 2 * Math.PI
+						}
+					}
+
+					// console.log('thetaBevelStart', thetaBevelStart)
+					// console.log('thetaBevelEnd', thetaBevelEnd)
 
 					const segments = Math.ceil(
 						Math.abs(thetaBevelEnd - thetaBevelStart) / _config.maxSegmentRadian
 					)
+
+					// @note segment is zero when collinear. 如果两条线平行，segments 为 0
+					// in this case, skip this joint (do not add any tie)
+					if (segments === 0) continue
+
 					for (let i = 0; i <= segments; i++) {
 						const total = thetaBevelEnd - thetaBevelStart
-						const theta = thetaBevelStart + total * (i / segments)
+						let theta = thetaBevelStart + total * (i / segments)
+
+						// 0~2pi => -pi~pi
+						if (theta > Math.PI) {
+							theta -= 2 * Math.PI
+						}
+
 						const dir = { x: width * Math.cos(theta), y: width * Math.sin(theta) }
 						const bevelPoint = addPoints(curr, dir)
 						crossties.push({
@@ -396,11 +453,8 @@ export function buildThickLine(polyline: Polyline2D, config: Config): Geometry |
 	return geom
 }
 
-export function buildMultiThickLine(
-	multiPolyline: MultiPolyline2D,
-	config: Config
-): Geometry | undefined {
-	if (multiPolyline.length === 0) return
+export function buildMultiThickLine(multiPolyline: MultiPolyline2D, config: Config): Geometry {
+	if (multiPolyline.length === 0) return buildEmpty()
 
 	const _config = {
 		...defaultConfig,
@@ -494,6 +548,9 @@ function normalize(p: Point2D): Point2D {
 }
 function dot(pa: Point2D, pb: Point2D): number {
 	return pa.x * pb.x + pa.y * pb.y
+}
+function isZero(p: Point2D): boolean {
+	return p.x === 0 && p.y === 0
 }
 
 // function buildThickLine(polyline: Polyline2D | MultiPolyline2D, config: Config): Geometry {
