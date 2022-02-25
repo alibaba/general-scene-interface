@@ -79,6 +79,9 @@ export const cameraProxy = new AnimatedCameraProxy({
 	timeline,
 	canvasWidth: WIDTH,
 	canvasHeight: HEIGHT,
+	limit: {
+		pitch: [-3, 3],
+	},
 	onUpdate: (cam) => {
 		camera.position.fromArray(cam.position)
 		camera.rotation.fromArray(cam.rotationEuler)
