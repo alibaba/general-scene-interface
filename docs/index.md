@@ -8,7 +8,7 @@ This is the document for GSI Project.
 >
 > - [x] 文档结构
 > - [ ] Project Intro
-> - [ ] Fast Useage
+> - [ ] Fast Usage
 > - [ ] Philosophy
 > - [ ] Examples
 > - [ ] Best Practice
