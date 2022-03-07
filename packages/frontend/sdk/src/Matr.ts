@@ -106,7 +106,7 @@ class MatrBase implements IR.MaterialBase {
 		this.extensions.EXT_matr_advanced.depthWrite = v
 	}
 
-	constructor(params: Partial<MatrBase>) {
+	constructor(params: Partial<IR.MaterialBase>) {
 		for (const key of Object.keys(params)) {
 			const v = params[key]
 			if (v !== undefined) {
@@ -155,7 +155,7 @@ export class PbrMaterial extends MatrBase {
 		EXT_matr_programmable_pbr: {},
 	}
 
-	constructor(params: Partial<PbrMaterial> = {}) {
+	constructor(params: Partial<IR.PbrMaterial> = {}) {
 		super(params)
 	}
 }
@@ -182,7 +182,7 @@ export class UnlitMaterial extends MatrBase {
 		},
 	}
 
-	constructor(params: Partial<UnlitMaterial> = {}) {
+	constructor(params: Partial<IR.UnlitMaterial> = {}) {
 		super(params)
 	}
 }
