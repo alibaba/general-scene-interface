@@ -34,6 +34,7 @@
 		"@gs.i/utils-wireframe": "^0.2.0-alpha",
 		"@gs.i/frontend-sprite": "^0.2.0-alpha",
 		"@gs.i/processor-base": "^0.2.0-alpha",
+		"@gs.i/utils-clone": "^0.2.0-alpha",
 		"@gs.i/utils-specify": "^0.2.0-alpha",
 		"@gs.i/thick-line-builder": "^0.2.0-alpha",
 		"@gs.i/frontend-gltf2": "^0.2.1-alpha",

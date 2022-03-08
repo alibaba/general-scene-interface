@@ -67,6 +67,9 @@
 			"path": "../thick-line-builder"
 		},
 		{
+			"path": "../clone"
+		},
+		{
 			"path": "../geom-builders"
 		},
 		{
