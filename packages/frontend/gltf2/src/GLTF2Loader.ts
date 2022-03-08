@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { specifyGeometry } from '@gs.i/utils-specify'
 /**
  * Copyright (C) 2021 Alibaba Group Holding Limited
@@ -5,7 +6,7 @@ import { specifyGeometry } from '@gs.i/utils-specify'
  */
 
 import IR from '@gs.i/schema-scene' // type only, will be deleted after compiled
-import { Quaternion } from '@gs.i/utils-math'
+// import { Quaternion } from '@gs.i/utils-math'
 
 import { specifyTree } from '@gs.i/utils-specify'
 
@@ -34,7 +35,7 @@ import {
 /**
  * 数据转换使用
  */
-const quaternion = new Quaternion()
+// const quaternion = new Quaternion()
 
 export class GLTF2Loader {
 	private _meshesCache: IR.LooseNodeLike[] = []
@@ -44,7 +45,7 @@ export class GLTF2Loader {
 
 	private _texturesCache: IR.LooseTexture[] = []
 
-	parse(glm: GLM): IR.LooseNodeLike {
+	parse(glm: GLM): IR.NodeLike {
 		this._meshesCache = []
 		this._materialsCache = []
 		this._accessorsCache = []
@@ -386,9 +387,7 @@ export class GLTF2Loader {
 		})
 
 		// specify the whole scene
-		specifyTree(result as IR.LooseNodeLike)
-
-		return result
+		return specifyTree(result as IR.LooseNodeLike)
 	}
 
 	glbToGLM(glb: ArrayBuffer): GLM {
