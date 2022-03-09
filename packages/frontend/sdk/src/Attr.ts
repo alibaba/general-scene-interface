@@ -25,9 +25,10 @@ export class Attr<T extends IR.AttributeBase['itemSize']> implements IR.Attribut
 	}
 	set updateRanges(v) {
 		if (!this.extensions) this.extensions = {}
-		if (!this.extensions.EXT_buffer_partial_update) this.extensions.EXT_buffer_partial_update = {}
+		if (!this.extensions.EXT_buffer_partial_update)
+			this.extensions.EXT_buffer_partial_update = { updateRanges: [] }
 
-		this.extensions.EXT_buffer_partial_update.updateRanges = v
+		this.extensions.EXT_buffer_partial_update.updateRanges = v || []
 	}
 
 	constructor(

@@ -277,11 +277,12 @@ export function specifySampler(s: IR.LooseSampler): IR.Sampler {
  */
 export function specifyTransform3(transform: IR.Transform3) {
 	if (IR.isTransform3Matrix(transform)) {
-		if (transform.position || transform.quaternion || transform.rotation || transform.scale) {
-			throw new SchemaNotValid(
-				'mesh.transform either has .matrix or TRS(.position .rotation etc.), can not have both.'
-			)
-		}
+		// @note this seems unnecessary. matrix will always be preferred
+		// if (transform.position || transform.quaternion || transform.rotation || transform.scale) {
+		// 	throw new SchemaNotValid(
+		// 		'mesh.transform either has .matrix or TRS(.position .rotation etc.), can not have both.'
+		// 	)
+		// }
 	} else {
 		if (transform.position === undefined) transform.position = { x: 0, y: 0, z: 0 }
 		if (transform.rotation === undefined && transform.quaternion === undefined)

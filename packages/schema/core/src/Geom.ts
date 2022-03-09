@@ -129,7 +129,7 @@ export interface Geometry {
 			/**
 			 * 绘制区域（索引）
 			 */
-			drawRange?: { start: Int; count: Int }
+			drawRange: { start: Int; count: Int }
 		}
 
 		/**
@@ -236,7 +236,7 @@ export interface AttributeBase extends Versioned {
 			 * 脏区域
 			 * @QianXun 保留数组形式，在convert时将多个ranges merge成一个
 			 */
-			updateRanges?: UpdateRanges
+			updateRanges: UpdateRanges
 		}
 	}
 }
