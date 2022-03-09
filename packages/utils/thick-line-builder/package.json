@@ -21,11 +21,12 @@
 	},
 	"dependencies": {
 		"@gs.i/schema-scene": "^0.2.1-alpha",
-		"@gs.i/utils-geometry": "^0.2.1-alpha",
 		"@gs.i/utils-geom-builders": "^0.2.1-alpha",
+		"@gs.i/utils-geometry": "^0.2.1-alpha",
 		"@gs.i/utils-math": "^0.0.0-beta"
 	},
 	"devDependencies": {
 		"typescript": ">4.4.0"
-	}
+	},
+	"gitHead": "746270cab33135e51d2a18889a77a1ba0fb6e81a"
 }
