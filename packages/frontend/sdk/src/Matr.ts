@@ -49,7 +49,9 @@ class MatrBase implements IR.MaterialBase {
 		this.extensions.EXT_matr_programmable.defines = v
 	}
 	get uniforms() {
-		return this.extensions.EXT_matr_programmable.uniforms
+		return this.extensions.EXT_matr_programmable.uniforms as {
+			[name: string]: IR.Uniform // remove undefined
+		}
 	}
 	set uniforms(v) {
 		this.extensions.EXT_matr_programmable.uniforms = v

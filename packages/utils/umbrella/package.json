@@ -42,7 +42,7 @@
 		"@gs.i/processor-culling": "^0.2.1-alpha.0",
 		"@gs.i/processor-raycast": "^0.2.1-alpha.0",
 		"@gs.i/backend-threelite": "^0.2.1-alpha.0",
-		"@gs.i/frontend-sdk": "^0.2.1-alpha.1",
+		"@gs.i/frontend-sdk": "^0.2.1-alpha.2",
 		"@gs.i/frontend-gline": "^0.2.1-alpha.0",
 		"@gs.i/frontend-gltf2": "^0.2.1-alpha.0",
 		"@gs.i/frontend-materials": "^0.2.1-alpha.0",
