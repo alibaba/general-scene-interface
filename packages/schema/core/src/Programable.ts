@@ -57,7 +57,7 @@ export interface Programable {
 	 * @glsl uniform TYPE name;
 	 * @default {}
 	 */
-	uniforms: { [name: string]: Uniform | undefined }
+	uniforms: { [name: string]: Uniform }
 
 	/**
 	 * whether this material modifies geometry data in shaders, if true, should not do raycasting in CPU side.
