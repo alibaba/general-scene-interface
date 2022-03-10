@@ -46,9 +46,10 @@ export class Geom implements IR.Geometry {
 	}
 	public set drawRange(v) {
 		if (!this.extensions) this.extensions = {}
-		if (!this.extensions.EXT_geometry_range) this.extensions.EXT_geometry_range = {}
+		if (!this.extensions.EXT_geometry_range)
+			this.extensions.EXT_geometry_range = { drawRange: { start: 0, count: Infinity } }
 
-		this.extensions.EXT_geometry_range.drawRange = v
+		this.extensions.EXT_geometry_range.drawRange = v || { start: 0, count: Infinity }
 	}
 
 	constructor(params: Partial<IR.Geometry> = {}) {

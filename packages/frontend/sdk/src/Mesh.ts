@@ -83,6 +83,7 @@ export class PointLight extends Mesh implements IR.LuminousNode {
  * A Transform3 that automatically marked as dirty when you changed any property
  * @note it is recommended to increase `.version` manually when you change something
  * @note this class is for folks who don't have the habit to mark something dirty explicitly
+ * @todo should be able to calculate matrix automatically
  */
 export class AutoVersionTransform3 implements IR.Transform3TRS {
 	version = 0
@@ -127,6 +128,15 @@ export class AutoVersionTransform3 implements IR.Transform3TRS {
 		// 	},
 		// })
 	}
+
+	/**
+	 * update matrix from TRS
+	 */
+	private updateMatrix() {}
+	/**
+	 * update TRS from matrix
+	 */
+	private updateTRS() {}
 }
 
 export function isBufferGeometry(geom?: IR.Geometry): boolean {
