@@ -7,7 +7,7 @@
  * circular dependency
  */
 
-import { Attribute, Geometry } from '@gs.i/schema-scene'
+import { Attribute, Geometry, Vec3Attribute } from '@gs.i/schema-scene'
 
 export const DefaultParams = {
 	normal: false,
@@ -21,7 +21,7 @@ export function buildEmpty(config: Partial<typeof DefaultParams> = {}): Geometry
 	}
 	// build geometry
 
-	const position: Attribute = {
+	const position: Vec3Attribute = {
 		array: new Float32Array([0, 0, 0]),
 		itemSize: 3,
 		count: 1,
