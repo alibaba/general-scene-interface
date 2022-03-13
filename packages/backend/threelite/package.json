@@ -38,5 +38,5 @@
 		"@types/webvr-api": "latest",
 		"typescript": ">4.4.0"
 	},
-	"gitHead": "d3f494090c94a039f0dc3821235fad3e6dcb8a18"
+	"gitHead": "4292967bf92477ff1df8b7c2037ff541dd374c49"
 }
