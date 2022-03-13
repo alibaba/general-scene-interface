@@ -1,6 +1,6 @@
 {
 	"name": "@gs.i/frontend-materials",
-	"version": "0.2.1-alpha.4",
+	"version": "0.2.1-alpha.5",
 	"description": "",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
@@ -21,14 +21,14 @@
 	},
 	"dependencies": {
 		"@gs.i/frontend-sdk": "^0.2.1-alpha.2",
-		"@gs.i/processor-bound": "^0.2.1-alpha.4",
-		"@gs.i/processor-culling": "^0.2.1-alpha.4",
-		"@gs.i/processor-graph": "^0.2.1-alpha.4",
-		"@gs.i/processor-matrix": "^0.2.1-alpha.4",
-		"@gs.i/schema-scene": "^0.2.1-alpha.4",
-		"@gs.i/utils-geom-builders": "^0.2.1-alpha.4",
+		"@gs.i/processor-bound": "^0.2.1-alpha.5",
+		"@gs.i/processor-culling": "^0.2.1-alpha.5",
+		"@gs.i/processor-graph": "^0.2.1-alpha.5",
+		"@gs.i/processor-matrix": "^0.2.1-alpha.5",
+		"@gs.i/schema-scene": "^0.2.1-alpha.5",
+		"@gs.i/utils-geom-builders": "^0.2.1-alpha.5",
 		"@gs.i/utils-math": "^0.0.0-beta",
-		"@gs.i/utils-specify": "^0.2.1-alpha.4"
+		"@gs.i/utils-specify": "^0.2.1-alpha.5"
 	},
 	"devDependencies": {
 		"typescript": ">4.4.0"
