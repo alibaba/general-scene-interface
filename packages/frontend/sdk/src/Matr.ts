@@ -60,36 +60,42 @@ class MatrBase implements IR.MaterialBase {
 		return this.extensions.EXT_matr_programmable.global
 	}
 	set global(v) {
+		this.version++
 		this.extensions.EXT_matr_programmable.global = v
 	}
 	get vertGlobal() {
 		return this.extensions.EXT_matr_programmable.vertGlobal
 	}
 	set vertGlobal(v) {
+		this.version++
 		this.extensions.EXT_matr_programmable.vertGlobal = v
 	}
 	get vertGeometry() {
 		return this.extensions.EXT_matr_programmable.vertGeometry
 	}
 	set vertGeometry(v) {
+		this.version++
 		this.extensions.EXT_matr_programmable.vertGeometry = v
 	}
 	get vertOutput() {
 		return this.extensions.EXT_matr_programmable.vertOutput
 	}
 	set vertOutput(v) {
+		this.version++
 		this.extensions.EXT_matr_programmable.vertOutput = v
 	}
 	get fragGlobal() {
 		return this.extensions.EXT_matr_programmable.fragGlobal
 	}
 	set fragGlobal(v) {
+		this.version++
 		this.extensions.EXT_matr_programmable.fragGlobal = v
 	}
 	get fragOutput() {
 		return this.extensions.EXT_matr_programmable.fragOutput
 	}
 	set fragOutput(v) {
+		this.version++
 		this.extensions.EXT_matr_programmable.fragOutput = v
 	}
 
@@ -112,6 +118,7 @@ class MatrBase implements IR.MaterialBase {
 		return this.extensions.EXT_matr_advanced?.depthTest
 	}
 	set depthTest(v) {
+		this.version++
 		this.extensions.EXT_matr_advanced.depthTest = v
 	}
 
@@ -122,6 +129,7 @@ class MatrBase implements IR.MaterialBase {
 		return this.extensions.EXT_matr_advanced?.depthWrite
 	}
 	set depthWrite(v) {
+		this.version++
 		this.extensions.EXT_matr_advanced.depthWrite = v
 	}
 
@@ -152,12 +160,14 @@ export class PbrMaterial extends MatrBase {
 		return this.extensions.EXT_matr_programmable_pbr.fragPreLighting
 	}
 	set fragPreLighting(v) {
+		this.version++
 		this.extensions.EXT_matr_programmable_pbr.fragPreLighting = v
 	}
 	get fragGeometry() {
 		return this.extensions.EXT_matr_programmable_pbr.fragGeometry
 	}
 	set fragGeometry(v) {
+		this.version++
 		this.extensions.EXT_matr_programmable_pbr.fragGeometry = v
 	}
 
@@ -202,6 +212,7 @@ export class PointMaterial extends MatrBase {
 		return this.extensions.EXT_matr_programmable_point.vertPointGeometry
 	}
 	set vertPointGeometry(v) {
+		this.version++
 		this.extensions.EXT_matr_programmable_point.vertPointGeometry = v
 	}
 
