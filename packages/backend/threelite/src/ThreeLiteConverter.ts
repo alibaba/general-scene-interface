@@ -878,6 +878,9 @@ export class ThreeLiteConverter implements Converter {
 				throw new Error('Unsupported value of GSI::Matr.type: ' + gsiMatr['type'])
 		}
 
+		// @note defensive programming
+		if (isNaN(gsiMatr.version)) throw new Error('gsiMatr.version is not a number')
+
 		// update
 		if (gsiMatr.version === -1) {
 			// it can't be right
@@ -887,6 +890,7 @@ export class ThreeLiteConverter implements Converter {
 		} else {
 			if (threeMatr.version !== gsiMatr.version) {
 				// needs update
+				// console.debug('Material.version bumped')
 				syncMaterial(gsiMatr, threeMatr, this._threeTex)
 				threeMatr.version = gsiMatr.version
 			}

@@ -78,6 +78,7 @@ export function specifyMaterial(matr: IR.LooseMaterialBase): IR.MaterialBase {
 	if (matr.side === undefined) matr.side = 'front'
 	if (matr.alphaMode === undefined) matr.alphaMode = 'OPAQUE'
 	if (matr.opacity === undefined) matr.opacity = 1
+	if (matr.version === undefined) matr.version = 0
 
 	/**
 	 * Programable extension
