@@ -40,8 +40,8 @@ import { scene as threeScene } from '../__utils/LiteScene'
 		// 			{ x: 800, y: 0 },
 		// 		],
 		// 	],
-		// 	// { uv: true, width: 10, joint: 'bevel' }
-		// 	{ uv: true, width: 10, joint: 'round' }
+		// 	{ uv: true, width: 10, joint: 'bevel' }
+		// 	// { uv: true, width: 10, joint: 'round' }
 		// 	// { uv: true, width: 10, joint: 'miter' }
 		// ),
 	})
