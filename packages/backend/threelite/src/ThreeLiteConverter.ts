@@ -793,6 +793,11 @@ export class ThreeLiteConverter implements Converter {
 			syncMaterial(gsiMatr, threeMatr, this._threeTex)
 		}
 
+		threeMatr.visible = gsiMatr.visible
+
+		if (gsiMatr.alphaMode === 'MASK') threeMatr.alphaTest = gsiMatr.opacity
+		else threeMatr.opacity = gsiMatr.opacity
+
 		/**
 		 * @NOTE these parameters are pipeline related. only update when version bumped
 		 */

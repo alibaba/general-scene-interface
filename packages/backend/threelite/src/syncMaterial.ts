@@ -23,7 +23,6 @@ export function syncMaterial(
 	cache: WeakMap<Texture, ThreeTexture>
 ): void {
 	threeMatr.name = threeMatr.name || gsiMatr.name || 'GSI-three-Matr'
-	threeMatr.visible = gsiMatr.visible
 
 	// face culling
 	switch (gsiMatr.side) {
@@ -53,7 +52,6 @@ export function syncMaterial(
 			threeMatr.depthTest = true
 			threeMatr.depthWrite = true
 			threeMatr.blending = NoBlending
-			threeMatr.alphaTest = gsiMatr.opacity
 			// threeMatr.alphaToCoverage = true // ?
 			break
 		case 'BLEND':
@@ -61,14 +59,12 @@ export function syncMaterial(
 			threeMatr.depthTest = true
 			threeMatr.depthWrite = false
 			threeMatr.blending = NormalBlending
-			threeMatr.opacity = gsiMatr.opacity
 			break
 		case 'BLEND_ADD':
 			threeMatr.transparent = true
 			threeMatr.depthTest = true
 			threeMatr.depthWrite = false
 			threeMatr.blending = AdditiveBlending
-			threeMatr.opacity = gsiMatr.opacity
 			break
 		default:
 			throw new Error('Unsupported value of GSI::Matr.alphaMode: ' + gsiMatr.alphaMode)
