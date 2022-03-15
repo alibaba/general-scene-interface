@@ -58,7 +58,7 @@ export function isMatrPoint(v: MaterialBase): v is PointMaterial {
 	return v.type === 'point'
 }
 export function isRenderable(v: NodeLike): v is RenderableNode {
-	return v['geometry'] && v['material']
+	return (v as any).geometry !== undefined && (v as any).material !== undefined
 }
 export function isLuminous(v: NodeLike): v is LuminousNode {
 	return v.extensions?.EXT_luminous !== undefined

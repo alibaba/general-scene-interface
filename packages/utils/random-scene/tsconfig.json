@@ -10,22 +10,22 @@
 	"exclude": ["dist"],
 	"references": [
 		{
-			"path": "../../schema/core"
-		},
-		{
-			"path": "../specify"
+			"path": "../../frontend/gline"
 		},
 		{
 			"path": "../../frontend/sdk"
 		},
 		{
+			"path": "../../frontend/sprite"
+		},
+		{
+			"path": "../../schema/core"
+		},
+		{
 			"path": "../geom-builders"
 		},
 		{
-			"path": "../../frontend/gline"
-		},
-		{
-			"path": "../../frontend/sprite"
+			"path": "../specify"
 		}
 	]
 }

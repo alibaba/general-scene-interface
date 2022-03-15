@@ -123,6 +123,7 @@ export interface MaterialBase extends Versioned {
 
 	/**
 	 * for readability only
+	 * @bumpVersion
 	 */
 	name: string
 
@@ -134,6 +135,7 @@ export interface MaterialBase extends Versioned {
 	/**
 	 * general rendering setting
 	 * @default front
+	 * @bumpVersion
 	 */
 	side: 'front' | 'back' | 'double'
 
@@ -146,6 +148,7 @@ export interface MaterialBase extends Versioned {
 	 * - 提供几种组合模式，来替代复杂的配置项,
 	 * - 这里扩展 glTF2 的 alphaMode 来实现
 	 * @default 'OPAQUE'
+	 * @bumpVersion
 	 */
 	alphaMode:
 		| 'OPAQUE' // 不透明 & depth on
@@ -172,12 +175,14 @@ export interface MaterialBase extends Versioned {
 
 	/**
 	 * @default {}
+	 * @bumpVersion
 	 */
 	extensions?: {
 		/**
 		 * advanced material render control.
 		 * - **will override parameters set above.**
 		 * - **do not use unless you know what you are doing**
+		 * @bumpVersion
 		 */
 		EXT_matr_advanced?: {
 			/**

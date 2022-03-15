@@ -10,12 +10,6 @@
 	"exclude": ["dist"],
 	"references": [
 		{
-			"path": "../../utils/wireframe"
-		},
-		{
-			"path": "../../utils/geometry"
-		},
-		{
 			"path": "../../frontend/sdk"
 		},
 		{
@@ -26,6 +20,12 @@
 		},
 		{
 			"path": "../../schema/core"
+		},
+		{
+			"path": "../../utils/geometry"
+		},
+		{
+			"path": "../../utils/wireframe"
 		}
 	]
 }

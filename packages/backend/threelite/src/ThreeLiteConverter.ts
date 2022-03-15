@@ -505,6 +505,12 @@ export class ThreeLiteConverter implements Converter {
 			// update cache
 			this._threeObject.set(gsiNode, threeObject)
 		}
+		// changing mesh primitive type is not allowed
+		{
+			if (isRenderable(gsiNode) !== ((threeObject as any).isRenderableObject3D === true)) {
+				throw new Error('Conv:: changing geometry type is not supported')
+			}
+		}
 		// sync
 		{
 			if (isRenderable(gsiNode)) {
@@ -518,6 +524,7 @@ export class ThreeLiteConverter implements Converter {
 
 				if (gsiNode.geometry.attributes.uv) {
 					// @note it's safe to assume `defines` was created above
+					// @note three react to `defines` change. no need for bumping version
 					;(material['defines'] as any).GSI_USE_UV = true
 				}
 			} else if (isLuminous(gsiNode)) {
@@ -793,6 +800,11 @@ export class ThreeLiteConverter implements Converter {
 			syncMaterial(gsiMatr, threeMatr, this._threeTex)
 		}
 
+		threeMatr.visible = gsiMatr.visible
+
+		if (gsiMatr.alphaMode === 'MASK') threeMatr.alphaTest = gsiMatr.opacity
+		else threeMatr.opacity = gsiMatr.opacity
+
 		/**
 		 * @NOTE these parameters are pipeline related. only update when version bumped
 		 */
@@ -873,6 +885,9 @@ export class ThreeLiteConverter implements Converter {
 				throw new Error('Unsupported value of GSI::Matr.type: ' + gsiMatr['type'])
 		}
 
+		// @note defensive programming
+		if (isNaN(gsiMatr.version)) throw new Error('gsiMatr.version is not a number')
+
 		// update
 		if (gsiMatr.version === -1) {
 			// it can't be right
@@ -882,6 +897,7 @@ export class ThreeLiteConverter implements Converter {
 		} else {
 			if (threeMatr.version !== gsiMatr.version) {
 				// needs update
+				// console.debug('Material.version bumped')
 				syncMaterial(gsiMatr, threeMatr, this._threeTex)
 				threeMatr.version = gsiMatr.version
 			}
@@ -1185,6 +1201,7 @@ export function getResourcesFlat(flatScene: IR.NodeLike[]) {
  * 把 three 的 Mesh Points Lines 合并到 父类 Object3D 上，来和 glTF2 保持一致
  */
 export class RenderableObject3D extends Object3D {
+	isRenderableObject3D = true
 	isMesh?: boolean
 	isPoints?: boolean
 	isLine?: boolean

@@ -15,6 +15,8 @@ import {
 } from '@gs.i/schema-scene'
 import { Box3, Sphere, Vector3 } from '@gs.i/utils-math'
 
+import { buildEmpty } from './buildEmpty'
+
 export function convBBoxToBox3(bbox: BBox): Box3 {
 	const min = new Vector3(bbox.min.x, bbox.min.y, bbox.min.z)
 	const max = new Vector3(bbox.max.x, bbox.max.y, bbox.max.z)
@@ -203,9 +205,9 @@ function estimateBSphereFromBBox(geometry: Geometry, positionAttrName = 'positio
 	return convBSphereToSphere(sphere)
 }
 
-export function mergeGeometries(geometries: Geometry[]): Geometry | undefined {
+export function mergeGeometries(geometries: Geometry[]): Geometry {
 	if (!geometries || geometries.length === 0) {
-		return
+		return buildEmpty()
 	}
 	// 模版
 	const target = geometries[0]
@@ -269,14 +271,16 @@ function mergeAttributes(attributes: Attribute[]) {
 		pointer = arrayLength
 	}
 
+	// @fix correct TypedArray type
+	const TypedArray = unifyTypeArray(target.array as TypedArray)
 	const result: Attribute = {
-		array: new (getTypedArrayConstructor(target.array as TypedArray))(arrayLength),
+		array: new TypedArray(arrayLength),
 		itemSize: target.itemSize,
 		count,
 		normalized: target.normalized,
 		usage: target.usage,
 		version: 0,
-		disposable: true,
+		disposable: false,
 	}
 
 	for (let i = 0; i < attributes.length; i++) {
@@ -308,14 +312,17 @@ function mergeIndices(attributes: Attribute[], positions: Attribute[]) {
 		positionOffsetLast += positions[i].array.length / positions[i].itemSize
 	}
 
+	// @fix correct TypedArray type
+	// const TypedArray = arrayLength < 65536 ? Uint16Array : Uint32Array
+	const TypedArray = Uint32Array
 	const result: Attribute = {
-		array: new (getTypedArrayConstructor(target.array as TypedArray))(arrayLength),
+		array: new TypedArray(arrayLength),
 		itemSize: target.itemSize,
 		count,
 		normalized: target.normalized,
 		usage: target.usage,
 		version: 0,
-		disposable: true,
+		disposable: false,
 	}
 
 	for (let i = 0; i < attributes.length; i++) {
@@ -323,10 +330,17 @@ function mergeIndices(attributes: Attribute[], positions: Attribute[]) {
 		const offset = offsets[i]
 		const positionOffset = positionOffsets[i]
 
-		for (let i = 0; i < attr.array.length; i++) {
-			;(attr.array as TypedArray)[i] += positionOffset
-		}
+		/**
+		 * @note @important @fix
+		 * Do not add offset on attr.array, because it may (very likely) be UInt16Array.
+		 * Add offset on UInt32Array.
+		 */
+
 		;(result.array as TypedArray).set(attr.array as TypedArray, offset)
+
+		for (let i = 0; i < attr.array.length; i++) {
+			;(result.array as TypedArray)[i + offset] += positionOffset
+		}
 	}
 
 	return result
@@ -335,6 +349,12 @@ function mergeIndices(attributes: Attribute[], positions: Attribute[]) {
 function getTypedArrayConstructor(typedArray: TypedArray) {
 	if (typedArray instanceof Float32Array) {
 		return Float32Array
+	}
+	if (typedArray instanceof Float64Array) {
+		return Float64Array
+	}
+	if (typedArray instanceof Int32Array) {
+		return Int32Array
 	}
 	if (typedArray instanceof Uint32Array) {
 		return Uint32Array
@@ -351,7 +371,41 @@ function getTypedArrayConstructor(typedArray: TypedArray) {
 	if (typedArray instanceof Int8Array) {
 		return Int8Array
 	}
-	throw new Error('不支持的 TypedArray 类型')
+	if (typedArray instanceof Uint8ClampedArray) {
+		return Uint8ClampedArray
+	}
+	throw new Error('unsupported TypedArray')
+}
+
+function unifyTypeArray(typedArray: TypedArray) {
+	if (typedArray instanceof Float32Array) {
+		return Float32Array
+	}
+	if (typedArray instanceof Float64Array) {
+		return Float32Array
+	}
+	if (typedArray instanceof Int32Array) {
+		return Int32Array
+	}
+	if (typedArray instanceof Uint32Array) {
+		return Uint32Array
+	}
+	if (typedArray instanceof Uint16Array) {
+		return Uint32Array
+	}
+	if (typedArray instanceof Int16Array) {
+		return Int32Array
+	}
+	if (typedArray instanceof Uint8Array) {
+		return Uint32Array
+	}
+	if (typedArray instanceof Int8Array) {
+		return Int32Array
+	}
+	if (typedArray instanceof Uint8ClampedArray) {
+		return Uint32Array
+	}
+	throw new Error('unsupported TypedArray')
 }
 
 export function infinityBox3() {

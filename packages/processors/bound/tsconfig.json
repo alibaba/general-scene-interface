@@ -10,22 +10,22 @@
 	"exclude": ["dist"],
 	"references": [
 		{
-			"path": "../../utils/geometry"
-		},
-		{
 			"path": "../base"
 		},
 		{
 			"path": "../matrix"
 		},
 		{
-			"path": "../../utils/traverse"
+			"path": "../../schema/core"
+		},
+		{
+			"path": "../../utils/geometry"
 		},
 		{
 			"path": "../../utils/math"
 		},
 		{
-			"path": "../../schema/core"
+			"path": "../../utils/traverse"
 		}
 	]
 }

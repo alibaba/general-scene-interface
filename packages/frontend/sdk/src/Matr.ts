@@ -7,67 +7,98 @@ import IR from '@gs.i/schema-scene'
 
 import { specifyMaterial } from '@gs.i/utils-specify'
 
-const pbrPrgProperties = ['fragPreLighting', 'fragGeometry'] as any[]
-const pointPrgProperties = ['vertPointGeometry'] as any[]
-const spritePrgProperties = ['vertSpriteGeometry'] as any[]
-const prgProperties = [
-	'language',
-	'extension',
-	'defines',
-	'uniforms',
-	'global',
-	'vertGlobal',
-	'vertGeometry',
-	'vertOutput',
-	'fragGlobal',
-	'fragOutput',
-] as any[]
-
-/**
- * 筛选 proxy 中真正的 property 位置，使用这种方式来把所有 extensions 中的 key 映射到 matr 类上
- */
-function getObject(target: IR.MaterialBase, property) {
-	let o: any
-	if (Reflect.has(target, property)) {
-		o = target
-	} else if (prgProperties.indexOf(property) > -1) {
-		if (!target.extensions) target.extensions = {}
-		if (!target.extensions.EXT_matr_programmable)
-			target.extensions.EXT_matr_programmable = {
-				language: 'GLSL300',
-				extension: '',
-				defines: {},
-				uniforms: {},
-			}
-
-		o = target.extensions.EXT_matr_programmable
-	} else if (pbrPrgProperties.indexOf(property) > -1) {
-		if (!target.extensions) target.extensions = {}
-		if (!target.extensions.EXT_matr_programmable_pbr)
-			target.extensions.EXT_matr_programmable_pbr = {}
-
-		o = target.extensions?.EXT_matr_programmable_pbr
-	} else if (pointPrgProperties.indexOf(property) > -1) {
-		if (!target.extensions) target.extensions = {}
-		if (!target.extensions.EXT_matr_programmable_point)
-			target.extensions.EXT_matr_programmable_point = {}
-
-		o = target.extensions?.EXT_matr_programmable_point
-	} else if (spritePrgProperties.indexOf(property) > -1) {
-		if (!target.extensions) target.extensions = {}
-		if (!target.extensions.EXT_matr_programmable_sprite)
-			target.extensions.EXT_matr_programmable_sprite = {}
-
-		o = target.extensions?.EXT_matr_programmable_sprite
-	} else {
-		o = target
-	}
-
-	return o || {}
-}
-
 interface MatrBase extends IR.MaterialBase, IR.Programable {}
 class MatrBase implements IR.MaterialBase {
+	/**
+	 * to simplify usage, init extensions now rather than when used.
+	 *
+	 * @note it is very important to init ALL THE POSSIBLE extensions in
+	 *       this base class. if you extends it in subclass. it will be
+	 *       replaced. but all the assignment was done by `super()`
+	 */
+	extensions: NonNullable<Required<IR.MaterialBase['extensions']>> = {
+		EXT_matr_advanced: {},
+		EXT_matr_programmable: {
+			language: 'GLSL300',
+			extension: '',
+			defines: {},
+			uniforms: {},
+		},
+		EXT_matr_programmable_point: {},
+		EXT_matr_programmable_pbr: {},
+	}
+
+	// alias to extensions
+
+	get language() {
+		return this.extensions.EXT_matr_programmable.language
+	}
+	set language(v) {
+		this.extensions.EXT_matr_programmable.language = v
+	}
+	get extension() {
+		return this.extensions.EXT_matr_programmable.extension
+	}
+	set extension(v) {
+		this.extensions.EXT_matr_programmable.extension = v
+	}
+	get defines() {
+		return this.extensions.EXT_matr_programmable.defines
+	}
+	set defines(v) {
+		this.extensions.EXT_matr_programmable.defines = v
+	}
+	get uniforms() {
+		return this.extensions.EXT_matr_programmable.uniforms as {
+			[name: string]: IR.Uniform // remove undefined
+		}
+	}
+	set uniforms(v) {
+		this.extensions.EXT_matr_programmable.uniforms = v
+	}
+	get global() {
+		return this.extensions.EXT_matr_programmable.global
+	}
+	set global(v) {
+		this.version++
+		this.extensions.EXT_matr_programmable.global = v
+	}
+	get vertGlobal() {
+		return this.extensions.EXT_matr_programmable.vertGlobal
+	}
+	set vertGlobal(v) {
+		this.version++
+		this.extensions.EXT_matr_programmable.vertGlobal = v
+	}
+	get vertGeometry() {
+		return this.extensions.EXT_matr_programmable.vertGeometry
+	}
+	set vertGeometry(v) {
+		this.version++
+		this.extensions.EXT_matr_programmable.vertGeometry = v
+	}
+	get vertOutput() {
+		return this.extensions.EXT_matr_programmable.vertOutput
+	}
+	set vertOutput(v) {
+		this.version++
+		this.extensions.EXT_matr_programmable.vertOutput = v
+	}
+	get fragGlobal() {
+		return this.extensions.EXT_matr_programmable.fragGlobal
+	}
+	set fragGlobal(v) {
+		this.version++
+		this.extensions.EXT_matr_programmable.fragGlobal = v
+	}
+	get fragOutput() {
+		return this.extensions.EXT_matr_programmable.fragOutput
+	}
+	set fragOutput(v) {
+		this.version++
+		this.extensions.EXT_matr_programmable.fragOutput = v
+	}
+
 	// legacy
 
 	/**
@@ -84,12 +115,10 @@ class MatrBase implements IR.MaterialBase {
 	 * @deprecated use {@link IR.MaterialBase.extensions EXT_matr_advanced}
 	 */
 	get depthTest() {
-		return this.extensions?.EXT_matr_advanced?.depthTest
+		return this.extensions.EXT_matr_advanced?.depthTest
 	}
 	set depthTest(v) {
-		if (!this.extensions) this.extensions = {}
-		if (!this.extensions.EXT_matr_advanced) this.extensions.EXT_matr_advanced = {}
-
+		this.version++
 		this.extensions.EXT_matr_advanced.depthTest = v
 	}
 
@@ -97,12 +126,10 @@ class MatrBase implements IR.MaterialBase {
 	 * @deprecated use {@link IR.MaterialBase.extensions EXT_matr_advanced}
 	 */
 	get depthWrite() {
-		return this.extensions?.EXT_matr_advanced?.depthWrite
+		return this.extensions.EXT_matr_advanced?.depthWrite
 	}
 	set depthWrite(v) {
-		if (!this.extensions) this.extensions = {}
-		if (!this.extensions.EXT_matr_advanced) this.extensions.EXT_matr_advanced = {}
-
+		this.version++
 		this.extensions.EXT_matr_advanced.depthWrite = v
 	}
 
@@ -115,24 +142,6 @@ class MatrBase implements IR.MaterialBase {
 		}
 
 		specifyMaterial(this)
-
-		return new Proxy(this, {
-			/**
-			 * @note this object should be considered as IR for backend
-			 * 		 get handler has performance issues
-			 * 		 these properties are deprecated and write only
-			 */
-			// get: (target, property, receiver) => {
-			// 	const o = getObject(target, property)
-			// 	return o[property]
-			// },
-			set: (target, property, value, receiver) => {
-				const o = getObject(target, property)
-				o[property] = value
-
-				return true
-			},
-		}) as MatrBase & IR.Programable
 	}
 }
 
@@ -144,15 +153,22 @@ export class PbrMaterial extends MatrBase {
 
 	name = 'MatrPbr'
 
-	extensions: Required<Exclude<IR.PbrMaterial['extensions'], undefined>> = {
-		EXT_matr_advanced: {},
-		EXT_matr_programmable: {
-			language: 'GLSL300',
-			defines: {},
-			uniforms: {},
-			extension: '',
-		},
-		EXT_matr_programmable_pbr: {},
+	// @note @important use the same object in base class
+	extensions: Required<NonNullable<IR.PbrMaterial['extensions']>>
+
+	get fragPreLighting() {
+		return this.extensions.EXT_matr_programmable_pbr.fragPreLighting
+	}
+	set fragPreLighting(v) {
+		this.version++
+		this.extensions.EXT_matr_programmable_pbr.fragPreLighting = v
+	}
+	get fragGeometry() {
+		return this.extensions.EXT_matr_programmable_pbr.fragGeometry
+	}
+	set fragGeometry(v) {
+		this.version++
+		this.extensions.EXT_matr_programmable_pbr.fragGeometry = v
 	}
 
 	constructor(params: Partial<PbrMaterial> = {}) {
@@ -172,15 +188,8 @@ export class UnlitMaterial extends MatrBase {
 
 	name = 'MatrUnlit'
 
-	extensions: Required<Exclude<IR.UnlitMaterial['extensions'], undefined>> = {
-		EXT_matr_advanced: {},
-		EXT_matr_programmable: {
-			language: 'GLSL300',
-			defines: {},
-			uniforms: {},
-			extension: '',
-		},
-	}
+	// @note @important use the same object in base class
+	extensions: Required<NonNullable<IR.UnlitMaterial['extensions']>>
 
 	constructor(params: Partial<UnlitMaterial> = {}) {
 		super(params)
@@ -199,20 +208,18 @@ export class PointMaterial extends MatrBase {
 
 	name = 'MatrPoint'
 
-	vertPointGeometry?: string
-
-	extensions: Required<Exclude<IR.PointMaterial['extensions'], undefined>> = {
-		EXT_matr_advanced: {},
-		EXT_matr_programmable: {
-			language: 'GLSL300',
-			defines: {},
-			uniforms: {},
-			extension: '',
-		},
-		EXT_matr_programmable_point: {},
+	get vertPointGeometry() {
+		return this.extensions.EXT_matr_programmable_point.vertPointGeometry
+	}
+	set vertPointGeometry(v) {
+		this.version++
+		this.extensions.EXT_matr_programmable_point.vertPointGeometry = v
 	}
 
-	constructor(params: Partial<IR.PointMaterial> = {}) {
+	// @note @important use the same object in base class
+	extensions: Required<NonNullable<IR.PointMaterial['extensions']>>
+
+	constructor(params: Partial<PointMaterial> = {}) {
 		super(params)
 	}
 }

@@ -10,28 +10,28 @@
 	"exclude": ["dist"],
 	"references": [
 		{
-			"path": "../../schema/core"
+			"path": "../../processors/bound"
+		},
+		{
+			"path": "../../processors/matrix"
 		},
 		{
 			"path": "../../schema/converter"
 		},
 		{
-			"path": "../../processors/bound"
-		},
-		{
-			"path": "../../utils/traverse"
-		},
-		{
-			"path": "../../utils/specify"
-		},
-		{
-			"path": "../../processors/matrix"
+			"path": "../../schema/core"
 		},
 		{
 			"path": "../../utils/gltf2"
 		},
 		{
 			"path": "../../utils/math"
+		},
+		{
+			"path": "../../utils/specify"
+		},
+		{
+			"path": "../../utils/traverse"
 		}
 	]
 }

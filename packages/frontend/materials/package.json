@@ -1,0 +1,37 @@
+{
+	"name": "@gs.i/frontend-materials",
+	"version": "0.2.1-alpha.6",
+	"description": "",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"type": "module",
+	"license": "MIT",
+	"publishConfig": {
+		"access": "public"
+	},
+	"files": [
+		"README.md",
+		"dist/*"
+	],
+	"scripts": {
+		"build": "./scripts/build.sh",
+		"clean": "./scripts/clean.sh",
+		"rebuild": "npm run clean && npm run build",
+		"v": "node -v && tsc -v"
+	},
+	"dependencies": {
+		"@gs.i/frontend-sdk": "^0.2.1-alpha.2",
+		"@gs.i/processor-bound": "^0.2.1-alpha.6",
+		"@gs.i/processor-culling": "^0.2.1-alpha.6",
+		"@gs.i/processor-graph": "^0.2.1-alpha.6",
+		"@gs.i/processor-matrix": "^0.2.1-alpha.6",
+		"@gs.i/schema-scene": "^0.2.1-alpha.6",
+		"@gs.i/utils-geom-builders": "^0.2.1-alpha.6",
+		"@gs.i/utils-math": "^0.0.0-beta",
+		"@gs.i/utils-specify": "^0.2.1-alpha.6"
+	},
+	"devDependencies": {
+		"typescript": ">4.4.0"
+	},
+	"gitHead": "9732890e73cc03efd0d3af5cdaa93d431ec742cc"
+}

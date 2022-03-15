@@ -148,6 +148,7 @@ export class GLine extends Mesh {
 		if (this.geometry) {
 			return this.geometry.updateData(data, bounds)
 		}
+		// TODO: ?? why
 		throw new Error('GLine - no geometry found')
 	}
 

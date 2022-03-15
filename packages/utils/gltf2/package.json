@@ -1,6 +1,6 @@
 {
 	"name": "@gs.i/utils-gltf2",
-	"version": "0.2.0-alpha",
+	"version": "0.2.1-alpha.6",
 	"description": "",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
@@ -20,10 +20,10 @@
 		"v": "node -v && tsc -v"
 	},
 	"dependencies": {
-		"@gs.i/schema-scene": "^0.2.0-alpha"
+		"@gs.i/schema-scene": "^0.2.1-alpha.6"
 	},
 	"devDependencies": {
 		"typescript": ">4.4.0"
 	},
-	"gitHead": "fcffb58565bc8dd5b122dc81812d3907e3753c73"
+	"gitHead": "9732890e73cc03efd0d3af5cdaa93d431ec742cc"
 }

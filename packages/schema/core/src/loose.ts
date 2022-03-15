@@ -55,10 +55,7 @@ export type LooseGeom = Replace<
 
 export type LooseSampler = Partial<Sampler>
 export type LooseImage = Partial<Image>
-export type LooseTexture = Replace<
-	Texture,
-	{ image: LooseImage; sampler: Partial<Sampler> | undefined }
->
+export type LooseTexture = Replace<Texture, { image: LooseImage; sampler?: Partial<Sampler> }>
 
 // const text : LooseTexture = {
 // 	image: {}

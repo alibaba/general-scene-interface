@@ -1,4 +1,4 @@
-import IR from '@gs.i/schema-scene'
+import IR, { LooseNodeLike } from '@gs.i/schema-scene'
 
 import { traverse } from '@gs.i/utils-traverse'
 
@@ -19,6 +19,11 @@ export function specifyTree(root: IR.LooseNodeLike): IR.NodeLike {
  * @param LooseMesh
  */
 export function specifyNode(node: IR.LooseNodeLike, parent?: IR.LooseNodeLike): IR.NodeLike {
+	// export function specifyNode(node: IR.LooseNodeLike, parent?: IR.LooseNodeLike): IR.NodeLike
+	// export function specifyNode(node: IR.LooseLuminousNode, parent?: IR.LooseNodeLike): IR.LuminousNode
+	// export function specifyNode( node: IR.LooseRenderableNode, parent?: IR.LooseNodeLike ): IR.RenderableNode
+	// export function specifyNode(node: IR.LooseBaseNode, parent?: IR.LooseNodeLike): IR.BaseNode
+	// export function specifyNode<T extends IR.LooseBaseNode>( node: T, parent?: IR.LooseNodeLike ): T extends IR.LooseRenderableNode ? IR.RenderableNode : T extends IR.LooseLuminousNode ? IR.LuminousNode : IR.BaseNode {
 	// const cached = this.cache.get(node)
 	// if (cached) return cached
 
@@ -36,6 +41,8 @@ export function specifyNode(node: IR.LooseNodeLike, parent?: IR.LooseNodeLike): 
 	if (isRenderable(node)) {
 		specifyMaterial(node.material)
 		specifyGeometry(node.geometry)
+
+		return node as IR.RenderableNode
 	} else if (isLuminousNode(node)) {
 		const l = node.extensions.EXT_luminous as IR.LuminousEXT
 		if (l.type === undefined) throw new SchemaNotValid('EXT_luminous.type is necessary.')
@@ -43,9 +50,11 @@ export function specifyNode(node: IR.LooseNodeLike, parent?: IR.LooseNodeLike): 
 		if (l.color === undefined) l.color = { r: 1, g: 1, b: 1 }
 		if (l.intensity === undefined) l.intensity = 1
 		if (l.range === undefined) l.range = Infinity
+
+		return node as IR.LuminousNode
 	}
 
-	return node as IR.NodeLike
+	return node as IR.BaseNode
 }
 
 /**
@@ -69,6 +78,7 @@ export function specifyMaterial(matr: IR.LooseMaterialBase): IR.MaterialBase {
 	if (matr.side === undefined) matr.side = 'front'
 	if (matr.alphaMode === undefined) matr.alphaMode = 'OPAQUE'
 	if (matr.opacity === undefined) matr.opacity = 1
+	if (matr.version === undefined) matr.version = 0
 
 	/**
 	 * Programable extension

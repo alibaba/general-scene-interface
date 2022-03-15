@@ -10,19 +10,10 @@
 	"exclude": ["dist"],
 	"references": [
 		{
-			"path": "../../schema/core"
-		},
-		{
-			"path": "../../schema/converter"
-		},
-		{
 			"path": "../../processors/bound"
 		},
 		{
-			"path": "../../utils/traverse"
-		},
-		{
-			"path": "../../utils/specify"
+			"path": "../../processors/culling"
 		},
 		{
 			"path": "../../processors/graph"
@@ -31,13 +22,22 @@
 			"path": "../../processors/matrix"
 		},
 		{
-			"path": "../../processors/culling"
+			"path": "../../schema/converter"
+		},
+		{
+			"path": "../../schema/core"
 		},
 		{
 			"path": "../../utils/geometry"
 		},
 		{
 			"path": "../../utils/math"
+		},
+		{
+			"path": "../../utils/specify"
+		},
+		{
+			"path": "../../utils/traverse"
 		}
 	]
 }

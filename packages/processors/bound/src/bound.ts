@@ -48,10 +48,6 @@ interface BVHCache {
 	bbox: BBox
 }
 
-const _box = new Box3()
-const _box2 = new Box3()
-const _mat = new Matrix4()
-
 /**
  * @note PURE FUNCTIONS, will not modify your input
  * @note CACHED
@@ -119,7 +115,13 @@ export class BoundingProcessor extends Processor {
 		if (customBSphere !== undefined) return generateBBoxFromBSphere(customBSphere)
 
 		const cache = this._cacheGeomBBox.get(geom)
-		const posVersion = geom.attributes.position?.version ?? 0
+
+		const position = geom.attributes.position
+		// if the geometry does not have position attribute. nor did user pass custom bounds.
+		// return Infinity bounds in this situation.
+		if (!position) return infinityBBox
+
+		const posVersion = position.version
 		if (!cache) {
 			// 未缓存
 			const bbox = computeBBox(geom)
@@ -146,7 +148,13 @@ export class BoundingProcessor extends Processor {
 		if (customBBox !== undefined) return generateBSphereFromBBox(customBBox)
 
 		const cache = this._cacheGeomBSphere.get(geom)
-		const posVersion = geom.attributes.position?.version ?? 0
+
+		const position = geom.attributes.position
+		// if the geometry does not have position attribute. nor did user pass custom bounds.
+		// return Infinity bounds in this situation.
+		if (!position) return infinityBSphere
+
+		const posVersion = position.version
 		if (!cache) {
 			// 未缓存
 			const bsphere = computeBSphere(geom)
@@ -201,7 +209,19 @@ export class BoundingProcessor extends Processor {
 			return result
 		}
 
-		const posVersion = geom.attributes.position?.version ?? 0
+		const position = geom.attributes.position
+
+		// if the geometry does not have position attribute. nor did user pass custom bounds.
+		// return Infinity bounds in this situation.
+
+		if (!position) {
+			result.bbox = infinityBBox
+			result.bsphere = infinityBSphere
+			result.version = undefined // useless
+			return result
+		}
+
+		const posVersion = position.version
 
 		if (result.version !== posVersion || posVersion === -1) {
 			// 更新缓存版本
@@ -355,3 +375,16 @@ export function generateBSphereFromBBox(bbox: BBox): BSphere {
 		),
 	}
 }
+
+const _box = new Box3()
+const _box2 = new Box3()
+const _mat = new Matrix4()
+
+const infinityBBox: BBox = Object.freeze({
+	min: { x: -Infinity, y: -Infinity, z: -Infinity },
+	max: { x: Infinity, y: Infinity, z: Infinity },
+})
+const infinityBSphere: BSphere = Object.freeze({
+	center: { x: 0, y: 0, z: 0 },
+	radius: Infinity,
+})
