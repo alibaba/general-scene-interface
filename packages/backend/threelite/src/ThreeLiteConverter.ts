@@ -527,6 +527,10 @@ export class ThreeLiteConverter implements Converter {
 					// @note three react to `defines` change. no need for bumping version
 					;(material['defines'] as any).GSI_USE_UV = true
 				}
+
+				// ext render order
+				const renderOrder = gsiNode.extensions?.EXT_mesh_order?.renderOrder
+				if (renderOrder !== undefined) threeObject.renderOrder = renderOrder
 			} else if (isLuminous(gsiNode)) {
 				const luminousEXT = gsiNode.extensions?.EXT_luminous as LuminousEXT
 
@@ -559,7 +563,12 @@ export class ThreeLiteConverter implements Converter {
 
 		// culling
 		// TODO set .visible false will cull all its children
-		if (this.config.overrideFrustumCulling && isRenderable(gsiNode) && gsiNode.visible) {
+		if (
+			this.config.overrideFrustumCulling &&
+			isRenderable(gsiNode) &&
+			gsiNode.visible &&
+			gsiNode.extensions?.EXT_mesh_advanced?.frustumCulling !== false
+		) {
 			if (this.config.cullingProcessor.isFrustumCulled(gsiNode)) {
 				this.info.culledCount++
 				threeObject.visible = false
