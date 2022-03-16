@@ -974,8 +974,8 @@ export class ThreeLiteConverter implements Converter {
 					)
 				} else if (imgData.uri !== undefined) {
 					threeTexture = texLoader.load(imgData.uri)
-				} else if (imgData.extensions?.EXT_image?.HTMLImage !== undefined) {
-					const image = imgData.extensions?.EXT_image?.HTMLImage
+				} else if (imgData.extensions?.EXT_image_HTML !== undefined) {
+					const image = imgData.extensions?.EXT_image_HTML
 					if (image instanceof HTMLElement) {
 						// HTMLElement
 						if (image instanceof HTMLCanvasElement) {

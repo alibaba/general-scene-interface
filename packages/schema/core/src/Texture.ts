@@ -47,9 +47,9 @@ export interface CubeTexture {
  * - 复杂 format 基本只会在流水线内部和后期逻辑中出现
  * - 这里交给转换器和渲染引擎选择合理的配置
  *
- * - if has `.data`, must not have `.uri` and `.extensions.EXT_image.HTMLImage`
- * - else if has `.uri`, must not have `.extensions.EXT_image.HTMLImage`
- * - else must have `.extensions.EXT_image.HTMLImage`
+ * - if has `.data`, must not have `.uri` and `.extensions.EXT_image_HTML`
+ * - else if has `.uri`, must not have `.extensions.EXT_image_HTML`
+ * - else must have `.extensions.EXT_image_HTML`
  */
 export interface Image extends Versioned {
 	/**
@@ -82,23 +82,20 @@ export interface Image extends Versioned {
 	uri?: string
 
 	extensions?: {
-		EXT_image?: {
-			/**
-			 * 是否反转Y轴坐标
-			 * - gl.UNPACK_FLIP_Y_WEBGL
-			 * - gltf2 不需要反转
-			 * - three 需要反转
-			 * @link https://github.com/KhronosGroup/glTF-Sample-Viewer/issues/16
-			 *
-			 * @default true
-			 */
-			flipY?: boolean
-
-			/**
-			 * HTML图片数据
-			 */
-			HTMLImage?: HTMLImageElement | HTMLCanvasElement | HTMLVideoElement
-		}
+		/**
+		 * 是否反转Y轴坐标
+		 * - gl.UNPACK_FLIP_Y_WEBGL
+		 * - gltf2 不需要反转
+		 * - three 需要反转
+		 * @link https://github.com/KhronosGroup/glTF-Sample-Viewer/issues/16
+		 *
+		 * @default true
+		 */
+		EXT_image_flipY?: boolean
+		/**
+		 * HTML图片数据
+		 */
+		EXT_image_HTML?: HTMLImageElement | HTMLCanvasElement | HTMLVideoElement
 		[key: string]: any
 	}
 	extras?: any
