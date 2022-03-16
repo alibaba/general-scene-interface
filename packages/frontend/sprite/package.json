@@ -1,6 +1,6 @@
 {
 	"name": "@gs.i/frontend-sprite",
-	"version": "0.2.1-alpha.9",
+	"version": "0.2.1-alpha.10",
 	"description": "",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
@@ -21,8 +21,8 @@
 	},
 	"dependencies": {
 		"@gs.i/frontend-sdk": "^0.2.1-alpha.2",
-		"@gs.i/schema-scene": "^0.2.1-alpha.9",
-		"@gs.i/utils-geometry": "0.2.1-alpha.9",
+		"@gs.i/schema-scene": "^0.2.1-alpha.10",
+		"@gs.i/utils-geometry": "0.2.1-alpha.10",
 		"@gs.i/utils-math": "^0.0.0-beta"
 	},
 	"devDependencies": {

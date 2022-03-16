@@ -264,6 +264,17 @@ export class ThreeLiteConverter implements Converter {
 	// private _committedMatr = new WeakMap<IR.Material | IR.MatrBase, Int>()
 	private _committedTex = new WeakMap<Texture | CubeTexture, Int>()
 
+	/**
+	 * @experimental
+	 */
+	readonly results = Object.freeze({
+		object3D: this._threeObject,
+		geometry: this._threeGeom,
+		attribute: this._threeAttr,
+		texture: this._threeTex,
+		material: this._threeMatr,
+	} as const)
+
 	// #endregion
 
 	constructor(config: ConverterConfig = {}) {
@@ -1044,7 +1055,6 @@ export class ThreeLiteConverter implements Converter {
 		this._threeGeom = new WeakMap()
 		this._threeAttr = new WeakMap()
 		this._threeTex = new WeakMap()
-		// TODO use IR.Material instead because IR.MatrBase can not be used alone
 		this._threeMatr = new WeakMap()
 		this._threeColor = new WeakMap()
 
