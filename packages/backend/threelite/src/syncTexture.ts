@@ -97,7 +97,7 @@ export function syncTexture(gsiTexture: Texture, threeTexture: ThreeTexture): vo
 	threeTexture.anisotropy = sampler.anisotropy
 
 	// flipY
-	threeTexture.flipY = gsiTexture.image.extensions?.EXT_image?.flipY || true
+	threeTexture.flipY = gsiTexture.image.extensions?.EXT_image?.flipY ?? true
 
 	// @TODO transform
 }

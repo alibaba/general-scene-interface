@@ -290,7 +290,7 @@ export function specifyTransform3(transform: IR.Transform3) {
 		if (transform.scale === undefined) transform.scale = { x: 1, y: 1, z: 1 }
 	}
 
-	if (transform.version === undefined) transform.version = -1
+	if (transform.version === undefined) transform.version = 0
 }
 
 // =======
