@@ -38,7 +38,6 @@
 		"watch": "node scripts/watch.mjs --fast",
 		"clean": "rm -rf ./yarn.lock && rm -rf ./node_modules && lerna clean -y && lerna run --no-private --stream --parallel clean",
 		"test": "cd test && npm test",
-		"publish": "npx lerna publish",
 		"prepare": "husky install"
 	},
 	"devDependencies": {
