@@ -10,6 +10,8 @@ import {
 	RepeatWrapping,
 	NearestMipMapLinearFilter,
 	LinearMipMapLinearFilter,
+	sRGBEncoding,
+	LinearEncoding,
 } from 'three-lite'
 
 /**
@@ -97,7 +99,11 @@ export function syncTexture(gsiTexture: Texture, threeTexture: ThreeTexture): vo
 	threeTexture.anisotropy = sampler.anisotropy
 
 	// flipY
-	threeTexture.flipY = gsiTexture.image.extensions?.EXT_image?.flipY || true
+	threeTexture.flipY = gsiTexture.image.extensions?.EXT_image_flipY ?? true
+
+	// encoding
+	threeTexture.encoding =
+		gsiTexture.image.extensions?.EXT_image_encoding === 'SRGB' ? sRGBEncoding : LinearEncoding
 
 	// @TODO transform
 }

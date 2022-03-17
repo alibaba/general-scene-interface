@@ -232,17 +232,17 @@ export function specifyImage(i: IR.LooseImage): IR.Image {
 		if (i.uri !== undefined)
 			throw new SchemaNotValid('texture.image.uri is conflict to texture.image.data')
 
-		if (i.extensions?.EXT_image?.HTMLImage !== undefined)
+		if (i.extensions?.EXT_image_HTML !== undefined)
 			throw new SchemaNotValid(
-				'texture.image.extensions.EXT_image.HTMLImage is conflict to texture.image.data'
+				'texture.image.extensions.EXT_imag_HTML is conflict to texture.image.data'
 			)
 	} else if (i.uri !== undefined) {
 		// use uri as image data
 
 		// shall not use other data sources
-		if (i.extensions?.EXT_image?.HTMLImage !== undefined)
+		if (i.extensions?.EXT_image_HTML !== undefined)
 			throw new SchemaNotValid(
-				'texture.image.extensions.EXT_image.HTMLImage is conflict to texture.image.data'
+				'texture.image.extensions.EXT_imag_HTML is conflict to texture.image.data'
 			)
 
 		// width and height will not work
@@ -254,7 +254,7 @@ export function specifyImage(i: IR.LooseImage): IR.Image {
 			throw new SchemaNotValid(
 				'texture.image.height can not be assigned when using uri as image data source'
 			)
-	} else if (i.extensions?.EXT_image?.HTMLImage === undefined) {
+	} else if (i.extensions?.EXT_image_HTML === undefined) {
 		// not using any image data
 		throw new SchemaNotValid(`texture.image doesn't have any image data source`)
 	}
@@ -290,7 +290,7 @@ export function specifyTransform3(transform: IR.Transform3) {
 		if (transform.scale === undefined) transform.scale = { x: 1, y: 1, z: 1 }
 	}
 
-	if (transform.version === undefined) transform.version = -1
+	if (transform.version === undefined) transform.version = 0
 }
 
 // =======

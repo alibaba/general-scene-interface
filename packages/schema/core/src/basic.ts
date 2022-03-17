@@ -136,7 +136,7 @@ export interface Versioned {
 	 * - 如果需要更新数据，务必主动将 version ++
 	 * - 或者设为 -1，将每次都更新
 	 *
-	 * @default 0 or -1 depends on how likely the object is to change
+	 * @default 0
 	 */
 	version: Int
 }

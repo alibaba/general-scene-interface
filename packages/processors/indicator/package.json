@@ -1,6 +1,6 @@
 {
 	"name": "@gs.i/processor-indicator",
-	"version": "0.2.1-alpha.6",
+	"version": "0.2.1-alpha.11",
 	"description": "",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
@@ -21,14 +21,14 @@
 	},
 	"dependencies": {
 		"@gs.i/frontend-sdk": "^0.2.1-alpha.2",
-		"@gs.i/processor-base": "^0.2.1-alpha.6",
-		"@gs.i/processor-bound": "^0.2.1-alpha.6",
-		"@gs.i/schema-scene": "^0.2.1-alpha.6",
-		"@gs.i/utils-geometry": "^0.2.1-alpha.6",
-		"@gs.i/utils-wireframe": "^0.2.1-alpha.6"
+		"@gs.i/processor-base": "^0.2.1-alpha.11",
+		"@gs.i/processor-bound": "^0.2.1-alpha.11",
+		"@gs.i/schema-scene": "^0.2.1-alpha.11",
+		"@gs.i/utils-geometry": "^0.2.1-alpha.11",
+		"@gs.i/utils-wireframe": "^0.2.1-alpha.11"
 	},
 	"devDependencies": {
 		"typescript": ">4.4.0"
 	},
-	"gitHead": "5f8603256ffd172682ac5c3e1bab7b72ba1e5f8c"
+	"gitHead": "20e1127a181d12b45ec18a9c8705d530d7d01d8f"
 }

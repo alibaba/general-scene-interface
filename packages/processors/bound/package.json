@@ -1,6 +1,6 @@
 {
 	"name": "@gs.i/processor-bound",
-	"version": "0.2.1-alpha.6",
+	"version": "0.2.1-alpha.11",
 	"description": "",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
@@ -20,15 +20,15 @@
 		"v": "node -v && tsc -v"
 	},
 	"dependencies": {
-		"@gs.i/processor-base": "^0.2.1-alpha.6",
-		"@gs.i/processor-matrix": "^0.2.1-alpha.6",
-		"@gs.i/schema-scene": "^0.2.1-alpha.6",
-		"@gs.i/utils-geometry": "^0.2.1-alpha.6",
+		"@gs.i/processor-base": "^0.2.1-alpha.11",
+		"@gs.i/processor-matrix": "^0.2.1-alpha.11",
+		"@gs.i/schema-scene": "^0.2.1-alpha.11",
+		"@gs.i/utils-geometry": "^0.2.1-alpha.11",
 		"@gs.i/utils-math": "^0.0.0-beta",
-		"@gs.i/utils-traverse": "^0.2.1-alpha.6"
+		"@gs.i/utils-traverse": "^0.2.1-alpha.11"
 	},
 	"devDependencies": {
 		"typescript": ">4.4.0"
 	},
-	"gitHead": "9732890e73cc03efd0d3af5cdaa93d431ec742cc"
+	"gitHead": "20e1127a181d12b45ec18a9c8705d530d7d01d8f"
 }

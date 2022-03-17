@@ -264,6 +264,17 @@ export class ThreeLiteConverter implements Converter {
 	// private _committedMatr = new WeakMap<IR.Material | IR.MatrBase, Int>()
 	private _committedTex = new WeakMap<Texture | CubeTexture, Int>()
 
+	/**
+	 * @experimental
+	 */
+	readonly results = Object.freeze({
+		object3D: this._threeObject,
+		geometry: this._threeGeom,
+		attribute: this._threeAttr,
+		texture: this._threeTex,
+		material: this._threeMatr,
+	} as const)
+
 	// #endregion
 
 	constructor(config: ConverterConfig = {}) {
@@ -527,6 +538,10 @@ export class ThreeLiteConverter implements Converter {
 					// @note three react to `defines` change. no need for bumping version
 					;(material['defines'] as any).GSI_USE_UV = true
 				}
+
+				// ext render order
+				const renderOrder = gsiNode.extensions?.EXT_mesh_order?.renderOrder
+				if (renderOrder !== undefined) threeObject.renderOrder = renderOrder
 			} else if (isLuminous(gsiNode)) {
 				const luminousEXT = gsiNode.extensions?.EXT_luminous as LuminousEXT
 
@@ -559,7 +574,12 @@ export class ThreeLiteConverter implements Converter {
 
 		// culling
 		// TODO set .visible false will cull all its children
-		if (this.config.overrideFrustumCulling && isRenderable(gsiNode) && gsiNode.visible) {
+		if (
+			this.config.overrideFrustumCulling &&
+			isRenderable(gsiNode) &&
+			gsiNode.visible &&
+			gsiNode.extensions?.EXT_mesh_advanced?.frustumCulling !== false
+		) {
 			if (this.config.cullingProcessor.isFrustumCulled(gsiNode)) {
 				this.info.culledCount++
 				threeObject.visible = false
@@ -965,8 +985,8 @@ export class ThreeLiteConverter implements Converter {
 					)
 				} else if (imgData.uri !== undefined) {
 					threeTexture = texLoader.load(imgData.uri)
-				} else if (imgData.extensions?.EXT_image?.HTMLImage !== undefined) {
-					const image = imgData.extensions?.EXT_image?.HTMLImage
+				} else if (imgData.extensions?.EXT_image_HTML !== undefined) {
+					const image = imgData.extensions?.EXT_image_HTML
 					if (image instanceof HTMLElement) {
 						// HTMLElement
 						if (image instanceof HTMLCanvasElement) {
@@ -1035,7 +1055,6 @@ export class ThreeLiteConverter implements Converter {
 		this._threeGeom = new WeakMap()
 		this._threeAttr = new WeakMap()
 		this._threeTex = new WeakMap()
-		// TODO use IR.Material instead because IR.MatrBase can not be used alone
 		this._threeMatr = new WeakMap()
 		this._threeColor = new WeakMap()
 

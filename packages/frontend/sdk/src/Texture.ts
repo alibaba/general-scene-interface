@@ -8,17 +8,15 @@ import { specifyTexture, specifyImage, specifySampler } from '@gs.i/utils-specif
 
 export interface Image extends IR.Image {}
 export class Image {
+	extensions = {} as NonNullable<IR.Image['extensions']>
 	/**
 	 * @deprecated Use {@link Image.extensions}
 	 */
 	public get flipY() {
-		return this.extensions?.EXT_image?.flipY
+		return this.extensions.EXT_image_flipY
 	}
 	public set flipY(v) {
-		if (!this.extensions) this.extensions = {}
-		if (!this.extensions.EXT_image) this.extensions.EXT_image = {}
-
-		this.extensions.EXT_image.flipY = v
+		this.extensions.EXT_image_flipY = v
 	}
 
 	constructor(params: {
@@ -33,10 +31,9 @@ export class Image {
 		if (typeof imageSource === 'string') {
 			this.uri = imageSource
 		} else if (imageSource instanceof HTMLElement) {
-			if (!this.extensions) this.extensions = {}
 			if (!this.extensions.EXT_image) this.extensions.EXT_image = {}
 
-			this.extensions.EXT_image.HTMLImage = imageSource
+			this.extensions.EXT_image_HTML = imageSource
 		} else {
 			this.data = imageSource
 		}

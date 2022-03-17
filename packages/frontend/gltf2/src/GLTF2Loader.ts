@@ -103,6 +103,10 @@ export class GLTF2Loader {
 				throw new Error('texture 缺少 source(image 数据)')
 			}
 
+			if (!gsiImage.extensions) gsiImage.extensions = {}
+			// glTF use same uv orientation as webgl. no need to flip Y
+			gsiImage.extensions.EXT_image_flipY = false
+
 			const gsiTexture: IR.LooseTexture = {
 				image: gsiImage,
 				sampler: gsiSampler,
@@ -191,6 +195,14 @@ export class GLTF2Loader {
 					console.warn('baseColorTexture.texCoord 必须为 0 或者 undefined，负责 uv 将会出现异常')
 				}
 
+				if (baseColorTexture) {
+					const gsiImage = baseColorTexture.image
+
+					// glTF **requires** baseColor and emissive use sRGB as input color space
+					if (!gsiImage.extensions) gsiImage.extensions = {}
+					gsiImage.extensions.EXT_image_encoding = 'SRGB'
+				}
+
 				const metallicRoughnessTextureIndex =
 					material.pbrMetallicRoughness?.metallicRoughnessTexture?.index
 				const metallicRoughnessTexture =
@@ -215,6 +227,14 @@ export class GLTF2Loader {
 					emissiveTextureIndex !== undefined ? this._texturesCache[emissiveTextureIndex] : undefined
 				if ((material.emissiveTexture?.texCoord || 0) !== 0) {
 					console.warn('emissiveTexture.texCoord 必须为 0 或者 undefined，负责 uv 将会出现异常')
+				}
+
+				if (emissiveTexture) {
+					const gsiImage = emissiveTexture.image
+
+					// glTF **requires** baseColor and emissive use sRGB as input color space
+					if (!gsiImage.extensions) gsiImage.extensions = {}
+					gsiImage.extensions.EXT_image_encoding = 'SRGB'
 				}
 
 				const occlusionTextureIndex = material.occlusionTexture?.index
