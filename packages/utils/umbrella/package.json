@@ -21,13 +21,10 @@
 	"dependencies": {
 		"@gs.i/schema-scene": "^0.2.1-alpha.11",
 		"@gs.i/utils-math": "^0.0.0-beta",
-		"@gs.i/backend-gl2": "^0.0.0-beta",
 		"@gs.i/schema-ext-scene": "^0.2.1-alpha.11",
 		"@gs.i/utils-geom-builders": "^0.2.1-alpha.11",
 		"@gs.i/utils-geometry": "^0.2.1-alpha.11",
-		"@gs.i/utils-gline": "^0.0.0-beta",
 		"@gs.i/utils-gltf2": "^0.2.1-alpha.11",
-		"@gs.i/utils-optimize": "^0.0.0-beta",
 		"@gs.i/utils-traverse": "^0.2.1-alpha.11",
 		"@gs.i/utils-wireframe": "^0.2.1-alpha.11",
 		"@gs.i/processor-base": "^0.2.1-alpha.11",

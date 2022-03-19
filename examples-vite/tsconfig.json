@@ -9,9 +9,6 @@
 	"exclude": ["dist", "node_modules", "packages"],
 	"references": [
 		{
-			"path": "../packages/backend/gl2"
-		},
-		{
 			"path": "../packages/backend/gltf2"
 		},
 		{
@@ -54,9 +51,6 @@
 			"path": "../packages/processors/raycast"
 		},
 		{
-			"path": "../packages/schema/core-old"
-		},
-		{
 			"path": "../packages/schema/ext-scene"
 		},
 		{
@@ -72,16 +66,10 @@
 			"path": "../packages/utils/geometry"
 		},
 		{
-			"path": "../packages/utils/gline"
-		},
-		{
 			"path": "../packages/utils/gltf2"
 		},
 		{
 			"path": "../packages/utils/math"
-		},
-		{
-			"path": "../packages/utils/optimize"
 		},
 		{
 			"path": "../packages/utils/random-scene"
