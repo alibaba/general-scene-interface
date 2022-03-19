@@ -116,11 +116,11 @@ await Promise.all(
 )
 
 try {
-	execSync(`lerna bootstrap `, { stdio: 'inherit' })
+	execSync(`lerna bootstrap --force-local`, { stdio: 'inherit' })
 
 	// # https://github.com/lerna/lerna/issues/2352
 	// # lerna link is needed
-	execSync(`lerna link `, { stdio: 'inherit' })
+	execSync(`lerna link --force-local`, { stdio: 'inherit' })
 
 	// # should not hoist local packages
 	// @note will cause error when a @gs.i/package is removed repo but installed as a dep
