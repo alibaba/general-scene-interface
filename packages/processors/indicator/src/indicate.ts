@@ -61,6 +61,13 @@ export class IndicatorProcessor extends Processor {
 			...defaultConfig,
 			...config,
 		}
+
+		if (this.config.boundingProcessor === defaultConfig.boundingProcessor) {
+			console.debug(
+				'IndicatorProcessor is using the default boundingProcessor.' +
+					`It's recommended to pass a boundingProcessor for constructor.`
+			)
+		}
 	}
 
 	override processNode(mesh: IR.NodeLike, parent?: IR.NodeLike) {
