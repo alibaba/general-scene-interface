@@ -6,7 +6,6 @@
 	"workspaces": {
 		"packages": [
 			"packages/**",
-			"examples",
 			"examples-vite",
 			"test"
 		],
