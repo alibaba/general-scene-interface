@@ -14,7 +14,6 @@
 		"@gs.i/schema-scene": "^0.2.1-alpha.11",
 		"@gs.i/utils-math": "^0.0.0-beta",
 		"@gs.i/backend-gl2": "^0.0.0-beta",
-		"@gs.i/schema-converter": "^0.2.1-alpha.11",
 		"@gs.i/schema-ext-scene": "^0.2.1-alpha.11",
 		"@gs.i/utils-geom-builders": "^0.2.1-alpha.11",
 		"@gs.i/utils-geometry": "^0.2.1-alpha.11",

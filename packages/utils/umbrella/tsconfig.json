@@ -55,9 +55,6 @@
 			"path": "../../processors/raycast"
 		},
 		{
-			"path": "../../schema/converter"
-		},
-		{
 			"path": "../../schema/ext-scene"
 		},
 		{

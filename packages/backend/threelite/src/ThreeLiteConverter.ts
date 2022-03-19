@@ -26,7 +26,7 @@ import IR, {
 
 const { GL_STATIC_DRAW, GL_DYNAMIC_DRAW } = constants
 
-import type { Converter } from '@gs.i/schema-converter'
+import type { Converter } from './Converter'
 import { MatProcessor } from '@gs.i/processor-matrix'
 import { BoundingProcessor } from '@gs.i/processor-bound'
 import { CullingProcessor } from '@gs.i/processor-culling'

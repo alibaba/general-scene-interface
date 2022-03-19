@@ -57,9 +57,6 @@
 			"path": "../packages/schema/core-old"
 		},
 		{
-			"path": "../packages/schema/converter"
-		},
-		{
 			"path": "../packages/schema/ext-scene"
 		},
 		{
