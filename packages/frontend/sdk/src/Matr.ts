@@ -16,7 +16,7 @@ class MatrBase implements IR.MaterialBase {
 	 *       this base class. if you extends it in subclass. it will be
 	 *       replaced. but all the assignment was done by `super()`
 	 */
-	extensions: NonNullable<Required<IR.MaterialBase['extensions']>> = {
+	readonly extensions: NonNullable<Required<IR.MaterialBase['extensions']>> = {
 		EXT_matr_advanced: {},
 		EXT_matr_programmable: {
 			language: 'GLSL300',
@@ -154,7 +154,7 @@ export class PbrMaterial extends MatrBase {
 	name = 'MatrPbr'
 
 	// @note @important use the same object in base class
-	extensions: Required<NonNullable<IR.PbrMaterial['extensions']>>
+	readonly extensions: Required<NonNullable<IR.PbrMaterial['extensions']>>
 
 	get fragPreLighting() {
 		return this.extensions.EXT_matr_programmable_pbr.fragPreLighting
@@ -189,7 +189,7 @@ export class UnlitMaterial extends MatrBase {
 	name = 'MatrUnlit'
 
 	// @note @important use the same object in base class
-	extensions: Required<NonNullable<IR.UnlitMaterial['extensions']>>
+	readonly extensions: Required<NonNullable<IR.UnlitMaterial['extensions']>>
 
 	constructor(params: Partial<UnlitMaterial> = {}) {
 		super(params)
@@ -217,7 +217,7 @@ export class PointMaterial extends MatrBase {
 	}
 
 	// @note @important use the same object in base class
-	extensions: Required<NonNullable<IR.PointMaterial['extensions']>>
+	readonly extensions: Required<NonNullable<IR.PointMaterial['extensions']>>
 
 	constructor(params: Partial<PointMaterial> = {}) {
 		super(params)
