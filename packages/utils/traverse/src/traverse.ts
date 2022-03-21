@@ -182,12 +182,15 @@ export function flatten(root?: IR.NodeLike, safe = false) {
 						throw new Error('Loop detected during traversal.')
 					}
 
-					if (child.parent && child.parent !== curr) {
+					if (!child.parent) {
+						console.debug(`Set child.parent when parent.children.add(child)`)
+						child.parent = curr
+					}
+
+					if (child.parent !== curr) {
 						console.error(child)
 						throw new Error('Detected parent change.')
 					}
-
-					child.parent = curr
 
 					result.push(child)
 					set.add(child)

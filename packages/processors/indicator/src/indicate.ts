@@ -83,6 +83,7 @@ export class IndicatorProcessor extends Processor {
 					baseColorFactor: HSVtoRGB(Math.random(), 1, 1),
 				})
 				mesh.children.add(indicator)
+				indicator.parent = mesh
 			}
 			if (this.config.useBSphere) {
 				const indicator = new Mesh()
@@ -95,6 +96,7 @@ export class IndicatorProcessor extends Processor {
 					baseColorFactor: HSVtoRGB(Math.random(), 1, 1),
 				})
 				mesh.children.add(indicator)
+				indicator.parent = mesh
 			}
 			if (this.config.useWireframe) {
 				const indicator = new Mesh()
@@ -104,6 +106,7 @@ export class IndicatorProcessor extends Processor {
 					baseColorFactor: HSVtoRGB(Math.random(), 1, 1),
 				})
 				mesh.children.add(indicator)
+				indicator.parent = mesh
 			}
 
 			if (this.config.hideOriginal) {
@@ -113,6 +116,7 @@ export class IndicatorProcessor extends Processor {
 				original.geometry = mesh.geometry
 				original.material = mesh.material
 				mesh.children.add(original)
+				original.parent = mesh
 				;(mesh as any)['geometry'] = undefined
 				;(mesh as any)['material'] = undefined
 			}

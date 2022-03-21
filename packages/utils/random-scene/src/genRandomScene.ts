@@ -175,7 +175,9 @@ export function generateScene(config: Config = {}): Mesh {
 
 	for (let i = 1; i < depth; i++) {
 		const branch = new Mesh()
-		trunk[trunk.length - 1].children.add(branch)
+		const parent = trunk[trunk.length - 1]
+		parent.children.add(branch)
+		branch.parent = parent
 		trunk.push(branch)
 	}
 
@@ -200,6 +202,7 @@ export function generateScene(config: Config = {}): Mesh {
 
 		const node = trunk[pointer]
 		node.children.add(mesh)
+		mesh.parent = node
 
 		if (config.useAnimation) {
 			const ran = Math.random()

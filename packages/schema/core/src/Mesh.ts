@@ -35,6 +35,8 @@ import { LuminousEXT } from './Luminous'
  * - rooted/oriented (有单一根). Every node has a single parent. Every scene has a single root.
  *
  * Also you can not re-use a removed node or change its position.
+ *
+ * @note When adding a node to a `parent.children`. It is necessary to set the `node.parent` too.
  */
 export interface BaseNode {
 	/**
