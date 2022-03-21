@@ -100,7 +100,7 @@ export type LooseRenderableNode = Replace<
 export type LooseLuminousNode = Replace<
 	LuminousNode,
 	{
-		extensions: { EXT_luminous: OnlyRequire<LuminousEXT, 'type'> }
+		extensions: { EXT_luminous?: OnlyRequire<LuminousEXT, 'type'> } & BaseNode['extensions']
 	}
 >
 export type LooseNodeLike = LooseRenderableNode | LooseBaseNode | LooseLuminousNode

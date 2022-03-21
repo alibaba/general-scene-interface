@@ -491,7 +491,7 @@ export class ThreeLiteConverter implements Converter {
 				const luminousEXT = gsiNode.extensions?.EXT_luminous as LuminousEXT
 				if (luminousEXT.type === 'point') {
 					threeObject = new PointLight()
-					threeObject.name = luminousEXT.name
+					threeObject.name = luminousEXT.name ?? threeObject.name
 					threeObject['decay'] = 2 // gltf2: "follow the inverse square law"
 				} else {
 					throw new Error('three-lite conv:: light type not implemented(' + luminousEXT.type + ')')

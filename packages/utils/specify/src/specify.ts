@@ -43,7 +43,9 @@ export function specifyNode(node: IR.LooseNodeLike, parent?: IR.LooseNodeLike): 
 		specifyGeometry(node.geometry)
 
 		return node as IR.RenderableNode
-	} else if (isLuminousNode(node)) {
+export function specifyLuminousNode(node: IR.LooseLuminousNode): IR.LuminousNode {
+	specifyBaseNode(node)
+
 		const l = node.extensions.EXT_luminous as IR.LuminousEXT
 		if (l.type === undefined) throw new SchemaNotValid('EXT_luminous.type is necessary.')
 		if (l.name === undefined) l.name = 'untitled-luminous'
@@ -51,10 +53,12 @@ export function specifyNode(node: IR.LooseNodeLike, parent?: IR.LooseNodeLike): 
 		if (l.intensity === undefined) l.intensity = 1
 		if (l.range === undefined) l.range = Infinity
 
-		return node as IR.LuminousNode
+	if (isSpotLight(l)) {
+		if (l.innerConeAngle === undefined) l.innerConeAngle = 0
+		if (l.outerConeAngle === undefined) l.outerConeAngle = Math.PI / 4
 	}
 
-	return node as IR.BaseNode
+	return node as IR.LuminousNode
 }
 
 /**
