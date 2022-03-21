@@ -159,39 +159,54 @@ export function traverseBFSBottomUp(root: IR.NodeLike, handler: (node: IR.NodeLi
 /**
  * flatten a DAG in to array
  * @param root
- * @param safe whether to detect infinity loop
+ * @param safe whether to detect graph error
  * @returns
  */
 export function flatten(root?: IR.NodeLike, safe = true) {
-	const result = [] as IR.NodeLike[]
+	if (!root) return []
 
-	if (!root) return result
+	const result = [root] as IR.NodeLike[]
+
+	let pointer = 0
 
 	if (safe) {
-		let count = 0
-		traverse(root, (node, parent) => {
-			if (result.indexOf(node) > -1) {
-				console.error(node)
-				throw new Error('Loop detected during traversal.')
+		const set = new WeakSet<IR.NodeLike>()
+
+		while (pointer < result.length) {
+			const curr = result[pointer]
+			const children = curr.children
+			if (children.size > 0) {
+				for (const child of children) {
+					if (set.has(child)) {
+						console.error(child)
+						throw new Error('Loop detected during traversal.')
+					}
+
+					result.push(child)
+					set.add(child)
+				}
 			}
 
-			if (count++ > MAX_NODE_COUNT)
+			pointer++
+
+			if (pointer > MAX_NODE_COUNT)
 				throw new Error('Max node count exceeded. Make sure you are not in a infinite loop.')
-
-			if (node.parent && node.parent !== parent) {
-				console.error(node)
-				throw new Error('Detected parent change.')
+		}
+	} else {
+		while (pointer < result.length) {
+			const curr = result[pointer]
+			const children = curr.children
+			if (children.size > 0) {
+				for (const child of children) {
+					result.push(child)
+				}
 			}
 
-			node.parent = parent
+			pointer++
 
-			result.push(node)
-		})
-	} else {
-		traverse(root, (node, parent) => {
-			node.parent = parent
-			result.push(node)
-		})
+			if (pointer > MAX_NODE_COUNT)
+				throw new Error('Max node count exceeded. Make sure you are not in a infinite loop.')
+		}
 	}
 
 	return result
