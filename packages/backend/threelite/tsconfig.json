@@ -22,9 +22,6 @@
 			"path": "../../processors/matrix"
 		},
 		{
-			"path": "../../schema/converter"
-		},
-		{
 			"path": "../../schema/core"
 		},
 		{

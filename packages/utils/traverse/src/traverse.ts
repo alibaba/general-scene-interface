@@ -1,6 +1,53 @@
 import IR from '@gs.i/schema-scene'
 
 /**
+ * The max node count in a scene.
+ *
+ * Used for detecting a infinite loop.
+ */
+const MAX_NODE_COUNT = 1024 * 1024 * 1024
+
+/**
+ * traverse a scene graph and process all the nodes
+ * - **with loop detection.**
+ * @param root
+ * @param handler
+ * @param order
+ */
+export function safeTraverse(
+	root: IR.NodeLike,
+	handler: (node: IR.NodeLike, parent?: IR.NodeLike) => any,
+	order: 'pre' | 'post' = 'pre'
+) {
+	const t = order === 'pre' ? traverse : traversePostOrder
+
+	const handled = new Set<IR.NodeLike>()
+
+	let count = 0
+
+	const h = (node: IR.NodeLike, parent?: IR.NodeLike) => {
+		if (handled.has(node)) {
+			console.error(node)
+			throw new Error('Loop detected during traversal.')
+		}
+
+		if (count++ > MAX_NODE_COUNT)
+			throw new Error('Max node count exceeded. Make sure you are not in a infinite loop.')
+
+		if (node.parent && node.parent !== parent) {
+			console.error(node)
+			throw new Error('Detected parent change.')
+		}
+
+		handled.add(node)
+
+		handler(node, parent)
+	}
+
+	t(root, h)
+}
+
+/**
  * traverse a scene graph and process all the nodes
  * 默认使用深度优先前序遍历（最快）
  * Pre-Order Traversal
@@ -111,16 +158,39 @@ export function traverseBFSBottomUp(root: IR.NodeLike, handler: (node: IR.NodeLi
 
 /**
  * flatten a DAG in to array
- * @param node
+ * @param root
+ * @param safe whether to detect infinity loop
  * @returns
  */
-export function flatten(node?: IR.NodeLike) {
+export function flatten(root?: IR.NodeLike, safe = true) {
 	const result = [] as IR.NodeLike[]
 
-	if (node) {
-		traverse(node, (_node, parent) => {
-			_node.parent = parent
-			result.push(_node)
+	if (!root) return result
+
+	if (safe) {
+		let count = 0
+		traverse(root, (node, parent) => {
+			if (result.indexOf(node) > -1) {
+				console.error(node)
+				throw new Error('Loop detected during traversal.')
+			}
+
+			if (count++ > MAX_NODE_COUNT)
+				throw new Error('Max node count exceeded. Make sure you are not in a infinite loop.')
+
+			if (node.parent && node.parent !== parent) {
+				console.error(node)
+				throw new Error('Detected parent change.')
+			}
+
+			node.parent = parent
+
+			result.push(node)
+		})
+	} else {
+		traverse(root, (node, parent) => {
+			node.parent = parent
+			result.push(node)
 		})
 	}
 

@@ -17,8 +17,6 @@ GSI 是一个 Web 3D 实时渲染领域的伞项目，包含一套标准化的�
 ```sh
 node -v # v14 or higher
 
-npx yarn -v # v1.x
-
 npx lerna -v # v4.x recommended
 ```
 

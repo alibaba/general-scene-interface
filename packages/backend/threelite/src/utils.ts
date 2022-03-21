@@ -5,6 +5,10 @@
 
 import { Box3, Sphere, Object3D, Vector3, Euler, Quaternion, Matrix4 } from 'three-lite'
 import { BBox, BSphere } from '@gs.i/schema-scene'
+import type {
+	ThreeLiteConverter,
+	defaultConfig as threeLiteDefaultConfig,
+} from './ThreeLiteConverter'
 
 export function box3Equals(b1: Box3 | BBox, b2: Box3 | BBox): boolean {
 	return (
@@ -191,7 +195,7 @@ export function sealTransform(threeMesh: Object3D) {
 		set: (v) => {
 			if (v)
 				console.error(
-					`matrixAutoUpdate can not be set to true,` +
+					`matrixAutoUpdate can not be set to true, ` +
 						`because this object3D's matrix is managed by gsi processor`
 				)
 		},
@@ -205,7 +209,7 @@ export function sealTransform(threeMesh: Object3D) {
 		set: (v) => {
 			if (v)
 				console.error(
-					`matrixWorldNeedsUpdate can not be set to true,` +
+					`matrixWorldNeedsUpdate can not be set to true, ` +
 						`because this object3D's matrix is managed by gsi processor`
 				)
 		},
@@ -214,7 +218,7 @@ export function sealTransform(threeMesh: Object3D) {
 	Object.defineProperty(threeMesh, 'position', {
 		get: () => {
 			console.warn(
-				`position will always be 0,0,0` +
+				`position will always be 0,0,0 ` +
 					`because this object3D's matrix is managed by gsi processor`
 			)
 			return new Vector3()
@@ -224,7 +228,7 @@ export function sealTransform(threeMesh: Object3D) {
 	Object.defineProperty(threeMesh, 'rotation', {
 		get: () => {
 			console.warn(
-				`rotation will always be 0,0,0` +
+				`rotation will always be 0,0,0 ` +
 					`because this object3D's matrix is managed by gsi processor`
 			)
 			return new Euler()
@@ -234,7 +238,7 @@ export function sealTransform(threeMesh: Object3D) {
 	Object.defineProperty(threeMesh, 'quaternion', {
 		get: () => {
 			console.warn(
-				`quaternion will always be default value` +
+				`quaternion will always be default value ` +
 					`because this object3D's matrix is managed by gsi processor`
 			)
 			return new Quaternion()
@@ -244,7 +248,7 @@ export function sealTransform(threeMesh: Object3D) {
 	Object.defineProperty(threeMesh, 'scale', {
 		get: () => {
 			console.warn(
-				`scale will always be 1` + `because this object3D's matrix is managed by gsi processor`
+				`scale will always be 1 ` + `because this object3D's matrix is managed by gsi processor`
 			)
 			return new Vector3()
 		},
@@ -253,7 +257,7 @@ export function sealTransform(threeMesh: Object3D) {
 	Object.defineProperty(threeMesh, 'matrix', {
 		get: () => {
 			console.warn(
-				`matrix will always be identical, use .worldMatrix instead.` +
+				`matrix will always be identical, use .worldMatrix instead. ` +
 					`because this object3D's matrix is managed by gsi processor`
 			)
 			return new Matrix4()
@@ -262,12 +266,75 @@ export function sealTransform(threeMesh: Object3D) {
 
 	threeMesh.updateMatrix = () =>
 		console.error(
-			`updateMatrix will not work, ` + `because this object3D's matrix is managed by gsi processor`
+			`updateMatrix will not work,  ` + `because this object3D's matrix is managed by gsi processor`
 		)
 
 	threeMesh.updateMatrixWorld = () =>
 		console.error(
-			`updateMatrixWorld will not work, ` +
+			`updateMatrixWorld will not work,  ` +
 				`because this object3D's matrix is managed by gsi processor`
 		)
+}
+
+/**
+ * - Check if shared defaultProcessors are used. (which would hurt performance)
+ * - Check if there multiple instances of the same processor. (which would break cache)
+ * @param conv
+ * @param defaultConfig
+ */
+export function checkProcessorPerformance(
+	conv: ThreeLiteConverter,
+	defaultConfig: typeof threeLiteDefaultConfig
+) {
+	if (conv.matrixProcessor === defaultConfig.matrixProcessor) {
+		console.debug(
+			'ThreeLiteConverter is using the default matrixProcessor. ' +
+				`Consider passing a matrixProcessor for constructor.`
+		)
+	}
+	if (conv.boundingProcessor === defaultConfig.boundingProcessor) {
+		console.debug(
+			'ThreeLiteConverter is using the default boundingProcessor. ' +
+				`Consider passing a boundingProcessor for constructor.`
+		)
+	}
+	if (conv.graphProcessor === defaultConfig.graphProcessor) {
+		console.debug(
+			'ThreeLiteConverter is using the default graphProcessor. ' +
+				`Consider passing a graphProcessor for constructor.`
+		)
+	}
+	if (conv.cullingProcessor === defaultConfig.cullingProcessor) {
+		console.debug(
+			'ThreeLiteConverter is using the default cullingProcessor. ' +
+				`Consider passing a cullingProcessor for constructor.`
+		)
+	}
+	if (
+		conv.boundingProcessor.matrixProcessor !== undefined &&
+		conv.boundingProcessor.matrixProcessor !== conv.matrixProcessor
+	) {
+		console.warn(
+			`ThreeLiteConverter's boundingProcessor is using a different matrixProcessor other than this.matrixProcessor. ` +
+				`It's highly recommended to use the same matrixProcessor for cache performance!`
+		)
+	}
+	if (
+		conv.cullingProcessor.matrixProcessor !== undefined &&
+		conv.cullingProcessor.matrixProcessor !== conv.matrixProcessor
+	) {
+		console.warn(
+			`ThreeLiteConverter's cullingProcessor is using a different matrixProcessor other than this.matrixProcessor. ` +
+				`It's highly recommended to use the same matrixProcessor for cache performance!`
+		)
+	}
+	if (
+		conv.cullingProcessor.boundingProcessor !== undefined &&
+		conv.cullingProcessor.boundingProcessor !== conv.boundingProcessor
+	) {
+		console.warn(
+			`ThreeLiteConverter's cullingProcessor is using a different boundingProcessor other than this.boundingProcessor. ` +
+				`It's highly recommended to use the same boundingProcessor for cache performance!`
+		)
+	}
 }

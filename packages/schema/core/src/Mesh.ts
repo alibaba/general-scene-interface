@@ -24,7 +24,17 @@ import { Int, Transform3 } from './basic'
 import { LuminousEXT } from './Luminous'
 
 /**
- * nodes in the scene graph
+ * A GSI scene is structured as a classic scene graph.
+ * Every object in a scene is a node. All nodes form into a tree.
+ * Transformations and visibilities are inherited down from the root to leaf nodes.
+ *
+ * The tree must meet the following constraints:
+ * - N-ary (多叉树). A node can have multiple children.
+ * - directed (有向). From the root to leaves.
+ * - acyclic (无环). No loop. There is one and only one path to every node.
+ * - rooted/oriented (有单一根). Every node has a single parent. Every scene has a single root.
+ *
+ * Also you can not re-use a removed node or change its position.
  */
 export interface BaseNode {
 	/**
@@ -60,9 +70,7 @@ export interface BaseNode {
 
 	extras?: any
 
-	extensions?: {
-		[key: string]: any
-	}
+	extensions?: { [key: string]: any }
 }
 
 /**
@@ -119,9 +127,7 @@ export interface RenderableNode extends BaseNode {
 }
 
 export interface LuminousNode extends BaseNode {
-	extensions?: {
-		EXT_luminous?: LuminousEXT
-	} & BaseNode['extensions']
+	extensions?: { EXT_luminous?: LuminousEXT } & BaseNode['extensions']
 }
 
 /**

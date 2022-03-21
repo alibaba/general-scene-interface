@@ -15,7 +15,7 @@ import IR, {
 	isRenderableMesh,
 } from '@gs.i/schema-scene'
 
-import type { Converter } from '@gs.i/schema-converter'
+import type { Converter } from './Converter'
 import { Color } from '@gs.i/utils-math'
 
 import { MatProcessor } from '@gs.i/processor-matrix'

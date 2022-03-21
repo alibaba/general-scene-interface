@@ -26,7 +26,7 @@ import IR, {
 
 const { GL_STATIC_DRAW, GL_DYNAMIC_DRAW } = constants
 
-import type { Converter } from '@gs.i/schema-converter'
+import type { Converter } from './Converter'
 import { MatProcessor } from '@gs.i/processor-matrix'
 import { BoundingProcessor } from '@gs.i/processor-bound'
 import { CullingProcessor } from '@gs.i/processor-culling'
@@ -55,7 +55,7 @@ import {
 	Light,
 	PointLight,
 } from 'three-lite'
-import { sealTransform } from './utils'
+import { checkProcessorPerformance, sealTransform } from './utils'
 
 /**
  * @note safe to share globally @simon
@@ -79,7 +79,7 @@ const defaultCullingProcessor = new CullingProcessor({
 	matrixProcessor: defaultMatrixProcessor,
 })
 
-export const DefaultConfig = {
+export const defaultConfig = {
 	/**
 	 * 是否启用Mesh frustumCulled属性，以及隐藏被视锥体剔除的Mesh
 	 * @deprecated
@@ -170,7 +170,7 @@ export const DefaultConfig = {
 	cullingProcessor: defaultCullingProcessor,
 }
 
-export type ConverterConfig = Partial<typeof DefaultConfig>
+export type ConverterConfig = Partial<typeof defaultConfig>
 
 /**
  * 生成Three Lite Scene的Converter
@@ -279,7 +279,7 @@ export class ThreeLiteConverter implements Converter {
 
 	constructor(config: ConverterConfig = {}) {
 		this.config = {
-			...DefaultConfig,
+			...defaultConfig,
 			...config,
 		}
 
@@ -287,6 +287,8 @@ export class ThreeLiteConverter implements Converter {
 		this.boundingProcessor = this.config.boundingProcessor
 		this.graphProcessor = this.config.graphProcessor
 		this.cullingProcessor = this.config.cullingProcessor
+
+		checkProcessorPerformance(this, defaultConfig)
 
 		// this._cachedSnapshot = this.config.graphProcessor.snapshot() // init with a empty node
 	}

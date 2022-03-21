@@ -1,8 +1,9 @@
 {
-	"version": "0.2.1-alpha.11",
-	"npmClient": "yarn",
+	"version": "0.2.1-alpha.12",
+	"npmClient": "npm",
 	"npmClientArgs": [
-		"--no-lockfile"
+		"--no-lockfile",
+		"--no-package-lock"
 	],
 	"useWorkspaces": true
 }
