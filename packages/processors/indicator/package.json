@@ -1,6 +1,6 @@
 {
 	"name": "@gs.i/processor-indicator",
-	"version": "0.2.1-alpha.15",
+	"version": "0.2.1-alpha.16",
 	"description": "",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
@@ -21,11 +21,11 @@
 	},
 	"dependencies": {
 		"@gs.i/frontend-sdk": "^0.2.1-alpha.2",
-		"@gs.i/processor-base": "^0.2.1-alpha.15",
-		"@gs.i/processor-bound": "^0.2.1-alpha.15",
-		"@gs.i/schema-scene": "^0.2.1-alpha.15",
-		"@gs.i/utils-geometry": "^0.2.1-alpha.15",
-		"@gs.i/utils-wireframe": "^0.2.1-alpha.15"
+		"@gs.i/processor-base": "^0.2.1-alpha.16",
+		"@gs.i/processor-bound": "^0.2.1-alpha.16",
+		"@gs.i/schema-scene": "^0.2.1-alpha.16",
+		"@gs.i/utils-geometry": "^0.2.1-alpha.16",
+		"@gs.i/utils-wireframe": "^0.2.1-alpha.16"
 	},
 	"devDependencies": {
 		"typescript": ">4.4.0"

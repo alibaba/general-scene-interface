@@ -157,7 +157,7 @@ export function traverseBFSBottomUp(root: IR.NodeLike, handler: (node: IR.NodeLi
 }
 
 /**
- * flatten a DAG in to array
+ * flatten a DAG in to array (branch-first-search order)
  * @param root
  * @param safe whether to detect graph error
  * @returns
@@ -182,6 +182,7 @@ export function flatten(root?: IR.NodeLike, safe = true) {
 						throw new Error('Loop detected during traversal.')
 					}
 
+					child.parent = curr
 					result.push(child)
 					set.add(child)
 				}
@@ -198,6 +199,7 @@ export function flatten(root?: IR.NodeLike, safe = true) {
 			const children = curr.children
 			if (children.size > 0) {
 				for (const child of children) {
+					child.parent = curr
 					result.push(child)
 				}
 			}
