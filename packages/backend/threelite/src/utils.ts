@@ -286,6 +286,10 @@ export function checkProcessorPerformance(
 	conv: ThreeLiteConverter,
 	defaultConfig: typeof threeLiteDefaultConfig
 ) {
+	if (conv.config.dev) {
+		console.log(`ThreeLiteConverter dev mode is enabled. Performance will be impacted.`)
+	}
+
 	if (conv.matrixProcessor === defaultConfig.matrixProcessor) {
 		console.debug(
 			'ThreeLiteConverter is using the default matrixProcessor. ' +

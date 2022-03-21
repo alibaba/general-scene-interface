@@ -153,6 +153,11 @@ export const defaultConfig = {
 	keepTopology: false,
 
 	/**
+	 * whether to do extra checks to make sure the scene is correct.
+	 */
+	dev: true,
+
+	/**
 	 * @note safe to share globally @simon
 	 */
 	matrixProcessor: defaultMatrixProcessor,
@@ -307,7 +312,7 @@ export class ThreeLiteConverter implements Converter {
 		// @note
 		// 		optimize with flatten tree
 		// 		it's quite expensive to traverse a tree multiple times
-		const flatScene = flatten(root)
+		const flatScene = flatten(root, this.config.dev)
 		// const flatScene = flattenBFS(root)
 
 		// update all the matrices
