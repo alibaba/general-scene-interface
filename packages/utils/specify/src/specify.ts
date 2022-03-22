@@ -216,7 +216,7 @@ export function specifyAttribute(attribute: IR.LooseAttribute, name = ''): IR.At
 	if (attribute.normalized === undefined) attribute.normalized = false
 	if (attribute.usage === undefined) attribute.usage = 'STATIC_DRAW'
 	if (attribute.version === undefined) attribute.version = 0
-	if (attribute.disposable === undefined) attribute.disposable = true
+	if (attribute.disposable === undefined) attribute.disposable = false
 
 	if (attribute.extensions === undefined) attribute.extensions = {}
 

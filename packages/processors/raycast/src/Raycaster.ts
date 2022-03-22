@@ -184,7 +184,7 @@ export class Raycaster extends Processor {
 		if (!rayIntersectsBox(this._inverseRay, bounds.bbox)) return result
 
 		// auto decide face culling
-		const backfaceCulling = mesh.material.side !== 'front'
+		const backfaceCulling = mesh.material.side === 'front'
 
 		const pos = geom.attributes.position?.array as TypedArray
 

@@ -13,24 +13,16 @@ export const DefaultParams = {
 	heightSegments: 1,
 	normal: false,
 	uv: false,
+	disposable: false,
 }
 
-export function buildPlane(
-	params: Partial<{
-		width: number
-		height: number
-		widthSegments: number
-		heightSegments: number
-		normal: boolean
-		uv: boolean
-	}> = {}
-): Geometry {
+export function buildPlane(params: Partial<typeof DefaultParams> = {}): Geometry {
 	const finalParams = {
 		...DefaultParams,
 		...params,
 	}
 
-	const { width, height, widthSegments, heightSegments, normal, uv } = finalParams
+	const { width, height, widthSegments, heightSegments, normal, uv, disposable } = finalParams
 
 	const width_half = width / 2
 	const height_half = height / 2
@@ -104,7 +96,7 @@ export function buildPlane(
 		normalized: false,
 		usage: 'STATIC_DRAW',
 		version: 0,
-		disposable: true,
+		disposable,
 	}
 
 	const indicesAttr: Attribute = {
@@ -114,7 +106,7 @@ export function buildPlane(
 		normalized: false,
 		usage: 'STATIC_DRAW',
 		version: 0,
-		disposable: true,
+		disposable,
 	}
 
 	// box.getBoundingSphere(sphere)
@@ -148,7 +140,7 @@ export function buildPlane(
 			normalized: false,
 			usage: 'STATIC_DRAW',
 			version: 0,
-			disposable: true,
+			disposable,
 		}
 	}
 
@@ -160,7 +152,7 @@ export function buildPlane(
 			normalized: false,
 			usage: 'STATIC_DRAW',
 			version: 0,
-			disposable: true,
+			disposable,
 		}
 	}
 
