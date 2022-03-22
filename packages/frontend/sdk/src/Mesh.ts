@@ -14,15 +14,23 @@ export class Mesh {
 	name = 'Mesh'
 
 	/**
+	 * to simplify usage, init extensions now rather than when used.
+	 *
+	 * @note it is very important to init ALL THE POSSIBLE extensions in
+	 *       this base class. if you extends it in subclass. it will be
+	 *       replaced. but all the assignment was done by `super()`
+	 */
+	readonly extensions: NonNullable<IR.RenderableNode['extensions']> = {}
+
+	/**
 	 * @deprecated use {@link IR.MaterialBase.extensions EXT_mesh_order}
 	 * @deprecated rely on mechanism of renderers, may act very differently for different backends
 	 * @deprecated do not use if you want this to work with different renderers
 	 */
 	get renderOrder() {
-		return this.extensions?.EXT_mesh_order?.renderOrder
+		return this.extensions.EXT_mesh_order?.renderOrder
 	}
 	set renderOrder(v) {
-		if (!this.extensions) this.extensions = {}
 		if (!this.extensions.EXT_mesh_order) this.extensions.EXT_mesh_order = {}
 
 		this.extensions.EXT_mesh_order.renderOrder = v
@@ -65,16 +73,16 @@ export class Mesh {
 
 export class PointLight extends Mesh implements IR.LuminousNode {
 	name = 'PointLight'
+	readonly extensions: IR.LuminousNode['extensions']
 	constructor(params: Partial<IR.LuminousEXT> = {}) {
 		super()
-		this.extensions = {
-			EXT_luminous: {
-				type: 'point',
-				color: params.color,
-				intensity: params.intensity,
-				range: params.range,
-			},
+		this.extensions.EXT_luminous = {
+			type: 'point',
+			color: params.color as any, // will handle in specifyNode
+			intensity: params.intensity as any, // will handle in specifyNode
+			range: params.range as any, // will handle in specifyNode
 		}
+
 		specifyNode(this)
 	}
 }

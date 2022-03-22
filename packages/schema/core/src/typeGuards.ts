@@ -19,6 +19,7 @@ import { Texture, CubeTexture } from './Texture'
 import { Uniform } from './Programable'
 
 import { RenderableNode, NodeLike, LuminousNode } from './Mesh'
+import { LightBase, PointLight, SpotLight } from './Luminous'
 
 export function isColorRGB(a: any): a is ColorRGB {
 	if (a && a.r !== undefined && a.g !== undefined && a.b !== undefined) {
@@ -62,6 +63,12 @@ export function isRenderable(v: NodeLike): v is RenderableNode {
 }
 export function isLuminous(v: NodeLike): v is LuminousNode {
 	return v.extensions?.EXT_luminous !== undefined
+}
+export function isPointLight(v: LightBase): v is PointLight {
+	return v.type === 'point'
+}
+export function isSpotLight(v: LightBase): v is SpotLight {
+	return v.type === 'spot'
 }
 
 export function isTransform3Matrix(v: Transform3): v is Transform3Matrix {

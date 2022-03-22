@@ -127,7 +127,7 @@ export interface RenderableNode extends BaseNode {
 }
 
 export interface LuminousNode extends BaseNode {
-	extensions?: { EXT_luminous?: LuminousEXT } & BaseNode['extensions']
+	extensions: { EXT_luminous?: LuminousEXT } & BaseNode['extensions']
 }
 
 /**

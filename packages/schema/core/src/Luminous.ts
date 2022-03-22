@@ -14,17 +14,15 @@
 
 import { ColorRGB } from './basic'
 
-type LightTypes = 'point' | 'spot' // | 'rect'
-
 /**
  * @see [gltf2-KHR_lights_punctual](https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_lights_punctual#light-shared-properties)
  */
-export interface LightBase<T extends LightTypes> {
-	type: T
+export interface LightBase {
+	type: 'point' | 'spot' // | 'rect'
 	/**
 	 * for readability
 	 */
-	name: string
+	name?: string
 	/**
 	 * @default {r:1, g:1, b:1}
 	 */
@@ -43,25 +41,28 @@ export interface LightBase<T extends LightTypes> {
 	range: number
 }
 
-export interface PointLight extends LightBase<'point'> {}
+export interface PointLight extends LightBase {
+	type: 'point'
+}
 
 /**
  * direction to -z axis
  * @see [gltf2-KHR_lights_punctual](https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_lights_punctual#spot)
  */
-export interface SpotLight extends LightBase<'spot'> {
+export interface SpotLight extends LightBase {
+	type: 'spot'
 	/**
 	 * falloff begin
 	 * @range [0, outerConeAngle]
 	 * @default 0
 	 */
-	innerConeAngle?: number
+	innerConeAngle: number
 	/**
 	 * falloff end
 	 * @range [innerConeAngle, PI/2]
 	 * @default PI/4
 	 */
-	outerConeAngle?: number
+	outerConeAngle: number
 }
 
-export type LuminousEXT = PointLight | SpotLight
+export type LuminousEXT = LightBase

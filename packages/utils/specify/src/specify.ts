@@ -1,4 +1,4 @@
-import IR, { LooseNodeLike } from '@gs.i/schema-scene'
+import IR, { isSpotLight } from '@gs.i/schema-scene'
 
 import { traverse } from '@gs.i/utils-traverse'
 
@@ -18,17 +18,22 @@ export function specifyTree(root: IR.LooseNodeLike): IR.NodeLike {
  * - **not** includes its children.
  * @param LooseMesh
  */
-export function specifyNode(node: IR.LooseNodeLike, parent?: IR.LooseNodeLike): IR.NodeLike {
-	// export function specifyNode(node: IR.LooseNodeLike, parent?: IR.LooseNodeLike): IR.NodeLike
-	// export function specifyNode(node: IR.LooseLuminousNode, parent?: IR.LooseNodeLike): IR.LuminousNode
-	// export function specifyNode( node: IR.LooseRenderableNode, parent?: IR.LooseNodeLike ): IR.RenderableNode
-	// export function specifyNode(node: IR.LooseBaseNode, parent?: IR.LooseNodeLike): IR.BaseNode
-	// export function specifyNode<T extends IR.LooseBaseNode>( node: T, parent?: IR.LooseNodeLike ): T extends IR.LooseRenderableNode ? IR.RenderableNode : T extends IR.LooseLuminousNode ? IR.LuminousNode : IR.BaseNode {
-	// const cached = this.cache.get(node)
-	// if (cached) return cached
+export function specifyNode(node: IR.LooseRenderableNode): IR.RenderableNode
+export function specifyNode(node: IR.LooseLuminousNode): IR.LuminousNode
+export function specifyNode(node: IR.LooseBaseNode): IR.BaseNode
+export function specifyNode(
+	node: IR.LooseBaseNode | IR.LooseRenderableNode | IR.LooseLuminousNode
+): IR.BaseNode | IR.RenderableNode | IR.LuminousNode {
+	if (isRenderable(node)) {
+		return specifyRenderableNode(node)
+	} else if (isLuminousNode(node)) {
+		return specifyLuminousNode(node)
+	} else {
+		return specifyBaseNode(node)
+	}
+}
 
-	if (parent) node.parent = parent as IR.NodeLike | undefined
-
+export function specifyBaseNode(node: IR.LooseBaseNode): IR.BaseNode {
 	if (node.name === undefined) node.name = 'unnamed mesh'
 	if (node.extensions === undefined) node.extensions = {}
 	if (node.extras === undefined) node.extras = {}
@@ -38,23 +43,34 @@ export function specifyNode(node: IR.LooseNodeLike, parent?: IR.LooseNodeLike): 
 	if (node.transform === undefined) node.transform = genDefaultTransform3()
 	specifyTransform3(node.transform)
 
-	if (isRenderable(node)) {
-		specifyMaterial(node.material)
-		specifyGeometry(node.geometry)
+	return node as IR.BaseNode
+}
 
-		return node as IR.RenderableNode
-	} else if (isLuminousNode(node)) {
-		const l = node.extensions.EXT_luminous as IR.LuminousEXT
-		if (l.type === undefined) throw new SchemaNotValid('EXT_luminous.type is necessary.')
-		if (l.name === undefined) l.name = 'untitled-luminous'
-		if (l.color === undefined) l.color = { r: 1, g: 1, b: 1 }
-		if (l.intensity === undefined) l.intensity = 1
-		if (l.range === undefined) l.range = Infinity
+export function specifyRenderableNode(node: IR.LooseRenderableNode): IR.RenderableNode {
+	specifyBaseNode(node)
 
-		return node as IR.LuminousNode
+	specifyMaterial(node.material)
+	specifyGeometry(node.geometry)
+
+	return node as IR.RenderableNode
+}
+
+export function specifyLuminousNode(node: IR.LooseLuminousNode): IR.LuminousNode {
+	specifyBaseNode(node)
+
+	const l = node.extensions.EXT_luminous as IR.LuminousEXT
+	if (l.type === undefined) throw new SchemaNotValid('EXT_luminous.type is necessary.')
+	if (l.name === undefined) l.name = 'untitled-luminous'
+	if (l.color === undefined) l.color = { r: 1, g: 1, b: 1 }
+	if (l.intensity === undefined) l.intensity = 1
+	if (l.range === undefined) l.range = Infinity
+
+	if (isSpotLight(l)) {
+		if (l.innerConeAngle === undefined) l.innerConeAngle = 0
+		if (l.outerConeAngle === undefined) l.outerConeAngle = Math.PI / 4
 	}
 
-	return node as IR.BaseNode
+	return node as IR.LuminousNode
 }
 
 /**
@@ -64,10 +80,27 @@ export const specifyMesh = specifyNode
 
 /**
  * specify a material, including its standard textures, not including custom textures in programable ext.
- * @param matr
- * @returns
  */
-export function specifyMaterial(matr: IR.LooseMaterialBase): IR.MaterialBase {
+export function specifyMaterial(matr: IR.LoosePbrMaterial): IR.PbrMaterial
+export function specifyMaterial(matr: IR.LooseUnlitMaterial): IR.UnlitMaterial
+export function specifyMaterial(matr: IR.LoosePointMaterial): IR.PointMaterial
+export function specifyMaterial(matr: IR.LooseMaterialBase): IR.MaterialBase
+export function specifyMaterial(
+	matr: IR.LooseMaterial | IR.LooseMaterialBase
+): IR.Material | IR.MaterialBase {
+	if (isPbrMaterial(matr)) {
+		return specifyPbrMaterial(matr)
+	} else if (isUnlitMaterial(matr)) {
+		return specifyUnlitMaterial(matr)
+	} else if (isPointMaterial(matr)) {
+		return specifyPointMaterial(matr)
+	} else {
+		// un-recognized material type
+		return specifyMaterialBase(matr)
+	}
+}
+
+export function specifyMaterialBase(matr: IR.LooseMaterialBase): IR.MaterialBase {
 	/**
 	 * common
 	 */
@@ -95,45 +128,44 @@ export function specifyMaterial(matr: IR.LooseMaterialBase): IR.MaterialBase {
 		// if (p.varyings === undefined) p.varyings = {}
 	}
 
-	/**
-	 * material specific
-	 */
-	if (isMatrPbrDataType(matr)) {
-		if (matr.baseColorFactor === undefined) matr.baseColorFactor = { r: 1, g: 1, b: 1 }
-		if (matr.emissiveFactor === undefined) matr.emissiveFactor = { r: 0, g: 0, b: 0 }
-		if (matr.metallicFactor === undefined) matr.metallicFactor = 0.5
-		if (matr.roughnessFactor === undefined) matr.roughnessFactor = 0.5
-
-		if (matr.baseColorTexture) specifyTexture(matr.baseColorTexture)
-		if (matr.metallicRoughnessTexture) specifyTexture(matr.metallicRoughnessTexture)
-		if (matr.emissiveTexture) specifyTexture(matr.emissiveTexture)
-		if (matr.normalTexture) specifyTexture(matr.normalTexture)
-		if (matr.occlusionTexture) specifyTexture(matr.occlusionTexture)
-
-		// return matr as MatrBaseDataType
-	}
-
-	if (isMatrUnlitDataType(matr)) {
-		if (matr.baseColorFactor === undefined) matr.baseColorFactor = { r: 1, g: 1, b: 1 }
-
-		if (matr.baseColorTexture) specifyTexture(matr.baseColorTexture)
-
-		// return matr as MatrBaseDataType
-	}
-
-	if (isMatrPointDataType(matr)) {
-		if (matr.baseColorFactor === undefined) matr.baseColorFactor = { r: 1, g: 1, b: 1 }
-		if (matr.size === undefined) matr.size = 10
-		if (matr.sizeAttenuation === undefined) matr.sizeAttenuation = false
-
-		if (matr.baseColorTexture) specifyTexture(matr.baseColorTexture)
-
-		// return matr as MatrBaseDataType
-	}
-
-	// un-recognized matr type
-
 	return matr as IR.MaterialBase
+}
+
+export function specifyPbrMaterial(matr: IR.LoosePbrMaterial): IR.PbrMaterial {
+	specifyMaterialBase(matr)
+
+	if (matr.baseColorFactor === undefined) matr.baseColorFactor = { r: 1, g: 1, b: 1 }
+	if (matr.emissiveFactor === undefined) matr.emissiveFactor = { r: 0, g: 0, b: 0 }
+	if (matr.metallicFactor === undefined) matr.metallicFactor = 0.5
+	if (matr.roughnessFactor === undefined) matr.roughnessFactor = 0.5
+
+	if (matr.baseColorTexture) specifyTexture(matr.baseColorTexture)
+	if (matr.metallicRoughnessTexture) specifyTexture(matr.metallicRoughnessTexture)
+	if (matr.emissiveTexture) specifyTexture(matr.emissiveTexture)
+	if (matr.normalTexture) specifyTexture(matr.normalTexture)
+	if (matr.occlusionTexture) specifyTexture(matr.occlusionTexture)
+
+	return matr as IR.PbrMaterial
+}
+
+export function specifyUnlitMaterial(matr: IR.LooseUnlitMaterial): IR.UnlitMaterial {
+	specifyMaterialBase(matr)
+
+	if (matr.baseColorFactor === undefined) matr.baseColorFactor = { r: 1, g: 1, b: 1 }
+	if (matr.baseColorTexture) specifyTexture(matr.baseColorTexture)
+
+	return matr as IR.UnlitMaterial
+}
+
+export function specifyPointMaterial(matr: IR.LoosePointMaterial): IR.PointMaterial {
+	specifyMaterialBase(matr)
+
+	if (matr.baseColorFactor === undefined) matr.baseColorFactor = { r: 1, g: 1, b: 1 }
+	if (matr.size === undefined) matr.size = 10
+	if (matr.sizeAttenuation === undefined) matr.sizeAttenuation = false
+	if (matr.baseColorTexture) specifyTexture(matr.baseColorTexture)
+
+	return matr as IR.PointMaterial
 }
 
 /**
@@ -316,21 +348,21 @@ function genDefaultTransform2() {
 	} as IR.Transform2
 }
 
-export function isMatrPbrDataType(v: IR.LooseMaterialBase): v is IR.LoosePbrMaterial {
+function isPbrMaterial(v: IR.LooseMaterialBase): v is IR.LoosePbrMaterial {
 	return v.type === 'pbr'
 }
 
-export function isMatrUnlitDataType(v: IR.LooseMaterialBase): v is IR.LooseUnlitMaterial {
+function isUnlitMaterial(v: IR.LooseMaterialBase): v is IR.LooseUnlitMaterial {
 	return v.type === 'unlit'
 }
 
-export function isMatrPointDataType(v: IR.LooseMaterialBase): v is IR.LoosePointMaterial {
+function isPointMaterial(v: IR.LooseMaterialBase): v is IR.LoosePointMaterial {
 	return v.type === 'point'
 }
 
-export function isRenderable(v: IR.LooseNodeLike): v is IR.RenderableNode {
-	return v['geometry'] && v['material']
+function isRenderable(v: IR.LooseNodeLike): v is IR.RenderableNode {
+	return (v as any).geometry && (v as any).material
 }
-export function isLuminousNode(v: IR.LooseNodeLike): v is IR.LuminousNode {
+function isLuminousNode(v: IR.LooseNodeLike): v is IR.LuminousNode {
 	return v.extensions?.EXT_luminous !== undefined
 }

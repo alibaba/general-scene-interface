@@ -153,6 +153,11 @@ export const defaultConfig = {
 	keepTopology: false,
 
 	/**
+	 * whether to do extra checks to make sure the scene is correct.
+	 */
+	dev: true,
+
+	/**
 	 * @note safe to share globally @simon
 	 */
 	matrixProcessor: defaultMatrixProcessor,
@@ -307,7 +312,7 @@ export class ThreeLiteConverter implements Converter {
 		// @note
 		// 		optimize with flatten tree
 		// 		it's quite expensive to traverse a tree multiple times
-		const flatScene = flatten(root)
+		const flatScene = flatten(root, this.config.dev)
 		// const flatScene = flattenBFS(root)
 
 		// update all the matrices
@@ -491,7 +496,7 @@ export class ThreeLiteConverter implements Converter {
 				const luminousEXT = gsiNode.extensions?.EXT_luminous as LuminousEXT
 				if (luminousEXT.type === 'point') {
 					threeObject = new PointLight()
-					threeObject.name = luminousEXT.name
+					threeObject.name = luminousEXT.name ?? threeObject.name
 					threeObject['decay'] = 2 // gltf2: "follow the inverse square law"
 				} else {
 					throw new Error('three-lite conv:: light type not implemented(' + luminousEXT.type + ')')
