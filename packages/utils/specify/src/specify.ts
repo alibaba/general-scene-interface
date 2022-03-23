@@ -337,15 +337,9 @@ class SchemaNotValid extends TypeError {
 
 function genDefaultTransform3() {
 	return {
-		version: -1,
+		version: 0,
 		matrix: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
 	} as IR.Transform3
-}
-function genDefaultTransform2() {
-	return {
-		version: -1,
-		matrix: [1, 0, 0, 0, 1, 0, 0, 0, 1],
-	} as IR.Transform2
 }
 
 function isPbrMaterial(v: IR.LooseMaterialBase): v is IR.LoosePbrMaterial {
