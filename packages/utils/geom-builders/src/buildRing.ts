@@ -15,26 +15,16 @@ export const DefaultParams = {
 	thetaLength: Math.PI * 2,
 	normal: false,
 	uv: false,
+	disposable: false,
 }
 
-export function buildRing(
-	params: Partial<{
-		innerRadius: number
-		outerRadius: number
-		thetaSegments: number
-		phiSegments: number
-		thetaStart: number
-		thetaLength: number
-		normal: boolean
-		uv: boolean
-	}> = {}
-): Geometry {
+export function buildRing(params: Partial<typeof DefaultParams> = {}): Geometry {
 	const finalParams = {
 		...DefaultParams,
 		...params,
 	}
 
-	const { innerRadius, outerRadius, thetaStart, thetaLength, normal, uv } = finalParams
+	const { innerRadius, outerRadius, thetaStart, thetaLength, normal, uv, disposable } = finalParams
 	const thetaSegments = Math.max(3, finalParams.thetaSegments)
 	const phiSegments = Math.max(1, finalParams.phiSegments)
 
@@ -127,7 +117,7 @@ export function buildRing(
 		normalized: false,
 		usage: 'STATIC_DRAW',
 		version: 0,
-		disposable: true,
+		disposable,
 	}
 
 	const indicesAttr: Attribute = {
@@ -137,7 +127,7 @@ export function buildRing(
 		normalized: false,
 		usage: 'STATIC_DRAW',
 		version: 0,
-		disposable: true,
+		disposable,
 	}
 
 	// box.getBoundingSphere(sphere)
@@ -171,7 +161,7 @@ export function buildRing(
 			normalized: false,
 			usage: 'STATIC_DRAW',
 			version: 0,
-			disposable: true,
+			disposable,
 		}
 	}
 
@@ -183,7 +173,7 @@ export function buildRing(
 			normalized: false,
 			usage: 'STATIC_DRAW',
 			version: 0,
-			disposable: true,
+			disposable,
 		}
 	}
 

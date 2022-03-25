@@ -17,6 +17,10 @@ export interface SpriteConfig {
 
 	/**
 	 * Whether to use attribute transforms (offset/scale/rotation)
+	 * @option true - the offset/scale/rotation data will be stored for each sprite,
+	 * therefore updating them can be done by Sprite.updateData()/.updateSubData()
+	 * @option false - the offset/scale/rotation data will be stored for entire sprites mesh,
+	 * therefore updating them can be done by setting props.uniformOffset/.uniformScale/.uniformRotation
 	 */
 	useAttributeTransform: boolean
 
@@ -56,12 +60,13 @@ export interface SpriteConfig {
 	depthWrite?: boolean
 
 	/**
-	 *
+	 * Whether to set attributes to be dynamic
+	 * @NOTE If the positions/offsets/scales/rotations will be changed, this must be true
 	 */
 	dynamic?: boolean
 
 	/**
-	 *
+	 * Whether to dispose all CPU array resource after first rendering
 	 */
 	disposable?: boolean
 }

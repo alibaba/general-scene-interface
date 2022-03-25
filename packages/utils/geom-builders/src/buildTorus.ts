@@ -14,25 +14,16 @@ export const DefaultParams = {
 	arc: Math.PI * 2,
 	normal: false,
 	uv: false,
+	disposable: false,
 }
 
-export function buildTorus(
-	params: Partial<{
-		radius: number
-		tube: number
-		radialSegments: number
-		tubularSegments: number
-		arc: number
-		normal: boolean
-		uv: boolean
-	}> = {}
-): Geometry {
+export function buildTorus(params: Partial<typeof DefaultParams> = {}): Geometry {
 	const finalParam = {
 		...DefaultParams,
 		...params,
 	}
 
-	const { radius, tube, arc, normal, uv } = finalParam
+	const { radius, tube, arc, normal, uv, disposable } = finalParam
 
 	const radialSegments = Math.floor(finalParam.radialSegments)
 	const tubularSegments = Math.floor(finalParam.tubularSegments)
@@ -121,7 +112,7 @@ export function buildTorus(
 		normalized: false,
 		usage: 'STATIC_DRAW',
 		version: 0,
-		disposable: true,
+		disposable,
 	}
 
 	const indicesAttr: Attribute = {
@@ -131,7 +122,7 @@ export function buildTorus(
 		normalized: false,
 		usage: 'STATIC_DRAW',
 		version: 0,
-		disposable: true,
+		disposable,
 	}
 
 	// box.getBoundingSphere(sphere)
@@ -165,7 +156,7 @@ export function buildTorus(
 			normalized: false,
 			usage: 'STATIC_DRAW',
 			version: 0,
-			disposable: true,
+			disposable,
 		}
 	}
 
@@ -177,7 +168,7 @@ export function buildTorus(
 			normalized: false,
 			usage: 'STATIC_DRAW',
 			version: 0,
-			disposable: true,
+			disposable,
 		}
 	}
 

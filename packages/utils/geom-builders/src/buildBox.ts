@@ -14,26 +14,16 @@ export const DefaultParams = {
 	depthSegments: 1,
 	normal: false,
 	uv: false,
+	disposable: false,
 }
 
-export function buildBox(
-	params: Partial<{
-		width: number
-		height: number
-		depth: number
-		widthSegments: number
-		heightSegments: number
-		depthSegments: number
-		normal: boolean
-		uv: boolean
-	}> = {}
-): Geometry {
+export function buildBox(params: Partial<typeof DefaultParams> = {}): Geometry {
 	const finalParam = {
 		...DefaultParams,
 		...params,
 	}
 
-	const { width, height, depth, normal, uv } = finalParam
+	const { width, height, depth, normal, uv, disposable } = finalParam
 	const widthSegments = Math.floor(finalParam.widthSegments)
 	const heightSegments = Math.floor(finalParam.heightSegments)
 	const depthSegments = Math.floor(finalParam.depthSegments)
@@ -152,7 +142,7 @@ export function buildBox(
 		normalized: false,
 		usage: 'STATIC_DRAW',
 		version: 0,
-		disposable: true,
+		disposable,
 	}
 
 	const indicesAttr: Attribute = {
@@ -162,7 +152,7 @@ export function buildBox(
 		normalized: false,
 		usage: 'STATIC_DRAW',
 		version: 0,
-		disposable: true,
+		disposable,
 	}
 
 	const geom: Geometry = {

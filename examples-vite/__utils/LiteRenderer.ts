@@ -17,12 +17,16 @@ export const FAR = 100000
 export const CONTAINER = document.querySelector('#container') as HTMLDivElement
 export const CANVAS = document.createElement('canvas') as HTMLCanvasElement
 
+CONTAINER.style.position = 'absolute'
+CONTAINER.style.width = WIDTH + 'px'
+CONTAINER.style.height = HEIGHT + 'px'
+
 CANVAS.style.position = 'absolute'
 CANVAS.style.left = '0px'
 CANVAS.style.top = '0px'
 CANVAS.style.width = WIDTH + 'px'
 CANVAS.style.height = HEIGHT + 'px'
-CANVAS.style.zIndex = '999999999'
+// CANVAS.style.zIndex = '999999999'
 CANVAS.width = WIDTH
 CANVAS.height = HEIGHT
 

@@ -8,6 +8,7 @@ import { Attribute, Geometry } from '@gs.i/schema-scene'
 export const DefaultParams = {
 	normal: false,
 	uv: false,
+	disposable: false,
 }
 
 export function buildEmpty(config: Partial<typeof DefaultParams> = {}): Geometry {
@@ -54,7 +55,7 @@ export function buildEmpty(config: Partial<typeof DefaultParams> = {}): Geometry
 			normalized: false,
 			usage: 'STATIC_DRAW',
 			version: 0,
-			disposable: true,
+			disposable: _config.disposable,
 		}
 	}
 
@@ -66,7 +67,7 @@ export function buildEmpty(config: Partial<typeof DefaultParams> = {}): Geometry
 			normalized: false,
 			usage: 'STATIC_DRAW',
 			version: 0,
-			disposable: true,
+			disposable: _config.disposable,
 		}
 	}
 
