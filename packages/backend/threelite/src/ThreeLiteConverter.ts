@@ -558,6 +558,7 @@ export class ThreeLiteConverter implements Converter {
 				threeLight.distance = luminousEXT.range
 			}
 
+			// @TODO: This does not work with flatten output, should resolve visibility properly
 			threeObject.visible = gsiNode.visible && (gsiNode.parent?.visible ?? true) // inherit visibility
 
 			// @note three doesn't use localMatrix at all. it's only for generating worldMatrix.
@@ -580,15 +581,17 @@ export class ThreeLiteConverter implements Converter {
 		}
 
 		// culling
-		// TODO set .visible false will cull all its children
 		if (
 			this.config.overrideFrustumCulling &&
 			isRenderable(gsiNode) &&
+			// @TODO: should resolve visibility properly
 			gsiNode.visible &&
 			gsiNode.extensions?.EXT_mesh_advanced?.frustumCulling !== false
 		) {
 			if (this.config.cullingProcessor.isFrustumCulled(gsiNode)) {
 				this.info.culledCount++
+				// @TODO: set .visible false will cull all its children
+				// 			this can be problematic when a renderable object has renderable children
 				threeObject.visible = false
 			}
 		}
