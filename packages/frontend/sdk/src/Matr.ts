@@ -9,6 +9,9 @@ import { specifyMaterial } from '@gs.i/utils-specify'
 
 interface MatrBase extends IR.MaterialBase, IR.Programable {}
 class MatrBase implements IR.MaterialBase {
+	// set .version first because following setters use it.
+	version = 0
+
 	/**
 	 * to simplify usage, init extensions now rather than when used.
 	 *
