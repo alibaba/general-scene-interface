@@ -96,7 +96,7 @@ export class PrgStandardMaterial extends MeshStandardMaterial {
 				/\$\$GSI_INSERT<PreFrag>/g,
 				(programable.global || '') + '\n' + (programable.fragGlobal || '')
 			)
-			.replace(/\$\$GSI_INSERT<FragColor>/g, programable.fragOutput || '')
+			.replace(/\$\$GSI_INSERT<FragOutput>/g, programable.fragOutput || '')
 			.replace(/\$\$GSI_INSERT<PreLighting>/g, programablePbr.fragPreLighting || '')
 			.replace(/\$\$GSI_INSERT<FragGeometry>/g, programablePbr.fragGeometry || '')
 

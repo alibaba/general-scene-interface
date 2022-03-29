@@ -52,6 +52,9 @@ $$GSI_INSERT<PreLighting>
 void GSI_FUNC_fragGeometry(inout vec3 modelViewPosition, inout vec3 normal) {
 $$GSI_INSERT<FragGeometry>
 }
+void GSI_FUNC_FragOutput(inout vec4 fragColor) {
+    $$GSI_INSERT<FragOutput>
+}
 void main() {
 	// #include <clipping_planes_fragment>
 	vec4 diffuseColor = vec4( diffuse, opacity );
@@ -239,6 +242,8 @@ void main() {
 	vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveRadiance;
 
 	gl_FragColor = vec4( outgoingLight, diffuseColor.a );
+
+	GSI_FUNC_FragOutput(gl_FragColor);
 
 	#include <tonemapping_fragment>
 	#include <encodings_fragment>
