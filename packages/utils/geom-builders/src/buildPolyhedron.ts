@@ -13,22 +13,16 @@ export const DefaultParams = {
 	detail: 0,
 	normal: false,
 	uv: false,
+	disposable: false,
 }
 
-export function buildPolyhedron(params: {
-	vertices: number[]
-	indices: number[]
-	radius: number
-	detail: number
-	normal: boolean
-	uv: boolean
-}): Geometry {
-	params = {
+export function buildPolyhedron(params: Partial<typeof DefaultParams> = {}): Geometry {
+	const finalParams = {
 		...DefaultParams,
 		...params,
 	}
 
-	const { vertices, indices, radius, detail, normal, uv } = params
+	const { vertices, indices, radius, detail, normal, uv, disposable } = finalParams
 
 	// helper functions
 
@@ -265,7 +259,7 @@ export function buildPolyhedron(params: {
 		normalized: false,
 		usage: 'STATIC_DRAW',
 		version: 0,
-		disposable: true,
+		disposable,
 	}
 
 	box.getBoundingSphere(sphere)
@@ -309,7 +303,7 @@ export function buildPolyhedron(params: {
 			normalized: false,
 			usage: 'STATIC_DRAW',
 			version: 0,
-			disposable: true,
+			disposable,
 		}
 	}
 

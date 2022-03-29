@@ -13,24 +13,16 @@ export const DefaultParams = {
 	thetaLength: Math.PI * 2,
 	normal: false,
 	uv: false,
+	disposable: false,
 }
 
-export function buildCircle(
-	params: Partial<{
-		radius: number
-		segments: number
-		thetaStart: number
-		thetaLength: number
-		normal: boolean
-		uv: boolean
-	}> = {}
-): Geometry {
+export function buildCircle(params: Partial<typeof DefaultParams> = {}): Geometry {
 	const finalParams = {
 		...DefaultParams,
 		...params,
 	}
 
-	const { radius, thetaStart, thetaLength, normal, uv } = finalParams
+	const { radius, thetaStart, thetaLength, normal, uv, disposable } = finalParams
 	const segments = Math.max(3, finalParams.segments)
 
 	// buffers
@@ -99,7 +91,7 @@ export function buildCircle(
 		normalized: false,
 		usage: 'STATIC_DRAW',
 		version: 0,
-		disposable: true,
+		disposable,
 	}
 
 	const indicesAttr: Attribute = {
@@ -109,7 +101,7 @@ export function buildCircle(
 		normalized: false,
 		usage: 'STATIC_DRAW',
 		version: 0,
-		disposable: true,
+		disposable,
 	}
 
 	// box.getBoundingSphere(sphere)
@@ -143,7 +135,7 @@ export function buildCircle(
 			normalized: false,
 			usage: 'STATIC_DRAW',
 			version: 0,
-			disposable: true,
+			disposable,
 		}
 	}
 
@@ -155,7 +147,7 @@ export function buildCircle(
 			normalized: false,
 			usage: 'STATIC_DRAW',
 			version: 0,
-			disposable: true,
+			disposable,
 		}
 	}
 

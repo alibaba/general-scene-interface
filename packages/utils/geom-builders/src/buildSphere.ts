@@ -16,27 +16,17 @@ export const DefaultParams = {
 	thetaLength: Math.PI,
 	normal: false,
 	uv: false,
+	disposable: false,
 }
 
-export function buildSphere(
-	params: Partial<{
-		radius: number
-		widthSegments: number
-		heightSegments: number
-		phiStart: number
-		phiLength: number
-		thetaStart: number
-		thetaLength: number
-		normal: boolean
-		uv: boolean
-	}> = {}
-): Geometry {
+export function buildSphere(params: Partial<typeof DefaultParams> = {}): Geometry {
 	const finalParams = {
 		...DefaultParams,
 		...params,
 	}
 
-	const { radius, phiStart, phiLength, thetaStart, thetaLength, normal, uv } = finalParams
+	const { radius, phiStart, phiLength, thetaStart, thetaLength, normal, uv, disposable } =
+		finalParams
 	const widthSegments = Math.max(3, Math.floor(finalParams.widthSegments))
 	const heightSegments = Math.max(2, Math.floor(finalParams.heightSegments))
 
@@ -137,7 +127,7 @@ export function buildSphere(
 		normalized: false,
 		usage: 'STATIC_DRAW',
 		version: 0,
-		disposable: true,
+		disposable,
 	}
 
 	const indicesAttr: Attribute = {
@@ -147,7 +137,7 @@ export function buildSphere(
 		normalized: false,
 		usage: 'STATIC_DRAW',
 		version: 0,
-		disposable: true,
+		disposable,
 	}
 
 	// box.getBoundingSphere(sphere)
@@ -181,7 +171,7 @@ export function buildSphere(
 			normalized: false,
 			usage: 'STATIC_DRAW',
 			version: 0,
-			disposable: true,
+			disposable,
 		}
 	}
 
@@ -193,7 +183,7 @@ export function buildSphere(
 			normalized: false,
 			usage: 'STATIC_DRAW',
 			version: 0,
-			disposable: true,
+			disposable,
 		}
 	}
 

@@ -17,29 +17,26 @@ export const DefaultParams = {
 	thetaLength: Math.PI * 2,
 	normal: false,
 	uv: false,
+	disposable: false,
 }
 
-export function buildCylinder(
-	params: Partial<{
-		radiusTop: number
-		radiusBottom: number
-		height: number
-		radialSegments: number
-		heightSegments: number
-		openEnded: boolean
-		thetaStart: number
-		thetaLength: number
-		normal: boolean
-		uv: boolean
-	}> = {}
-): Geometry {
+export function buildCylinder(params: Partial<typeof DefaultParams> = {}): Geometry {
 	const finalParams = {
 		...DefaultParams,
 		...params,
 	}
 
-	const { radiusTop, radiusBottom, height, openEnded, thetaStart, thetaLength, normal, uv } =
-		finalParams
+	const {
+		radiusTop,
+		radiusBottom,
+		height,
+		openEnded,
+		thetaStart,
+		thetaLength,
+		normal,
+		uv,
+		disposable,
+	} = finalParams
 	const radialSegments = Math.floor(finalParams.radialSegments)
 	const heightSegments = Math.floor(finalParams.heightSegments)
 
@@ -240,7 +237,7 @@ export function buildCylinder(
 		normalized: false,
 		usage: 'STATIC_DRAW',
 		version: 0,
-		disposable: true,
+		disposable,
 	}
 
 	const indicesAttr: Attribute = {
@@ -250,7 +247,7 @@ export function buildCylinder(
 		normalized: false,
 		usage: 'STATIC_DRAW',
 		version: 0,
-		disposable: true,
+		disposable,
 	}
 
 	// box.getBoundingSphere(sphere)
@@ -284,7 +281,7 @@ export function buildCylinder(
 			normalized: false,
 			usage: 'STATIC_DRAW',
 			version: 0,
-			disposable: true,
+			disposable,
 		}
 	}
 
@@ -296,7 +293,7 @@ export function buildCylinder(
 			normalized: false,
 			usage: 'STATIC_DRAW',
 			version: 0,
-			disposable: true,
+			disposable,
 		}
 	}
 
