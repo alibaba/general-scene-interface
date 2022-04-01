@@ -24,52 +24,52 @@ const ShaderLib = {
 
 	},
 
-	// lambert: {
+	lambert: {
 
-	// 	uniforms: mergeUniforms( [
-	// 		UniformsLib.common,
-	// 		UniformsLib.specularmap,
-	// 		UniformsLib.envmap,
-	// 		UniformsLib.aomap,
-	// 		UniformsLib.lightmap,
-	// 		UniformsLib.emissivemap,
-	// 		UniformsLib.fog,
-	// 		UniformsLib.lights,
-	// 		{
-	// 			emissive: { value: new Color( 0x000000 ) }
-	// 		}
-	// 	] ),
+		uniforms: mergeUniforms( [
+			UniformsLib.common,
+			UniformsLib.specularmap,
+			UniformsLib.envmap,
+			UniformsLib.aomap,
+			UniformsLib.lightmap,
+			UniformsLib.emissivemap,
+			UniformsLib.fog,
+			UniformsLib.lights,
+			{
+				emissive: { value: new Color( 0x000000 ) }
+			}
+		] ),
 
-	// 	vertexShader: ShaderChunk.meshlambert_vert,
-	// 	fragmentShader: ShaderChunk.meshlambert_frag
+		vertexShader: ShaderChunk.meshlambert_vert,
+		fragmentShader: ShaderChunk.meshlambert_frag
 
-	// },
+	},
 
-	// phong: {
+	phong: {
 
-	// 	uniforms: mergeUniforms( [
-	// 		UniformsLib.common,
-	// 		UniformsLib.specularmap,
-	// 		UniformsLib.envmap,
-	// 		UniformsLib.aomap,
-	// 		UniformsLib.lightmap,
-	// 		UniformsLib.emissivemap,
-	// 		UniformsLib.bumpmap,
-	// 		UniformsLib.normalmap,
-	// 		UniformsLib.displacementmap,
-	// 		UniformsLib.fog,
-	// 		UniformsLib.lights,
-	// 		{
-	// 			emissive: { value: new Color( 0x000000 ) },
-	// 			specular: { value: new Color( 0x111111 ) },
-	// 			shininess: { value: 30 }
-	// 		}
-	// 	] ),
+		uniforms: mergeUniforms( [
+			UniformsLib.common,
+			UniformsLib.specularmap,
+			UniformsLib.envmap,
+			UniformsLib.aomap,
+			UniformsLib.lightmap,
+			UniformsLib.emissivemap,
+			UniformsLib.bumpmap,
+			UniformsLib.normalmap,
+			UniformsLib.displacementmap,
+			UniformsLib.fog,
+			UniformsLib.lights,
+			{
+				emissive: { value: new Color( 0x000000 ) },
+				specular: { value: new Color( 0x111111 ) },
+				shininess: { value: 30 }
+			}
+		] ),
 
-	// 	vertexShader: ShaderChunk.meshphong_vert,
-	// 	fragmentShader: ShaderChunk.meshphong_frag
+		vertexShader: ShaderChunk.meshphong_vert,
+		fragmentShader: ShaderChunk.meshphong_frag
 
-	// },
+	},
 
 	standard: {
 
@@ -99,46 +99,46 @@ const ShaderLib = {
 
 	},
 
-	// toon: {
+	toon: {
 
-	// 	uniforms: mergeUniforms( [
-	// 		UniformsLib.common,
-	// 		UniformsLib.aomap,
-	// 		UniformsLib.lightmap,
-	// 		UniformsLib.emissivemap,
-	// 		UniformsLib.bumpmap,
-	// 		UniformsLib.normalmap,
-	// 		UniformsLib.displacementmap,
-	// 		UniformsLib.gradientmap,
-	// 		UniformsLib.fog,
-	// 		UniformsLib.lights,
-	// 		{
-	// 			emissive: { value: new Color( 0x000000 ) }
-	// 		}
-	// 	] ),
+		uniforms: mergeUniforms( [
+			UniformsLib.common,
+			UniformsLib.aomap,
+			UniformsLib.lightmap,
+			UniformsLib.emissivemap,
+			UniformsLib.bumpmap,
+			UniformsLib.normalmap,
+			UniformsLib.displacementmap,
+			UniformsLib.gradientmap,
+			UniformsLib.fog,
+			UniformsLib.lights,
+			{
+				emissive: { value: new Color( 0x000000 ) }
+			}
+		] ),
 
-	// 	vertexShader: ShaderChunk.meshtoon_vert,
-	// 	fragmentShader: ShaderChunk.meshtoon_frag
+		vertexShader: ShaderChunk.meshtoon_vert,
+		fragmentShader: ShaderChunk.meshtoon_frag
 
-	// },
+	},
 
-	// matcap: {
+	matcap: {
 
-	// 	uniforms: mergeUniforms( [
-	// 		UniformsLib.common,
-	// 		UniformsLib.bumpmap,
-	// 		UniformsLib.normalmap,
-	// 		UniformsLib.displacementmap,
-	// 		UniformsLib.fog,
-	// 		{
-	// 			matcap: { value: null }
-	// 		}
-	// 	] ),
+		uniforms: mergeUniforms( [
+			UniformsLib.common,
+			UniformsLib.bumpmap,
+			UniformsLib.normalmap,
+			UniformsLib.displacementmap,
+			UniformsLib.fog,
+			{
+				matcap: { value: null }
+			}
+		] ),
 
-	// 	vertexShader: ShaderChunk.meshmatcap_vert,
-	// 	fragmentShader: ShaderChunk.meshmatcap_frag
+		vertexShader: ShaderChunk.meshmatcap_vert,
+		fragmentShader: ShaderChunk.meshmatcap_frag
 
-	// },
+	},
 
 	points: {
 
@@ -152,22 +152,22 @@ const ShaderLib = {
 
 	},
 
-	// dashed: {
+	dashed: {
 
-	// 	uniforms: mergeUniforms( [
-	// 		UniformsLib.common,
-	// 		UniformsLib.fog,
-	// 		{
-	// 			scale: { value: 1 },
-	// 			dashSize: { value: 1 },
-	// 			totalSize: { value: 2 }
-	// 		}
-	// 	] ),
+		uniforms: mergeUniforms( [
+			UniformsLib.common,
+			UniformsLib.fog,
+			{
+				scale: { value: 1 },
+				dashSize: { value: 1 },
+				totalSize: { value: 2 }
+			}
+		] ),
 
-	// 	vertexShader: ShaderChunk.linedashed_vert,
-	// 	fragmentShader: ShaderChunk.linedashed_frag
+		vertexShader: ShaderChunk.linedashed_vert,
+		fragmentShader: ShaderChunk.linedashed_frag
 
-	// },
+	},
 
 	depth: {
 
@@ -193,22 +193,22 @@ const ShaderLib = {
 			}
 		] ),
 
-		vertexShader: ShaderChunk.normal_vert,
-		fragmentShader: ShaderChunk.normal_frag
+		vertexShader: ShaderChunk.meshnormal_vert,
+		fragmentShader: ShaderChunk.meshnormal_frag
 
 	},
 
-	// sprite: {
+	sprite: {
 
-	// 	uniforms: mergeUniforms( [
-	// 		UniformsLib.sprite,
-	// 		UniformsLib.fog
-	// 	] ),
+		uniforms: mergeUniforms( [
+			UniformsLib.sprite,
+			UniformsLib.fog
+		] ),
 
-	// 	vertexShader: ShaderChunk.sprite_vert,
-	// 	fragmentShader: ShaderChunk.sprite_frag
+		vertexShader: ShaderChunk.sprite_vert,
+		fragmentShader: ShaderChunk.sprite_frag
 
-	// },
+	},
 
 	background: {
 
@@ -239,16 +239,16 @@ const ShaderLib = {
 
 	},
 
-	// equirect: {
+	equirect: {
 
-	// 	uniforms: {
-	// 		tEquirect: { value: null },
-	// 	},
+		uniforms: {
+			tEquirect: { value: null },
+		},
 
-	// 	vertexShader: ShaderChunk.equirect_vert,
-	// 	fragmentShader: ShaderChunk.equirect_frag
+		vertexShader: ShaderChunk.equirect_vert,
+		fragmentShader: ShaderChunk.equirect_frag
 
-	// },
+	},
 
 	distanceRGBA: {
 
@@ -296,7 +296,11 @@ ShaderLib.physical = {
 			clearcoatRoughnessMap: { value: null },
 			clearcoatNormalScale: { value: new Vector2( 1, 1 ) },
 			clearcoatNormalMap: { value: null },
-			sheen: { value: new Color( 0x000000 ) },
+			sheen: { value: 0 },
+			sheenColor: { value: new Color( 0x000000 ) },
+			sheenColorMap: { value: null },
+			sheenRoughness: { value: 1 },
+			sheenRoughnessMap: { value: null },
 			transmission: { value: 0 },
 			transmissionMap: { value: null },
 			transmissionSamplerSize: { value: new Vector2() },
@@ -304,7 +308,11 @@ ShaderLib.physical = {
 			thickness: { value: 0 },
 			thicknessMap: { value: null },
 			attenuationDistance: { value: 0 },
-			attenuationColor: { value: new Color( 0x000000 ) }
+			attenuationColor: { value: new Color( 0x000000 ) },
+			specularIntensity: { value: 1 },
+			specularIntensityMap: { value: null },
+			specularColor: { value: new Color( 1, 1, 1 ) },
+			specularColorMap: { value: null },
 		}
 	] ),
 

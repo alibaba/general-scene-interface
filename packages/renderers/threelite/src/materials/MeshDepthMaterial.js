@@ -1,24 +1,6 @@
 import { Material } from './Material.js';
 import { BasicDepthPacking } from '../constants.js';
 
-/**
- * parameters = {
- *
- *  opacity: <float>,
- *
- *  map: new THREE.Texture( <Image> ),
- *
- *  alphaMap: new THREE.Texture( <Image> ),
- *
- *  displacementMap: new THREE.Texture( <Image> ),
- *  displacementScale: <float>,
- *  displacementBias: <float>,
- *
- *  wireframe: <boolean>,
- *  wireframeLinewidth: <float>
- * }
- */
-
 class MeshDepthMaterial extends Material {
 
 	constructor( parameters ) {
@@ -28,8 +10,6 @@ class MeshDepthMaterial extends Material {
 		this.type = 'MeshDepthMaterial';
 
 		this.depthPacking = BasicDepthPacking;
-
-		this.morphTargets = false;
 
 		this.map = null;
 
@@ -53,8 +33,6 @@ class MeshDepthMaterial extends Material {
 		super.copy( source );
 
 		this.depthPacking = source.depthPacking;
-
-		this.morphTargets = source.morphTargets;
 
 		this.map = source.map;
 

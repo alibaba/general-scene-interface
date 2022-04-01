@@ -22,13 +22,15 @@
 
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
+import * as Curves from '../extras/curves/Curves.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Vector3 } from '../math/Vector3.js';
+import { Shape } from '../extras/core/Shape.js';
 import { ShapeUtils } from '../extras/ShapeUtils.js';
 
 class ExtrudeGeometry extends BufferGeometry {
 
-	constructor( shapes, options ) {
+	constructor( shapes = new Shape( [ new Vector2( 0.5, 0.5 ), new Vector2( - 0.5, 0.5 ), new Vector2( - 0.5, - 0.5 ), new Vector2( 0.5, - 0.5 ) ] ), options = {} ) {
 
 		super();
 
@@ -70,11 +72,11 @@ class ExtrudeGeometry extends BufferGeometry {
 
 			const curveSegments = options.curveSegments !== undefined ? options.curveSegments : 12;
 			const steps = options.steps !== undefined ? options.steps : 1;
-			let depth = options.depth !== undefined ? options.depth : 100;
+			let depth = options.depth !== undefined ? options.depth : 1;
 
 			let bevelEnabled = options.bevelEnabled !== undefined ? options.bevelEnabled : true;
-			let bevelThickness = options.bevelThickness !== undefined ? options.bevelThickness : 6;
-			let bevelSize = options.bevelSize !== undefined ? options.bevelSize : bevelThickness - 2;
+			let bevelThickness = options.bevelThickness !== undefined ? options.bevelThickness : 0.2;
+			let bevelSize = options.bevelSize !== undefined ? options.bevelSize : bevelThickness - 0.1;
 			let bevelOffset = options.bevelOffset !== undefined ? options.bevelOffset : 0;
 			let bevelSegments = options.bevelSegments !== undefined ? options.bevelSegments : 3;
 
@@ -692,6 +694,30 @@ class ExtrudeGeometry extends BufferGeometry {
 		const options = this.parameters.options;
 
 		return toJSON( shapes, options, data );
+
+	}
+
+	static fromJSON( data, shapes ) {
+
+		const geometryShapes = [];
+
+		for ( let j = 0, jl = data.shapes.length; j < jl; j ++ ) {
+
+			const shape = shapes[ data.shapes[ j ] ];
+
+			geometryShapes.push( shape );
+
+		}
+
+		const extrudePath = data.options.extrudePath;
+
+		if ( extrudePath !== undefined ) {
+
+			data.options.extrudePath = new Curves[ extrudePath.type ]().fromJSON( extrudePath );
+
+		}
+
+		return new ExtrudeGeometry( geometryShapes, data.options );
 
 	}
 
