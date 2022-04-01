@@ -12,13 +12,7 @@
       "import": "./build/three.module.js",
       "require": "./build/three.cjs"
     },
-    "./examples/fonts/*": "./examples/fonts/*",
-    "./examples/jsm/*": "./examples/jsm/*",
     "./src/*": "./src/*"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/mrdoob/three.js"
   },
   "sideEffects": false,
   "files": [
@@ -31,11 +25,7 @@
     "README.md",
     "src"
   ],
-  "directories": {
-    "doc": "docs",
-    "example": "examples",
-    "test": "test"
-  },
+  "directories": {},
   "eslintConfig": {
     "root": true,
     "extends": [
