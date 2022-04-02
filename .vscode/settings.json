@@ -43,6 +43,7 @@
 	"typescript.suggest.paths": false,
 	"editor.smoothScrolling": true,
 	"files.associations": {
+		"*.baseline": "json",
 		"**/README": "markdown",
 		"**/*.json.bac": "json",
 		"**/*.json.bac.*": "json"

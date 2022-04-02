@@ -9,3 +9,12 @@ demo
 assets
 
 packages/utils/math
+
+*.d.ts
+*.js
+
+scripts
+
+examples
+examples-vite
+test
