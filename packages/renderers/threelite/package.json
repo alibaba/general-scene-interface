@@ -5,8 +5,9 @@
   "description": "A lite version of three.js",
   "author": "",
   "type": "module",
-  "main": "./build/three.js",
-  "module": "./build/three.module.js",
+  "main": "build/three.js",
+  "module": "build/three.module.js",
+  "types": "types/Three.d.ts",
   "exports": {
     ".": {
       "import": "./build/three.module.js",
@@ -26,63 +27,6 @@
     "src"
   ],
   "directories": {},
-  "eslintConfig": {
-    "root": true,
-    "extends": [
-      "mdcs",
-      "plugin:compat/recommended"
-    ],
-    "parser": "@babel/eslint-parser",
-    "parserOptions": {
-      "babelOptions": {
-        "configFile": "./utils/build/.babelrc.json"
-      }
-    },
-    "plugins": [
-      "html",
-      "import"
-    ],
-    "settings": {
-      "polyfills": [
-        "WebGL2RenderingContext"
-      ]
-    },
-    "globals": {
-      "__THREE_DEVTOOLS__": "readonly",
-      "WebGL2ComputeRenderingContext": "readonly",
-      "potpack": "readonly",
-      "fflate": "readonly",
-      "bodymovin": "readonly",
-      "OIMO": "readonly",
-      "Stats": "readonly",
-      "XRWebGLBinding": "readonly",
-      "XRWebGLLayer": "readonly",
-      "GPUShaderStage": "readonly",
-      "GPUBufferUsage": "readonly",
-      "GPUTextureUsage": "readonly",
-      "QUnit": "readonly"
-    },
-    "rules": {
-      "no-throw-literal": [
-        "error"
-      ],
-      "import/extensions": [
-        "error",
-        "always"
-      ],
-      "quotes": [
-        "error",
-        "single"
-      ],
-      "prefer-const": [
-        "error",
-        {
-          "destructuring": "any",
-          "ignoreReadBeforeAssign": false
-        }
-      ]
-    }
-  },
   "browserslist": [
     "> 1%, not dead, not ie 11, not op_mini all"
   ],

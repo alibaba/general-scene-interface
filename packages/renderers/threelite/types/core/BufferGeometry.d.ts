@@ -22,8 +22,6 @@ export class BufferGeometry extends EventDispatcher {
      */
     constructor();
 
-    static MaxIndex: number;
-
     /**
      * Unique number of this buffergeometry instance
      */
@@ -67,7 +65,7 @@ export class BufferGeometry extends EventDispatcher {
     /**
      * @default []
      */
-    groups: Array<{ start: number; count: number; materialIndex?: number }>;
+    groups: Array<{ start: number; count: number; materialIndex?: number | undefined }>;
 
     /**
      * @default null

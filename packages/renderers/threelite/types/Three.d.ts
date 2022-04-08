@@ -3,6 +3,7 @@
  */
 export * from './constants';
 // export * from './Three.Legacy';
+export * from './utils';
 /**
  * Animation
  */
@@ -57,12 +58,10 @@ export * from './core/Clock';
 /**
  * Extras
  */
-// export * from './extras/objects/ImmediateRenderObject';
 // export * from './extras/curves/Curves';
 // export * from './extras/core/Shape';
 // export * from './extras/core/Path';
 // export * from './extras/core/ShapePath';
-// export * from './extras/core/Font';
 // export * from './extras/core/CurvePath';
 // export * from './extras/core/Curve';
 // export * from './extras/DataUtils';
@@ -92,20 +91,20 @@ export * from './core/Clock';
 /**
  * Lights
  */
-// export * from './lights/SpotLightShadow';
-// export * from './lights/SpotLight';
+export * from './lights/SpotLightShadow';
+export * from './lights/SpotLight';
 export * from './lights/PointLight';
 export * from './lights/PointLightShadow';
-// export * from './lights/RectAreaLight';
-// export * from './lights/HemisphereLight';
+export * from './lights/RectAreaLight';
+export * from './lights/HemisphereLight';
 export * from './lights/DirectionalLightShadow';
 export * from './lights/DirectionalLight';
 export * from './lights/AmbientLight';
 export * from './lights/LightShadow';
 export * from './lights/Light';
-// export * from './lights/AmbientLightProbe';
-// export * from './lights/HemisphereLightProbe';
-// export * from './lights/LightProbe';
+export * from './lights/AmbientLightProbe';
+export * from './lights/HemisphereLightProbe';
+export * from './lights/LightProbe';
 /**
  * Loaders
  */
@@ -120,7 +119,6 @@ export * from './loaders/TextureLoader';
 export * from './loaders/LoadingManager';
 export * from './loaders/ImageLoader';
 export * from './loaders/ImageBitmapLoader';
-// export * from './loaders/FontLoader';
 export * from './loaders/FileLoader';
 export * from './loaders/Loader';
 export * from './loaders/LoaderUtils';
@@ -162,27 +160,29 @@ export { MathUtils };
 /**
  * Objects
  */
-// export * from './objects/Sprite';
-// export * from './objects/LOD';
+export * from './objects/Sprite';
+export * from './objects/LOD';
 export * from './objects/InstancedMesh';
-// export * from './objects/SkinnedMesh';
-// export * from './objects/Skeleton';
-// export * from './objects/Bone';
+export * from './objects/SkinnedMesh';
+export * from './objects/Skeleton';
+export * from './objects/Bone';
 export * from './objects/Mesh';
 export * from './objects/LineSegments';
-// export * from './objects/LineLoop';
-// export * from './objects/Line';
+export * from './objects/LineLoop';
+export * from './objects/Line';
 export * from './objects/Points';
-// export * from './objects/Group';
+export * from './objects/Group';
 /**
  * Renderers
  */
-// export * from './renderers/WebGLMultisampleRenderTarget';
-// export * from './renderers/WebGLCubeRenderTarget';
-// export * from './renderers/WebGLMultipleRenderTargets';
+export * from './renderers/WebGLMultisampleRenderTarget';
+export * from './renderers/WebGLCubeRenderTarget';
+export * from './renderers/WebGLMultipleRenderTargets';
 export * from './renderers/WebGLRenderTarget';
 export * from './renderers/WebGLRenderer';
-// export * from './renderers/WebGL1Renderer';
+export * from './renderers/WebGL1Renderer';
+export * from './renderers/WebGL3DRenderTarget';
+export * from './renderers/WebGLArrayRenderTarget';
 export * from './renderers/shaders/ShaderLib';
 export * from './renderers/shaders/UniformsLib';
 export * from './renderers/shaders/UniformsUtils';
@@ -190,6 +190,7 @@ export * from './renderers/shaders/ShaderChunk';
 export * from './renderers/webgl/WebGLBufferRenderer';
 export * from './renderers/webgl/WebGLCapabilities';
 export * from './renderers/webgl/WebGLClipping';
+export * from './renderers/webgl/WebGLCubeUVMaps';
 export * from './renderers/webgl/WebGLExtensions';
 export * from './renderers/webgl/WebGLGeometries';
 export * from './renderers/webgl/WebGLIndexedBufferRenderer';
@@ -205,9 +206,10 @@ export * from './renderers/webgl/WebGLShadowMap';
 export * from './renderers/webgl/WebGLState';
 export * from './renderers/webgl/WebGLTextures';
 export * from './renderers/webgl/WebGLUniforms';
-// export * from './renderers/webxr/WebXR';
-// export * from './renderers/webxr/WebXRController';
-// export * from './renderers/webxr/WebXRManager';
+export * from './renderers/webxr/WebXR';
+export * from './renderers/webxr/WebXRController';
+export * from './renderers/webxr/WebXRManager';
+export { WebGLUtils } from './renderers/webgl/WebGLUtils.js';
 /**
  * Scenes
  */
@@ -223,6 +225,10 @@ export * from './textures/DataTexture2DArray';
 export * from './textures/DataTexture3D';
 export * from './textures/CompressedTexture';
 export * from './textures/CubeTexture';
+export * from './textures/Data3DTexture';
+export * from './textures/DataArrayTexture';
 export * from './textures/CanvasTexture';
 export * from './textures/DepthTexture';
+export * from './textures/FramebufferTexture';
+export * from './textures/Source';
 export * from './textures/Texture';

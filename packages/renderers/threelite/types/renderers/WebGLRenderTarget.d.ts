@@ -5,24 +5,23 @@ import { EventDispatcher } from './../core/EventDispatcher';
 import { Wrapping, TextureFilter, TextureDataType, TextureEncoding } from '../constants';
 
 export interface WebGLRenderTargetOptions {
-    wrapS?: Wrapping;
-    wrapT?: Wrapping;
-    magFilter?: TextureFilter;
-    minFilter?: TextureFilter;
-    format?: number; // RGBAFormat;
-    type?: TextureDataType; // UnsignedByteType;
-    anisotropy?: number; // 1;
-    depthBuffer?: boolean; // true;
-    stencilBuffer?: boolean; // false;
-    generateMipmaps?: boolean; // true;
-    depthTexture?: DepthTexture;
-    encoding?: TextureEncoding;
+    wrapS?: Wrapping | undefined;
+    wrapT?: Wrapping | undefined;
+    magFilter?: TextureFilter | undefined;
+    minFilter?: TextureFilter | undefined;
+    format?: number | undefined; // RGBAFormat;
+    type?: TextureDataType | undefined; // UnsignedByteType;
+    anisotropy?: number | undefined; // 1;
+    depthBuffer?: boolean | undefined; // true;
+    stencilBuffer?: boolean | undefined; // false;
+    generateMipmaps?: boolean | undefined; // true;
+    depthTexture?: DepthTexture | undefined;
+    encoding?: TextureEncoding | undefined;
 }
 
 export class WebGLRenderTarget extends EventDispatcher {
     constructor(width: number, height: number, options?: WebGLRenderTargetOptions);
 
-    uuid: string;
     width: number;
     height: number;
     depth: number;
@@ -49,6 +48,13 @@ export class WebGLRenderTarget extends EventDispatcher {
      * @default null
      */
     depthTexture: DepthTexture;
+
+    /**
+     * Defines the count of MSAA samples. Can only be used with WebGL 2. Default is **0**.
+     * @default 0
+     */
+    samples: number;
+
     readonly isWebGLRenderTarget: true;
 
     /**
@@ -92,7 +98,6 @@ export class WebGLRenderTarget extends EventDispatcher {
      */
     generateMipmaps: any;
 
-    setTexture(texture: Texture): void;
     setSize(width: number, height: number, depth?: number): void;
     clone(): this;
     copy(source: WebGLRenderTarget): this;
