@@ -3,7 +3,7 @@
   "_name": "three-lite",
   "version": "0.0.139",
   "description": "A lite version of three.js",
-  "author": "https://github.com/LeonYuanYao",
+  "author": "",
   "type": "module",
   "main": "./build/three.js",
   "module": "./build/three.module.js",

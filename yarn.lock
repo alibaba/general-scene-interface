@@ -8136,7 +8136,7 @@
 
 "three-lite@file:/Users/qianxun/Documents/projects/general-scene-interface/packages/renderers/threelite":
   "resolved" "file:packages/renderers/threelite"
-  "version" "0.0.2"
+  "version" "0.0.139"
 
 "three@0.94.0":
   "integrity" "sha1-TObbfyv795wtc0RKpuPPwIoy12I="

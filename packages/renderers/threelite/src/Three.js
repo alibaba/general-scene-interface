@@ -58,7 +58,7 @@ export { ImageBitmapLoader } from './loaders/ImageBitmapLoader.js';
 export { SpotLight } from './lights/SpotLight.js';
 export { PointLight } from './lights/PointLight.js';
 export { RectAreaLight } from './lights/RectAreaLight.js';
-// export { HemisphereLight } from './lights/HemisphereLight.js';
+export { HemisphereLight } from './lights/HemisphereLight.js';
 // export { HemisphereLightProbe } from './lights/HemisphereLightProbe.js';
 export { DirectionalLight } from './lights/DirectionalLight.js';
 export { AmbientLight } from './lights/AmbientLight.js';

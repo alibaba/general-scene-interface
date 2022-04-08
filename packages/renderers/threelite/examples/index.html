@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<title>three.js examples</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+</head>
+
+<body>
+
+	<script type="module">
+
+		import * as THREE from '../build/three.module.js';
+
+		let camera, scene, renderer;
+
+		init();
+		animate();
+
+		function init() {
+
+			camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 200000);
+			camera.position.y = 400;
+
+			scene = new THREE.Scene();
+
+			const ambientLight = new THREE.AmbientLight(0xcccccc, 0.4);
+			scene.add(ambientLight);
+
+			const pointLight = new THREE.PointLight(0xffffff, 0.8);
+			camera.add(pointLight);
+			scene.add(camera);
+
+			const material = new THREE.MeshPhongMaterial({ color: new THREE.Color('#ffafff'), side: THREE.DoubleSide, flatShading: false });
+
+			const geometry = new THREE.BufferGeometry()
+			const positions = [50, 50, 50, 50, 50, -50, 50, -50, 50, 50, -50, -50, -50, 50, -50, -50, 50, 50, -50, -50, -50, -50, -50, 50, -50, 50, -50, 50, 50, -50, -50, 50, 50, 50, 50, 50, -50, -50, 50, 50, -50, 50, -50, -50, -50, 50, -50, -50, -50, 50, 50, 50, 50, 50, -50, -50, 50, 50, -50, 50, 50, 50, -50, -50, 50, -50, 50, -50, -50, -50, -50, -50]
+			const normals = [1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1]
+			const indices = [0, 2, 1, 2, 3, 1, 4, 6, 5, 6, 7, 5, 8, 10, 9, 10, 11, 9, 12, 14, 13, 14, 15, 13, 16, 18, 17, 18, 19, 17, 20, 22, 21, 22, 23, 21]
+
+			geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(positions), 3, false))
+			geometry.setAttribute('normal', new THREE.BufferAttribute(new Float32Array(normals), 3, false))
+			geometry.setIndex(new THREE.BufferAttribute(new Uint16Array(indices), 1, false))
+
+			const object = new THREE.Mesh(geometry, material);
+			object.position.set(0, 0, 0);
+			scene.add(object);
+
+			//
+
+			renderer = new THREE.WebGLRenderer({ antialias: true });
+			renderer.setPixelRatio(window.devicePixelRatio);
+			renderer.setSize(window.innerWidth, window.innerHeight);
+			document.body.appendChild(renderer.domElement);
+
+			//
+
+			window.addEventListener('resize', onWindowResize);
+
+		}
+
+		function onWindowResize() {
+
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+
+			renderer.setSize(window.innerWidth, window.innerHeight);
+
+		}
+
+		//
+
+		function animate() {
+
+			requestAnimationFrame(animate);
+
+			render();
+
+		}
+
+		function render() {
+
+			const timer = Date.now() * 0.0001;
+
+			camera.position.x = Math.cos(timer) * 800;
+			camera.position.z = Math.sin(timer) * 800;
+
+			camera.lookAt(scene.position);
+
+			scene.traverse(function (object) {
+
+				if (object.isMesh === true) {
+
+					object.rotation.x = timer * 5;
+					object.rotation.y = timer * 2.5;
+
+				}
+
+			});
+
+			renderer.render(scene, camera);
+
+		}
+	</script>
+
+</body>
+
+</html>
