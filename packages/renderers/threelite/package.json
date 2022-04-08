@@ -1,7 +1,7 @@
 {
   "name": "three-lite",
   "_name": "three-lite",
-  "version": "0.0.139",
+  "version": "0.0.139-alpha",
   "description": "A lite version of three.js",
   "author": "",
   "type": "module",
