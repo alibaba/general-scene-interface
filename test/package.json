@@ -1,14 +1,14 @@
 {
 	"name": "@gs.i/test",
 	"_name": "@gs.i/test",
-	"version": "0.0.0-beta",
+	"version": "0.2.1-alpha.19",
 	"private": true,
 	"scripts": {
 		"test": "mocha --recursive"
 	},
 	"devDependencies": {
-		"mocha": ">=9.0.0",
+		"@gs.i/all": "^0.0.0-beta",
 		"chai": ">=4.0.0",
-		"@gs.i/all": "^0.0.0-beta"
+		"mocha": ">=9.0.0"
 	}
 }
