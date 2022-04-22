@@ -1,6 +1,6 @@
 {
 	"name": "@gs.i/frontend-sprite",
-	"version": "0.2.1-alpha.19",
+	"version": "0.2.1-alpha.20",
 	"description": "",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
@@ -20,10 +20,10 @@
 		"v": "node -v && tsc -v"
 	},
 	"dependencies": {
-		"@gs.i/frontend-sdk": "^0.2.1-alpha.19",
-		"@gs.i/schema-scene": "^0.2.1-alpha.19",
-		"@gs.i/utils-geometry": "^0.2.1-alpha.19",
-		"@gs.i/utils-math": "^0.2.1-alpha.19"
+		"@gs.i/frontend-sdk": "^0.2.1-alpha.20",
+		"@gs.i/schema-scene": "^0.2.1-alpha.20",
+		"@gs.i/utils-geometry": "^0.2.1-alpha.20",
+		"@gs.i/utils-math": "^0.2.1-alpha.20"
 	},
 	"devDependencies": {
 		"typescript": ">4.4.0"
