@@ -25,7 +25,23 @@ export interface Texture {
 	sampler: Sampler
 	image: Image
 	transform: Matrix
-	extensions?: { [key: string]: any }
+	extensions?: {
+		/**
+		 * @experimental
+		 *
+		 * A direct reference to corresponding threejs object.
+		 * - Used for bypassing GSI converter.
+		 * - When represented, the converter should use this object as result without minification.
+		 * - Conv will fallback to normal conversion if this extension is not supported.
+		 *
+		 * @note This will break compatibility for different backends.
+		 * @note This extension should only affect converters.
+		 *
+		 * @deprecated May change in the future.
+		 */
+		EXT_ref_threejs?: any
+		[key: string]: any
+	}
 	extras?: any
 }
 

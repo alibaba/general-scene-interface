@@ -1,4 +1,4 @@
-import IR, { Texture } from '@gs.i/schema-scene'
+import IR from '@gs.i/schema-scene'
 import {
 	Texture as ThreeTexture,
 	NearestFilter,
@@ -17,7 +17,7 @@ import {
 /**
  * sync texture parameters from gsi IR to three texture
  */
-export function syncTexture(gsiTexture: Texture, threeTexture: ThreeTexture): void {
+export function syncTexture(gsiTexture: IR.Texture, threeTexture: ThreeTexture): void {
 	const sampler = gsiTexture.sampler
 	switch (sampler.magFilter) {
 		case 'NEAREST':

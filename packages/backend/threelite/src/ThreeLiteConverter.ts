@@ -975,6 +975,12 @@ export class ThreeLiteConverter implements Converter {
 	private convTexture(gsiTexture: Texture | undefined | null): ThreeTexture | null {
 		if (gsiTexture === undefined || gsiTexture === null) return null
 
+		if (gsiTexture.extensions?.EXT_ref_threejs) {
+			const threeTexture = gsiTexture.extensions?.EXT_ref_threejs as ThreeTexture
+			this._threeTex.set(gsiTexture, threeTexture)
+			return threeTexture
+		}
+
 		let threeTexture = this._threeTex.get(gsiTexture) as ThreeTexture
 		let committedVersion = this._committedTex.get(gsiTexture) as Int
 
