@@ -15,10 +15,9 @@
 	],
 	"scripts": {
 		"build": "./scripts/build.sh",
+		"prebuild": "node ./scripts/glsl-processor.cjs",
 		"clean": "./scripts/clean.sh",
 		"rebuild": "npm run clean && npm run build",
-		"prebuild": "node ./scripts/glsl-processor.cjs",
-		"prerebuild": "node ./scripts/glsl-processor.cjs",
 		"v": "node -v && tsc -v"
 	},
 	"dependencies": {
