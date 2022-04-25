@@ -3,9 +3,9 @@
  * All rights reserved.
  */
 
-import { PrgStandardMaterial } from './PrgStandardMaterial'
-import { PrgBasicMaterial } from './PrgBasicMaterial'
-import { PrgPointMaterial } from './PrgPointMaterial'
+import { PrgStandardMaterial } from './materials/PrgStandardMaterial'
+import { PrgBasicMaterial } from './materials/PrgBasicMaterial'
+import { PrgPointMaterial } from './materials/PrgPointMaterial'
 
 import IR, {
 	Texture,
