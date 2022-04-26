@@ -10,7 +10,7 @@ import vs from './PrgPointMatr.vs.glsl'
 import fs from './PrgPointMatr.fs.glsl'
 
 export class PrgPointMaterial extends PointsMaterial {
-	type = 'ShaderMaterial'
+	type = 'GSI-Points'
 
 	// Add ShaderMaterial flag
 	isShaderMaterial = true

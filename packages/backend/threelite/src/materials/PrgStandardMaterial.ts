@@ -10,7 +10,7 @@ import vs from './PrgPbrMatr.vs.glsl'
 import fs from './PrgPbrMatr.fs.glsl'
 
 export class PrgStandardMaterial extends MeshStandardMaterial {
-	type = 'ShaderMaterial'
+	type = 'GSI-Standard'
 
 	// Add ShaderMaterial flag
 	isShaderMaterial = true
