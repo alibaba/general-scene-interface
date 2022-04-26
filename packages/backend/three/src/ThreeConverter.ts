@@ -1044,7 +1044,6 @@ export class Converter {
 			 * - textureLoader may change it without notice.
 			 * - DataTexture must start with 1.
 			 */
-			threeTexture.needsUpdate = true
 			// threeTexture.version = gsiTexture.image.version
 
 			this._threeTex.set(gsiTexture, threeTexture)
