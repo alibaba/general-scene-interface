@@ -13,6 +13,9 @@
 			"path": "../../backend/gltf2"
 		},
 		{
+			"path": "../../backend/three"
+		},
+		{
 			"path": "../../backend/threelite"
 		},
 		{

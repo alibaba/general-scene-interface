@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-import { TypedArray, Matrix, Versioned } from './basic'
+import { TypedArray, Versioned } from './basic'
 
 /**
  * texture and sampler
@@ -24,7 +24,6 @@ import { TypedArray, Matrix, Versioned } from './basic'
 export interface Texture {
 	sampler: Sampler
 	image: Image
-	transform: Matrix
 	extensions?: {
 		/**
 		 * @experimental

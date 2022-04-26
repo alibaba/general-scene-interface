@@ -12,6 +12,9 @@
 			"path": "../packages/backend/gltf2"
 		},
 		{
+			"path": "../packages/backend/three"
+		},
+		{
 			"path": "../packages/backend/threelite"
 		},
 		{

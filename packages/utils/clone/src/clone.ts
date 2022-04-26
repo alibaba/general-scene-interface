@@ -15,8 +15,6 @@ export function cloneTexture(t: IR.Texture): IR.Texture {
 	result.image = cloneImage(t.image)
 	result.sampler = cloneSampler(t.sampler)
 
-	if (t.transform !== undefined) result.transform = Array.from(t.transform)
-
 	return result
 }
 

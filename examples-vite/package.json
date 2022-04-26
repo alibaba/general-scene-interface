@@ -10,6 +10,7 @@
 		"@gs.i/backend-gl2": "^0.0.0-beta",
 		"@gs.i/backend-gltf2": "^0.2.1-alpha.20",
 		"@gs.i/backend-threelite": "^0.2.1-alpha.20",
+		"@gs.i/backend-three": "^0.2.1-alpha.20",
 		"@gs.i/frontend-gline": "^0.2.1-alpha.20",
 		"@gs.i/frontend-gltf2": "^0.2.1-alpha.20",
 		"@gs.i/frontend-materials": "^0.2.1-alpha.20",
@@ -35,7 +36,8 @@
 		"@gs.i/utils-wireframe": "^0.2.1-alpha.20",
 		"ani-timeline": "1.2.19-m",
 		"camera-proxy": "0.1.24",
-		"three-lite": "0.0.2"
+		"three-lite": "0.0.2",
+		"three": "^0.139.2"
 	},
 	"devDependencies": {
 		"typescript": ">4.4.0",
