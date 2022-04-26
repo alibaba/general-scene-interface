@@ -237,7 +237,6 @@ export function specifyTexture(t: IR.LooseTexture): IR.Texture {
 
 	specifySampler(t.sampler)
 
-	if (t.transform === undefined) t.transform = [1, 0, 0, 0, 1, 0, 0, 0, 1]
 	if (t.extensions === undefined) t.extensions = {}
 	if (t.extras === undefined) t.extras = {}
 

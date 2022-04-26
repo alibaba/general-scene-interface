@@ -141,22 +141,42 @@ export interface Versioned {
 	version: Int
 }
 
+/**
+ * TRS-style 3D transform
+ */
 export interface Transform3TRS extends Versioned {
+	/**
+	 * @default {x:0,y:0,z:0}
+	 */
 	position?: Vec3
+	/**
+	 * if `.quaternion` is provided, `.rotation` will be ignored.
+	 * @default undefined
+	 */
 	rotation?: Euler3
-	scale?: Vec3
+	/**
+	 * if `.quaternion` is provided, `.rotation` will be ignored.
+	 * @default {0,0,0,1}
+	 */
 	quaternion?: Quaternion
+	/**
+	 * @default {x:1,y:1,z:1}
+	 */
+	scale?: Vec3
 	//
 	matrix?: never
 }
 
+/**
+ * 4x4-matrix-style 3D transform
+ */
 export interface Transform3Matrix extends Versioned {
 	position?: never
 	rotation?: never
 	scale?: never
 	quaternion?: never
 	/**
-	 * @default [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1] // identity 4x4 matrix
+	 * @default [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1] // identity 4x4 matrix
 	 */
 	matrix: Matrix
 }

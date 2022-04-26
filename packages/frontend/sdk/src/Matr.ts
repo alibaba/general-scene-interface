@@ -21,6 +21,7 @@ class MatrBase implements IR.MaterialBase {
 	 */
 	readonly extensions: NonNullable<Required<IR.MaterialBase['extensions']>> = {
 		EXT_matr_advanced: {},
+		EXT_matr_uv_transform: { matrix: [1, 0, 0, 0, 1, 0, 0, 0, 1] },
 		EXT_matr_programmable: {
 			language: 'GLSL300',
 			extension: '',

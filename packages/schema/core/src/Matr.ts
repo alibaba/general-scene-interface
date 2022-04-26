@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-import { ColorRGB, Double, Versioned } from './basic'
+import { ColorRGB, Double, Matrix, Versioned } from './basic'
 import { Texture } from './Texture'
 import { Programable, ProgramablePbr } from './Programable'
 
@@ -124,6 +124,7 @@ export interface MaterialBase extends Versioned {
 	/**
 	 * for readability only
 	 * @bumpVersion
+	 * @default 'unnamed matr'
 	 */
 	name: string
 
@@ -259,6 +260,12 @@ export interface MaterialBase extends Versioned {
 				// stencilZFail?: number
 				// stencilZPass?: number
 			}
+		}
+		/**
+		 * material specified uv transformation.
+		 */
+		EXT_matr_uv_transform?: {
+			matrix: Matrix
 		}
 		EXT_matr_programmable?: Programable
 		[key: string]: any
