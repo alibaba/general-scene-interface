@@ -12,28 +12,32 @@ GSI 是一个 Web 3D 实时渲染领域的伞项目，包含一套标准化的�
 
 ## Development
 
-- Make sure you have `nodejs`, `yarn` and `lerna` installed
+> MacOS, Linux and Windows WSL are supported for building this project. 
+
+### Setup
+
+Make sure you have `nodejs` and `lerna` installed.
 
 ```sh
 node -v # v14 or higher
 
-npx lerna -v # v4.x recommended
+npx lerna -v # v4.x or higher
 ```
 
-- setup
+And then.
 
 `npm run setup`
 
 > If you are in China. You probably want to change registry to a mirror. 
 > - `npm config set registry https://registry.npm.taobao.org`
 
-- build packages
+### Build
 
 `npm run build`
 
 If something goes wrong. You should try `npm run rebuild` which will clean up all the build caches.
 
-- watch files and serve examples
+### Serve examples
 
 Good old fashioned `npm start`
 
