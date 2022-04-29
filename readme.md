@@ -24,11 +24,8 @@ npx lerna -v # v4.x recommended
 
 `npm run setup`
 
-Should not see any error. If something goes wrong (probably caused by a registry). Run `npm run clean` and try it again.
-
-> If you are in China. You may want to change registry to a mirror. 
+> If you are in China. You probably want to change registry to a mirror. 
 > - `npm config set registry https://registry.npm.taobao.org`
-> - `yarn config set registry https://registry.npmmirror.com/`
 
 - build packages
 
@@ -50,7 +47,7 @@ Please refer to [Alibaba Open Source Code of Conduct](https://github.com/Alibaba
 
 本项目使用 MIT 协议，three.js 源码版权归 three.js 作者所有。
 
-详见 ./LICENSE
+详见 [LICENSE](./LICENSE)
 
 ## 免责声明
 
