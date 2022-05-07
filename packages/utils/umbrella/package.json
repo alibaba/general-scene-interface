@@ -1,6 +1,6 @@
 {
 	"name": "@gs.i/all",
-	"version": "0.2.1-alpha.23",
+	"version": "0.2.1-alpha.24",
 	"description": "",
 	"main": "index.js",
 	"type": "module",
@@ -21,7 +21,7 @@
 	"dependencies": {
 		"@gs.i/backend-gltf2": "^0.2.1-alpha.23",
 		"@gs.i/backend-three": "^0.2.1-alpha.23",
-		"@gs.i/backend-threelite": "^0.2.1-alpha.23",
+		"@gs.i/backend-threelite": "^0.2.1-alpha.24",
 		"@gs.i/frontend-gline": "^0.2.1-alpha.23",
 		"@gs.i/frontend-gltf2": "^0.2.1-alpha.23",
 		"@gs.i/frontend-materials": "^0.2.1-alpha.23",
