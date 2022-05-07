@@ -7,7 +7,7 @@ import { Box3, Sphere, Object3D, Vector3, Euler, Quaternion, Matrix4 } from 'thr
 import { BBox, BSphere } from '@gs.i/schema-scene'
 import type {
 	ThreeLiteConverter,
-	defaultConfig as threeLiteDefaultConfig,
+	defaultConfig as threeliteDefaultConfig,
 } from './ThreeLiteConverter'
 
 export function box3Equals(b1: Box3 | BBox, b2: Box3 | BBox): boolean {
@@ -42,6 +42,12 @@ export function elementsEquals(e1: number[], e2: number[]): boolean {
 	return true
 }
 
+/**
+ * @todo ignore keys start with __GSI_INSERT__
+ * @param gl2Defines
+ * @param defines
+ * @returns
+ */
 export function convDefines(gl2Defines = {}, defines = {}) {
 	const d = gl2Defines
 	for (const key in defines) {
@@ -56,7 +62,7 @@ export function convDefines(gl2Defines = {}, defines = {}) {
 		if (defines[key] === undefined || defines[key] === null || defines[key] === false) {
 			delete gl2Defines[key]
 			console.error(
-				'GSI::GL2Converter Material defines has been changed, this will not take effects because shaders re-compilation is not supported in GL2Converter. Please reconstruct a new material instead. '
+				'GSI::Converter Material defines has been changed, this will not take effects because shaders re-compilation is not supported in GL2Converter. Please reconstruct a new material instead. '
 			)
 		}
 	}
@@ -148,25 +154,25 @@ export const SupportedExtensions = (function checkExts() {
 	// 2. EXT_shader_texture_lod
 	const ext1 = 'OES_standard_derivatives'
 	if (!_gl.getExtension(ext1)) {
-		console.error(`GSI::ThreeLiteConverter - WebGL Extension not supported: ${ext1}`)
+		console.error(`GSI::ThreeConverter - WebGL Extension not supported: ${ext1}`)
 		flags.derivatives = false
 	}
 
 	const ext2 = 'EXT_shader_texture_lod'
 	if (!_gl.getExtension(ext2)) {
-		console.error(`GSI::ThreeLiteConverter - WebGL Extension not supported: ${ext2}`)
+		console.error(`GSI::ThreeConverter - WebGL Extension not supported: ${ext2}`)
 		flags.shaderTextureLOD = false
 	}
 
 	const ext3 = 'EXT_frag_depth'
 	if (!_gl.getExtension(ext3)) {
-		console.error(`GSI::ThreeLiteConverter - WebGL Extension not supported: ${ext3}`)
+		console.error(`GSI::ThreeConverter - WebGL Extension not supported: ${ext3}`)
 		flags.fragDepth = false
 	}
 
 	const ext4 = 'WEBGL_draw_buffers'
 	if (!_gl.getExtension(ext4)) {
-		console.error(`GSI::ThreeLiteConverter - WebGL Extension not supported: ${ext4}`)
+		console.error(`GSI::ThreeConverter - WebGL Extension not supported: ${ext4}`)
 		flags.drawBuffers = false
 	}
 
@@ -284,33 +290,33 @@ export function sealTransform(threeMesh: Object3D) {
  */
 export function checkProcessorPerformance(
 	conv: ThreeLiteConverter,
-	defaultConfig: typeof threeLiteDefaultConfig
+	defaultConfig: typeof threeliteDefaultConfig
 ) {
 	if (conv.config.dev) {
-		console.log(`ThreeLiteConverter dev mode is enabled. Performance will be impacted.`)
+		console.log(`ThreeConverter dev mode is enabled. Performance will be impacted.`)
 	}
 
 	if (conv.matrixProcessor === defaultConfig.matrixProcessor) {
 		console.debug(
-			'ThreeLiteConverter is using the default matrixProcessor. ' +
+			'ThreeConverter is using the default matrixProcessor. ' +
 				`Consider passing a matrixProcessor for constructor.`
 		)
 	}
 	if (conv.boundingProcessor === defaultConfig.boundingProcessor) {
 		console.debug(
-			'ThreeLiteConverter is using the default boundingProcessor. ' +
+			'ThreeConverter is using the default boundingProcessor. ' +
 				`Consider passing a boundingProcessor for constructor.`
 		)
 	}
 	if (conv.graphProcessor === defaultConfig.graphProcessor) {
 		console.debug(
-			'ThreeLiteConverter is using the default graphProcessor. ' +
+			'ThreeConverter is using the default graphProcessor. ' +
 				`Consider passing a graphProcessor for constructor.`
 		)
 	}
 	if (conv.cullingProcessor === defaultConfig.cullingProcessor) {
 		console.debug(
-			'ThreeLiteConverter is using the default cullingProcessor. ' +
+			'ThreeConverter is using the default cullingProcessor. ' +
 				`Consider passing a cullingProcessor for constructor.`
 		)
 	}
@@ -319,7 +325,7 @@ export function checkProcessorPerformance(
 		conv.boundingProcessor.matrixProcessor !== conv.matrixProcessor
 	) {
 		console.warn(
-			`ThreeLiteConverter's boundingProcessor is using a different matrixProcessor other than this.matrixProcessor. ` +
+			`ThreeConverter's boundingProcessor is using a different matrixProcessor other than this.matrixProcessor. ` +
 				`It's highly recommended to use the same matrixProcessor for cache performance!`
 		)
 	}
@@ -328,7 +334,7 @@ export function checkProcessorPerformance(
 		conv.cullingProcessor.matrixProcessor !== conv.matrixProcessor
 	) {
 		console.warn(
-			`ThreeLiteConverter's cullingProcessor is using a different matrixProcessor other than this.matrixProcessor. ` +
+			`ThreeConverter's cullingProcessor is using a different matrixProcessor other than this.matrixProcessor. ` +
 				`It's highly recommended to use the same matrixProcessor for cache performance!`
 		)
 	}
@@ -337,7 +343,7 @@ export function checkProcessorPerformance(
 		conv.cullingProcessor.boundingProcessor !== conv.boundingProcessor
 	) {
 		console.warn(
-			`ThreeLiteConverter's cullingProcessor is using a different boundingProcessor other than this.boundingProcessor. ` +
+			`ThreeConverter's cullingProcessor is using a different boundingProcessor other than this.boundingProcessor. ` +
 				`It's highly recommended to use the same boundingProcessor for cache performance!`
 		)
 	}

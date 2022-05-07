@@ -3,9 +3,9 @@
  * All rights reserved.
  */
 
-import { PrgStandardMaterial } from './materials/PrgStandardMaterial'
-import { PrgBasicMaterial } from './materials/PrgBasicMaterial'
-import { PrgPointMaterial } from './materials/PrgPointMaterial'
+import { createPrgStandardMaterial, TPrgStandardMaterial } from './materials/PrgStandardMaterial'
+import { createPrgBasicMaterial, TPrgBasicMaterial } from './materials/PrgBasicMaterial'
+import { createPrgPointMaterial, TPrgPointMaterial } from './materials/PrgPointMaterial'
 
 import IR, {
 	Texture,
@@ -26,7 +26,6 @@ import IR, {
 
 const { GL_STATIC_DRAW, GL_DYNAMIC_DRAW } = constants
 
-import type { Converter } from './Converter'
 import { MatProcessor } from '@gs.i/processor-matrix'
 import { BoundingProcessor } from '@gs.i/processor-bound'
 import { CullingProcessor } from '@gs.i/processor-culling'
@@ -36,7 +35,7 @@ import { traverse, flatten } from '@gs.i/utils-traverse'
 import { syncMaterial } from './syncMaterial'
 import { syncTexture } from './syncTexture'
 
-// import * as THREE from 'three-lite'
+import * as THREE from 'three-lite'
 import {
 	Object3D,
 	BufferGeometry,
@@ -56,6 +55,8 @@ import {
 	PointLight,
 } from 'three-lite'
 import { checkProcessorPerformance, sealTransform } from './utils'
+
+console.log('THREE', THREE)
 
 /**
  * @note safe to share globally @simon
@@ -182,11 +183,11 @@ export type ConverterConfig = Partial<typeof defaultConfig>
  * @authors @Simon @QianXun
  * @note 底层渲染器通常需要用户主动资源回收，单向数据流中，用户只看到数据变化不看到底层资源的增减，因此可以提供自动回收机制
  */
-export class ThreeLiteConverter implements Converter {
+export class ThreeLiteConverter {
 	/**
 	 * type
 	 */
-	readonly type = 'ThreeLiteConverter'
+	readonly type = 'ThreeConverter'
 
 	/**
 	 * config
@@ -261,7 +262,10 @@ export class ThreeLiteConverter implements Converter {
 	private _threeAttr = new WeakMap<IR.Attribute, BufferAttribute>()
 	private _threeTex = new WeakMap<Texture | CubeTexture, ThreeTexture>()
 	// TODO use IR.Material instead because IR.MatrBase can not be used alone
-	private _threeMatr = new WeakMap<IR.Material | IR.MaterialBase, Material>()
+	private _threeMatr = new WeakMap<
+		IR.Material | IR.MaterialBase,
+		TPrgStandardMaterial | TPrgBasicMaterial | TPrgPointMaterial
+	>()
 	private _threeColor = new WeakMap<ColorRGB, Color>()
 
 	// private _committedVersions = new WeakMap<any, number>()
@@ -499,7 +503,7 @@ export class ThreeLiteConverter implements Converter {
 					threeObject.name = luminousEXT.name ?? threeObject.name
 					threeObject['decay'] = 2 // gltf2: "follow the inverse square law"
 				} else {
-					throw new Error('three-lite conv:: light type not implemented(' + luminousEXT.type + ')')
+					throw new Error('three conv:: light type not implemented(' + luminousEXT.type + ')')
 				}
 			} else {
 				threeObject = new Object3D()
@@ -572,7 +576,7 @@ export class ThreeLiteConverter implements Converter {
 				threeObject.matrixWorld.elements = matrix
 			} else {
 				console.warn(
-					`Conv-threelite:: WorldMatrix of ${gsiNode.name} is not cached. ` +
+					`Conv-three:: WorldMatrix of ${gsiNode.name} is not cached. ` +
 						`Will fall back to dirty-checking. ` +
 						`The scene-graph may have changed during this conversion.`
 				)
@@ -795,8 +799,7 @@ export class ThreeLiteConverter implements Converter {
 	 * @note run after all the textures are cached
 	 */
 	private convMatr(gsiMatr: IR.Material) {
-		let threeMatr = this._threeMatr.get(gsiMatr) as Material
-		// let committedVersion = this._committedMatr.get(gsiMatr) as Int
+		let threeMatr = this._threeMatr.get(gsiMatr)
 
 		// create
 		if (!threeMatr) {
@@ -807,13 +810,13 @@ export class ThreeLiteConverter implements Converter {
 				// 	threeMatr = new PrgBasicMaterial(gsiMatr as IR.MatrUnlit)
 				// 	break
 				case 'point':
-					threeMatr = new PrgPointMaterial(gsiMatr as IR.PointMaterial)
+					threeMatr = createPrgPointMaterial(gsiMatr as IR.PointMaterial)
 					break
 				case 'unlit':
-					threeMatr = new PrgBasicMaterial(gsiMatr as IR.UnlitMaterial)
+					threeMatr = createPrgBasicMaterial(gsiMatr as IR.UnlitMaterial)
 					break
 				case 'pbr':
-					threeMatr = new PrgStandardMaterial(gsiMatr as IR.PbrMaterial)
+					threeMatr = createPrgStandardMaterial(gsiMatr as IR.PbrMaterial)
 					break
 				default:
 					throw 'Unsupported GSI::Material Type: ' + gsiMatr['type']
@@ -853,7 +856,7 @@ export class ThreeLiteConverter implements Converter {
 			// 	break
 
 			case 'pbr': {
-				const pbrThreeMatr = threeMatr as PrgStandardMaterial
+				const pbrThreeMatr = threeMatr as TPrgStandardMaterial
 
 				pbrThreeMatr.color = this.convColor(gsiMatr.baseColorFactor)
 				pbrThreeMatr.emissive = this.convColor(gsiMatr.emissiveFactor)
@@ -888,7 +891,7 @@ export class ThreeLiteConverter implements Converter {
 			}
 
 			case 'unlit': {
-				const unlitThreeMatr = threeMatr as PrgBasicMaterial
+				const unlitThreeMatr = threeMatr as TPrgBasicMaterial
 				const matr = gsiMatr as IR.UnlitMaterial
 
 				unlitThreeMatr.color = this.convColor(matr.baseColorFactor)
@@ -900,7 +903,7 @@ export class ThreeLiteConverter implements Converter {
 
 			case 'point': {
 				const matr = gsiMatr as IR.PointMaterial
-				const pointThreeMatr = threeMatr as PrgPointMaterial
+				const pointThreeMatr = threeMatr as TPrgPointMaterial
 
 				pointThreeMatr.size = matr.size
 				pointThreeMatr.sizeAttenuation = matr.sizeAttenuation
@@ -969,6 +972,19 @@ export class ThreeLiteConverter implements Converter {
 			}
 		}
 
+		// give a default material.map
+		// sync uv transform
+		{
+			if (!threeMatr.map) {
+				threeMatr.map = getDefaultMap(gsiMatr)
+			}
+
+			const uvMatrix = gsiMatr.extensions?.EXT_matr_uv_transform?.matrix
+			if (uvMatrix) {
+				threeMatr.map.matrix.fromArray(uvMatrix)
+			}
+		}
+
 		return threeMatr
 	}
 
@@ -999,6 +1015,8 @@ export class ThreeLiteConverter implements Converter {
 						imgData.width as number,
 						imgData.height as number
 					)
+
+					threeTexture.needsUpdate = true // @note this is required by threejs DataTexture
 				} else if (imgData.uri !== undefined) {
 					threeTexture = texLoader.load(imgData.uri)
 				} else if (imgData.extensions?.EXT_image_HTML !== undefined) {
@@ -1022,7 +1040,13 @@ export class ThreeLiteConverter implements Converter {
 			}
 
 			committedVersion = gsiTexture.image.version
-			threeTexture.version = gsiTexture.image.version
+
+			/**
+			 * @note threeTexture.version can not be managed directly.
+			 * - textureLoader may change it without notice.
+			 * - DataTexture must start with 1.
+			 */
+			// threeTexture.version = gsiTexture.image.version
 
 			this._threeTex.set(gsiTexture, threeTexture)
 			this._committedTex.set(gsiTexture, committedVersion)
@@ -1032,6 +1056,7 @@ export class ThreeLiteConverter implements Converter {
 		if (committedVersion !== gsiTexture.image.version || gsiTexture.image.version === -1) {
 			// @note new texture will always be uploaded by three,
 			// 		 no needs to set needsUpdate for newly created texture
+			// @edit except for DataTexture which must be set needsUpdate manually after created
 
 			threeTexture.needsUpdate = true
 
@@ -1264,3 +1289,30 @@ export class RenderableObject3D extends Object3D {
  */
 const texLoader = new TextureLoader()
 // texLoader.setCrossOrigin('')
+
+/**
+ * get a default texture for `.map` property of threejs material
+ * @description
+ * `THREE.Material.map` is a very special placeholder in threejs renderer.
+ * Give it a default empty texture can shim up some internal differences of threejs.
+ *
+ * - vUv will always be available in vertex and fragment shader.
+ * - `material.map.matrix` will always be the uvTransform of the material. {@link https://threejs.org/docs/index.html?q=material#api/en/textures/Texture.offset}
+ */
+function getDefaultMap(material: IR.Material): ThreeTexture {
+	const map = EMPTY_MAPS.get(material)
+	if (map) {
+		return map
+	} else {
+		const newMap = new DataTexture(new Uint8Array(4).fill(255), 1, 1)
+		newMap.needsUpdate = true
+
+		newMap.matrixAutoUpdate = false // @note important
+		EMPTY_MAPS.set(material, newMap)
+		return newMap
+	}
+}
+
+const EMPTY_MAPS = new WeakMap<IR.Material, ThreeTexture>()
+
+export default ThreeLiteConverter

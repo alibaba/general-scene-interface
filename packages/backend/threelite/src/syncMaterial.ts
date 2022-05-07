@@ -1,4 +1,4 @@
-import IR, { MaterialBase, Texture } from '@gs.i/schema-scene'
+import { MaterialBase, Texture } from '@gs.i/schema-scene'
 import {
 	Material,
 	Texture as ThreeTexture,
@@ -8,9 +8,8 @@ import {
 	NoBlending,
 	NormalBlending,
 	AdditiveBlending,
-	ShaderMaterial,
 } from 'three-lite'
-import { box3Equals, convDefines, elementsEquals, sphereEquals, SupportedExtensions } from './utils'
+import { convDefines } from './utils'
 
 /**
  * sync material parameters from gsi IR to three material

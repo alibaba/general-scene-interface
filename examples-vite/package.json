@@ -37,7 +37,7 @@
 		"ani-timeline": "1.2.19-m",
 		"camera-proxy": "0.1.24",
 		"three": "^0.139.2",
-		"three-lite": "0.0.2"
+		"three-lite": "0.0.139-alpha"
 	},
 	"devDependencies": {
 		"typescript": ">4.4.0",
