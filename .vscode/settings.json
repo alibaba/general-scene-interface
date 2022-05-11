@@ -29,7 +29,11 @@
 		// "**/*.back": true,
 		// "**/*.old": true
 		// "**/*.tsbuildinfo": true
-		// "packages/**/node_modules": true
+		".*": true,
+		"packages/**/node_modules": true,
+		"packages/**/dist": true,
+		"packages/**/scripts": true,
+		"packages/**/tsconfig*json": true
 		// "**/!package.json": true
 		// "**/package.json": false,
 	},
