@@ -26,10 +26,8 @@ import type IR from '@gs.i/schema-scene'
 
 export function Shaderlize<TBase extends new (...args: any[]) => Material>(
 	ThreeMaterial: TBase,
-	uniforms: { [name: string]: { value: any } },
 	vs: string,
-	fs: string,
-	useLights = false
+	fs: string
 ) {
 	return class ShaderMaterial extends ThreeMaterial {
 		/**
@@ -47,7 +45,7 @@ export function Shaderlize<TBase extends new (...args: any[]) => Material>(
 		 */
 
 		defines = {} as { [name: string]: string | boolean | number | undefined }
-		uniforms = uniforms
+		uniforms = {} as { [name: string]: { value: any } }
 
 		vertexShader = '' as string
 		fragmentShader = '' as string
@@ -63,7 +61,7 @@ export function Shaderlize<TBase extends new (...args: any[]) => Material>(
 		/**
 		 * @note change it to true if needs lights info in shaders
 		 */
-		lights = useLights // set to use scene lights
+		lights = false // set to use scene lights
 
 		extensions = {
 			derivatives: false, // set to use derivatives

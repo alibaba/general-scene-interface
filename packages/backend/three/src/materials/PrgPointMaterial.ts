@@ -9,19 +9,15 @@ import vs from './shaders/point.vs.glsl'
 import fs from './shaders/point.fs.glsl'
 import { Shaderlize } from './mixin'
 
-const PrgPointMaterial = Shaderlize(
-	PointsMaterial,
-	UniformsUtils.clone(ShaderLib.points.uniforms),
-	vs,
-	fs,
-	false
-)
+const PrgPointMaterial = Shaderlize(PointsMaterial, vs, fs)
 
 export type TPrgPointMaterial = ReturnType<typeof createPrgPointMaterial>
 
 export function createPrgPointMaterial(matr: IR.Material) {
 	const m = new PrgPointMaterial()
 	m.type = 'GSI-Point'
+	m.lights = false
+	m.uniforms = UniformsUtils.clone(ShaderLib.points.uniforms)
 	m.updateProgramable(matr)
 	return m
 }
