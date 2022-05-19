@@ -136,15 +136,17 @@ export class Raycaster extends Processor {
 	/**
 	 * @param {boolean} [backfaceCulling=true] Set to false to check both front & back triangles
 	 * @param {boolean} [allInters=false] By default the method will stop when first intersection is found, set allInters = true to get all intersections sorted from near to far
+	 * @param {boolean} [reversedOrder=true] By default the method will test triangles by order from index last to first (or positions last to first),
+	 * that means triangles rendered last will be tested first, which can be used by most cases. By setting this to false to perform a normal ordered test.
 	 * @note update this mesh's matrix before calling this
 	 */
-	raycast(mesh: RenderableNode, allInters = false): RaycastInfo {
+	raycast(mesh: RenderableNode, allInters = false, reversedOrder = true): RaycastInfo {
 		if (!isRenderable(mesh) || mesh.material.extensions?.EXT_matr_programmable?.vertexModified) {
 			return { hit: false, hittable: false, intersections: [] }
 		}
 
 		if (mesh.geometry.mode === 'TRIANGLES') {
-			return this.intersectTriangleMesh(mesh, allInters)
+			return this.intersectTriangleMesh(mesh, allInters, reversedOrder)
 			// } else if (mesh.geometry.mode === 'LINES') {
 			// 	return this.intersectLineMesh(mesh, allInters)
 			// } else if (mesh.geometry.mode === 'POINTS') {
@@ -155,12 +157,20 @@ export class Raycaster extends Processor {
 	}
 
 	/**
+	 * @changelog 2022.5.19 qianxun: change triangle test order from pre-order to reversed-order
+	 *
 	 * @note world matrix of this mesh should be updated before
 	 * @note early stop algorithm 遇到第一个intersect triangle时即返回
 	 *
-	 * @param {boolean} [allInters=false] By default the method will stop when first intersection is found, set allInters = true to get all intersections sorted from near to far
+	 * @param {boolean} [allInters=false] By default the method will stop when first intersection is found, set allInters = true to get all intersections sorted from near to far.
+	 * @param {boolean} [reversedOrder=true] By default the method will test triangles by order from index last to first (or positions last to first),
+	 * that means triangles rendered last will be tested first, which can be used by most cases. By setting this to false to perform a normal ordered test.
 	 */
-	private intersectTriangleMesh(mesh: RenderableNode, allInters = false): RaycastInfo {
+	private intersectTriangleMesh(
+		mesh: RenderableNode,
+		allInters = false,
+		reversedOrder = true
+	): RaycastInfo {
 		const result: RaycastInfo = {
 			hit: false,
 			intersections: [],
@@ -201,66 +211,138 @@ export class Raycaster extends Processor {
 
 			const indices = geom.indices.array
 
-			for (let i = 0, l = indices.length; i < l; i += 3) {
-				const i0 = indices[i + 0]
-				const i1 = indices[i + 1]
-				const i2 = indices[i + 2]
+			// Test by orders
+			if (reversedOrder) {
+				for (let i = indices.length - 3; i >= 0; i -= 3) {
+					const i0 = indices[i + 0]
+					const i1 = indices[i + 1]
+					const i2 = indices[i + 2]
 
-				this._v30.fromArray(pos, i0 * 3)
-				this._v31.fromArray(pos, i1 * 3)
-				this._v32.fromArray(pos, i2 * 3)
+					this._v30.fromArray(pos, i0 * 3)
+					this._v31.fromArray(pos, i1 * 3)
+					this._v32.fromArray(pos, i2 * 3)
 
-				const distance = rayIntersectsTriangle(
-					this._inverseRay,
-					this.near,
-					this.far,
-					this._v30,
-					this._v31,
-					this._v32,
-					backfaceCulling,
-					this._target
-				)
-				if (distance !== undefined) {
-					result.hit = true
-					result.intersections.push({
-						pointLocal: this._target.clone(),
-						point: this._target.clone().applyMatrix4(this._modelMatrix),
-						distance,
-						index: i / 3,
-						triangle: [this._v30.clone(), this._v31.clone(), this._v32.clone()],
-					})
-					if (!allInters) {
-						return result
+					const distance = rayIntersectsTriangle(
+						this._inverseRay,
+						this.near,
+						this.far,
+						this._v30,
+						this._v31,
+						this._v32,
+						backfaceCulling,
+						this._target
+					)
+					if (distance !== undefined) {
+						result.hit = true
+						result.intersections.push({
+							pointLocal: this._target.clone(),
+							point: this._target.clone().applyMatrix4(this._modelMatrix),
+							distance,
+							index: i / 3,
+							triangle: [this._v30.clone(), this._v31.clone(), this._v32.clone()],
+						})
+						if (!allInters) {
+							return result
+						}
+					}
+				}
+			} else {
+				for (let i = 0; i < indices.length; i += 3) {
+					const i0 = indices[i + 0]
+					const i1 = indices[i + 1]
+					const i2 = indices[i + 2]
+
+					this._v30.fromArray(pos, i0 * 3)
+					this._v31.fromArray(pos, i1 * 3)
+					this._v32.fromArray(pos, i2 * 3)
+
+					const distance = rayIntersectsTriangle(
+						this._inverseRay,
+						this.near,
+						this.far,
+						this._v30,
+						this._v31,
+						this._v32,
+						backfaceCulling,
+						this._target
+					)
+					if (distance !== undefined) {
+						result.hit = true
+						result.intersections.push({
+							pointLocal: this._target.clone(),
+							point: this._target.clone().applyMatrix4(this._modelMatrix),
+							distance,
+							index: i / 3,
+							triangle: [this._v30.clone(), this._v31.clone(), this._v32.clone()],
+						})
+						if (!allInters) {
+							return result
+						}
 					}
 				}
 			}
-		} else {
-			// Non-indexed geometry
-			for (let i = 0, l = pos.length; i < l; i += 9) {
-				this._v30.fromArray(pos, i + 0)
-				this._v31.fromArray(pos, i + 3)
-				this._v32.fromArray(pos, i + 6)
+		}
+		// Non-indexed geometry
+		else {
+			// Test by orders
+			if (reversedOrder) {
+				for (let i = pos.length - 9; i >= 0; i -= 9) {
+					this._v30.fromArray(pos, i + 0)
+					this._v31.fromArray(pos, i + 3)
+					this._v32.fromArray(pos, i + 6)
 
-				const distance = rayIntersectsTriangle(
-					this._inverseRay,
-					this.near,
-					this.far,
-					this._v30,
-					this._v31,
-					this._v32,
-					backfaceCulling,
-					this._target
-				)
-				if (distance !== undefined) {
-					result.intersections.push({
-						pointLocal: this._target.clone(),
-						point: this._target.clone().applyMatrix4(this._modelMatrix),
-						distance,
-						index: i / 3,
-						triangle: [this._v30.clone(), this._v31.clone(), this._v32.clone()],
-					})
-					if (!allInters) {
-						return result
+					const distance = rayIntersectsTriangle(
+						this._inverseRay,
+						this.near,
+						this.far,
+						this._v30,
+						this._v31,
+						this._v32,
+						backfaceCulling,
+						this._target
+					)
+					if (distance !== undefined) {
+						result.hit = true
+						result.intersections.push({
+							pointLocal: this._target.clone(),
+							point: this._target.clone().applyMatrix4(this._modelMatrix),
+							distance,
+							index: i / 3,
+							triangle: [this._v30.clone(), this._v31.clone(), this._v32.clone()],
+						})
+						if (!allInters) {
+							return result
+						}
+					}
+				}
+			} else {
+				for (let i = 0; i < pos.length; i += 9) {
+					this._v30.fromArray(pos, i + 0)
+					this._v31.fromArray(pos, i + 3)
+					this._v32.fromArray(pos, i + 6)
+
+					const distance = rayIntersectsTriangle(
+						this._inverseRay,
+						this.near,
+						this.far,
+						this._v30,
+						this._v31,
+						this._v32,
+						backfaceCulling,
+						this._target
+					)
+					if (distance !== undefined) {
+						result.hit = true
+						result.intersections.push({
+							pointLocal: this._target.clone(),
+							point: this._target.clone().applyMatrix4(this._modelMatrix),
+							distance,
+							index: i / 3,
+							triangle: [this._v30.clone(), this._v31.clone(), this._v32.clone()],
+						})
+						if (!allInters) {
+							return result
+						}
 					}
 				}
 			}
