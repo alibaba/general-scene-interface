@@ -7,7 +7,7 @@
 		"test": "mocha --recursive"
 	},
 	"devDependencies": {
-		"@gs.i/all": "0.2.1-alpha.26",
+		"@gs.i/all": "^0.2.1-alpha.26",
 		"chai": ">=4.0.0",
 		"mocha": ">=9.0.0"
 	}
