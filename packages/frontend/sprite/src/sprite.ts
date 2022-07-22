@@ -25,7 +25,7 @@ export interface SpriteConfig {
 	useAttributeTransform: boolean
 
 	/**
-	 * @default {r:1, g:1, b: 1}
+	 * @default {r:1,g:1,b:1}
 	 */
 	baseColorFactor?: ColorRGB
 
