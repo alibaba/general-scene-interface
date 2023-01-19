@@ -90,7 +90,19 @@ export class Raycaster extends Processor {
 	matrixProcessor: MatProcessor
 
 	ray = new Ray()
+	/**
+	 * @deprecated bad naming
+	 * @note
+	 * This algorithm put camera in model space, so near & far must be in model space.
+	 * Which means, when model space contains scaling, you shouldn't use camera.near & camera.far directly.
+	 */
 	near = 0
+	/**
+	 * @deprecated bad naming
+	 * @note
+	 * This algorithm put camera in model space, so near & far must be in model space.
+	 * Which means, when model space contains scaling, you shouldn't use camera.near & camera.far directly.
+	 */
 	far = Infinity
 
 	/**
