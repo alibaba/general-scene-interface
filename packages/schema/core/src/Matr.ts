@@ -219,9 +219,10 @@ export interface MaterialBase extends Versioned {
 
 			/**
 			 * @delete flatShading?: boolean
-			 * {@link https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#meshes}
+			 * {@link https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#meshes}
 			 * 自动判断是否存在 attributes.normal
-			 * Implementation note: When normals are not specified, client implementations should calculate flat normals.
+			 * When normals are not specified, client implementations MUST calculate flat normals and the provided tangents (if present) MUST be ignored.
+			 * @note 注意，gltf的这种设计实际上让 material 和 geometry 耦合，因为 material 要知道 geometry 是否存在 normal 来决定自己的 shader
 			 */
 
 			/**

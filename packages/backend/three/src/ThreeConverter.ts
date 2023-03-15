@@ -147,7 +147,8 @@ export const defaultConfig = {
 	 * 	 useless inode(non-renderable nodes) will be removed from output scene graph
 	 * - keep this disabled for best performance
 	 * - enabling this doesn't promise the output tree has exactly same shape of input
-	 * - TODO enabling this may change some behavers of bounding and culling
+	 * - TODO: enabling this may change some behavers of bounding and culling
+	 * - TODO: disabling this breaks visibility inheritance
 	 */
 	keepTopology: false,
 
@@ -548,6 +549,11 @@ export class Converter {
 					;(material['defines'] as any).GSI_USE_UV = true
 				}
 
+				if (!gsiNode.geometry.attributes.normal) {
+					// @note required by GLTF2 spec
+					material['flatShading'] = true
+				}
+
 				// ext render order
 				const renderOrder = gsiNode.extensions?.EXT_mesh_order?.renderOrder
 				if (renderOrder !== undefined) threeObject.renderOrder = renderOrder
@@ -593,7 +599,7 @@ export class Converter {
 			if (this.config.cullingProcessor.isFrustumCulled(gsiNode)) {
 				this.info.culledCount++
 				// @TODO: set .visible false will cull all its children
-				// 			this can be problematic when a renderable object has renderable children
+				// 			this can be problematic without BVH
 				threeObject.visible = false
 			}
 		}
