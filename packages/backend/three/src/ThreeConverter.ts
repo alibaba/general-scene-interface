@@ -550,9 +550,9 @@ export class Converter {
 					;(material['defines'] as any).GSI_USE_UV = true
 				}
 
-				if (!gsiNode.geometry.attributes.normal && material.type === 'MeshStandardMaterial') {
+				if (!gsiNode.geometry.attributes.normal) {
 					// @note required by GLTF2 spec
-					;(material as MeshStandardMaterial).flatShading = true
+					;(material as any).flatShading = true
 				}
 
 				// ext render order
