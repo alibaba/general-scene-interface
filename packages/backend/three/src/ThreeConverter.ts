@@ -53,6 +53,7 @@ import {
 	DataTexture,
 	Light,
 	PointLight,
+	MeshStandardMaterial,
 } from 'three'
 import { checkProcessorPerformance, sealTransform } from './utils'
 
@@ -549,9 +550,9 @@ export class Converter {
 					;(material['defines'] as any).GSI_USE_UV = true
 				}
 
-				if (!gsiNode.geometry.attributes.normal) {
+				if (!gsiNode.geometry.attributes.normal && material.type === 'MeshStandardMaterial') {
 					// @note required by GLTF2 spec
-					material['flatShading'] = true
+					;(material as MeshStandardMaterial).flatShading = true
 				}
 
 				// ext render order
