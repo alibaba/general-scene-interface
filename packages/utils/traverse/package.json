@@ -1,6 +1,6 @@
 {
 	"name": "@gs.i/utils-traverse",
-	"version": "0.2.1-alpha.30",
+	"version": "0.2.1-alpha.31",
 	"description": "",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
@@ -20,7 +20,7 @@
 		"v": "node -v && tsc -v"
 	},
 	"dependencies": {
-		"@gs.i/schema-scene": "0.2.1-alpha.30"
+		"@gs.i/schema-scene": "0.2.1-alpha.31"
 	},
 	"devDependencies": {
 		"typescript": ">4.4.0"
