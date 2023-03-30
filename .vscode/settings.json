@@ -29,7 +29,7 @@
 		// "**/*.back": true,
 		// "**/*.old": true
 		// "**/*.tsbuildinfo": true
-		".*": true,
+		// ".*": true,
 		"packages/**/node_modules": true,
 		"packages/**/dist": true,
 		"packages/**/scripts": true,
