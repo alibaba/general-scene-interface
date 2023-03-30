@@ -178,6 +178,8 @@ export class GLTF2Loader {
 					},
 					opacity: baseColorFactor[3],
 					baseColorTexture,
+					alphaMode: material.alphaMode ?? 'OPAQUE',
+					doubleSided: material.doubleSided ?? false,
 				} as IR.LooseUnlitMaterial
 			} else {
 				// PBR 材质
@@ -267,6 +269,9 @@ export class GLTF2Loader {
 					normalTexture,
 					emissiveTexture,
 					occlusionTexture,
+
+					alphaMode: material.alphaMode ?? 'OPAQUE',
+					doubleSided: material.doubleSided ?? false,
 				} as IR.LoosePbrMaterial
 			}
 

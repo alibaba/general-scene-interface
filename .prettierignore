@@ -1,3 +1,4 @@
 packages/utils/math
 packages/renderers/gl2
 packages/renderers/threelite
+packages/utils/gltf2/src/GLTF.ts

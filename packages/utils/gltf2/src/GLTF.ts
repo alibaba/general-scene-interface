@@ -430,7 +430,7 @@ export interface Material {
   /**
    * The alpha rendering mode of the material.
    */
-  "alphaMode"?: "OPAQUE" | "MASK" | "BLEND" | string;
+  "alphaMode"?: "OPAQUE" | "MASK" | "BLEND";
   /**
    * The alpha cutoff value of the material.
    */
