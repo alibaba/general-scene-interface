@@ -482,7 +482,9 @@ export function buildMultiThickLine(multiPolyline: MultiPolyline2D, config: Conf
 			bounds: false,
 		})
 
-		geom && geoms.push(geom)
+		// If the polyline collapse to a point, the geom will be empty.
+		if (geom && geom.attributes.position?.array?.length && geom.indices?.array?.length)
+			geoms.push(geom)
 
 		start += percents[i]
 		end += percents[i + 1] // @note this will be NAN in the last loop. But ok.
