@@ -92,6 +92,8 @@ export function buildThickLine(polyline: Polyline2D, config: Config): Geometry {
 		}
 	})
 
+	if (polyline.length < 2) return buildEmpty()
+
 	for (let i = 0; i < polyline.length; i++) {
 		const prev = polyline[i - 1]
 		const curr = polyline[i]
