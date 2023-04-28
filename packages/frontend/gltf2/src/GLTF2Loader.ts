@@ -1,16 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { specifyGeometry } from '@gs.i/utils-specify'
+
 /**
  * Copyright (C) 2021 Alibaba Group Holding Limited
  * All rights reserved.
  */
 
-import IR from '@gs.i/schema-scene' // type only, will be deleted after compiled
-// import { Quaternion } from '@gs.i/utils-math'
-
-import { specifyTree } from '@gs.i/utils-specify'
-
-// import * as SDK from '@gs.i/frontend-sdk'
+import type IR from '@gs.i/schema-scene' // type only, will be deleted after compiled
+import { specifyTree, specifyGeometry } from '@gs.i/utils-specify'
 
 import {
 	GLTF,
@@ -30,6 +26,7 @@ import {
 	GLB_CHUNK_TYPE_BIN,
 	parseImageFromBufferView,
 	attrNameGltfToThree,
+	deInterleave,
 } from '@gs.i/utils-gltf2'
 
 /**
@@ -121,6 +118,8 @@ export class GLTF2Loader {
 			const bufferView = glm.bufferViews[bufferViewIndex]
 			const TypedArrayConstructor = componentTypeToTypedArray(accessor.componentType)
 
+			let isInterleaved = false
+
 			if (bufferView.byteStride !== undefined) {
 				// https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#data-alignment
 				// > effective stride equals the size of the element
@@ -129,16 +128,23 @@ export class GLTF2Loader {
 
 				if (effectiveStride !== bufferView.byteStride) {
 					// interleaved
-					console.warn('暂时不支持 interleaved/byteStride, 可能出现行为异常')
+					console.warn('interleaved/byteStride unpack. will be slow.')
+
+					isInterleaved = true
 				}
 			}
 
-			const typedArray: IR.TypedArray = new TypedArrayConstructor(
-				composedBuffer,
-				(bufferView.byteOffset || 0) + (accessor.byteOffset || 0),
-				// bufferView.byteLength / TypedArrayConstructor.BYTES_PER_ELEMENT
-				AccessorTypeToItemSize[accessor.type] * accessor.count
-			)
+			let typedArray: IR.TypedArray
+
+			if (isInterleaved) {
+				typedArray = deInterleave(accessor, bufferView, composedBuffer)
+			} else {
+				typedArray = new TypedArrayConstructor(
+					composedBuffer,
+					(bufferView.byteOffset || 0) + (accessor.byteOffset || 0),
+					AccessorTypeToItemSize[accessor.type] * accessor.count
+				)
+			}
 
 			const attributeData: IR.LooseAttribute = {
 				array: typedArray,

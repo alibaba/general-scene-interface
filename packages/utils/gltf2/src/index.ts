@@ -5,6 +5,7 @@
 
 import { TypedArray, AttributeDataType } from '@gs.i/schema-scene'
 
+import type * as GLTF from './GLTF'
 export * as GLTF from './GLTF'
 export * from './GLTF2.memory'
 
@@ -313,5 +314,49 @@ export function getMinMax(attributeData: AttributeDataType) {
 		}
 	}
 
-	throw 'attributeData.itemSize 未实现'
+	throw `unsupported attributeData.itemSize: ${attributeData.itemSize}`
+}
+
+/**
+ * separate a tightly packed typedArray from an interleaved buffer view
+ */
+export function deInterleave(
+	accessor: GLTF.Accessor,
+	bufferView: GLTF.BufferView,
+	composedBuffer: ArrayBuffer
+) {
+	// accessor.byteOffset and bufferView.byteStride MUST be multiples of 4
+
+	const byteOffsetInStride = accessor.byteOffset || 0
+	// const offsetInStride = byteOffsetInStride / 4
+
+	const byteStride = bufferView.byteStride
+
+	if (byteStride === undefined)
+		throw new Error('bufferView.byteStride is undefined. can not deInterleave')
+
+	// const stride = byteStride / 4
+
+	const count = accessor.count
+
+	const itemSize = AccessorTypeToItemSize[accessor.type]
+
+	const TypedArrayConstructor = componentTypeToTypedArray(accessor.componentType)
+
+	const BYTES_PER_ELEMENT = TypedArrayConstructor.BYTES_PER_ELEMENT as number
+
+	const resultView = new Uint8Array(count * itemSize * BYTES_PER_ELEMENT)
+	const sourceView = new Uint8Array(composedBuffer, bufferView.byteOffset, bufferView.byteLength)
+
+	for (let i = 0; i < count; i++) {
+		for (let j = 0; j < itemSize; j++) {
+			const targetOffset = i * itemSize * BYTES_PER_ELEMENT + j * BYTES_PER_ELEMENT
+			const sourceOffset = i * byteStride + j * BYTES_PER_ELEMENT + byteOffsetInStride
+
+			resultView.set(sourceView.slice(sourceOffset, sourceOffset + BYTES_PER_ELEMENT), targetOffset)
+		}
+	}
+
+	const result = new TypedArrayConstructor(resultView.buffer)
+	return result
 }
