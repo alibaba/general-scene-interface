@@ -52,7 +52,7 @@ export interface Geometry {
 		 * - normal
 		 * - color
 		 * - uv
-		 * - uv2
+		 * - uv1 * {@link https://github.com/mrdoob/three.js/pull/25943}
 		 *
 		 * gltf2 PBR
 		 * {@link https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#meshes}
@@ -83,7 +83,6 @@ export interface Geometry {
 		position?: Vec3Attribute
 		normal?: Vec3Attribute
 		uv?: Vec2Attribute
-		uv2?: Vec2Attribute
 		color?: Vec3Attribute | Vec4Attribute
 
 		[name: string]: Attribute | undefined

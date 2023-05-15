@@ -221,7 +221,7 @@ export function attrNameThreeToGltf(name: string): string {
 			return 'NORMAL'
 		case 'uv':
 			return 'TEXCOORD_0'
-		case 'uv2':
+		case 'uv1':
 			return 'TEXCOORD_1'
 		default:
 			// console.warn('不支持的 attributes: ', name)
@@ -238,7 +238,7 @@ export function attrNameGltfToThree(name: string): string {
 		case 'TEXCOORD_0':
 			return 'uv'
 		case 'TEXCOORD_1':
-			return 'uv2'
+			return 'uv1'
 		default:
 			// console.warn('不支持的 attributes: ', name)
 			return name

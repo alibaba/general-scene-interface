@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /**
  * Copyright (C) 2021 Alibaba Group Holding Limited
  * All rights reserved.
@@ -875,22 +876,22 @@ export class Converter {
 				 * @note it is safe to assume that textures have been handled and cached in previews #resourceStage
 				 */
 				pbrThreeMatr.metalnessMap = gsiMatr.metallicRoughnessTexture
-					? (this._threeTex.get(gsiMatr.metallicRoughnessTexture) as ThreeTexture)
+					? this._threeTex.get(gsiMatr.metallicRoughnessTexture)!
 					: null
 				pbrThreeMatr.roughnessMap = gsiMatr.metallicRoughnessTexture
-					? (this._threeTex.get(gsiMatr.metallicRoughnessTexture) as ThreeTexture)
+					? this._threeTex.get(gsiMatr.metallicRoughnessTexture)!
 					: null
 				pbrThreeMatr.map = gsiMatr.baseColorTexture
-					? (this._threeTex.get(gsiMatr.baseColorTexture) as ThreeTexture)
+					? this._threeTex.get(gsiMatr.baseColorTexture)!
 					: null
 				pbrThreeMatr.emissiveMap = gsiMatr.emissiveTexture
-					? (this._threeTex.get(gsiMatr.emissiveTexture) as ThreeTexture)
+					? this._threeTex.get(gsiMatr.emissiveTexture)!
 					: null
 				pbrThreeMatr.normalMap = gsiMatr.normalTexture
-					? (this._threeTex.get(gsiMatr.normalTexture) as ThreeTexture)
+					? this._threeTex.get(gsiMatr.normalTexture)!
 					: null
 				pbrThreeMatr.aoMap = gsiMatr.occlusionTexture
-					? (this._threeTex.get(gsiMatr.occlusionTexture) as ThreeTexture)
+					? this._threeTex.get(gsiMatr.occlusionTexture)!
 					: null
 				break
 			}
@@ -901,7 +902,7 @@ export class Converter {
 
 				unlitThreeMatr.color = this.convColor(matr.baseColorFactor)
 				unlitThreeMatr.map = matr.baseColorTexture
-					? (this._threeTex.get(matr.baseColorTexture) as ThreeTexture)
+					? this._threeTex.get(matr.baseColorTexture)!
 					: null
 				break
 			}
@@ -914,7 +915,7 @@ export class Converter {
 				pointThreeMatr.sizeAttenuation = matr.sizeAttenuation
 				pointThreeMatr.color = this.convColor(matr.baseColorFactor)
 				pointThreeMatr.map = matr.baseColorTexture
-					? (this._threeTex.get(matr.baseColorTexture) as ThreeTexture)
+					? this._threeTex.get(matr.baseColorTexture)!
 					: null
 				break
 			}
@@ -958,7 +959,7 @@ export class Converter {
 
 					if (isTexture(uniform.value)) {
 						// it should be cached before
-						const threeTexture = this._threeTex.get(uniform.value) as ThreeTexture
+						const threeTexture = this._threeTex.get(uniform.value)!
 						threeUniforms[key].value = threeTexture
 					} else if (isCubeTexture(uniform.value)) {
 						// 👀
@@ -1002,7 +1003,7 @@ export class Converter {
 			return threeTexture
 		}
 
-		let threeTexture = this._threeTex.get(gsiTexture) as ThreeTexture
+		let threeTexture = this._threeTex.get(gsiTexture)!
 		let committedVersion = this._committedTex.get(gsiTexture) as Int
 
 		// create
