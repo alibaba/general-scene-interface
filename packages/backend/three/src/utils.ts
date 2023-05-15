@@ -5,7 +5,7 @@
 
 import { Box3, Sphere, Object3D, Vector3, Euler, Quaternion, Matrix4 } from 'three'
 import { BBox, BSphere } from '@gs.i/schema-scene'
-import type { Converter, defaultConfig as threeDefaultConfig } from './ThreeConverter'
+import type { Converter, defaultConfig as threeDefaultConfig } from './Converter'
 
 export function box3Equals(b1: Box3 | BBox, b2: Box3 | BBox): boolean {
 	return (

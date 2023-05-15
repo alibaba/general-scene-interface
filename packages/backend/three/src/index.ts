@@ -3,4 +3,4 @@
  * All rights reserved.
  */
 
-export * from './ThreeConverter'
+export * from './Converter'

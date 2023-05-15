@@ -36,7 +36,6 @@ import { traverse, flatten } from '@gs.i/utils-traverse'
 import { syncMaterial } from './syncMaterial'
 import { syncTexture } from './syncTexture'
 
-// import * as THREE from 'three'
 import {
 	Object3D,
 	BufferGeometry,
@@ -54,7 +53,6 @@ import {
 	DataTexture,
 	Light,
 	PointLight,
-	MeshStandardMaterial,
 } from 'three'
 import { checkProcessorPerformance, sealTransform } from './utils'
 
@@ -836,7 +834,7 @@ export class Converter {
 			this._threeMatr.set(gsiMatr, threeMatr)
 			// this._committedMatr.set(gsiMatr, committedVersion)
 
-			syncMaterial(gsiMatr, threeMatr, this._threeTex)
+			syncMaterial(gsiMatr, threeMatr)
 		}
 
 		threeMatr.visible = gsiMatr.visible
@@ -937,7 +935,7 @@ export class Converter {
 			if (threeMatr.version !== gsiMatr.version) {
 				// needs update
 				// console.debug('Material.version bumped')
-				syncMaterial(gsiMatr, threeMatr, this._threeTex)
+				syncMaterial(gsiMatr, threeMatr)
 				threeMatr.version = gsiMatr.version
 			}
 		}
