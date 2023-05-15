@@ -1,14 +1,13 @@
-import { MaterialBase, Texture } from '@gs.i/schema-scene'
+import { MaterialBase } from '@gs.i/schema-scene'
 import {
 	Material,
-	Texture as ThreeTexture,
 	FrontSide,
 	BackSide,
 	DoubleSide,
 	NoBlending,
 	NormalBlending,
 	AdditiveBlending,
-} from 'three-lite'
+} from 'three'
 import { convDefines } from './utils'
 
 /**
@@ -18,8 +17,7 @@ import { convDefines } from './utils'
 export function syncMaterial(
 	gsiMatr: MaterialBase,
 	/** it's actually ShaderMaterial but three.js ShaderMaterial type declaration is kinda funky. won't rely on it anyway*/
-	threeMatr: Material,
-	cache: WeakMap<Texture, ThreeTexture>
+	threeMatr: Material
 ): void {
 	threeMatr.name = threeMatr.name || gsiMatr.name || 'GSI-three-Matr'
 

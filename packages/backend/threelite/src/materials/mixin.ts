@@ -21,7 +21,7 @@
  *
  */
 
-import { Material, UniformsUtils } from 'three-lite'
+import { Material, UniformsUtils } from 'three'
 import type IR from '@gs.i/schema-scene'
 
 export function Shaderlize<TBase extends new (...args: any[]) => Material>(

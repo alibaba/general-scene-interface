@@ -1,4 +1,4 @@
-import IR from '@gs.i/schema-scene'
+import type IR from '@gs.i/schema-scene'
 import {
 	Texture as ThreeTexture,
 	NearestFilter,
@@ -12,7 +12,7 @@ import {
 	LinearMipMapLinearFilter,
 	sRGBEncoding,
 	LinearEncoding,
-} from 'three-lite'
+} from 'three'
 
 /**
  * sync texture parameters from gsi IR to three texture

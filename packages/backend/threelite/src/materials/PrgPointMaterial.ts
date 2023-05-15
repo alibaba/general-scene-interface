@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-import { PointsMaterial, UniformsUtils, ShaderLib } from 'three-lite'
+import { PointsMaterial, UniformsUtils, ShaderLib } from 'three'
 import type IR from '@gs.i/schema-scene'
 import vs from './shaders/point.vs.glsl'
 import fs from './shaders/point.fs.glsl'

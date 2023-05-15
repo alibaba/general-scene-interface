@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-import { MeshBasicMaterial, UniformsUtils, ShaderLib } from 'three-lite'
+import { MeshBasicMaterial, UniformsUtils, ShaderLib } from 'three'
 import type IR from '@gs.i/schema-scene'
 import vs from './shaders/unlit.vs.glsl'
 import fs from './shaders/unlit.fs.glsl'

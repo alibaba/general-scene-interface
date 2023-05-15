@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /**
  * Copyright (C) 2021 Alibaba Group Holding Limited
  * All rights reserved.
@@ -35,8 +36,8 @@ import { traverse, flatten } from '@gs.i/utils-traverse'
 import { syncMaterial } from './syncMaterial'
 import { syncTexture } from './syncTexture'
 
-import * as THREE from 'three-lite'
 import {
+	REVISION,
 	Object3D,
 	BufferGeometry,
 	Material,
@@ -53,10 +54,10 @@ import {
 	DataTexture,
 	Light,
 	PointLight,
-} from 'three-lite'
+} from 'three'
 import { checkProcessorPerformance, sealTransform } from './utils'
 
-console.log('THREE', THREE)
+console.log('THREE', REVISION)
 
 /**
  * @note safe to share globally @simon
@@ -830,7 +831,7 @@ export class ThreeLiteConverter {
 			this._threeMatr.set(gsiMatr, threeMatr)
 			// this._committedMatr.set(gsiMatr, committedVersion)
 
-			syncMaterial(gsiMatr, threeMatr, this._threeTex)
+			syncMaterial(gsiMatr, threeMatr)
 		}
 
 		threeMatr.visible = gsiMatr.visible
@@ -931,7 +932,7 @@ export class ThreeLiteConverter {
 			if (threeMatr.version !== gsiMatr.version) {
 				// needs update
 				// console.debug('Material.version bumped')
-				syncMaterial(gsiMatr, threeMatr, this._threeTex)
+				syncMaterial(gsiMatr, threeMatr)
 				threeMatr.version = gsiMatr.version
 			}
 		}
@@ -981,7 +982,7 @@ export class ThreeLiteConverter {
 
 			const uvMatrix = gsiMatr.extensions?.EXT_matr_uv_transform?.matrix
 			if (uvMatrix) {
-				threeMatr.map.matrix.fromArray(uvMatrix)
+				threeMatr.map!.matrix.fromArray(uvMatrix)
 			}
 		}
 

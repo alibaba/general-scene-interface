@@ -30,7 +30,7 @@
 		"@gs.i/utils-math": "0.2.1-alpha.34",
 		"@gs.i/utils-specify": "0.2.1-alpha.34",
 		"@gs.i/utils-traverse": "0.2.1-alpha.34",
-		"three": "^0.139.2"
+		"three": "0.139.2"
 	},
 	"devDependencies": {
 		"@types/offscreencanvas": "latest",
