@@ -30,11 +30,11 @@
 		"@gs.i/utils-math": "0.2.1-alpha.34",
 		"@gs.i/utils-specify": "0.2.1-alpha.34",
 		"@gs.i/utils-traverse": "0.2.1-alpha.34",
-		"three": "^0.139.2"
+		"three": "^0.152.2",
+		"@types/three": "^0.152.1"
 	},
 	"devDependencies": {
 		"@types/offscreencanvas": "latest",
-		"@types/three": "^0.139.0",
 		"@types/webvr-api": "latest",
 		"typescript": ">4.4.0"
 	}

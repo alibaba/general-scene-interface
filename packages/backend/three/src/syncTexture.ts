@@ -10,8 +10,9 @@ import {
 	RepeatWrapping,
 	NearestMipMapLinearFilter,
 	LinearMipMapLinearFilter,
-	sRGBEncoding,
-	LinearEncoding,
+	NoColorSpace,
+	SRGBColorSpace,
+	LinearSRGBColorSpace,
 } from 'three'
 
 /**
@@ -101,9 +102,9 @@ export function syncTexture(gsiTexture: IR.Texture, threeTexture: ThreeTexture):
 	// flipY
 	threeTexture.flipY = gsiTexture.image.extensions?.EXT_image_flipY ?? true
 
-	// encoding
-	threeTexture.encoding =
-		gsiTexture.image.extensions?.EXT_image_encoding === 'SRGB' ? sRGBEncoding : LinearEncoding
+	// colorSpace
+	threeTexture.colorSpace =
+		gsiTexture.image.extensions?.EXT_image_encoding === 'SRGB' ? SRGBColorSpace : NoColorSpace
 
 	// @TODO transform
 }

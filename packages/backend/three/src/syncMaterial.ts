@@ -1,6 +1,8 @@
-import { MaterialBase } from '@gs.i/schema-scene'
+import type IR from '@gs.i/schema-scene'
 import {
-	Material,
+	MeshBasicMaterial,
+	MeshPhysicalMaterial,
+	PointsMaterial,
 	FrontSide,
 	BackSide,
 	DoubleSide,
@@ -15,9 +17,9 @@ import { convDefines } from './utils'
  * @note these parameters only sync when the material needs update. NOT EVERY FRAME!
  */
 export function syncMaterial(
-	gsiMatr: MaterialBase,
+	gsiMatr: IR.Material,
 	/** it's actually ShaderMaterial but three.js ShaderMaterial type declaration is kinda funky. won't rely on it anyway*/
-	threeMatr: Material
+	threeMatr: MeshBasicMaterial | MeshPhysicalMaterial | PointsMaterial
 ): void {
 	threeMatr.name = threeMatr.name || gsiMatr.name || 'GSI-three-Matr'
 
@@ -67,6 +69,14 @@ export function syncMaterial(
 			throw new Error('Unsupported value of GSI::Matr.alphaMode: ' + gsiMatr.alphaMode)
 	}
 
+	// physical
+	{
+		const transmission = gsiMatr.extensions?.EXT_matr_transmission
+		if (threeMatr instanceof MeshPhysicalMaterial) {
+			threeMatr.transmission = transmission ?? 0
+		}
+	}
+
 	// advanced controls
 	{
 		const extAdvanced = gsiMatr.extensions?.EXT_matr_advanced
@@ -76,8 +86,6 @@ export function syncMaterial(
 			if (extAdvanced.depthTest !== undefined) threeMatr.depthTest = extAdvanced.depthTest
 
 			if (extAdvanced.depthWrite !== undefined) threeMatr.depthWrite = extAdvanced.depthWrite
-
-			if (extAdvanced.depthFunc !== undefined) threeMatr.depthFunc = extAdvanced.depthFunc
 
 			if (extAdvanced.polygonOffset !== undefined)
 				threeMatr.polygonOffset = extAdvanced.polygonOffset

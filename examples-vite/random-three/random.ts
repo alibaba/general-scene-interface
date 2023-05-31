@@ -22,6 +22,9 @@ import { scene as threeScene } from '../__utils/ThreeScene'
 		// count: 1,
 		// depth: 1,
 		useAnimation: true,
+		useTransmission: true,
+		ditherOptions: true,
+
 		// useGLine: false,
 		// usePrg: false,
 		// useLine: false,
@@ -38,7 +41,7 @@ import { scene as threeScene } from '../__utils/ThreeScene'
 		useBSphere: true,
 		// useWireframe: true,
 	})
-	indicator.traverse(scene)
+	// indicator.traverse(scene)
 
 	const conv = new Converter({ overrideFrustumCulling: true })
 	console.log(conv)

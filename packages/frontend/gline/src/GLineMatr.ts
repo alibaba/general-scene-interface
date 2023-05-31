@@ -4,7 +4,7 @@
  */
 
 /* eslint-disable @typescript-eslint/no-this-alias */
-import { MatrUnlit, MatrPoint } from '@gs.i/frontend-sdk'
+import { UnlitMaterial, PointMaterial } from '@gs.i/frontend-sdk'
 import vsPreVert from './lv24.preVert.glsl'
 import vsVertOutput from './lv24.vertOutput.glsl'
 import nativeVertGeometry from './lv1.vertGeometry.glsl'
@@ -98,7 +98,7 @@ const MatrProps = {
 /**
  * GLineMaterial
  */
-export class GLineMatr extends MatrUnlit {
+export class GLineMatr extends UnlitMaterial {
 	name = 'GLineMatr'
 
 	/**
@@ -121,6 +121,8 @@ export class GLineMatr extends MatrUnlit {
 			language: 'GLSL100',
 			extension: '',
 			defines: {
+				// three r152 fix
+				USE_UV: true,
 				// 禁止修改
 				LEVEL: _config.level,
 				INFINITY: _config.infinity,
@@ -206,11 +208,6 @@ export class GLineMatr extends MatrUnlit {
 				`
 				break
 		}
-
-		// this.varyings = {
-		// 	vUv: 'vec2',
-		// 	vColor4: 'vec4',
-		// }
 
 		if (_config.transparent !== undefined) {
 			this.alphaMode = _config.transparent ? 'BLEND' : 'OPAQUE'
@@ -342,7 +339,7 @@ export class GLineMatr extends MatrUnlit {
 	}
 }
 
-export class GLinePointMatr extends MatrPoint {
+export class GLinePointMatr extends PointMaterial {
 	name = 'GLineMatr'
 
 	config: any = {}
@@ -396,26 +393,6 @@ export class GLinePointMatr extends MatrPoint {
 		if (_config.texture) {
 			this.uniforms.TEX = { value: _config.texture }
 		}
-
-		// this.defines = {
-		// 	// 禁止修改
-		// 	LEVEL: _config.level,
-		// 	INFINITY: _config.infinity,
-		// 	// 可以修改
-		// 	USE_COLORS: _config.useColors || false,
-		// 	USE_TEXTURE: _config.texture && true,
-		// }
-
-		// this.attributes = {
-		// 	curr: 'vec3',
-		// 	u: 'float',
-		// 	color: 'vec4',
-		// }
-
-		// this.varyings = {
-		// 	vUv: 'vec2',
-		// 	vColor4: 'vec4',
-		// }
 
 		if (_config.transparent !== undefined) {
 			this.alphaMode = _config.transparent ? 'BLEND' : 'OPAQUE'

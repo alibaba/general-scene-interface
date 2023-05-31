@@ -4,7 +4,7 @@
  * All rights reserved.
  */
 
-import { createPrgStandardMaterial, TPrgStandardMaterial } from './materials/PrgStandardMaterial'
+import { createPrgPhysicalMaterial, TPrgPhysicalMaterial } from './materials/PrgPhysicalMaterial'
 import { createPrgBasicMaterial, TPrgBasicMaterial } from './materials/PrgBasicMaterial'
 import { createPrgPointMaterial, TPrgPointMaterial } from './materials/PrgPointMaterial'
 
@@ -263,7 +263,7 @@ export class Converter {
 	// TODO use IR.Material instead because IR.MatrBase can not be used alone
 	private _threeMatr = new WeakMap<
 		IR.Material | IR.MaterialBase,
-		TPrgStandardMaterial | TPrgBasicMaterial | TPrgPointMaterial
+		TPrgPhysicalMaterial | TPrgBasicMaterial | TPrgPointMaterial
 	>()
 	private _threeColor = new WeakMap<ColorRGB, Color>()
 
@@ -543,11 +543,11 @@ export class Converter {
 				threeObject['material'] = material
 				threeObject['geometry'] = geometry
 
-				if (gsiNode.geometry.attributes.uv) {
-					// @note it's safe to assume `defines` was created above
-					// @note three react to `defines` change. no need for bumping version
-					;(material['defines'] as any).GSI_USE_UV = true
-				}
+				// if (gsiNode.geometry.attributes.uv) {
+				// @note it's safe to assume `defines` was created above
+				// @note three react to `defines` change. no need for bumping version
+				// ;(material['defines'] as any).GSI_USE_UV = true
+				// }
 
 				if (!gsiNode.geometry.attributes.normal) {
 					// @note required by GLTF2 spec
@@ -561,7 +561,7 @@ export class Converter {
 				const luminousEXT = gsiNode.extensions?.EXT_luminous as LuminousEXT
 
 				const threeLight = threeObject as PointLight
-				threeLight.color.copy(luminousEXT.color as Color)
+				threeLight.color.setRGB(luminousEXT.color.r, luminousEXT.color.g, luminousEXT.color.b) // three 152 color management
 				threeLight.intensity = luminousEXT.intensity
 				threeLight.distance = luminousEXT.range
 			}
@@ -820,7 +820,7 @@ export class Converter {
 					threeMatr = createPrgBasicMaterial(gsiMatr as IR.UnlitMaterial)
 					break
 				case 'pbr':
-					threeMatr = createPrgStandardMaterial(gsiMatr as IR.PbrMaterial)
+					threeMatr = createPrgPhysicalMaterial(gsiMatr as IR.PbrMaterial)
 					break
 				default:
 					throw 'Unsupported GSI::Material Type: ' + gsiMatr['type']
@@ -860,7 +860,7 @@ export class Converter {
 			// 	break
 
 			case 'pbr': {
-				const pbrThreeMatr = threeMatr as TPrgStandardMaterial
+				const pbrThreeMatr = threeMatr as TPrgPhysicalMaterial
 
 				pbrThreeMatr.color = this.convColor(gsiMatr.baseColorFactor)
 				pbrThreeMatr.emissive = this.convColor(gsiMatr.emissiveFactor)
@@ -1079,9 +1079,8 @@ export class Converter {
 		let color = this._threeColor.get(gsiColor)
 
 		if (color) {
-			color.r = gsiColor.r
-			color.g = gsiColor.g
-			color.b = gsiColor.b
+			// so that three r152 color management will work
+			color.setRGB(gsiColor.r, gsiColor.g, gsiColor.b)
 		} else {
 			color = new Color(gsiColor.r, gsiColor.g, gsiColor.b)
 			this._threeColor.set(gsiColor, color)
@@ -1266,16 +1265,16 @@ export function getResourcesFlat(flatScene: IR.NodeLike[]) {
  */
 export class RenderableObject3D extends Object3D {
 	isRenderableObject3D = true
-	isMesh?: boolean
-	isPoints?: boolean
-	isLine?: boolean
-	isLineSegments?: boolean
+	declare isMesh?: boolean
+	declare isPoints?: boolean
+	declare isLine?: boolean
+	declare isLineSegments?: boolean
 
 	// TrianglesDrawMode / TriangleStripDrawMode / TriangleFanDrawMode
-	drawMode: number
+	declare drawMode: number
 
-	geometry: BufferGeometry
-	material: Material
+	declare geometry: BufferGeometry
+	declare material: Material
 
 	constructor(params: Partial<RenderableObject3D> = {}) {
 		super()

@@ -73,7 +73,7 @@ export class Mesh {
 
 export class PointLight extends Mesh implements IR.LuminousNode {
 	name = 'PointLight'
-	readonly extensions: IR.LuminousNode['extensions']
+	declare readonly extensions: IR.LuminousNode['extensions']
 	constructor(params: Partial<IR.LuminousEXT> = {}) {
 		super()
 		this.extensions.EXT_luminous = {
@@ -100,7 +100,7 @@ export class AutoVersionTransform3 implements IR.Transform3TRS {
 	readonly position: Vector3
 	readonly scale: Vector3
 	// readonly quaternion: Quaternion
-	readonly quaternion: never
+	declare readonly quaternion: never
 
 	constructor() {
 		this.rotation = new Proxy(new Euler(), {

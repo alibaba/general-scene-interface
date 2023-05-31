@@ -36,8 +36,8 @@
 		"@gs.i/utils-wireframe": "0.2.1-alpha.34",
 		"ani-timeline": "1.2.19-m",
 		"camera-proxy": "0.1.26-alpha",
-		"three": "^0.139.2",
-		"three-lite": "0.0.139-alpha"
+		"three": "^0.152.2",
+		"@types/three": "^0.152.1"
 	},
 	"devDependencies": {
 		"typescript": ">4.4.0",

@@ -64,6 +64,7 @@ class MatrBase implements IR.MaterialBase {
 		return this.extensions.EXT_matr_programmable.global
 	}
 	set global(v) {
+		if (this.extensions.EXT_matr_programmable.global === v) return
 		this.version++
 		this.extensions.EXT_matr_programmable.global = v
 	}
@@ -71,6 +72,7 @@ class MatrBase implements IR.MaterialBase {
 		return this.extensions.EXT_matr_programmable.vertGlobal
 	}
 	set vertGlobal(v) {
+		if (this.extensions.EXT_matr_programmable.vertGlobal === v) return
 		this.version++
 		this.extensions.EXT_matr_programmable.vertGlobal = v
 	}
@@ -78,6 +80,7 @@ class MatrBase implements IR.MaterialBase {
 		return this.extensions.EXT_matr_programmable.vertGeometry
 	}
 	set vertGeometry(v) {
+		if (this.extensions.EXT_matr_programmable.vertGeometry === v) return
 		this.version++
 		this.extensions.EXT_matr_programmable.vertGeometry = v
 	}
@@ -85,6 +88,7 @@ class MatrBase implements IR.MaterialBase {
 		return this.extensions.EXT_matr_programmable.vertOutput
 	}
 	set vertOutput(v) {
+		if (this.extensions.EXT_matr_programmable.vertOutput === v) return
 		this.version++
 		this.extensions.EXT_matr_programmable.vertOutput = v
 	}
@@ -92,6 +96,7 @@ class MatrBase implements IR.MaterialBase {
 		return this.extensions.EXT_matr_programmable.fragGlobal
 	}
 	set fragGlobal(v) {
+		if (this.extensions.EXT_matr_programmable.fragGlobal === v) return
 		this.version++
 		this.extensions.EXT_matr_programmable.fragGlobal = v
 	}
@@ -99,6 +104,7 @@ class MatrBase implements IR.MaterialBase {
 		return this.extensions.EXT_matr_programmable.fragOutput
 	}
 	set fragOutput(v) {
+		if (this.extensions.EXT_matr_programmable.fragOutput === v) return
 		this.version++
 		this.extensions.EXT_matr_programmable.fragOutput = v
 	}
@@ -122,6 +128,7 @@ class MatrBase implements IR.MaterialBase {
 		return this.extensions.EXT_matr_advanced?.depthTest
 	}
 	set depthTest(v) {
+		if (this.extensions.EXT_matr_advanced.depthTest === v) return
 		this.version++
 		this.extensions.EXT_matr_advanced.depthTest = v
 	}
@@ -133,19 +140,19 @@ class MatrBase implements IR.MaterialBase {
 		return this.extensions.EXT_matr_advanced?.depthWrite
 	}
 	set depthWrite(v) {
+		if (this.extensions.EXT_matr_advanced.depthWrite === v) return
 		this.version++
 		this.extensions.EXT_matr_advanced.depthWrite = v
 	}
 
-	constructor(params: Partial<MatrBase>) {
-		for (const key of Object.keys(params)) {
-			const v = params[key]
-			if (v !== undefined) {
-				this[key] = v
-			}
-		}
-
-		specifyMaterial(this)
+	#alphaMode = 'OPAQUE' as IR.MaterialBase['alphaMode']
+	get alphaMode() {
+		return this.#alphaMode
+	}
+	set alphaMode(v) {
+		if (this.#alphaMode === v) return
+		this.version++
+		this.#alphaMode = v
 	}
 }
 
@@ -158,12 +165,13 @@ export class PbrMaterial extends MatrBase {
 	name = 'MatrPbr'
 
 	// @note @important use the same object in base class
-	readonly extensions: Required<NonNullable<IR.PbrMaterial['extensions']>>
+	declare readonly extensions: Required<NonNullable<IR.PbrMaterial['extensions']>>
 
 	get fragPreLighting() {
 		return this.extensions.EXT_matr_programmable_pbr.fragPreLighting
 	}
 	set fragPreLighting(v) {
+		if (this.extensions.EXT_matr_programmable_pbr.fragPreLighting === v) return
 		this.version++
 		this.extensions.EXT_matr_programmable_pbr.fragPreLighting = v
 	}
@@ -171,12 +179,32 @@ export class PbrMaterial extends MatrBase {
 		return this.extensions.EXT_matr_programmable_pbr.fragGeometry
 	}
 	set fragGeometry(v) {
+		if (this.extensions.EXT_matr_programmable_pbr.fragGeometry === v) return
 		this.version++
 		this.extensions.EXT_matr_programmable_pbr.fragGeometry = v
 	}
 
+	// transmission
+	get transmission() {
+		return this.extensions.EXT_matr_transmission
+	}
+	set transmission(v) {
+		if (this.extensions.EXT_matr_transmission === v) return
+		this.version++
+		this.extensions.EXT_matr_transmission = v
+	}
+
 	constructor(params: Partial<PbrMaterial> = {}) {
-		super(params)
+		super()
+
+		for (const key of Object.keys(params)) {
+			const v = params[key]
+			if (v !== undefined) {
+				this[key] = v
+			}
+		}
+
+		specifyMaterial(this)
 	}
 }
 /**
@@ -193,10 +221,19 @@ export class UnlitMaterial extends MatrBase {
 	name = 'MatrUnlit'
 
 	// @note @important use the same object in base class
-	readonly extensions: Required<NonNullable<IR.UnlitMaterial['extensions']>>
+	declare readonly extensions: Required<NonNullable<IR.UnlitMaterial['extensions']>>
 
 	constructor(params: Partial<UnlitMaterial> = {}) {
-		super(params)
+		super()
+
+		for (const key of Object.keys(params)) {
+			const v = params[key]
+			if (v !== undefined) {
+				this[key] = v
+			}
+		}
+
+		specifyMaterial(this)
 	}
 }
 /**
@@ -216,15 +253,25 @@ export class PointMaterial extends MatrBase {
 		return this.extensions.EXT_matr_programmable_point.vertPointGeometry
 	}
 	set vertPointGeometry(v) {
+		if (this.extensions.EXT_matr_programmable_point.vertPointGeometry === v) return
 		this.version++
 		this.extensions.EXT_matr_programmable_point.vertPointGeometry = v
 	}
 
 	// @note @important use the same object in base class
-	readonly extensions: Required<NonNullable<IR.PointMaterial['extensions']>>
+	declare readonly extensions: Required<NonNullable<IR.PointMaterial['extensions']>>
 
 	constructor(params: Partial<PointMaterial> = {}) {
-		super(params)
+		super()
+
+		for (const key of Object.keys(params)) {
+			const v = params[key]
+			if (v !== undefined) {
+				this[key] = v
+			}
+		}
+
+		specifyMaterial(this)
 	}
 }
 /**

@@ -69,7 +69,7 @@ export class GLineGeom extends Geom {
 	/**
 	 * extend Geom properties
 	 */
-	attributes: {
+	declare attributes: {
 		curr: Attr<3>
 		prev: Attr<3>
 		next: Attr<3>
@@ -78,7 +78,7 @@ export class GLineGeom extends Geom {
 		u: Attr<1>
 		position: Attr<3>
 	}
-	indices: Attr<1>
+	declare indices: Attr<1>
 	extensions: Exclude<IR.Geometry['extensions'], undefined> = {}
 
 	/**
@@ -86,10 +86,10 @@ export class GLineGeom extends Geom {
 	 */
 	config: GLineGeomConfig & { mag: number }
 	buffers: { [key: string]: any } = {}
-	usePoint: boolean
+	declare usePoint: boolean
 	segments: number[]
 	segmentProperty: GeomUtil.SegmentProperty
-	oldSegmentProperty: GeomUtil.SegmentProperty
+	declare oldSegmentProperty: GeomUtil.SegmentProperty
 
 	private _bufferPointCount: number
 

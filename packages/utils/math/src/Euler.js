@@ -291,20 +291,6 @@ class Euler {
 
 	}
 
-	toVector3( optionalResult ) {
-
-		if ( optionalResult ) {
-
-			return optionalResult.set( this._x, this._y, this._z );
-
-		} else {
-
-			return new Vector3( this._x, this._y, this._z );
-
-		}
-
-	}
-
 	_onChange( callback ) {
 
 		this._onChangeCallback = callback;

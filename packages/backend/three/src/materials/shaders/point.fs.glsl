@@ -34,9 +34,9 @@ void main() {
 
 	#include <output_fragment>
 
-    // slot
+	// slot
     GSI_FUNC_FragOutput(gl_FragColor);
-	
+
 	#include <tonemapping_fragment>
 	#include <encodings_fragment>
 	#include <fog_fragment>

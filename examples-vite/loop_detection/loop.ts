@@ -1,5 +1,5 @@
 import { generateScene } from '@gs.i/utils-random-scene'
-import { ThreeLiteConverter } from '@gs.i/backend-threelite'
+import { Converter } from '@gs.i/backend-three'
 import { IndicatorProcessor } from '@gs.i/processor-indicator'
 // import { traverseBFS } from '@gs.i/utils-traverse'
 
@@ -11,12 +11,12 @@ import {
 	cameraProxy,
 	WIDTH,
 	HEIGHT,
-} from '../__utils/LiteRenderer'
-import { scene as threeScene } from '../__utils/LiteScene'
+} from '../__utils/ThreeRenderer'
+import { scene as threeScene } from '../__utils/ThreeScene'
 import { specifyNode } from '@gs.i/utils-specify'
 
 {
-	const conv = new ThreeLiteConverter({ overrideFrustumCulling: true })
+	const conv = new Converter({ overrideFrustumCulling: true })
 	console.log(conv)
 	window['conv'] = conv
 	try {

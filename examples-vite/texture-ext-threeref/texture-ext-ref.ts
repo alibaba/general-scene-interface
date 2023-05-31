@@ -10,7 +10,7 @@ import * as THREE from 'three'
  */
 export const threeScene = new THREE.Scene()
 threeScene.matrixAutoUpdate = false
-threeScene.autoUpdate = false
+threeScene.matrixWorldAutoUpdate = false
 
 import {
 	renderer,
@@ -23,6 +23,7 @@ import {
 } from '../__utils/ThreeRenderer'
 import { specifyGeometry, specifyMaterial, specifyNode } from '@gs.i/utils-specify'
 import { buildBox } from '@gs.i/utils-geom-builders'
+import { Color } from 'three'
 
 {
 	const conv = new Converter({ overrideFrustumCulling: true })

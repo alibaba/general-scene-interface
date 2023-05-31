@@ -32,12 +32,6 @@ CANVAS.height = HEIGHT
 
 CONTAINER.appendChild(CANVAS)
 
-const gl = CANVAS.getContext('webgl')
-
-if (!gl) {
-	throw new Error('Cannot get WebGL context. ')
-}
-
 /**
  * 渲染器
  */
@@ -45,13 +39,15 @@ export const renderer = new THREE.WebGLRenderer({
 	// width: WIDTH,
 	// height: HEIGHT,
 	canvas: CANVAS,
-	context: gl,
+	// context: gl,
 	alpha: true,
 	antialias: true,
 	stencil: false,
 })
 // 如果需要关闭webgl warnings
 // renderer.debug.checkShaderErrors = false
+
+renderer.toneMapping = THREE.ACESFilmicToneMapping
 
 /**
  * 时间线
@@ -88,7 +84,7 @@ export const cameraProxy = new AnimatedCameraProxy({
 	},
 	onUpdate: (cam) => {
 		camera.position.fromArray(cam.position)
-		camera.rotation.fromArray(cam.rotationEuler)
+		camera.rotation.fromArray(cam.rotationEuler as any)
 		camera.updateMatrix()
 		camera.updateMatrixWorld(true)
 		// @TODO update cameraNear/cameraFar

@@ -9,7 +9,7 @@ import * as THREE from 'three'
  */
 export const scene = new THREE.Scene()
 scene.matrixAutoUpdate = false
-scene.autoUpdate = false
+scene.matrixWorldAutoUpdate = false
 
 const lights = new THREE.Object3D()
 lights.name = 'LightsWrapper'

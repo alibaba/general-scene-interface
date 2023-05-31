@@ -2,15 +2,15 @@ import { uvMaterial } from '@gs.i/frontend-materials'
 import { buildMultiThickLine, buildThickLine } from '@gs.i/thick-line-builder'
 import IR from '@gs.i/schema-scene'
 import { specifyNode } from '@gs.i/utils-specify'
-import { ThreeLiteConverter } from '@gs.i/backend-threelite'
+import { Converter } from '@gs.i/backend-three'
 import { IndicatorProcessor } from '@gs.i/processor-indicator'
 
-import { renderer, timeline, camera, cameraProxy, WIDTH, HEIGHT } from '../__utils/LiteRenderer'
-import { scene } from './../__utils/LiteScene'
+import { renderer, timeline, camera, cameraProxy, WIDTH, HEIGHT } from '../__utils/ThreeRenderer'
+import { scene } from './../__utils/ThreeScene'
 
 import { GLTF2Loader } from '@gs.i/frontend-gltf2'
 {
-	const conv = new ThreeLiteConverter({ overrideFrustumCulling: true })
+	const conv = new Converter({ overrideFrustumCulling: true })
 	console.log(conv)
 	window['conv'] = conv
 

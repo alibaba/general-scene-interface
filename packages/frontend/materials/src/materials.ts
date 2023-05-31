@@ -10,6 +10,10 @@ import { UnlitMaterial } from '@gs.i/frontend-sdk'
 
 export function buildUvMaterial() {
 	const matr = new UnlitMaterial()
+	matr.defines = {
+		USE_UV: true,
+	}
+
 	matr.vertGlobal = `
 	`
 	matr.fragOutput = `

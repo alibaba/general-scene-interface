@@ -148,6 +148,7 @@ export const defaultConfig = {
 	useTransparency: false,
 	useBackSide: false,
 	useDoubleSide: false,
+	useTransmission: false,
 
 	useAnimation: false,
 
@@ -298,8 +299,11 @@ export function getMatr(config: Config): IR.MaterialBase {
 	let usePBR = config.usePBR
 	if (usePBR && config.ditherOptions) usePBR = Math.random() > 0.5
 
+	let useTransmission = config.useTransmission
+	if (useTransmission && config.ditherOptions) useTransmission = Math.random() > 0.5
+
 	if (usePBR) {
-		return new MatrPbr({
+		const m = new MatrPbr({
 			baseColorFactor: {
 				r: Math.random(),
 				g: Math.random(),
@@ -323,6 +327,15 @@ export function getMatr(config: Config): IR.MaterialBase {
 					  )
 					: undefined,
 		})
+
+		if (useTransmission) {
+			m.alphaMode = 'BLEND'
+			m.transmission = Math.random() * 0.2 + 0.8
+			m.roughnessFactor = Math.random() * 0.2 + 0.2
+			m.side = 'double'
+		}
+
+		return m
 	} else {
 		return new MatrUnlit({
 			baseColorFactor: {

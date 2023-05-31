@@ -9,7 +9,7 @@ import vs from './shaders/point.vs.glsl'
 import fs from './shaders/point.fs.glsl'
 import { Shaderlize } from './mixin'
 
-const PrgPointMaterial = Shaderlize(PointsMaterial, vs, fs)
+export const PrgPointMaterial = Shaderlize(PointsMaterial, vs, fs)
 
 export type TPrgPointMaterial = ReturnType<typeof createPrgPointMaterial>
 

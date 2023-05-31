@@ -1,16 +1,16 @@
 import { generateScene } from '@gs.i/utils-random-scene'
-import { ThreeLiteConverter } from '@gs.i/backend-threelite'
+import { Converter } from '@gs.i/backend-three'
 import { IndicatorProcessor } from '@gs.i/processor-indicator'
 // import { traverseBFS } from '@gs.i/utils-traverse'
 
-import * as THREE from 'three-lite'
+import * as THREE from 'three'
 
 /**
  * 场景
  */
 export const threeScene = new THREE.Scene()
 threeScene.matrixAutoUpdate = false
-threeScene.autoUpdate = false
+threeScene.matrixWorldAutoUpdate = false
 
 import {
 	renderer,
@@ -20,13 +20,13 @@ import {
 	cameraProxy,
 	WIDTH,
 	HEIGHT,
-} from '../__utils/LiteRenderer'
+} from '../__utils/ThreeRenderer'
 import { specifyGeometry, specifyMaterial, specifyNode } from '@gs.i/utils-specify'
 import { buildBox } from '@gs.i/utils-geom-builders'
-import { Color } from 'three-lite'
+import { Color } from 'three'
 
 {
-	const conv = new ThreeLiteConverter({ overrideFrustumCulling: true })
+	const conv = new Converter({ overrideFrustumCulling: true })
 
 	const geometry = buildBox({ width: 100, height: 100, depth: 100 })
 	const material = specifyMaterial({ type: 'pbr', emissiveFactor: new Color('red') })

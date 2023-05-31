@@ -9,7 +9,7 @@ import vs from './shaders/unlit.vs.glsl'
 import fs from './shaders/unlit.fs.glsl'
 import { Shaderlize } from './mixin'
 
-const PrgBasicMaterial = Shaderlize(MeshBasicMaterial, vs, fs)
+export const PrgBasicMaterial = Shaderlize(MeshBasicMaterial, vs, fs)
 
 export type TPrgBasicMaterial = ReturnType<typeof createPrgBasicMaterial>
 

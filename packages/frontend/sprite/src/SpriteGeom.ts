@@ -51,8 +51,8 @@ export class SpriteGeom extends Geom {
 
 	readonly mode = 'TRIANGLES'
 
-	indices: Attr<1>
-	attributes: {
+	declare indices: Attr<1>
+	declare attributes: {
 		position: Attr<3>
 		corner: Attr<1>
 		aOffset?: Attr<2>
@@ -72,7 +72,7 @@ export class SpriteGeom extends Geom {
 		},
 	}
 
-	private _spritesInfo: {
+	private declare _spritesInfo: {
 		count: number
 		maxIndex: number
 		initialized: boolean

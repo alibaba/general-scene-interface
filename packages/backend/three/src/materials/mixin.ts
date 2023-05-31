@@ -46,6 +46,7 @@ export function Shaderlize<TBase extends new (...args: any[]) => Material>(
 
 		defines = {} as { [name: string]: string | boolean | number | undefined }
 		uniforms = {} as { [name: string]: { value: any } }
+		uniformsGroups = [] as any[]
 
 		vertexShader = '' as string
 		fragmentShader = '' as string
@@ -80,7 +81,7 @@ export function Shaderlize<TBase extends new (...args: any[]) => Material>(
 			normal: [0, 0, 0],
 			color: [1, 1, 1],
 			uv: [0, 0],
-			uv2: [0, 0],
+			uv1: [0, 0],
 		}
 
 		index0AttributeName = undefined

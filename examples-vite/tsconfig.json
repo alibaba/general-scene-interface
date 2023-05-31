@@ -15,9 +15,6 @@
 			"path": "../packages/backend/three"
 		},
 		{
-			"path": "../packages/backend/threelite"
-		},
-		{
 			"path": "../packages/frontend/gline"
 		},
 		{

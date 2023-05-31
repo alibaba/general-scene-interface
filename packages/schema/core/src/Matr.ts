@@ -103,7 +103,14 @@ export interface PbrMaterial extends MaterialBase {
 	occlusionTexture?: Texture
 
 	extensions?: {
+		/**
+		 * @bumpVersion
+		 */
 		EXT_matr_programmable_pbr?: ProgramablePbr
+		/**
+		 * @bumpVersion
+		 */
+		EXT_matr_transmission?: number
 	} & MaterialBase['extensions']
 }
 
@@ -191,7 +198,6 @@ export interface MaterialBase extends Versioned {
 			 */
 			depthTest?: boolean
 			depthWrite?: boolean
-			depthFunc?: number
 			polygonOffset?: boolean
 			polygonOffsetFactor?: number
 			polygonOffsetUnits?: number

@@ -361,11 +361,11 @@ export class GLTF2Loader {
 						 * POSITION NORMAL TANGENT TEXCOORD_0 TEXCOORD_1 COLOR_0
 						 *
 						 * 也可以在这里转换成 three 的 flavor
-						 * position normal uv uv2 color
+						 * position normal uv uv1 color
 						 *
 						 * three 内置材质不允许 自定义 uv 指向
 						 * color normal 这些必须用 uv
-						 * ao light 这些必须用 uv2
+						 * ao light 这些必须用 uv1
 						 * 可以通过修改 three pbr 材质
 						 * 这里暂时不支持与 three 不同的指向
 						 *
