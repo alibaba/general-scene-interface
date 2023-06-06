@@ -30,7 +30,7 @@ export interface Texture {
 		 *
 		 * A direct reference to corresponding threejs object.
 		 * - Used for bypassing GSI converter.
-		 * - When represented, the converter should use this object as result without minification.
+		 * - When represented, the converter should use this object as result without modification.
 		 * - Conv will fallback to normal conversion if this extension is not supported.
 		 *
 		 * @note This will break compatibility for different backends.

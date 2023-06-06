@@ -72,7 +72,28 @@ export interface BaseNode {
 
 	extras?: any
 
-	extensions?: { [key: string]: any }
+	extensions?: {
+		/**
+		 * @experimental
+		 *
+		 * A direct reference to a threejs object3D.
+		 * - Used for bypassing GSI converter.
+		 * - When represented, the converter should use this object as result without modification. Other properties should be ignored.
+		 * - Fallback to a normal node if this extension is not supported.
+		 *
+		 * @note Referenced three objects should not traverse up the parent tree.
+		 * @note Root node can not use this extension.
+		 * @note You may have to call `updateMatrixWorld(true)` on your referenced objects.
+		 * @note Must enable `keepTopology`.
+		 * @note When using this extension, you are responsible for managing this threejs object's lifecycle.
+		 *
+		 * @note This will break compatibility for different backends.
+		 * @note This extension only affect certain converters.
+		 */
+		EXT_ref_threejs?: any
+
+		[key: string]: any
+	}
 }
 
 /**

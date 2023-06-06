@@ -428,6 +428,7 @@ export class Converter {
 		{
 			const rootThree = this.convNode(root)
 			rootThree.children = []
+			if (root.extensions?.EXT_ref_threejs) throw new Error('root node cannot be a ref node')
 			// pre-order traversal, parents are handled before children
 
 			if (this.config.keepTopology) {
@@ -440,7 +441,9 @@ export class Converter {
 						const parentThree = this._threeObject.get(parent) as Object3D
 						const currentThree = this.convNode(node)
 						// clear current children to handle removed nodes
-						currentThree.children = []
+						// @note
+						// three ref nodes do not have children. But the corresponding three obj has, and should be untouched.
+						if (!node.extensions?.EXT_ref_threejs) currentThree.children = []
 						parentThree.children.push(currentThree)
 					}
 				}
@@ -468,6 +471,13 @@ export class Converter {
 	 * @note require parent to be handled before child, only work for top-down traversal
 	 */
 	private convNode(gsiNode: IR.NodeLike): RenderableObject3D | Object3D {
+		// bypass conv with EXT_ref_threejs
+		if (gsiNode.extensions?.EXT_ref_threejs) {
+			const threeObject = gsiNode.extensions?.EXT_ref_threejs as Object3D
+			this._threeObject.set(gsiNode, threeObject)
+			return threeObject
+		}
+
 		let threeObject = this._threeObject.get(gsiNode) as RenderableObject3D | Object3D
 
 		// create

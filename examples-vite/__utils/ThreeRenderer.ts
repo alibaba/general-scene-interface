@@ -47,7 +47,7 @@ export const renderer = new THREE.WebGLRenderer({
 // 如果需要关闭webgl warnings
 // renderer.debug.checkShaderErrors = false
 
-renderer.toneMapping = THREE.ACESFilmicToneMapping
+// renderer.toneMapping = THREE.ACESFilmicToneMapping
 
 /**
  * 时间线
@@ -74,6 +74,10 @@ camera.matrixAutoUpdate = false
  * 相机控制
  */
 
+export let CamConfig = {
+	useCameraProxy: true,
+}
+
 export const cameraProxy = new AnimatedCameraProxy({
 	cameraFOV: FOV,
 	timeline,
@@ -83,6 +87,8 @@ export const cameraProxy = new AnimatedCameraProxy({
 		pitch: [-3, 3],
 	},
 	onUpdate: (cam) => {
+		if (!CamConfig.useCameraProxy) return
+
 		camera.position.fromArray(cam.position)
 		camera.rotation.fromArray(cam.rotationEuler as any)
 		camera.updateMatrix()
