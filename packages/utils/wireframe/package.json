@@ -1,6 +1,6 @@
 {
 	"name": "@gs.i/utils-wireframe",
-	"version": "0.3.1-alpha",
+	"version": "0.3.2-alpha",
 	"description": "",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
@@ -20,8 +20,8 @@
 		"v": "node -v && tsc -v"
 	},
 	"dependencies": {
-		"@gs.i/schema-scene": "0.3.1-alpha",
-		"@gs.i/utils-math": "0.3.1-alpha"
+		"@gs.i/schema-scene": "0.3.2-alpha",
+		"@gs.i/utils-math": "0.3.2-alpha"
 	},
 	"devDependencies": {
 		"typescript": ">4.4.0"
