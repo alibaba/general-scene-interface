@@ -120,7 +120,7 @@ export interface Image extends Versioned {
 		EXT_image_flipY?: boolean
 		/**
 		 * the encoding of this image data
-		 * @default "LINEAR"
+		 * @default {RendererSpecific}
 		 */
 		EXT_image_encoding?: 'SRGB' | 'LINEAR'
 		/**

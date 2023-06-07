@@ -445,6 +445,7 @@ export class Converter {
 						// three ref nodes do not have children. But the corresponding three obj has, and should be untouched.
 						if (!node.extensions?.EXT_ref_threejs) currentThree.children = []
 						parentThree.children.push(currentThree)
+						currentThree.parent = parentThree
 					}
 				}
 			} else {
@@ -456,6 +457,7 @@ export class Converter {
 					// currentThree.children = [] // it should always be empty, not need to empty it every time
 					if ((isRenderable(node) || isLuminous(node)) && currentThree.visible) {
 						rootThree.children.push(currentThree)
+						currentThree.parent = rootThree
 					}
 				}
 			}
@@ -1288,6 +1290,12 @@ export class RenderableObject3D extends Object3D {
 
 	constructor(params: Partial<RenderableObject3D> = {}) {
 		super()
+
+		// GSI conv 接管了所有 matrix 的计算和更新
+		this.matrixAutoUpdate = false
+		this.matrixWorldNeedsUpdate = false
+		this.matrixWorldAutoUpdate = false
+
 		for (const key of Object.keys(params)) {
 			const v = params[key]
 			if (v !== undefined) {
