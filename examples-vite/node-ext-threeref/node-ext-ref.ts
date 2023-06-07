@@ -91,8 +91,6 @@ function init() {
 	const meshKnot = new THREE.Mesh(geoKnot, matKnot)
 	meshKnot.position.set(0, 5, 0)
 	group.add(meshKnot)
-
-	group.updateMatrixWorld(true)
 }
 
 {

@@ -427,7 +427,7 @@ export class Converter {
 
 		{
 			const rootThree = this.convNode(root)
-			rootThree.children = []
+
 			if (root.extensions?.EXT_ref_threejs) throw new Error('root node cannot be a ref node')
 			// pre-order traversal, parents are handled before children
 
@@ -440,10 +440,6 @@ export class Converter {
 						// @note parent is cached before
 						const parentThree = this._threeObject.get(parent) as Object3D
 						const currentThree = this.convNode(node)
-						// clear current children to handle removed nodes
-						// @note
-						// three ref nodes do not have children. But the corresponding three obj has, and should be untouched.
-						if (!node.extensions?.EXT_ref_threejs) currentThree.children = []
 						parentThree.children.push(currentThree)
 						currentThree.parent = parentThree
 					}
@@ -454,7 +450,6 @@ export class Converter {
 					const node = flatScene[i]
 					const currentThree = this.convNode(node)
 					// clear current children to handle removed nodes
-					// currentThree.children = [] // it should always be empty, not need to empty it every time
 					if ((isRenderable(node) || isLuminous(node)) && currentThree.visible) {
 						rootThree.children.push(currentThree)
 						currentThree.parent = rootThree
@@ -471,15 +466,9 @@ export class Converter {
 	/**
 	 * @note run after all the geometries and materials are cached
 	 * @note require parent to be handled before child, only work for top-down traversal
+	 * @note result's children and parent will be unset
 	 */
 	private convNode(gsiNode: IR.NodeLike): RenderableObject3D | Object3D {
-		// bypass conv with EXT_ref_threejs
-		if (gsiNode.extensions?.EXT_ref_threejs) {
-			const threeObject = gsiNode.extensions?.EXT_ref_threejs as Object3D
-			this._threeObject.set(gsiNode, threeObject)
-			return threeObject
-		}
-
 		let threeObject = this._threeObject.get(gsiNode) as RenderableObject3D | Object3D
 
 		// create
@@ -597,6 +586,18 @@ export class Converter {
 						`The scene-graph may have changed during this conversion.`
 				)
 				threeObject.matrixWorld.elements = this.config.matrixProcessor.getWorldMatrix(gsiNode)
+			}
+
+			// unset children and parent, this method only handles one single node
+			threeObject.children = []
+			threeObject.parent = null
+
+			// EXT_ref_threejs as child of this result
+			if (gsiNode.extensions?.EXT_ref_threejs) {
+				const ref = gsiNode.extensions.EXT_ref_threejs as Object3D
+				threeObject.children.push(ref)
+				ref.parent = threeObject
+				ref.updateMatrixWorld()
 			}
 		}
 
