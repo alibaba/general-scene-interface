@@ -558,6 +558,12 @@ export class Converter {
 				// ext render order
 				const renderOrder = gsiNode.extensions?.EXT_mesh_order?.renderOrder
 				if (renderOrder !== undefined) threeObject.renderOrder = renderOrder
+
+				// ext shadow
+				const castShadow = gsiNode.extensions?.EXT_mesh_shadow?.castShadow
+				if (castShadow !== undefined) threeObject.castShadow = castShadow
+				const receiveShadow = gsiNode.extensions?.EXT_mesh_shadow?.receiveShadow
+				if (receiveShadow !== undefined) threeObject.receiveShadow = receiveShadow
 			} else if (isLuminous(gsiNode)) {
 				const luminousEXT = gsiNode.extensions?.EXT_luminous as LuminousEXT
 

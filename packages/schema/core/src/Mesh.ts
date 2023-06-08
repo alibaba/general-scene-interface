@@ -146,6 +146,19 @@ export interface RenderableNode extends BaseNode {
 			 */
 			frustumCulling?: boolean
 		}
+
+		/**
+		 * advanced control for mesh shadow rendering.
+		 * @note
+		 * - Shadow control is NOT a part of the scene graph. But a part of renderer technique.
+		 * - In the realistic world. All visible objects should be able to cast and receive shadows. Unless its very luminous or transparent.
+		 * - But in the real-time rendering. Most shadows will look wrong.
+		 * - This extension should only effect supported backends.
+		 */
+		EXT_mesh_shadow?: {
+			receiveShadow?: boolean
+			castShadow?: boolean
+		}
 	} & BaseNode['extensions']
 }
 
