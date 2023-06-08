@@ -1,5 +1,7 @@
 # General Scene Interface
 
+[![build](https://github.com/alibaba/general-scene-interface/actions/workflows/build.yml/badge.svg)](https://github.com/alibaba/general-scene-interface/actions/workflows/build.yml)
+
 **This Project Is Still In Uploading Process.**
 
 > 抛砖引玉
@@ -16,20 +18,19 @@ GSI 是一个 Web 3D 实时渲染领域的伞项目，包含一套标准化的�
 
 ### Setup
 
-Make sure you have `nodejs` and `lerna` installed.
+Make sure you have `nodejs` and `lerna@4` installed.
 
 ```sh
-node -v # v14 or higher
+node -v # v14 or higher.
 
-npx lerna -v # v4.x or higher
+npm -v # v9 or higher. v6 is not supported.
+
+npx lerna -v # v4.x only. v5 is not supported.
 ```
 
 And then.
 
 `npm run setup`
-
-> If you are in China. You probably want to change registry to a mirror. 
-> - `npm config set registry https://registry.npm.taobao.org`
 
 ### Build
 
