@@ -1,6 +1,6 @@
 {
 	"name": "@gs.i/backend-gltf2",
-	"version": "0.3.3-alpha",
+	"version": "0.3.4-alpha",
 	"description": "",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
@@ -20,13 +20,13 @@
 		"v": "node -v && tsc -v"
 	},
 	"dependencies": {
-		"@gs.i/processor-bound": "0.3.3-alpha",
-		"@gs.i/processor-matrix": "0.3.3-alpha",
-		"@gs.i/schema-scene": "0.3.3-alpha",
-		"@gs.i/utils-gltf2": "0.3.3-alpha",
-		"@gs.i/utils-math": "0.3.3-alpha",
-		"@gs.i/utils-specify": "0.3.3-alpha",
-		"@gs.i/utils-traverse": "0.3.3-alpha"
+		"@gs.i/processor-bound": "0.3.4-alpha",
+		"@gs.i/processor-matrix": "0.3.4-alpha",
+		"@gs.i/schema-scene": "0.3.4-alpha",
+		"@gs.i/utils-gltf2": "0.3.4-alpha",
+		"@gs.i/utils-math": "0.3.4-alpha",
+		"@gs.i/utils-specify": "0.3.4-alpha",
+		"@gs.i/utils-traverse": "0.3.4-alpha"
 	},
 	"devDependencies": {
 		"typescript": ">4.4.0"

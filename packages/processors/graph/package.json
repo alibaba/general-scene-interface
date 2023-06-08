@@ -1,6 +1,6 @@
 {
 	"name": "@gs.i/processor-graph",
-	"version": "0.3.3-alpha",
+	"version": "0.3.4-alpha",
 	"description": "",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
@@ -20,9 +20,9 @@
 		"v": "node -v && tsc -v"
 	},
 	"dependencies": {
-		"@gs.i/processor-base": "0.3.3-alpha",
-		"@gs.i/schema-scene": "0.3.3-alpha",
-		"@gs.i/utils-traverse": "0.3.3-alpha"
+		"@gs.i/processor-base": "0.3.4-alpha",
+		"@gs.i/schema-scene": "0.3.4-alpha",
+		"@gs.i/utils-traverse": "0.3.4-alpha"
 	},
 	"devDependencies": {
 		"typescript": ">4.4.0"

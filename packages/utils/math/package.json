@@ -1,6 +1,6 @@
 {
 	"name": "@gs.i/utils-math",
-	"version": "0.3.3-alpha",
+	"version": "0.3.4-alpha",
 	"description": "",
 	"main": "src/index.js",
 	"types": "src/index.d.ts",
