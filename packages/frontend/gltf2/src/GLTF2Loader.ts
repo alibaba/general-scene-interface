@@ -391,6 +391,9 @@ export class GLTF2Loader {
 				}
 			}
 
+			if (node.name !== undefined) {
+				gsiMesh.name = node.name
+			}
 			// 否则就是个普通的 group
 
 			this._meshesCache.push(gsiMesh)
