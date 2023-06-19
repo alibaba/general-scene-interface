@@ -42,6 +42,7 @@ export function Shaderlize<TBase extends new (...args: any[]) => Material>(
 
 		/**
 		 * from THREE.ShaderMaterial
+		 * @todo 这里可能和 THREE.PhysicalMaterial 有冲突
 		 */
 
 		defines = {} as { [name: string]: string | boolean | number | undefined }
@@ -64,6 +65,9 @@ export function Shaderlize<TBase extends new (...args: any[]) => Material>(
 		 */
 		lights = false // set to use scene lights
 
+		/**
+		 * @todo 似乎是 WebGL1 的遗留，WebGL2 无效，尝试删除
+		 */
 		extensions = {
 			derivatives: false, // set to use derivatives
 			fragDepth: false, // set to use fragment depth values
