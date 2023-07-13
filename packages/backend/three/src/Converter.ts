@@ -378,6 +378,7 @@ export class Converter {
 			if (this.config.autoDisposeThreeObject) {
 				removed.textures.forEach((texture) => {
 					this._threeTex.get(texture)?.dispose()
+					this._threeTex.get(texture)?.image?.close?.() // ImageBitmap
 				})
 				// @note three only dispose geom
 				removed.geometries.forEach((geometry) => {

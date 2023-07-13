@@ -21,7 +21,7 @@ import * as SDK from '@gs.i/frontend-sdk'
 
 	scene.children.forEach((node) => {
 		if (isRenderable(node)) {
-			const matr = new SDK.UnlitMaterial()
+			const matr = new SDK.PbrMaterial({})
 			matr.uniforms = {
 				time: { value: 0 },
 			}
