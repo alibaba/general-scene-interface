@@ -44,13 +44,13 @@
 	background-position: 0 0;
 	-webkit-text-fill-color: transparent;
 
-	transform: scaleY(1.4);
+	transform: scale(1.4);
 	transform-origin: left center;
 }
 
 .slogan {
 	padding-top: 7px;
-	padding-left: 33px;
+	padding-left: 73px;
 
 	display: flex;
 	gap: 20px;

@@ -9,6 +9,7 @@ lib
 lib-cub
 
 commitlint.config.js
+postcss.config.js
 vite.config.ts
 vite.lib.config.ts
 
