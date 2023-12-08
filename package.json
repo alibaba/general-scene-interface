@@ -1,0 +1,88 @@
+{
+  "name": "cubs.js",
+  "version": "0.0.0",
+  "type": "module",
+  "files": [
+    "lib"
+  ],
+  "main": "./lib/cubs.umd.cjs",
+  "module": "./lib/cubs.js",
+  "types": "./lib/cubs.d.ts",
+  "exports": {
+    ".": {
+      "import": "./lib/cubs.js",
+      "require": "./lib/cubs.umd.cjs"
+    },
+    "./lib/style.css": {
+      "import": "./lib/style.css",
+      "require": "./lib/style.css"
+    }
+  },
+  "scripts": {
+    "start": "echo 'Please use `npm run dev` instead.' && exit 1",
+    "dev": "vite --open",
+    "buildDemo": "tsc && vite build",
+    "buildLib": "tsc && vite build --config vite.lib.config.ts",
+    "build": "npm run buildLib && npm run buildDemo",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview",
+    "prepare": "husky install"
+  },
+  "peerDependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "lint-staged": {
+    "**/*.{js,ts,cjs,cts,mjs,mts,jsx,tsx}": [
+      "npx prettier --write --ignore-unknown",
+      "npx eslint"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^18.4.2",
+    "@commitlint/config-conventional": "^18.4.2",
+    "@trivago/prettier-plugin-sort-imports": "^4.3.0",
+    "@types/d3-contour": "^3.0.6",
+    "@types/node": "^20.9.0",
+    "@types/react": "^18.2.15",
+    "@types/react-dom": "^18.2.7",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "@vitejs/plugin-react": "^4.2.0",
+    "@vitejs/plugin-react-swc": "^3.3.2",
+    "autoprefixer": "^10.4.16",
+    "classnames": "^2.3.2",
+    "d3-contour": "^4.0.2",
+    "eslint": "^8.45.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.3",
+    "husky": "^8.0.3",
+    "immer": "^10.0.3",
+    "lint-staged": "^15.1.0",
+    "normalize.css": "^8.0.1",
+    "postcss": "^8.4.31",
+    "prettier": "^3.1.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "simplify-js": "^1.2.4",
+    "typescript": "^5.0.2",
+    "typescript-plugin-css-modules": "^5.0.2",
+    "vite": "^4.4.5",
+    "vite-plugin-dts": "^3.6.4",
+    "vite-plugin-static-copy": "^1.0.0",
+    "vite-tsconfig-paths": "^4.2.1"
+  }
+}

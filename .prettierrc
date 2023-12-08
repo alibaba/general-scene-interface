@@ -1,0 +1,21 @@
+{
+	"jsxBracketSameLine": true,
+	"bracketSameLine": true,
+	"singleQuote": true,
+	"semi": false,
+	"useTabs": true,
+	"printWidth": 100,
+	"trailingComma": "es5",
+	"eslintIntegration": true,
+	"plugins": [
+		"@trivago/prettier-plugin-sort-imports"
+	],
+	"importOrder": [
+		"^react",
+		"<THIRD_PARTY_MODULES>",
+		"^[./].*(?<!css)$",
+		".css$"
+	],
+	"importOrderSeparation": true,
+	"importOrderSortSpecifiers": true
+}

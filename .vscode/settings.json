@@ -1,0 +1,40 @@
+{
+	"typescript.validate.enable": true,
+	"editor.defaultFormatter": "esbenp.prettier-vscode",
+	"editor.rulers": [80 /* js and doc */, 100 /* ts */],
+	"[json]": {
+		"editor.defaultFormatter": "vscode.json-language-features"
+	},
+	"[javascript]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[typescript]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[typescriptreact]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"editor.formatOnPaste": false,
+	"files.exclude": {
+		"node_modules/_*": true
+	},
+	"eslint.enable": true,
+	"eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
+	"typescript.tsdk": "./node_modules/typescript/lib",
+	"editor.formatOnSave": true,
+	"workbench.colorCustomizations": {
+		"statusBar.background": "#1525696b",
+		"statusBar.foreground": "#fafafaa8",
+		"statusBar.noFolderBackground": "#000000",
+		"statusBar.debuggingBackground": "#002c49"
+		// "editor.background": "#292421"
+	},
+	"workbench.tree.indent": 24,
+	"workbench.tree.renderIndentGuides": "always",
+	"explorer.decorations.colors": true,
+	"explorer.decorations.badges": true,
+	"files.associations": {
+		"README": "markdown"
+	},
+	"cSpell.words": ["Fileset", "keypoint", "mediapipe", "tailwind"]
+}
