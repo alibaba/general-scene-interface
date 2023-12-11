@@ -1,10 +1,11 @@
 {
   "name": "cubs.js",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "type": "module",
   "files": [
     "lib"
   ],
+  "license": "MIT",
   "main": "./lib/cubs.umd.cjs",
   "module": "./lib/cubs.js",
   "types": "./lib/cubs.d.ts",
