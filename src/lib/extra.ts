@@ -108,7 +108,6 @@ export function scenePointerControl(scene: Scene) {
 		if (e.button !== 2) return
 
 		e.preventDefault()
-		e.stopPropagation()
 
 		scene.cursor = 'grabbing'
 
@@ -146,7 +145,6 @@ export function scenePointerControl(scene: Scene) {
 		if (e.buttons !== 0) return
 
 		e.preventDefault()
-		e.stopPropagation()
 
 		const scale = Math.pow(1.1, -e.deltaY / 50)
 

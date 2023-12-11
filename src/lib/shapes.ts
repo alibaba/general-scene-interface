@@ -300,8 +300,8 @@ export class PolygonShape extends Shape {
 export class ImageShape extends RectShape {
 	constructor(
 		public image: HTMLImageElement,
-		x: number = image.width / 2,
-		y: number = image.height / 2,
+		x = 0,
+		y = 0,
 		width: number = image.width,
 		height: number = image.height
 	) {
@@ -309,21 +309,13 @@ export class ImageShape extends RectShape {
 	}
 
 	draw(ctx: CanvasRenderingContext2D) {
-		const { x: tx, y: ty } = this._translate
-		const s = this._scale
-
-		const halfWidth = this.width / 2
-		const halfHeight = this.height / 2
-
-		const viewX = (this.x - halfWidth) * s + tx
-		const viewY = (this.y - halfHeight) * s + ty
-		const viewWidth = this.width * s
-		const viewHeight = this.height * s
+		const { x: left, y: top } = this.localToView(this.x, this.y)
+		const { x: right, y: bottom } = this.localToView(this.x + this.width, this.y + this.height)
 
 		ctx.imageSmoothingEnabled = true
 		ctx.imageSmoothingQuality = 'high'
 
-		ctx.drawImage(this.image, viewX, viewY, viewWidth, viewHeight)
+		ctx.drawImage(this.image, left, top, right - left, bottom - top)
 	}
 }
 
@@ -359,14 +351,7 @@ export class PathShape extends Shape {
 	}
 
 	hit(x: number, y: number, ctx: CanvasRenderingContext2D) {
-		const { x: tx, y: ty } = this._translate
-		const s = this._scale
-
-		const revX = (x - tx) / s
-		const revY = (y - ty) / s
-
-		const localX = revX - this.x
-		const localY = revY - this.y
+		const { x: localX, y: localY } = this.viewToLocal(x, y)
 
 		return ctx.isPointInPath(this.path, localX, localY)
 	}

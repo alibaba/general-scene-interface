@@ -12,10 +12,6 @@
     ".": {
       "import": "./lib/cubs.js",
       "require": "./lib/cubs.umd.cjs"
-    },
-    "./lib/style.css": {
-      "import": "./lib/style.css",
-      "require": "./lib/style.css"
     }
   },
   "scripts": {
