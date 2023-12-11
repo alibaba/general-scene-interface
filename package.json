@@ -20,8 +20,7 @@
     "start": "echo 'Please use `npm run dev` instead.' && npm run dev",
     "dev": "vite --open",
     "buildDemo": "tsc && vite build",
-    "buildLib": "tsc && vite build --config vite.lib.config.ts",
-    "build": "npm run buildLib && npm run buildDemo",
+    "build": "tsc && vite build --config vite.lib.config.ts",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "prepare": "husky install"
