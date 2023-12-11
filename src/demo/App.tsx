@@ -187,11 +187,17 @@ function App() {
 					</Suspense>
 				</main>
 				<footer className={styles.footer}>
-					<a href="#" target="_blank" className={styles.link}>
+					<a
+						href="https://github.com/alibaba/general-scene-interface/tree/cubs.js"
+						target="_blank"
+						className={styles.link}>
 						<div className={styles.linkIconCode}></div>
 						<div>源码</div>
 					</a>
-					<a href="#" target="_blank" className={styles.link}>
+					<a
+						href="https://github.com/alibaba/general-scene-interface/tree/cubs.js/src/lib/test"
+						target="_blank"
+						className={styles.link}>
 						<div className={styles.linkIconUsage}></div>
 						<div>用例</div>
 					</a>
