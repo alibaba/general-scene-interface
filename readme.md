@@ -40,12 +40,7 @@ class MyShape extends Shape {
 	// 实现以下两个抽象方法
 
 	hit(x: number, y: number, ctx: CanvasRenderingContext2D): boolean | undefined | object {
-		// 将transform逆作用于坐标
-		const { x: tx, y: ty } = this._translate
-		const s = this._scale
-
-		const revX = (x - tx) / s
-		const revY = (y - ty) / s
+		const { x: localX, y: localY } = this.viewToLocal(x, y)
 
 		// 使用 图形算法 或者 canvas Path2D 接口判断是否命中
 		// 若命中，返回详细信息或者 true，否则返回 false 或者 undefined
@@ -53,7 +48,7 @@ class MyShape extends Shape {
 
 	draw(ctx: CanvasRenderingContext2D): void {
 		// 使用 ctx 绘制图形
-		// 注意 transform 变换，先缩放再平移。x,y 为图形的局部原点
+		// 使用 this.localToView(x, y) 将本地坐标转换为canvas坐标
 	}
 }
 ```
