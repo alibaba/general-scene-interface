@@ -1,11 +1,12 @@
 {
   "name": "cubs.js",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "type": "module",
   "files": [
     "lib"
   ],
   "license": "MIT",
+  "author": "Simon <https://github.com/gaomeng1900>",
   "main": "./lib/cubs.umd.cjs",
   "module": "./lib/cubs.js",
   "types": "./lib/cubs.d.ts",
