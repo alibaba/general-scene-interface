@@ -107,6 +107,11 @@ export function scenePointerControl(scene: Scene) {
 
 		if (e.button !== 2) return
 
+		e.preventDefault()
+		e.stopPropagation()
+
+		scene.cursor = 'grabbing'
+
 		const { left, top } = scene.canvas.getBoundingClientRect() || { left: 0, top: 0 }
 
 		const startX = e.clientX - left
@@ -127,6 +132,7 @@ export function scenePointerControl(scene: Scene) {
 
 		// @note: 只监听了 Pointer up，所以鼠标移出了 canvas 也会继续平移，如果需要处理移出页面需要额外逻辑
 		const handlePointerUp = (event: PointerEvents['pointerup']) => {
+			scene.cursor = 'default'
 			scene.removeEventListener('pointermove', handlePointerMove)
 			scene.removeEventListener('pointerup', handlePointerUp)
 		}
@@ -136,10 +142,11 @@ export function scenePointerControl(scene: Scene) {
 	}
 
 	const handleWheel = (e: WheelEvent) => {
-		e.preventDefault()
-
 		// 操作安全
 		if (e.buttons !== 0) return
+
+		e.preventDefault()
+		e.stopPropagation()
 
 		const scale = Math.pow(1.1, -e.deltaY / 50)
 

@@ -1,11 +1,12 @@
 import { useEffect, useRef } from 'react'
 
+import { RectShape } from '..'
 import { useSize2 } from '../../demo/hooks'
 import { Scene } from '../core'
 import { drawRect } from '../draw/drawRect'
 import { editRect } from '../edit/editRect'
 import { addAxis, scenePointerControl } from '../extra'
-import { randomColor } from '../utils/misc'
+import { constrainRect, randomColor } from '../utils/misc'
 
 import styles from './Test.module.css'
 
@@ -21,12 +22,22 @@ export default function Test() {
 		addAxis(scene)
 
 		const cancel = drawRect(scene, (e) => {
+			constrainRect(e.target, [100, 100, 700, 500])
+
 			const rect = e.target
 
-			const controlPoints = editRect(rect, undefined, undefined, 5, {
-				stroke: true,
-				strokeStyle: 'white',
-			})
+			const controlPoints = editRect(
+				rect,
+				(e) => {
+					constrainRect(e.target, [100, 100, 700, 500])
+				},
+				undefined,
+				5,
+				{
+					stroke: true,
+					strokeStyle: 'white',
+				}
+			)
 
 			const seed = Math.random()
 
@@ -40,6 +51,19 @@ export default function Test() {
 
 			scene.add(controlPoints)
 		})
+
+		// constrain area
+		{
+			const rect = new RectShape()
+			rect.styles.zIndex = -1
+			rect.styles.fillStyle = 'rgba(0, 0, 0, 0.1)'
+			rect.styles.pointerEvents = 'none'
+			rect.x = 100
+			rect.y = 100
+			rect.width = 600
+			rect.height = 400
+			scene.add(rect)
+		}
 
 		return () => {
 			cancel()

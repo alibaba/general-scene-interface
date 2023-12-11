@@ -51,10 +51,6 @@ export function drawRect(
 
 			rect.width = x - startX
 			rect.height = y - startY
-
-			// console.log(rect.width)
-			rect.x = startX + rect.width / 2
-			rect.y = startY + rect.height / 2
 		}
 
 		const handlePointerUp = (event: PointerEvents['pointerup']) => {

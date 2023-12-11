@@ -1,11 +1,11 @@
 import { useEffect, useRef } from 'react'
 
-import { useSize2 } from '../../utils/hooks'
-import { randomColor } from '../../utils/misc'
+import { useSize2 } from '../../demo/hooks'
 import { Scene } from '../core'
 import { editPolygon } from '../edit/editPolygon'
 import { addAxis, scenePointerControl } from '../extra'
 import { PolygonShape } from '../shapes'
+import { randomColor } from '../utils/misc'
 
 import styles from './Test.module.css'
 
@@ -24,7 +24,7 @@ export default function Test() {
 
 		polygon.x = star[0].x
 		polygon.y = star[0].y
-		polygon.points = star.slice(1).map((p) => ({ x: p.x - polygon.x, y: p.y - polygon.y }))
+		polygon.points = star.map((p) => ({ x: p.x - polygon.x, y: p.y - polygon.y }))
 
 		polygon.styles.fillStyle = randomColor(0.5)
 		polygon.styles.stroke = true

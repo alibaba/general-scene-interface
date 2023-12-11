@@ -70,6 +70,8 @@ export function drawPolyline(
 
 			polyline.x = startX
 			polyline.y = startY
+			polyline.points.push({ x: 0, y: 0 })
+
 			Object.assign(polyline.styles, styles)
 
 			// 增加 mask 盖住其他所有物体，来避免误操作

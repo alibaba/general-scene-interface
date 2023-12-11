@@ -2,9 +2,6 @@ import { Suspense, lazy, useEffect, useState } from 'react'
 
 import styles from './App.module.css'
 
-const TestRect = lazy(() => import('../lib/test/TestRect'))
-const TestPoint = lazy(() => import('../lib/test/TestPoint'))
-
 const categories = [{ key: 'demo', name: 'Demo' }]
 
 const entries = [
@@ -14,7 +11,8 @@ const entries = [
 		name: '点绘制',
 		category: 'demo',
 		getComponent: (onResult: any) => {
-			return <TestPoint />
+			const Test = lazy(() => import('../lib/test/TestPoint'))
+			return <Test />
 		},
 	},
 	{
@@ -22,7 +20,17 @@ const entries = [
 		name: '矩形绘制',
 		category: 'demo',
 		getComponent: (onResult: any) => {
-			return <TestRect />
+			const Test = lazy(() => import('../lib/test/TestRect'))
+			return <Test />
+		},
+	},
+	{
+		key: 'scene-test-rect-constrain',
+		name: '矩形绘制(受限区)',
+		category: 'demo',
+		getComponent: (onResult: any) => {
+			const Test = lazy(() => import('../lib/test/TestRectConstrain'))
+			return <Test />
 		},
 	},
 	{
@@ -67,6 +75,15 @@ const entries = [
 		category: 'demo',
 		getComponent: (onResult: any) => {
 			const Test = lazy(() => import('../lib/test/TestPolylineDraw'))
+			return <Test />
+		},
+	},
+	{
+		key: 'scene-test-polyline-draw-constrain',
+		name: '折线绘制(受限区)',
+		category: 'demo',
+		getComponent: (onResult: any) => {
+			const Test = lazy(() => import('../lib/test/TestPolylineDrawConstrain'))
 			return <Test />
 		},
 	},

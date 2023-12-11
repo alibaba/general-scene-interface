@@ -39,8 +39,10 @@
 	font-size: 30px;
 	font-weight: 600;
 	font-family: var(--monospace-font);
+
 	background: linear-gradient(170deg, rgb(242, 174, 26), rgb(236, 6, 98));
 	background-clip: text;
+	-webkit-background-clip: text;
 	background-position: 0 0;
 	-webkit-text-fill-color: transparent;
 
@@ -60,6 +62,7 @@
 	/* font-family: var(--monospace-font); */
 	background: linear-gradient(170deg, rgb(242, 120, 26), rgb(236, 6, 98));
 	background-clip: text;
+	-webkit-background-clip: text;
 	background-position: 0 0;
 	-webkit-text-fill-color: transparent;
 }

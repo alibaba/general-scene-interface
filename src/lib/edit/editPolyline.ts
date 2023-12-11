@@ -46,31 +46,7 @@ export function editPolyline(
 		onEdit?.(PolylineEditEvent)
 	}
 
-	const x = polyline.x
-	const y = polyline.y
-
-	const startPoint = new CircleShape(x, y, pointRadius)
-	startPoint.fixedRadius = true
-	startPoint.radius = pointRadius
-	Object.assign(startPoint.styles, pointStyles)
-	Object.assign(startPoint.hoverStyles, pointHoverStyles)
-	Object.assign(startPoint.activeStyles, pointActiveStyles)
-
-	draggable(
-		startPoint,
-		(e) => {
-			polyline.points.forEach((point) => {
-				point.x -= e.x - polyline.x
-				point.y -= e.y - polyline.y
-			})
-
-			polyline.x = e.x
-			polyline.y = e.y
-		},
-		onChange
-	)
-
-	const controlPoints = new ShapeGroup([startPoint])
+	const controlPoints = new ShapeGroup<CircleShape>()
 
 	const controlPointsMap = new WeakMap<{ x: number; y: number }, CircleShape>()
 
@@ -95,7 +71,7 @@ export function editPolyline(
 
 		controlPoints.add(controlPoint)
 
-		// 删除点(不能删除定位点)
+		// 删除点
 		controlPoint.addEventListener('pointerdown', (e) => {
 			if (e.srcEvent.ctrlKey || e.srcEvent.metaKey) {
 				const index = polyline.points.indexOf(point)
@@ -154,7 +130,7 @@ export function editPolyline(
 
 			controlPoints.add(controlPoint)
 
-			// 删除点(不能删除定位点)
+			// 删除点
 			controlPoint.addEventListener('pointerdown', (e) => {
 				if (e.srcEvent.ctrlKey || e.srcEvent.metaKey) {
 					const index = polyline.points.indexOf(newPoint)
@@ -171,9 +147,6 @@ export function editPolyline(
 	draggable(polyline, undefined, onChange)
 
 	polyline.addEventListener('beforeDraw', (e) => {
-		startPoint.x = polyline.x
-		startPoint.y = polyline.y
-
 		polyline.points.forEach((point) => {
 			const controlPoint = controlPointsMap.get(point)!
 

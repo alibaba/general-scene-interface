@@ -1,12 +1,12 @@
 import { useEffect, useRef } from 'react'
 
-import { useSize2 } from '../../utils/hooks'
-import { constrainSegment, minmax, randomColor } from '../../utils/misc'
+import { useSize2 } from '../../demo/hooks'
 import { Scene } from '../core'
 import { drawSegment } from '../draw/drawSegment'
 import { editSegment } from '../edit/editSegment'
 import { addAxis, scenePointerControl } from '../extra'
 import { RectShape } from '../shapes'
+import { constrainSegment, minmax, randomColor } from '../utils/misc'
 
 import styles from './Test.module.css'
 
@@ -22,6 +22,8 @@ export default function Test() {
 		addAxis(scene)
 
 		const cancel = drawSegment(scene, (e) => {
+			constrainSegment(e.target, [100, 100, 1000, 500])
+
 			const seg = e.target
 
 			seg.styles.lineCap = 'round'
@@ -29,7 +31,7 @@ export default function Test() {
 			seg.styles.strokeStyle = randomColor()
 
 			const controlPoints = editSegment(seg, (e) => {
-				constrainSegment(e.target, [0, 0, 1000, 500])
+				constrainSegment(e.target, [100, 100, 1000, 500])
 			})
 
 			scene.add(controlPoints)
@@ -39,10 +41,10 @@ export default function Test() {
 		rect.styles.zIndex = -1
 		rect.styles.fillStyle = 'rgba(0, 0, 0, 0.1)'
 		rect.styles.pointerEvents = 'none'
-		rect.x = 500
-		rect.y = 250
-		rect.width = 1000
-		rect.height = 500
+		rect.x = 100
+		rect.y = 100
+		rect.width = 900
+		rect.height = 400
 		scene.add(rect)
 
 		return () => {

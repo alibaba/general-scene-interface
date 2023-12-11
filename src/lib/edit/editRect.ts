@@ -42,10 +42,7 @@ export function editRect(
 		onEdit?.(rectEditEvent)
 	}
 
-	const ltX = rect.x - rect.width / 2
-	const ltY = rect.y - rect.height / 2
-
-	const ltPoint = new CircleShape(ltX, ltY, pointRadius)
+	const ltPoint = new CircleShape(rect.x, rect.y, pointRadius)
 	ltPoint.fixedRadius = true
 
 	// ltPoint.styles.zIndex = rect.styles.zIndex
@@ -56,22 +53,16 @@ export function editRect(
 	draggable(
 		ltPoint,
 		(e) => {
-			const r = rect.x + rect.width / 2
-			const b = rect.y + rect.height / 2
+			rect.width += rect.x - e.x
+			rect.height += rect.y - e.y
 
-			rect.width = r - e.x
-			rect.height = b - e.y
-
-			rect.x = r - rect.width / 2
-			rect.y = b - rect.height / 2
+			rect.x = e.x
+			rect.y = e.y
 		},
 		onChange
 	)
 
-	const rtX = rect.x + rect.width / 2
-	const rtY = rect.y - rect.height / 2
-
-	const rtPoint = new CircleShape(rtX, rtY, pointRadius)
+	const rtPoint = new CircleShape(rect.x + rect.width, rect.y, pointRadius)
 	rtPoint.fixedRadius = true
 
 	rtPoint.styles.zIndex = rect.styles.zIndex
@@ -82,22 +73,15 @@ export function editRect(
 	draggable(
 		rtPoint,
 		(e) => {
-			const l = rect.x - rect.width / 2
-			const b = rect.y + rect.height / 2
+			rect.width = e.x - rect.x
+			rect.height += rect.y - e.y
 
-			rect.width = e.x - l
-			rect.height = b - e.y
-
-			rect.x = l + rect.width / 2
-			rect.y = b - rect.height / 2
+			rect.y = e.y
 		},
 		onChange
 	)
 
-	const lbX = rect.x - rect.width / 2
-	const lbY = rect.y + rect.height / 2
-
-	const lbPoint = new CircleShape(lbX, lbY, pointRadius)
+	const lbPoint = new CircleShape(rect.x, rect.y + rect.height, pointRadius)
 	lbPoint.fixedRadius = true
 
 	lbPoint.styles.zIndex = rect.styles.zIndex
@@ -108,22 +92,15 @@ export function editRect(
 	draggable(
 		lbPoint,
 		(e) => {
-			const r = rect.x + rect.width / 2
-			const t = rect.y - rect.height / 2
+			rect.width += rect.x - e.x
+			rect.height = e.y - rect.y
 
-			rect.width = r - e.x
-			rect.height = e.y - t
-
-			rect.x = r - rect.width / 2
-			rect.y = t + rect.height / 2
+			rect.x = e.x
 		},
 		onChange
 	)
 
-	const rbX = rect.x + rect.width / 2
-	const rbY = rect.y + rect.height / 2
-
-	const rbPoint = new CircleShape(rbX, rbY, pointRadius)
+	const rbPoint = new CircleShape(rect.x + rect.width, rect.y + rect.height, pointRadius)
 	rbPoint.fixedRadius = true
 
 	rbPoint.styles.zIndex = rect.styles.zIndex
@@ -134,14 +111,8 @@ export function editRect(
 	draggable(
 		rbPoint,
 		(e) => {
-			const l = rect.x - rect.width / 2
-			const t = rect.y - rect.height / 2
-
-			rect.width = e.x - l
-			rect.height = e.y - t
-
-			rect.x = l + rect.width / 2
-			rect.y = t + rect.height / 2
+			rect.width = e.x - rect.x
+			rect.height = e.y - rect.y
 		},
 		onChange
 	)
@@ -149,17 +120,17 @@ export function editRect(
 	draggable(rect, undefined, onChange)
 
 	rect.addEventListener('beforeDraw', (e) => {
-		ltPoint.x = rect.x - rect.width / 2
-		ltPoint.y = rect.y - rect.height / 2
+		ltPoint.x = rect.x
+		ltPoint.y = rect.y
 
-		rtPoint.x = rect.x + rect.width / 2
-		rtPoint.y = rect.y - rect.height / 2
+		rtPoint.x = rect.x + rect.width
+		rtPoint.y = rect.y
 
-		lbPoint.x = rect.x - rect.width / 2
-		lbPoint.y = rect.y + rect.height / 2
+		lbPoint.x = rect.x
+		lbPoint.y = rect.y + rect.height
 
-		rbPoint.x = rect.x + rect.width / 2
-		rbPoint.y = rect.y + rect.height / 2
+		rbPoint.x = rect.x + rect.width
+		rbPoint.y = rect.y + rect.height
 	})
 
 	return new ShapeGroup([ltPoint, rtPoint, lbPoint, rbPoint])

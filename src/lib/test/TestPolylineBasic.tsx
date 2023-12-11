@@ -1,10 +1,10 @@
 import { useEffect, useRef } from 'react'
 
-import { useSize2 } from '../../utils/hooks'
-import { randomColor } from '../../utils/misc'
+import { useSize2 } from '../../demo/hooks'
 import { Scene } from '../core'
 import { addAxis, draggable, scenePointerControl } from '../extra'
 import { PolylineShape } from '../shapes'
+import { randomColor } from '../utils/misc'
 
 import styles from './Test.module.css'
 
@@ -20,6 +20,7 @@ export default function Test() {
 		addAxis(scene)
 
 		const polyline = new PolylineShape(200, 200, [
+			{ x: 0, y: 0 },
 			{ x: 10, y: 100 },
 			{ x: 100, y: 10 },
 			{ x: 100, y: 100 },

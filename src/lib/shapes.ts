@@ -16,36 +16,18 @@ export class RectShape extends Shape {
 	}
 
 	hit(x: number, y: number) {
-		const { x: tx, y: ty } = this._translate
-		const s = this._scale
+		const { x: left, y: top } = this.localToView(0, 0)
+		const { x: right, y: bottom } = this.localToView(this.width, this.height)
 
-		const halfWidth = this.width / 2
-		const halfHeight = this.height / 2
-
-		const revX = (x - tx) / s
-		const revY = (y - ty) / s
-
-		return (
-			revX >= this.x - halfWidth &&
-			revX <= this.x + halfWidth &&
-			revY >= this.y - halfHeight &&
-			revY <= this.y + halfHeight
-		)
+		return x >= left && x <= right && y >= top && y <= bottom
 	}
 
 	draw(ctx: CanvasRenderingContext2D) {
-		const { x: tx, y: ty } = this._translate
-		const s = this._scale
+		const { x: left, y: top } = this.localToView(0, 0)
+		const { x: right, y: bottom } = this.localToView(this.width, this.height)
 
-		const halfWidth = this.width / 2
-		const halfHeight = this.height / 2
+		ctx.rect(left, top, right - left, bottom - top)
 
-		const viewX = (this.x - halfWidth) * s + tx
-		const viewY = (this.y - halfHeight) * s + ty
-		const viewWidth = this.width * s
-		const viewHeight = this.height * s
-
-		ctx.rect(viewX, viewY, viewWidth, viewHeight)
 		ctx.globalAlpha = this.styles.fillOpacity === undefined ? 1 : this.styles.fillOpacity
 		this._fill && ctx.fill()
 		ctx.globalAlpha = this.styles.strokeOpacity === undefined ? 1 : this.styles.strokeOpacity
@@ -71,27 +53,24 @@ export class CircleShape extends Shape {
 	}
 
 	hit(x: number, y: number) {
-		const { x: tx, y: ty } = this._translate
-		const s = this._scale
-
-		const revX = (x - tx) / s
-		const revY = (y - ty) / s
+		const { x: localX, y: localY } = this.viewToLocal(x, y)
 
 		return (
-			Math.sqrt((revX - this.x) ** 2 + (revY - this.y) ** 2) <=
-			this.radius / (this.fixedRadius ? s : 1)
+			Math.sqrt(localX ** 2 + localY ** 2) <= this.radius / (this.fixedRadius ? this._scale : 1)
 		)
 	}
 
 	draw(ctx: CanvasRenderingContext2D) {
-		const { x: tx, y: ty } = this._translate
-		const s = this._scale
+		const { x: viewX, y: viewY } = this.localToView(0, 0)
 
-		const viewX = this.x * s + tx
-		const viewY = this.y * s + ty
-		const viewRadius = this.radius * s
+		ctx.arc(
+			viewX,
+			viewY,
+			this.fixedRadius ? this.radius : this.radius * this._scale,
+			0,
+			2 * Math.PI
+		)
 
-		ctx.arc(viewX, viewY, viewRadius / (this.fixedRadius ? s : 1), 0, 2 * Math.PI)
 		ctx.globalAlpha = this.styles.fillOpacity === undefined ? 1 : this.styles.fillOpacity
 		this._fill && ctx.fill()
 		ctx.globalAlpha = this.styles.strokeOpacity === undefined ? 1 : this.styles.strokeOpacity
@@ -128,14 +107,7 @@ export class SegmentShape extends Shape {
 	}
 
 	hit(x: number, y: number) {
-		const { x: tx, y: ty } = this._translate
-		const s = this._scale
-
-		const revX = (x - tx) / s
-		const revY = (y - ty) / s
-
-		const dPx = revX - this.x
-		const dPy = revY - this.y
+		const { x: dPx, y: dPy } = this.viewToLocal(x, y)
 
 		const distance = distancePointToSegmentVector(dPx, dPy, this.dx, this.dy)
 
@@ -144,20 +116,15 @@ export class SegmentShape extends Shape {
 		if (this._hover) width = this.hoverStyles.lineWidth ?? width
 		if (this._active) width = this.activeStyles.lineWidth ?? width
 
-		return distance <= width / s / 2
+		return distance <= width / this._scale / 2
 	}
 
 	draw(ctx: CanvasRenderingContext2D) {
-		const { x: tx, y: ty } = this._translate
-		const s = this._scale
-
-		const viewX = this.x * s + tx
-		const viewY = this.y * s + ty
-		const viewDx = this.dx * s
-		const viewDy = this.dy * s
+		const { x: viewX, y: viewY } = this.localToView(0, 0)
+		const { x: viewDx, y: viewDy } = this.localToView(this.dx, this.dy)
 
 		ctx.moveTo(viewX, viewY)
-		ctx.lineTo(viewX + viewDx, viewY + viewDy)
+		ctx.lineTo(viewDx, viewDy)
 		ctx.globalAlpha = this.styles.strokeOpacity === undefined ? 1 : this.styles.strokeOpacity
 		this._stroke && ctx.stroke()
 	}
@@ -194,30 +161,23 @@ export class PolylineShape extends Shape {
 	}
 
 	hit(x: number, y: number) {
-		const { x: tx, y: ty } = this._translate
-		const s = this._scale
-
-		const revX = (x - tx) / s
-		const revY = (y - ty) / s
+		const { x: revX, y: revY } = this.viewToLocal(x, y)
 
 		let width = this.styles.lineWidth || 2
 
 		if (this._hover) width = this.hoverStyles.lineWidth ?? width
 		if (this._active) width = this.activeStyles.lineWidth ?? width
 
-		width = width / s / 2
+		width = width / this._scale / 2
 
 		// TODO: 优化, bbox?
 		const len = this.closed ? this.points.length + 1 : this.points.length
-		for (let i = 0; i < len; i++) {
-			const lastVec = this.points[i - 1] || { x: 0, y: 0 }
-			const currentVec = this.points[i] || { x: 0, y: 0 }
+		for (let i = 1; i < len; i++) {
+			const lastVec = this.points[i - 1]
+			const currentVec = this.points[i] || this.points[0]
 
-			const x1 = this.x + lastVec.x
-			const y1 = this.y + lastVec.y
-
-			const px = revX - x1
-			const py = revY - y1
+			const px = revX - lastVec.x
+			const py = revY - lastVec.y
 
 			const dx = currentVec.x - lastVec.x
 			const dy = currentVec.y - lastVec.y
@@ -248,19 +208,13 @@ export class PolylineShape extends Shape {
 	}
 
 	draw(ctx: CanvasRenderingContext2D) {
-		const { x: tx, y: ty } = this._translate
-		const s = this._scale
-
-		const { x, y } = this
-		const viewX = x * s + tx
-		const viewY = y * s + ty
+		const { x, y } = this.points[0]
+		const { x: viewX, y: viewY } = this.localToView(x, y)
 		ctx.moveTo(viewX, viewY)
 
-		for (let i = 0; i < this.points.length; i++) {
+		for (let i = 1; i < this.points.length; i++) {
 			const { x, y } = this.points[i]
-
-			const viewX = (x + this.x) * s + tx
-			const viewY = (y + this.y) * s + ty
+			const { x: viewX, y: viewY } = this.localToView(x, y)
 
 			ctx.lineTo(viewX, viewY)
 		}
@@ -295,18 +249,14 @@ export class PolygonShape extends Shape {
 	}
 
 	hit(x: number, y: number) {
-		const { x: tx, y: ty } = this._translate
-		const s = this._scale
-
-		const revX = (x - tx) / s - this.x
-		const revY = (y - ty) / s - this.y
+		const { x: revX, y: revY } = this.viewToLocal(x, y)
 
 		let inside = false
 
 		// 判断点 revX revY 是否在 polygon 内
-		for (let i = 0; i <= this.points.length; i++) {
-			const lastPoint = this.points[i - 1] || { x: 0, y: 0 }
-			const currentPoint = this.points[i] || { x: 0, y: 0 }
+		for (let i = 1; i <= this.points.length; i++) {
+			const lastPoint = this.points[i - 1]
+			const currentPoint = this.points[i] || this.points[0]
 
 			const x1 = lastPoint.x
 			const y1 = lastPoint.y
@@ -324,19 +274,13 @@ export class PolygonShape extends Shape {
 	}
 
 	draw(ctx: CanvasRenderingContext2D) {
-		const { x: tx, y: ty } = this._translate
-		const s = this._scale
-
-		const { x, y } = this
-		const viewX = x * s + tx
-		const viewY = y * s + ty
+		const { x, y } = this.points[0]
+		const { x: viewX, y: viewY } = this.localToView(x, y)
 		ctx.moveTo(viewX, viewY)
 
-		for (let i = 0; i < this.points.length; i++) {
+		for (let i = 1; i < this.points.length; i++) {
 			const { x, y } = this.points[i]
-
-			const viewX = (x + this.x) * s + tx
-			const viewY = (y + this.y) * s + ty
+			const { x: viewX, y: viewY } = this.localToView(x, y)
 
 			ctx.lineTo(viewX, viewY)
 		}

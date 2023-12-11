@@ -11,7 +11,7 @@ export abstract class Shape extends EventDispatcher<PointerEvents & ShapeLifeCyc
 	readonly hoverStyles: Partial<CanvasStyles> = {}
 	readonly activeStyles: Partial<CanvasStyles> = {}
 
-	// 位置（所有派生类都应该尊重该属性）
+	// 位置（局部坐标的原点，派生类中的坐标都为局部坐标）
 	x: number = 0
 	y: number = 0
 
@@ -19,7 +19,7 @@ export abstract class Shape extends EventDispatcher<PointerEvents & ShapeLifeCyc
 
 	readonly userData = {} as any
 
-	// 以下为内部只读状态，渲染时由 renderer 指定
+	// 以下为内部只读状态，渲染时由 renderer 指定，派生类应视为只读状态，每次 hit 或 draw 之前更新
 
 	_hover = false
 	_active = false
@@ -52,6 +52,26 @@ export abstract class Shape extends EventDispatcher<PointerEvents & ShapeLifeCyc
 		this.draw(ctx)
 
 		ctx.restore()
+	}
+
+	/**
+	 * 将局部坐标转换为视图坐标（canvas坐标系，左上角为原点，像素为单位）
+	 */
+	localToView(x: number, y: number) {
+		return {
+			x: (x + this.x) * this._scale + this._translate.x,
+			y: (y + this.y) * this._scale + this._translate.y,
+		}
+	}
+
+	/**
+	 * 将视图坐标转换为局部坐标
+	 */
+	viewToLocal(x: number, y: number) {
+		return {
+			x: (x - this._translate.x) / this._scale - this.x,
+			y: (y - this._translate.y) / this._scale - this.y,
+		}
 	}
 
 	// 派生形状需实现以下两个接口
@@ -105,6 +125,8 @@ export class Scene extends EventDispatcher<SceneEvents> {
 
 	scale = 1
 	translate = { x: 0, y: 0 }
+
+	cursor = 'default'
 
 	private children: (Shape | ShapeGroup)[] = []
 
@@ -328,7 +350,7 @@ export class Scene extends EventDispatcher<SceneEvents> {
 
 	private render() {
 		// 鼠标样式 reset
-		this.canvas.style.cursor = 'default'
+		this.canvas.style.cursor = this.cursor
 
 		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
 

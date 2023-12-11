@@ -1,12 +1,12 @@
 import { useEffect, useRef } from 'react'
 
-import { useSize2 } from '../../utils/hooks'
-import { constrainPolyline, randomColor } from '../../utils/misc'
+import { useSize2 } from '../../demo/hooks'
 import { Scene } from '../core'
 import { drawPolygon } from '../draw/drawPolygon'
 import { editPolygon } from '../edit/editPolygon'
 import { addAxis, scenePointerControl } from '../extra'
 import { RectShape } from '../shapes'
+import { constrainPoly, randomColor } from '../utils/misc'
 
 import styles from './Test.module.css'
 
@@ -24,6 +24,8 @@ export default function Test() {
 		const cancel = drawPolygon(
 			scene,
 			(e) => {
+				constrainPoly(e.target, [100, 100, 700, 500])
+
 				const polygon = e.target
 
 				polygon.styles.fillStyle = randomColor(0.5)
@@ -34,7 +36,7 @@ export default function Test() {
 				polygon.hoverStyles.strokeStyle = 'red'
 
 				const controlPoints = editPolygon(polygon, (e) => {
-					constrainPolyline(polygon, [100, 100, 900, 500])
+					constrainPoly(e.target, [100, 100, 700, 500])
 				})
 				scene.add(controlPoints)
 			},
@@ -42,14 +44,18 @@ export default function Test() {
 			{ fillStyle: 'green' }
 		)
 
-		const rect = new RectShape()
-		rect.x = 500
-		rect.y = 300
-		rect.width = 800
-		rect.height = 400
-		rect.styles.fillStyle = 'rgba(0, 0, 0, 0.2)'
-		rect.styles.pointerEvents = 'none'
-		scene.add(rect)
+		// constrain area
+		{
+			const rect = new RectShape()
+			rect.styles.zIndex = -1
+			rect.styles.fillStyle = 'rgba(0, 0, 0, 0.1)'
+			rect.styles.pointerEvents = 'none'
+			rect.x = 100
+			rect.y = 100
+			rect.width = 600
+			rect.height = 400
+			scene.add(rect)
+		}
 
 		return () => {
 			cancel()

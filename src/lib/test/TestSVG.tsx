@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 
-import { useSize2 } from '../../utils/hooks'
+import { useSize2 } from '../../demo/hooks'
 import { Scene } from '../core'
 import { addAxis, draggable, scenePointerControl } from '../extra'
 import { parseSVG } from '../svg/parseSVG'

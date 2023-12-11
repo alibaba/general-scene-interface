@@ -14,3 +14,5 @@ export * from './draw/drawPolygon'
 export * from './draw/drawPolyline'
 export * from './draw/drawRect'
 export * from './draw/drawSegment'
+
+export * from './utils/misc'

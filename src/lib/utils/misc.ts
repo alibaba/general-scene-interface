@@ -49,19 +49,25 @@ export function constrainRect(
 	rect: { x: number; y: number; width: number; height: number },
 	bbox: [number, number, number, number]
 ) {
-	const left = minmax(rect.x - rect.width / 2, bbox[0], bbox[2])
-	const top = minmax(rect.y - rect.height / 2, bbox[1], bbox[3])
-	const right = minmax(rect.x + rect.width / 2, bbox[0], bbox[2])
-	const bottom = minmax(rect.y + rect.height / 2, bbox[1], bbox[3])
+	// 纠正方向
+	if (rect.width < 0) {
+		rect.width = -rect.width
+		rect.x -= rect.width
+	}
+	if (rect.height < 0) {
+		rect.height = -rect.height
+		rect.y -= rect.height
+	}
 
-	rect.x = (left + right) / 2
-	rect.y = (top + bottom) / 2
+	const left = minmax(rect.x, bbox[0], bbox[2])
+	const top = minmax(rect.y, bbox[1], bbox[3])
+	const right = minmax(rect.x + rect.width, bbox[0], bbox[2])
+	const bottom = minmax(rect.y + rect.height, bbox[1], bbox[3])
+
+	rect.x = left
+	rect.y = top
 	rect.width = right - left
 	rect.height = bottom - top
-
-	// 纠正方向
-	if (rect.width < 0) rect.width = -rect.width
-	if (rect.height < 0) rect.height = -rect.height
 }
 
 export function constrainSegment(
@@ -83,9 +89,9 @@ export function constrainSegment(
 }
 
 /**
- * 用包围盒限制折线区域，超出则压缩
+ * 用包围盒限制折线/多边形区域，超出则压缩
  */
-export function constrainPolyline(
+export function constrainPoly(
 	polyline: { x: number; y: number; points: { x: number; y: number }[] },
 	bbox: [number, number, number, number]
 ) {
@@ -95,21 +101,9 @@ export function constrainPolyline(
 		bbox[2] - polyline.x,
 		bbox[3] - polyline.y,
 	] as const
+
 	for (const point of polyline.points) {
 		constrainPoint(point, localBbox)
-	}
-
-	// local origin 特殊处理
-	const newX = minmax(polyline.x, bbox[0], bbox[2])
-	const newY = minmax(polyline.y, bbox[1], bbox[3])
-
-	if (newX !== polyline.x || newY !== polyline.y) {
-		for (const point of polyline.points) {
-			point.x -= newX - polyline.x
-			point.y -= newY - polyline.y
-		}
-		polyline.x = newX
-		polyline.y = newY
 	}
 }
 
