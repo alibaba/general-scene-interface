@@ -82,8 +82,8 @@ export default function Test() {
 					<div style={{ fontSize: '1.1em', fontWeight: '500' }}> 🖌️ 绘制多边形：</div>
 					<ul>
 						<li>开始绘制：点击空白处</li>
-						<li>结束绘制：点击尾点结束绘制，或者点击首点结束绘制并标记闭合</li>
-						<li>修改位置：拖动任意边</li>
+						<li>结束绘制：点击首点或尾点结束绘制</li>
+						<li>修改位置：拖动多边形</li>
 						<li>修改形状：拖动顶点</li>
 						<li>添加顶点：按住 meta 或 Ctrl 键，点击边</li>
 						<li>删除顶点：按住 meta 或 Ctrl 键，点击顶点</li>
