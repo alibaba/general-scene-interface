@@ -1,12 +1,13 @@
 import { useEffect, useRef } from 'react'
 
-import { RectShape } from '..'
+import { RectShape, autoFPS } from '..'
 import { useSize2 } from '../../demo/hooks'
 import { Scene } from '../core'
 import { drawRect } from '../draw/drawRect'
 import { editRect } from '../edit/editRect'
 import { addAxis, scenePointerControl } from '../extra'
 import { constrainRect, randomColor } from '../utils/misc'
+import Info from './Info'
 
 import styles from './Test.module.css'
 
@@ -20,6 +21,7 @@ export default function Test() {
 
 		scenePointerControl(scene)
 		addAxis(scene)
+		autoFPS(scene, 5)
 
 		const cancel = drawRect(scene, (e) => {
 			constrainRect(e.target, [100, 100, 700, 500])
@@ -79,12 +81,19 @@ export default function Test() {
 		<div className={styles.wrapper}>
 			<main className={styles.mainPaper} ref={mainRef}>
 				<canvas ref={canvasRef} className={styles.canvas} width={width} height={height} />
+
+				<Info>
+					<div style={{ fontSize: '1.1em', fontWeight: '500' }}> 📷 画布：</div>
+					<ul>
+						<li>右键拖动，滚轮缩放</li>
+					</ul>
+					<div style={{ fontSize: '1.1em', fontWeight: '500' }}> 🖌️ 绘制矩形：</div>
+					<ul>
+						<li>点击空白处并拖动，增加矩形</li>
+						<li>拖动矩形或顶点，调整矩形</li>
+					</ul>
+				</Info>
 			</main>
-			<footer className={styles.footer}>
-				🔔
-				<div>绘制：空白区域按下左键开始绘制；松开左键结束绘制；左键拖动图形</div>
-				<div>画布：滚轮缩放；右键平移</div>
-			</footer>
 		</div>
 	)
 }

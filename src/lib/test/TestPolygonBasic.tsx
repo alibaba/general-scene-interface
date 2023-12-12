@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react'
 import { useSize2 } from '../../demo/hooks'
 import { Scene } from '../core'
 import { editPolygon } from '../edit/editPolygon'
-import { addAxis, scenePointerControl } from '../extra'
+import { addAxis, autoFPS, scenePointerControl } from '../extra'
 import { PolygonShape } from '../shapes'
 import { randomColor } from '../utils/misc'
 
@@ -19,6 +19,7 @@ export default function Test() {
 
 		scenePointerControl(scene)
 		addAxis(scene)
+		autoFPS(scene, 5)
 
 		const polygon = new PolygonShape()
 

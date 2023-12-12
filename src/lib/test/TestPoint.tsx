@@ -3,8 +3,9 @@ import { useEffect, useRef } from 'react'
 import { useSize2 } from '../../demo/hooks'
 import { Scene } from '../core'
 import { drawPoint } from '../draw/drawPoint'
-import { addAxis, draggable, scenePointerControl } from '../extra'
+import { addAxis, autoFPS, draggable, scenePointerControl } from '../extra'
 import { randomColor } from '../utils/misc'
+import Info from './Info'
 
 import styles from './Test.module.css'
 
@@ -18,6 +19,7 @@ export default function Test() {
 
 		scenePointerControl(scene)
 		addAxis(scene)
+		autoFPS(scene, 5)
 
 		const cancel = drawPoint(
 			scene,
@@ -53,12 +55,19 @@ export default function Test() {
 		<div className={styles.wrapper}>
 			<main className={styles.mainPaper} ref={mainRef}>
 				<canvas ref={canvasRef} className={styles.canvas} width={width} height={height} />
+
+				<Info>
+					<div style={{ fontSize: '1.1em', fontWeight: '500' }}> 📷 画布：</div>
+					<ul>
+						<li>右键拖动，滚轮缩放</li>
+					</ul>
+					<div style={{ fontSize: '1.1em', fontWeight: '500' }}> 🖌️ 绘制点：</div>
+					<ul>
+						<li>点击空白处增加点</li>
+						<li>拖动点可改变位置</li>
+					</ul>
+				</Info>
 			</main>
-			<footer className={styles.footer}>
-				🔔
-				<div>绘制：空白区域左键加点；左键拖动图形</div>
-				<div>画布：滚轮缩放；右键平移</div>
-			</footer>
 		</div>
 	)
 }

@@ -4,8 +4,9 @@ import { useSize2 } from '../../demo/hooks'
 import { Scene } from '../core'
 import { drawPolyline } from '../draw/drawPolyline'
 import { editPolyline } from '../edit/editPolyline'
-import { addAxis, scenePointerControl } from '../extra'
+import { addAxis, autoFPS, scenePointerControl } from '../extra'
 import { randomColor } from '../utils/misc'
+import Info from './Info'
 
 import styles from './Test.module.css'
 
@@ -21,6 +22,7 @@ export default function Test() {
 
 		scenePointerControl(scene)
 		addAxis(scene)
+		autoFPS(scene, 5)
 
 		const cancel = drawPolyline(
 			scene,
@@ -55,14 +57,23 @@ export default function Test() {
 		<div className={styles.wrapper}>
 			<main className={styles.mainPaper} ref={mainRef}>
 				<canvas ref={canvasRef} className={styles.canvas} width={width} height={height} />
+
+				<Info>
+					<div style={{ fontSize: '1.1em', fontWeight: '500' }}> 📷 画布：</div>
+					<ul>
+						<li>右键拖动，滚轮缩放</li>
+					</ul>
+					<div style={{ fontSize: '1.1em', fontWeight: '500' }}> 🖌️ 绘制折线：</div>
+					<ul>
+						<li>开始绘制：点击空白处</li>
+						<li>结束绘制：点击尾点结束绘制，或者点击首点结束绘制并标记闭合</li>
+						<li>修改位置：拖动任意边</li>
+						<li>修改形状：拖动顶点</li>
+						<li>添加顶点：按住 meta 或 Ctrl 键，点击边</li>
+						<li>删除顶点：按住 meta 或 Ctrl 键，点击顶点</li>
+					</ul>
+				</Info>
 			</main>
-			<footer className={styles.footer}>
-				🔔
-				<div>
-					绘制：空白区域左键开始绘制；点击尾部点结束绘制；点击头部点结束绘制并设为闭合图形；meta+点击边可添加顶点；meta点击顶点可删除顶点（头部点不可删除）；左键拖动图形
-				</div>
-				<div>画布：滚轮缩放；右键平移</div>
-			</footer>
 		</div>
 	)
 }

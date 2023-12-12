@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 
 import { useSize2 } from '../../demo/hooks'
 import { Scene } from '../core'
-import { addAxis, draggable, scenePointerControl } from '../extra'
+import { addAxis, autoFPS, draggable, scenePointerControl } from '../extra'
 import { SegmentShape } from '../shapes'
 import { randomColor } from '../utils/misc'
 
@@ -18,6 +18,7 @@ export default function Test() {
 
 		scenePointerControl(scene)
 		addAxis(scene)
+		autoFPS(scene, 5)
 
 		{
 			const seg = new SegmentShape(200, 200, -50, 0)

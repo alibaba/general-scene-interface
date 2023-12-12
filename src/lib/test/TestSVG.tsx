@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 
 import { useSize2 } from '../../demo/hooks'
 import { Scene } from '../core'
-import { addAxis, draggable, scenePointerControl } from '../extra'
+import { addAxis, autoFPS, draggable, scenePointerControl } from '../extra'
 import { parseSVG } from '../svg/parseSVG'
 
 import styles from './Test.module.css'
@@ -19,6 +19,7 @@ export default function Test() {
 
 		scenePointerControl(scene)
 		addAxis(scene)
+		autoFPS(scene, 5)
 
 		const group = parseSVG(svgRef.current!, undefined, 4)
 		group.shapes.forEach((shape) => {
