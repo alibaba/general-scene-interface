@@ -123,6 +123,15 @@ const entries = [
 			return <Test />
 		},
 	},
+	{
+		key: 'scene-test-max-fps',
+		name: 'FPS 限制',
+		category: 'demo',
+		getComponent: (onResult: any) => {
+			const Test = lazy(() => import('../lib/test/TestMaxFPS'))
+			return <Test />
+		},
+	},
 ]
 
 function App() {

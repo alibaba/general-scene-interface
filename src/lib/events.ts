@@ -80,4 +80,9 @@ export type SceneEvents = {
 		target: Shape | ShapeGroup
 		currentTarget: Scene
 	}
+	beforeRender: {
+		type: 'beforeRender'
+		target: Scene
+		currentTarget: Scene
+	}
 } & PointerEvents

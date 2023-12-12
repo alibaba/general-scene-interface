@@ -323,3 +323,94 @@ export function addAxis(scene: Scene): () => void {
 		scene.remove(group)
 	}
 }
+
+/**
+ * 无交互时自动降低 FPS，有交互时恢复 FPS
+ * @return 取消函数
+ */
+export function autoFPS(scene: Scene, minFPS = 5, maxFPS?: number): () => void {
+	const originalFPS = maxFPS || scene.maxFPS
+
+	scene.maxFPS = minFPS
+
+	let isPointerDown = false
+	let isPointerHovering = false
+
+	const handlePointerDown = () => {
+		isPointerDown = true
+		scene.maxFPS = originalFPS
+	}
+
+	const handlePointerUp = () => {
+		isPointerDown = false
+		if (!isPointerHovering) scene.maxFPS = minFPS
+	}
+
+	const handlePointerEnter = () => {
+		isPointerHovering = true
+		scene.maxFPS = originalFPS
+	}
+
+	const handlePointerLeave = () => {
+		isPointerHovering = false
+		if (!isPointerDown) scene.maxFPS = minFPS
+	}
+
+	const handlePointerMove = () => {
+		isPointerHovering = true
+		scene.maxFPS = originalFPS
+	}
+
+	scene.addEventListener('pointerdown', handlePointerDown)
+	scene.addEventListener('pointerup', handlePointerUp)
+	scene.addEventListener('pointerenter', handlePointerEnter)
+	scene.addEventListener('pointerleave', handlePointerLeave)
+	scene.addEventListener('pointermove', handlePointerMove)
+
+	return () => {
+		scene.removeEventListener('pointerdown', handlePointerDown)
+		scene.removeEventListener('pointerup', handlePointerUp)
+		scene.removeEventListener('pointerenter', handlePointerEnter)
+		scene.removeEventListener('pointerleave', handlePointerLeave)
+		scene.removeEventListener('pointermove', handlePointerMove)
+	}
+}
+
+/**
+ * 在画布上显示 FPS 数值
+ * @return 取消函数
+ */
+export function showFPS(scene: Scene): () => void {
+	let lastTime = 0
+	let lastFPS = 0
+
+	const div = document.createElement('div')
+	div.style.position = 'absolute'
+	div.style.right = '0'
+	div.style.bottom = '0'
+	div.style.textShadow = 'white'
+	div.style.color = 'black'
+	div.style.fontFamily = 'monospace'
+
+	const listener = () => {
+		const now = performance.now()
+		const dt = now - lastTime
+		lastTime = now
+
+		const fps = Math.round(1000 / dt)
+
+		if (fps !== lastFPS) {
+			lastFPS = fps
+
+			div.innerText = `${fps} FPS`
+		}
+	}
+
+	scene.addEventListener('beforeRender', listener)
+	scene.canvas.parentElement?.appendChild(div)
+
+	return () => {
+		scene.removeEventListener('beforeRender', listener)
+		div.remove()
+	}
+}

@@ -122,11 +122,14 @@ export class Scene extends EventDispatcher<SceneEvents> {
 	readonly ctx: CanvasRenderingContext2D
 
 	// 全局变换
-
 	scale = 1
 	translate = { x: 0, y: 0 }
 
+	// 画布指针样式
 	cursor = 'default'
+
+	// 帧率限制
+	maxFPS = 60
 
 	private children: (Shape | ShapeGroup)[] = []
 
@@ -320,12 +323,23 @@ export class Scene extends EventDispatcher<SceneEvents> {
 		this.canvas.addEventListener('pointerleave', onPointerLeave)
 		this.domListeners.add([this.canvas, 'pointerleave', onPointerLeave])
 
-		const tick = () => {
+		let currentTime: number | null = null
+		const tick = (t: number | null) => {
+			if (currentTime !== null && t !== null) {
+				const minDt = 1000 / this.maxFPS - 5 // 5ms 误差
+				const dt = t - currentTime
+				if (dt < minDt) {
+					this.rafID = requestAnimationFrame(tick)
+					return
+				}
+			}
+
+			currentTime = t
 			this.rafID = requestAnimationFrame(tick)
 			this.render()
 		}
 
-		tick()
+		tick(null)
 	}
 
 	add(child: Shape | ShapeGroup) {
@@ -348,7 +362,9 @@ export class Scene extends EventDispatcher<SceneEvents> {
 		this.hoveringShape = null
 	}
 
-	private render() {
+	render() {
+		this.dispatchEvent({ type: 'beforeRender', target: this, currentTarget: this })
+
 		// 鼠标样式 reset
 		this.canvas.style.cursor = this.cursor
 
