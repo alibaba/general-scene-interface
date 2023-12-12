@@ -232,3 +232,18 @@ export function findNearestPolygonBbox(
 
 	return nearestBbox
 }
+
+/**
+ * 纠正 rect 的方向
+ */
+export function fixRect(rect: { x: number; y: number; width: number; height: number }) {
+	if (rect.width < 0) {
+		rect.x += rect.width
+		rect.width = -rect.width
+	}
+
+	if (rect.height < 0) {
+		rect.y += rect.height
+		rect.height = -rect.height
+	}
+}

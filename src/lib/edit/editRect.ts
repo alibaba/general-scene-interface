@@ -2,6 +2,7 @@ import { ShapeGroup } from '../core'
 import { draggable } from '../extra'
 import { CircleShape, RectShape } from '../shapes'
 import type { CanvasStyles, ExtendedCanvasStyles } from '../styles'
+import { fixRect } from '../utils/misc'
 
 type BeforeRectEditEvent = {
 	type: 'beforeRectEdit'
@@ -37,6 +38,8 @@ export function editRect(
 			target: rect,
 			currentTarget: rect,
 		} as const
+
+		fixRect(rect)
 
 		onBeforeEdit?.(event)
 		onEdit?.(rectEditEvent)

@@ -2,6 +2,7 @@ import { Scene } from '../core'
 import type { PointerEvents } from '../events'
 import { RectShape } from '../shapes'
 import type { ExtendedCanvasStyles } from '../styles'
+import { fixRect } from '../utils/misc'
 
 type RectCreationEvent = {
 	type: 'rectCreation'
@@ -57,9 +58,7 @@ export function drawRect(
 			scene.removeEventListener('pointermove', handlePointerMove)
 			scene.removeEventListener('pointerup', handlePointerUp)
 
-			// 纠正方向
-			if (rect.width < 0) rect.width = -rect.width
-			if (rect.height < 0) rect.height = -rect.height
+			fixRect(rect)
 
 			if (rect.width === 0 || rect.height === 0) {
 				scene.remove(rect)
