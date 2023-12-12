@@ -391,6 +391,7 @@ export function showFPS(scene: Scene): () => void {
 	div.style.textShadow = 'white'
 	div.style.color = 'black'
 	div.style.fontFamily = 'monospace'
+	div.style.pointerEvents = 'none'
 
 	const listener = () => {
 		const now = performance.now()
