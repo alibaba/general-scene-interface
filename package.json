@@ -19,7 +19,7 @@
   "scripts": {
     "start": "echo 'Please use `npm run dev` instead.' && npm run dev",
     "dev": "vite --open",
-    "buildDemo": "tsc && npm run buildSW &&vite build",
+    "buildDemo": "tsc &&vite build && npm run buildSW",
     "buildSW": "vite build --config vite.sw.config.ts",
     "build": "tsc && vite build --config vite.lib.config.ts",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",

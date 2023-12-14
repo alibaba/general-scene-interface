@@ -1,8 +1,8 @@
 /* eslint-disable node/no-extraneous-import */
 import { NavigationRoute, Route, registerRoute } from 'workbox-routing'
-import { NetworkOnly, StaleWhileRevalidate } from 'workbox-strategies'
+import { CacheFirst, NetworkOnly, StaleWhileRevalidate } from 'workbox-strategies'
 
-console.log('sw.js version: 0.0.1')
+console.log('sw.js version: 0.0.2')
 
 // localhost 放行
 registerRoute(
@@ -13,6 +13,13 @@ registerRoute(
 
 // nav
 // registerRoute(new NavigationRoute(new StaleWhileRevalidate()))
+
+registerRoute(
+	({ url }) => url.origin === 'https://fonts.googleapis.com',
+	new CacheFirst({
+		cacheName: 'sw-cache-google-fonts',
+	})
+)
 
 // 已知安全的固定地址服务，缓存优先，长时间不过期
 registerRoute(

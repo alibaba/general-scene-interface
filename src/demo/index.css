@@ -56,15 +56,15 @@ h6 {
 /* 统一等宽字体 */
 /* 优先使用开源等款字体，而非系统自带 */
 
-@font-face {
+/* @font-face {
 	font-family: 'source-code-pro';
 	src: url('./SourceCodePro-VariableFont_wght.ttf');
 	font-weight: 100 900;
-}
+} */
 
 :root {
 	/* windows 下 中文的 monospace 是宋体，因此 fallback 到 sans */
-	--monospace-font: source-code-pro, sans-serif;
+	--monospace-font: 'Source Code Pro', monospace, sans-serif;
 
 	--tp-blade-spacing: 12px;
 }
