@@ -4,10 +4,24 @@
 		<meta charset="UTF-8" />
 		<link
 			rel="icon"
-			type="image/svg+xml"
-			href="https://img.alicdn.com/imgextra/i1/O1CN01KQ1HjR1MFXN9XGdu0_!!6000000001405-2-tps-200-200.png" />
+			type="image/png"
+			href="https://img.alicdn.com/imgextra/i2/O1CN014SgycT1Oiy3sqPoAC_!!6000000001740-2-tps-256-256.png" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Cubs.js</title>
+
+		<!-- service worker -->
+		<script>
+			if ('serviceWorker' in navigator) {
+				navigator.serviceWorker
+					.register('./service-worker.iife.js', { scope: './' })
+					.then(function (reg) {
+						console.log('SW Registration succeeded.')
+					})
+					.catch(function (error) {
+						console.log('SW Registration failed with ' + error)
+					})
+			}
+		</script>
 	</head>
 	<body>
 		<div id="root"></div>

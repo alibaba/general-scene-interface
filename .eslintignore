@@ -6,15 +6,12 @@ node_modules
 
 dist
 lib
-lib-cub
 
 commitlint.config.js
 postcss.config.js
 vite.config.ts
 vite.lib.config.ts
+vite.sw.config.ts
+sw.mjs
 
-demo
-
-assets
-
-AppBase.d.ts
+public

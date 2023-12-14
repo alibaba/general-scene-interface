@@ -19,7 +19,8 @@
   "scripts": {
     "start": "echo 'Please use `npm run dev` instead.' && npm run dev",
     "dev": "vite --open",
-    "buildDemo": "tsc && vite build",
+    "buildDemo": "tsc && npm run buildSW &&vite build",
+    "buildSW": "vite build --config vite.sw.config.ts",
     "build": "tsc && vite build --config vite.lib.config.ts",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
@@ -71,7 +72,9 @@
     "typescript": "^5.0.2",
     "vite": "^4.4.5",
     "vite-plugin-dts": "^3.6.4",
-    "vite-tsconfig-paths": "^4.2.1"
+    "vite-tsconfig-paths": "^4.2.1",
+    "workbox-routing": "^7.0.0",
+    "workbox-strategies": "^7.0.0"
   },
   "repository": "https://github.com/alibaba/general-scene-interface.git"
 }
