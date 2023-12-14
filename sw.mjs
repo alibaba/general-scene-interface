@@ -2,7 +2,7 @@
 import { NavigationRoute, Route, registerRoute } from 'workbox-routing'
 import { CacheFirst, NetworkOnly, StaleWhileRevalidate } from 'workbox-strategies'
 
-console.log('sw.js version: 0.0.2')
+console.log('sw.js version: 0.0.3')
 
 // localhost 放行
 registerRoute(
