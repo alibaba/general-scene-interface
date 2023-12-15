@@ -1,10 +1,16 @@
 # 🐯 cubs.js
 
-微型 canvas 绘图库，暂定名 cubs.js （老虎幼崽）
+[🏠 Homepage](https://gaomeng1900.github.io/cubs.js)
 
-提供 DOM 风格的事件和样式接口，以及常用的图形编辑与绘制方法。
+轻量级 canvas 绘图库
 
-> cubs 不对标 G 或 paper.js，不提供新的图形API，而是对 canvas 的简单封装，提供物体粒度的状态控制以及配套的绘图工具。
+- 轻量级模块化（所有模块 gzip 7k）
+- DOM 风格的事件和样式接口
+- Shape 粒度的隔离与控制，场景树接口
+- 常见图元（点、线、折线、多边形、矩形、圆形、图片）
+- 鼠标交互、图形编辑工具、绘图工具
+
+> 不对标 G 或 paper.js 等图形框架，不提供新的图形API，不封装底层图形接口
 
 ## 🎯 目标场景
 
@@ -16,11 +22,14 @@
 
 ```typescript
 const scene = new Scene(canvas)
+scenePointerControl(scene) // add pointer control for view
+addAxis(scene) // add coordinate axis
 
 scene.addEventListener('pointerdown', (e) => {
 	console.log('pointer down', e)
 })
 
+// shape
 const shape = new RectShape()
 
 shape.styles.fillStyle = 'red'
@@ -31,14 +40,14 @@ shape.addEventListener('pointerdown', (e) => {
 })
 
 scene.add(shape)
+
+editRect(shape) // add edit tool for rect shape
 ```
 
 ## 📐 自定义 Shape
 
 ```typescript
 class MyShape extends Shape {
-	// 实现以下两个抽象方法
-
 	hit(x: number, y: number, ctx: CanvasRenderingContext2D): boolean | undefined | object {
 		const { x: localX, y: localY } = this.viewToLocal(x, y)
 
