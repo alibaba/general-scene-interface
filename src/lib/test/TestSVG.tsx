@@ -16,6 +16,7 @@ export default function Test() {
 		const canvas = canvasRef.current
 
 		const scene = new Scene(canvas)
+		scene.scale = 0.7
 
 		scenePointerControl(scene)
 		addAxis(scene)

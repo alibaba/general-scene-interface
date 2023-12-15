@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 
-import { CircleShape, RectShape, draggable, draggableAnchor } from '..'
+import { CircleShape, RectShape, SegmentShape, draggable, draggableAnchor, randomColor } from '..'
 import { useSize2 } from '../../demo/hooks'
 import { Scene, Shape } from '../core'
 import { addAxis, scenePointerControl } from '../extra'
@@ -20,6 +20,89 @@ export default function Test() {
 		addAxis(scene)
 		// autoFPS(scene, 5)
 
+		// root
+
+		const root = new CircleShape()
+		root.x = 100
+		root.y = 30
+		root.fixedRadius = true
+		root.styles.zIndex = 10
+		root.radius = 10
+		root.styles.fillStyle = randomColor()
+		draggable(root)
+
+		// l1
+		const l1 = new CircleShape()
+		l1.fixedRadius = true
+		l1.styles.zIndex = 9
+		l1.radius = 10
+		l1.styles.fillStyle = randomColor()
+		l1.y = 50
+		root.add(l1)
+		draggable(l1)
+
+		const seg01 = new SegmentShape()
+		scene.addEventListener('beforeRender', () => {
+			seg01.dx = l1.x
+			seg01.dy = l1.y
+		})
+		root.add(seg01)
+
+		for (let i = 1; i < 4; i++) {
+			const l1 = new CircleShape()
+			l1.fixedRadius = true
+			l1.styles.zIndex = 8
+			l1.radius = 10
+			l1.styles.fillStyle = randomColor()
+			l1.y = 50
+			l1.x = i * 30
+			root.add(l1)
+			draggable(l1)
+
+			const seg01 = new SegmentShape()
+			scene.addEventListener('beforeRender', () => {
+				seg01.dx = l1.x
+				seg01.dy = l1.y
+			})
+			root.add(seg01)
+		}
+
+		// l2
+		const l2 = new CircleShape()
+		l2.fixedRadius = true
+		l2.styles.zIndex = 7
+		l2.radius = 10
+		l2.styles.fillStyle = randomColor()
+		l2.y = 50
+		l1.add(l2)
+		draggable(l2)
+
+		const seg12 = new SegmentShape()
+		scene.addEventListener('beforeRender', () => {
+			seg12.dx = l2.x
+			seg12.dy = l2.y
+		})
+		l1.add(seg12)
+
+		for (let i = 1; i < 4; i++) {
+			const l2 = new CircleShape()
+			l2.fixedRadius = true
+			l2.styles.zIndex = 6
+			l2.radius = 10
+			l2.styles.fillStyle = randomColor()
+			l2.y = 50
+			l2.x = i * 30
+			l1.add(l2)
+			draggable(l2)
+
+			const seg12 = new SegmentShape()
+			scene.addEventListener('beforeRender', () => {
+				seg12.dx = l2.x
+				seg12.dy = l2.y
+			})
+			l1.add(seg12)
+		}
+
 		const group = new Shape()
 		const rect = new RectShape(0, 0, 100, 200)
 		const point = new CircleShape()
@@ -32,10 +115,10 @@ export default function Test() {
 		point.y = 100
 
 		group.add(point)
-
 		group.add(rect)
 
-		const anchor = draggableAnchor(group)
+		l2.add(group)
+
 		draggable(rect)
 		draggable(point)
 
@@ -49,10 +132,9 @@ export default function Test() {
 			id = requestAnimationFrame(animate)
 		}
 
-		// id = requestAnimationFrame(animate)
+		id = requestAnimationFrame(animate)
 
-		scene.add(group)
-		scene.add(anchor)
+		scene.add(root)
 
 		return () => {
 			scene.dispose()
