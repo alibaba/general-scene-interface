@@ -44,12 +44,10 @@ export type PointerEvents = {
  * Shape 生命周期事件
  */
 export type ShapeLifeCycleEvents = {
-	beforeDraw: {
-		type: 'beforeDraw'
+	beforeRender: {
+		type: 'beforeRender'
 		target: Shape
-		currentTarget: Shape
-		shape: Shape
-		ctx: CanvasRenderingContext2D
+		currentTarget: Scene
 	}
 	add: {
 		type: 'add'

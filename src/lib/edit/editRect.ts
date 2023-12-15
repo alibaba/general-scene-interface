@@ -129,7 +129,7 @@ export function editRect(
 
 	draggable(rect, undefined, onChange)
 
-	rect.addEventListener('beforeDraw', (e) => {
+	rect.addEventListener('beforeRender', (e) => {
 		ltPoint.x = 0
 		ltPoint.y = 0
 

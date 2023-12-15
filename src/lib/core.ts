@@ -47,14 +47,6 @@ export abstract class Shape extends EventDispatcher<ShapeEvents> {
 
 		if (this.styles.lineDash) ctx.setLineDash(this.styles.lineDash)
 
-		this.dispatchEvent({
-			type: 'beforeDraw',
-			target: this,
-			currentTarget: this,
-			shape: this,
-			ctx,
-		})
-
 		this.draw(ctx)
 
 		ctx.restore()
@@ -65,8 +57,6 @@ export abstract class Shape extends EventDispatcher<ShapeEvents> {
 	 */
 	localToView(x: number, y: number) {
 		return {
-			// x: (x + this.x) * this._scale + this._translate.x,
-			// y: (y + this.y) * this._scale + this._translate.y,
 			x: x * this._scale + this._translate.x,
 			y: y * this._scale + this._translate.y,
 		}
@@ -77,8 +67,6 @@ export abstract class Shape extends EventDispatcher<ShapeEvents> {
 	 */
 	viewToLocal(x: number, y: number) {
 		return {
-			// x: (x - this._translate.x) / this._scale - this.x,
-			// y: (y - this._translate.y) / this._scale - this.y,
 			x: (x - this._translate.x) / this._scale,
 			y: (y - this._translate.y) / this._scale,
 		}
@@ -121,45 +109,6 @@ export abstract class Shape extends EventDispatcher<ShapeEvents> {
 	abstract hit(x: number, y: number, ctx: CanvasRenderingContext2D): boolean | void | object
 	abstract draw(ctx: CanvasRenderingContext2D): void
 }
-
-/**
- * 形状组
- */
-// export class ShapeGroup<T extends Shape = Shape> extends Shape {
-// 	constructor(public readonly children = [] as (T | ShapeGroup)[]) {
-// 		super()
-// 	}
-
-// 	add(shapes: T | T[]) {
-// 		if (Array.isArray(shapes)) {
-// 			for (const shape of shapes) {
-// 				this.add(shape)
-// 			}
-// 			return
-// 		} else {
-// 			this.children.push(shapes)
-// 			this.dispatchEvent({ type: 'add', target: shapes, currentTarget: this })
-// 		}
-// 	}
-
-// 	remove(shape: T) {
-// 		const index = this.children.indexOf(shape)
-
-// 		if (index !== -1) {
-// 			this.children.splice(index, 1)
-// 			this.dispatchEvent({ type: 'remove', target: shape, currentTarget: this })
-// 		}
-// 	}
-
-// 	traverse(fn: (shape: Shape) => void) {
-// 		fn(this)
-// 		for (const shape of this.children) {
-// 			if (shape instanceof ShapeGroup) shape.traverse(fn)
-// 			else if (shape instanceof ShapeGroup) fn(shape)
-// 			else throw new Error('ShapeGroup::traverse: unknown child type')
-// 		}
-// 	}
-// }
 
 /**
  * @deprecated
@@ -431,14 +380,18 @@ export class Scene extends EventDispatcher<SceneEvents> {
 	render() {
 		this.dispatchEvent({ type: 'beforeRender', target: this, currentTarget: this })
 
-		this.updateSceneGraph()
-
 		// 鼠标样式 reset
 		this.canvas.style.cursor = this.cursor
 
 		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
 
 		const shapes = this.getShapeList().filter((s) => s._visible)
+
+		for (const shape of shapes) {
+			shape.dispatchEvent({ type: 'beforeRender', target: shape, currentTarget: this })
+		}
+
+		this.updateSceneGraph()
 
 		for (const shape of shapes) {
 			// 描边填色 reset

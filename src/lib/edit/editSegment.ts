@@ -87,7 +87,7 @@ export function editSegment(
 
 	draggable(segment, undefined, onChange)
 
-	segment.addEventListener('beforeDraw', (e) => {
+	segment.addEventListener('beforeRender', (e) => {
 		startPoint.x = segment.x
 		startPoint.y = segment.y
 

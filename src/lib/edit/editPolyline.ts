@@ -145,7 +145,7 @@ export function editPolyline(
 	// 对线的整体拖动
 	const cancelDrag = draggable(polyline, undefined, onChange)
 
-	const onBeforeDraw = (e: any) => {
+	const onBeforeRender = (e: any) => {
 		polyline.points.forEach((point) => {
 			const controlPoint = controlPointsMap.get(point)!
 
@@ -153,14 +153,14 @@ export function editPolyline(
 			controlPoint.y = point.y
 		})
 	}
-	polyline.addEventListener('beforeDraw', onBeforeDraw)
+	polyline.addEventListener('beforeRender', onBeforeRender)
 
 	polyline.add(controlPoints)
 
 	return () => {
 		cancelDrag()
 		polyline.removeEventListener('pointerdown', onPointerDown)
-		polyline.removeEventListener('beforeDraw', onBeforeDraw)
+		polyline.removeEventListener('beforeRender', onBeforeRender)
 		polyline.remove(controlPoints)
 	}
 }
