@@ -22,6 +22,7 @@ export default function Test() {
 		addAxis(scene)
 		autoFPS(scene, 5)
 
+		let cancelEdit = () => {}
 		const cancel = drawSegment(scene, (e) => {
 			const seg = e.target
 
@@ -29,13 +30,12 @@ export default function Test() {
 			seg.styles.lineWidth = 20
 			seg.styles.strokeStyle = randomColor()
 
-			const controlPoints = editSegment(seg)
-
-			scene.add(controlPoints)
+			cancelEdit = editSegment(seg)
 		})
 
 		return () => {
 			cancel()
+			cancelEdit()
 			scene.dispose()
 		}
 	}, [])

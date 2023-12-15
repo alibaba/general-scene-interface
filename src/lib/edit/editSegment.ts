@@ -1,4 +1,3 @@
-import { ShapeGroup } from '../core'
 import { draggable } from '../extra'
 import { CircleShape, SegmentShape } from '../shapes'
 import type { CanvasStyles, ExtendedCanvasStyles } from '../styles'
@@ -27,7 +26,7 @@ export function editSegment(
 	pointStyles: Partial<ExtendedCanvasStyles> = {},
 	pointHoverStyles: Partial<CanvasStyles> = {},
 	pointActiveStyles: Partial<CanvasStyles> = {}
-): ShapeGroup<CircleShape> {
+): () => void {
 	const segmentEditEvent = Object.freeze({
 		type: 'segmentEdit',
 		target: segment,
@@ -44,20 +43,14 @@ export function editSegment(
 		onEdit?.(segmentEditEvent)
 	}
 
-	const x = segment.x
-	const y = segment.y
-
-	const dx = segment.dx
-	const dy = segment.dy
-
-	const startPoint = new CircleShape(x, y, pointRadius)
+	const startPoint = new CircleShape(0, 0, pointRadius)
 	startPoint.fixedRadius = true
 	startPoint.radius = pointRadius
 	Object.assign(startPoint.styles, pointStyles)
 	Object.assign(startPoint.hoverStyles, pointHoverStyles)
 	Object.assign(startPoint.activeStyles, pointActiveStyles)
 
-	const endPoint = new CircleShape(x + dx, y + dy, pointRadius)
+	const endPoint = new CircleShape(segment.dx, segment.dy, pointRadius)
 	endPoint.fixedRadius = true
 	endPoint.radius = pointRadius
 	Object.assign(endPoint.styles, pointStyles)
@@ -67,11 +60,11 @@ export function editSegment(
 	draggable(
 		startPoint,
 		(e) => {
-			segment.dx -= e.x - segment.x
-			segment.dy -= e.y - segment.y
+			segment.dx -= e.dx
+			segment.dy -= e.dy
 
-			segment.x = e.x
-			segment.y = e.y
+			segment.x += e.dx
+			segment.y += e.dy
 		},
 		onChange
 	)
@@ -79,21 +72,29 @@ export function editSegment(
 	draggable(
 		endPoint,
 		(e) => {
-			segment.dx = e.x - segment.x
-			segment.dy = e.y - segment.y
+			segment.dx += e.dx
+			segment.dy += e.dy
 		},
 		onChange
 	)
 
-	draggable(segment, undefined, onChange)
+	const cancelDrag = draggable(segment, undefined, onChange)
 
-	segment.addEventListener('beforeRender', (e) => {
-		startPoint.x = segment.x
-		startPoint.y = segment.y
+	const onBeforeRender = () => {
+		startPoint.x = 0
+		startPoint.y = 0
 
-		endPoint.x = segment.x + segment.dx
-		endPoint.y = segment.y + segment.dy
-	})
+		endPoint.x = segment.dx
+		endPoint.y = segment.dy
+	}
 
-	return new ShapeGroup([startPoint, endPoint])
+	segment.addEventListener('beforeRender', onBeforeRender)
+
+	segment.add([startPoint, endPoint])
+
+	return () => {
+		cancelDrag()
+		segment.removeEventListener('beforeRender', onBeforeRender)
+		segment.remove([startPoint, endPoint])
+	}
 }

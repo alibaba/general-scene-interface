@@ -23,6 +23,7 @@ export default function Test() {
 		addAxis(scene)
 		autoFPS(scene, 5)
 
+		let cancelEdit = () => {}
 		const cancel = drawSegment(scene, (e) => {
 			constrainSegment(e.target, [100, 100, 1000, 500])
 
@@ -32,11 +33,9 @@ export default function Test() {
 			seg.styles.lineWidth = 20
 			seg.styles.strokeStyle = randomColor()
 
-			const controlPoints = editSegment(seg, (e) => {
+			cancelEdit = editSegment(seg, (e) => {
 				constrainSegment(e.target, [100, 100, 1000, 500])
 			})
-
-			scene.add(controlPoints)
 		})
 
 		const rect = new RectShape()
@@ -51,6 +50,7 @@ export default function Test() {
 
 		return () => {
 			cancel()
+			cancelEdit()
 			scene.dispose()
 		}
 	}, [])

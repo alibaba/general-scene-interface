@@ -2,11 +2,8 @@ import { useEffect, useRef } from 'react'
 
 import { CircleShape, RectShape, draggable, draggableAnchor } from '..'
 import { useSize2 } from '../../demo/hooks'
-import { Scene, ShapeGroup } from '../core'
-import { drawRect } from '../draw/drawRect'
-import { editRect } from '../edit/editRect'
-import { addAxis, autoFPS, scenePointerControl } from '../extra'
-import { randomColor } from '../utils/misc'
+import { Scene, Shape } from '../core'
+import { addAxis, scenePointerControl } from '../extra'
 import Info from './Info'
 
 import styles from './Test.module.css'
@@ -23,7 +20,7 @@ export default function Test() {
 		addAxis(scene)
 		// autoFPS(scene, 5)
 
-		const group = new ShapeGroup()
+		const group = new Shape()
 		const rect = new RectShape(0, 0, 100, 200)
 		const point = new CircleShape()
 		point.fixedRadius = true
@@ -39,7 +36,8 @@ export default function Test() {
 		group.add(rect)
 
 		const anchor = draggableAnchor(group)
-		// draggable(rect)
+		draggable(rect)
+		draggable(point)
 
 		group.scale = 2
 

@@ -1,6 +1,5 @@
-import { ShapeGroup } from '../core'
 import { draggable } from '../extra'
-import { CircleShape, PolygonShape, PolylineShape } from '../shapes'
+import { PolygonShape, PolylineShape } from '../shapes'
 import type { CanvasStyles, ExtendedCanvasStyles } from '../styles'
 import { editPolyline } from './editPolyline'
 
@@ -72,5 +71,8 @@ export function editPolygon(
 
 	draggable(polygon, undefined, onChange)
 
-	return cancel
+	return () => {
+		cancel()
+		polygon.remove(shadowPolyline)
+	}
 }

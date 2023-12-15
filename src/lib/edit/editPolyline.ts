@@ -1,4 +1,4 @@
-import { ShapeGroup } from '../core'
+import { Shape } from '../core'
 import { draggable } from '../extra'
 import { CircleShape, PolylineShape } from '../shapes'
 import type { CanvasStyles, ExtendedCanvasStyles } from '../styles'
@@ -46,7 +46,7 @@ export function editPolyline(
 		onEdit?.(PolylineEditEvent)
 	}
 
-	const controlPoints = new ShapeGroup<CircleShape>()
+	const controlPoints = new Shape()
 
 	const controlPointsMap = new WeakMap<{ x: number; y: number }, CircleShape>()
 

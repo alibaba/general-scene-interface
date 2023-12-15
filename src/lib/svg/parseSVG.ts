@@ -1,13 +1,9 @@
-import { ShapeGroup } from '..'
+import { Shape } from '..'
 import { PathShape } from '../shapes'
 import { ExtendedCanvasStyles } from '../styles'
 
-export function parseSVG(
-	svg: SVGElement,
-	style?: Partial<ExtendedCanvasStyles>,
-	scale = 1
-): ShapeGroup {
-	const group = new ShapeGroup()
+export function parseSVG(svg: SVGElement, style?: Partial<ExtendedCanvasStyles>, scale = 1): Shape {
+	const group = new Shape()
 
 	for (const child of svg.children) {
 		if (child instanceof SVGPathElement) {

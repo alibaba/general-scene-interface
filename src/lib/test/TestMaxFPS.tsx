@@ -23,10 +23,11 @@ export default function Test() {
 		scenePointerControl(scene)
 		addAxis(scene)
 
+		let cancelEdit = () => {}
 		const cancel = drawRect(scene, (e) => {
 			const rect = e.target
 
-			const controlPoints = editRect(rect, undefined, undefined, 5, {
+			cancelEdit = editRect(rect, undefined, undefined, 5, {
 				stroke: true,
 				strokeStyle: 'white',
 			})
@@ -40,13 +41,12 @@ export default function Test() {
 			rect.hoverStyles.fillStyle = randomColor(1, seed)
 
 			rect.activeStyles.strokeStyle = 'red'
-
-			scene.add(controlPoints)
 		})
 
 		return () => {
 			cancel()
 			cancelShowFPS()
+			cancelEdit()
 			scene.dispose()
 		}
 	}, [])

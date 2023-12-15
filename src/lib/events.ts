@@ -1,5 +1,5 @@
 import type { EventDispatcher } from './EventDispatcher'
-import type { Scene, Shape, ShapeGroup } from './core'
+import type { Scene, Shape } from './core'
 
 /**
  * 代理的鼠标事件
@@ -63,31 +63,15 @@ export type ShapeLifeCycleEvents = {
 
 export type ShapeEvents = PointerEvents & ShapeLifeCycleEvents
 
-/**
- * Group 生命周期事件
- */
-export type ShapeGroupEvents<S extends Shape> = {
-	add: {
-		type: 'add'
-		target: S
-		currentTarget: ShapeGroup<S>
-	}
-	remove: {
-		type: 'remove'
-		target: S
-		currentTarget: ShapeGroup<S>
-	}
-}
-
 export type SceneEvents = {
 	add: {
 		type: 'add'
-		target: Shape | ShapeGroup
+		target: Shape
 		currentTarget: Scene
 	}
 	remove: {
 		type: 'remove'
-		target: Shape | ShapeGroup
+		target: Shape
 		currentTarget: Scene
 	}
 	beforeRender: {

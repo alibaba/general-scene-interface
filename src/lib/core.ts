@@ -5,7 +5,7 @@ import { CanvasStyles, ExtendedCanvasStyles, getAssignableStyles } from './style
 /**
  * 可绘制图形的虚基类
  */
-export abstract class Shape extends EventDispatcher<ShapeEvents> {
+export class Shape extends EventDispatcher<ShapeEvents> {
 	// 样式
 	readonly styles: Partial<ExtendedCanvasStyles> = { fillStyle: 'red' }
 	readonly hoverStyles: Partial<CanvasStyles> = {}
@@ -84,12 +84,18 @@ export abstract class Shape extends EventDispatcher<ShapeEvents> {
 		}
 	}
 
-	remove(shape: Shape) {
-		const index = this.children.indexOf(shape)
+	remove(shape: Shape | Shape[]) {
+		if (Array.isArray(shape)) {
+			for (const s of shape) {
+				this.remove(s)
+			}
+		} else {
+			const index = this.children.indexOf(shape)
 
-		if (index !== -1) {
-			this.children.splice(index, 1)
-			this.dispatchEvent({ type: 'remove', target: shape, currentTarget: this })
+			if (index !== -1) {
+				this.children.splice(index, 1)
+				this.dispatchEvent({ type: 'remove', target: shape, currentTarget: this })
+			}
 		}
 	}
 
@@ -106,27 +112,8 @@ export abstract class Shape extends EventDispatcher<ShapeEvents> {
 	 * 检测点是否命中形状
 	 * @return true | object 命中，false | undefined 未命中
 	 */
-	abstract hit(x: number, y: number, ctx: CanvasRenderingContext2D): boolean | void | object
-	abstract draw(ctx: CanvasRenderingContext2D): void
-}
-
-/**
- * @deprecated
- */
-export class ShapeGroup<T extends Shape = Shape> extends Shape {
-	constructor(children?: T[]) {
-		super()
-		if (children) this.add(children)
-	}
-
-	readonly children = [] as T[]
-
-	add(shapes: T | T[]) {
-		super.add(shapes)
-	}
-
-	hit() {}
-	draw() {}
+	hit(x: number, y: number, ctx: CanvasRenderingContext2D): boolean | void | object {}
+	draw(ctx: CanvasRenderingContext2D): void {}
 }
 
 /**

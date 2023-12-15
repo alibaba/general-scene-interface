@@ -1,4 +1,3 @@
-import { ShapeGroup } from '../core'
 import { draggable } from '../extra'
 import { CircleShape, RectShape } from '../shapes'
 import type { CanvasStyles, ExtendedCanvasStyles } from '../styles'
@@ -127,9 +126,9 @@ export function editRect(
 		onChange
 	)
 
-	draggable(rect, undefined, onChange)
+	const cancelDrag = draggable(rect, undefined, onChange)
 
-	rect.addEventListener('beforeRender', (e) => {
+	const onBeforeRender = () => {
 		ltPoint.x = 0
 		ltPoint.y = 0
 
@@ -141,14 +140,15 @@ export function editRect(
 
 		rbPoint.x = rect.width
 		rbPoint.y = rect.height
-	})
+	}
+
+	rect.addEventListener('beforeRender', onBeforeRender)
 
 	rect.add([ltPoint, rtPoint, lbPoint, rbPoint])
 
 	return () => {
-		rect.remove(ltPoint)
-		rect.remove(rtPoint)
-		rect.remove(lbPoint)
-		rect.remove(rbPoint)
+		rect.remove([ltPoint, rtPoint, lbPoint, rbPoint])
+		rect.removeEventListener('beforeRender', onBeforeRender)
+		cancelDrag()
 	}
 }

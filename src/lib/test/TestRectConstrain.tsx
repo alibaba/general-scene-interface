@@ -23,12 +23,13 @@ export default function Test() {
 		addAxis(scene)
 		autoFPS(scene, 5)
 
+		let cancelEdit = () => {}
 		const cancel = drawRect(scene, (e) => {
 			constrainRect(e.target, [100, 100, 700, 500])
 
 			const rect = e.target
 
-			const controlPoints = editRect(
+			cancelEdit = editRect(
 				rect,
 				(e) => {
 					constrainRect(e.target, [100, 100, 700, 500])
@@ -50,8 +51,6 @@ export default function Test() {
 			rect.hoverStyles.fillStyle = randomColor(1, seed)
 
 			rect.activeStyles.strokeStyle = 'red'
-
-			scene.add(controlPoints)
 		})
 
 		// constrain area
@@ -69,6 +68,7 @@ export default function Test() {
 
 		return () => {
 			cancel()
+			cancelEdit()
 			scene.dispose()
 		}
 	}, [])

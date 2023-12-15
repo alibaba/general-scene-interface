@@ -1,5 +1,4 @@
-import { CircleShape, RectShape, SegmentShape, TextShape, randomColor } from '.'
-import { Scene, Shape, ShapeGroup } from './core'
+import { CircleShape, Scene, SegmentShape, Shape, TextShape, randomColor } from '.'
 import type { PointerEvents } from './events'
 
 type BeforeDragEvent = {
@@ -215,7 +214,7 @@ export function scenePointerControl(scene: Scene) {
  * @return 取消函数
  */
 export function addAxis(scene: Scene): () => void {
-	const group = new ShapeGroup()
+	const group = new Shape()
 
 	const xAxis = new SegmentShape()
 	group.add(xAxis)
