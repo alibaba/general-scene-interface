@@ -309,8 +309,8 @@ export class ImageShape extends RectShape {
 	}
 
 	draw(ctx: CanvasRenderingContext2D) {
-		const { x: left, y: top } = this.localToView(this.x, this.y)
-		const { x: right, y: bottom } = this.localToView(this.x + this.width, this.y + this.height)
+		const { x: left, y: top } = this.localToView(0, 0)
+		const { x: right, y: bottom } = this.localToView(this.width, this.height)
 
 		ctx.imageSmoothingEnabled = true
 		ctx.imageSmoothingQuality = 'high'
@@ -359,7 +359,6 @@ export class PathShape extends Shape {
 	draw(ctx: CanvasRenderingContext2D) {
 		ctx.translate(this._translate.x, this._translate.y)
 		ctx.scale(this._scale, this._scale)
-		ctx.translate(this.x, this.y)
 
 		ctx.globalAlpha = this.styles.fillOpacity === undefined ? 1 : this.styles.fillOpacity
 		this._fill && ctx.fill(this.path)
@@ -388,12 +387,10 @@ export class TextShape extends Shape {
 
 		const { width, actualBoundingBoxAscent, actualBoundingBoxDescent } = this.textMetrics
 
-		const screenLeft = this.x * this._scale + this._translate.x
+		const lt = this.localToView(0, 0)
+		const screenLeft = lt.x
 		const screenRight = screenLeft + width * (this.fixedSize ? 1 : this._scale)
-		const screenTop =
-			this.y * this._scale +
-			this._translate.y -
-			actualBoundingBoxAscent * (this.fixedSize ? 1 : this._scale)
+		const screenTop = lt.y - actualBoundingBoxAscent * (this.fixedSize ? 1 : this._scale)
 		const screenBottom =
 			screenTop +
 			(actualBoundingBoxAscent + actualBoundingBoxDescent) * (this.fixedSize ? 1 : this._scale)
@@ -404,7 +401,6 @@ export class TextShape extends Shape {
 	draw(ctx: CanvasRenderingContext2D) {
 		ctx.translate(this._translate.x, this._translate.y)
 		ctx.scale(this._scale, this._scale)
-		ctx.translate(this.x, this.y)
 		this.fixedSize && ctx.scale(1 / this._scale, 1 / this._scale)
 
 		ctx.globalAlpha = this.styles.fillOpacity === undefined ? 1 : this.styles.fillOpacity
