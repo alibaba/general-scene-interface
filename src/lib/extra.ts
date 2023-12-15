@@ -1,4 +1,4 @@
-import { SegmentShape, TextShape } from '.'
+import { CircleShape, RectShape, SegmentShape, TextShape, randomColor } from '.'
 import { Scene, Shape, ShapeGroup } from './core'
 import type { PointerEvents } from './events'
 
@@ -95,6 +95,25 @@ export function draggable(
 		shape.removeEventListener('pointermove', onPointerMove)
 		shape.removeEventListener('pointerup', onPointerUp)
 	}
+}
+
+/**
+ * make a anchor(Drag Controller in the shape local origin) to drag the shape
+ */
+export function draggableAnchor(shape: Shape, size = 20) {
+	const anchor = new CircleShape(0, 0, size * 0.5)
+	anchor.fixedRadius = true
+	anchor.styles.stroke = true
+	anchor.styles.fillStyle = randomColor()
+	anchor.styles.strokeStyle = randomColor()
+	anchor.styles.zIndex = 9999
+
+	draggable(anchor, (e) => {
+		shape.x = e.x
+		shape.y = e.y
+	})
+
+	return anchor
 }
 
 /**
@@ -312,7 +331,7 @@ export function addAxis(scene: Scene): () => void {
 		textY.text = yWorld.toFixed(2)
 	})
 
-	group.shapes.forEach((shape) => {
+	group.children.forEach((shape) => {
 		shape.styles.pointerEvents = 'none'
 		shape.styles.zIndex = -1
 	})

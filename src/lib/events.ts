@@ -51,21 +51,33 @@ export type ShapeLifeCycleEvents = {
 		shape: Shape
 		ctx: CanvasRenderingContext2D
 	}
-}
-
-/**
- * Group 生命周期事件
- */
-export type ShapeGroupEvents = {
 	add: {
 		type: 'add'
 		target: Shape
-		currentTarget: ShapeGroup
+		currentTarget: Shape
 	}
 	remove: {
 		type: 'remove'
 		target: Shape
-		currentTarget: ShapeGroup
+		currentTarget: Shape
+	}
+}
+
+export type ShapeEvents = PointerEvents & ShapeLifeCycleEvents
+
+/**
+ * Group 生命周期事件
+ */
+export type ShapeGroupEvents<S extends Shape> = {
+	add: {
+		type: 'add'
+		target: S
+		currentTarget: ShapeGroup<S>
+	}
+	remove: {
+		type: 'remove'
+		target: S
+		currentTarget: ShapeGroup<S>
 	}
 }
 

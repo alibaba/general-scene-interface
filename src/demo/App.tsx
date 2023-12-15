@@ -7,128 +7,137 @@ const categories = [{ key: 'demo', name: 'Demo' }]
 const entries = [
 	//
 	{
-		key: 'scene-test-point',
+		key: 'point',
 		name: '点绘制',
 		category: 'demo',
-		getComponent: (onResult: any) => {
+		getComponent: () => {
 			const Test = lazy(() => import('../lib/test/TestPoint'))
 			return <Test />
 		},
 	},
 	{
-		key: 'scene-test-rect',
+		key: 'rect',
 		name: '矩形绘制',
 		category: 'demo',
-		getComponent: (onResult: any) => {
+		getComponent: () => {
 			const Test = lazy(() => import('../lib/test/TestRect'))
 			return <Test />
 		},
 	},
 	{
-		key: 'scene-test-rect-constrain',
+		key: 'rect-constrain',
 		name: '矩形绘制(受限区)',
 		category: 'demo',
-		getComponent: (onResult: any) => {
+		getComponent: () => {
 			const Test = lazy(() => import('../lib/test/TestRectConstrain'))
 			return <Test />
 		},
 	},
 	{
-		key: 'scene-test-segment',
+		key: 'segment',
 		name: '线段',
 		category: 'demo',
-		getComponent: (onResult: any) => {
+		getComponent: () => {
 			const Test = lazy(() => import('../lib/test/TestSegmentBasic'))
 			return <Test />
 		},
 	},
 	{
-		key: 'scene-test-segment-draw',
+		key: 'segment-draw',
 		name: '线段绘制',
 		category: 'demo',
-		getComponent: (onResult: any) => {
+		getComponent: () => {
 			const Test = lazy(() => import('../lib/test/TestSegmentDraw'))
 			return <Test />
 		},
 	},
 	{
-		key: 'scene-test-segment-draw-constrain',
+		key: 'segment-draw-constrain',
 		name: '线段绘制(受限区)',
 		category: 'demo',
-		getComponent: (onResult: any) => {
+		getComponent: () => {
 			const Test = lazy(() => import('../lib/test/TestSegmentDrawConstrain'))
 			return <Test />
 		},
 	},
 	{
-		key: 'scene-test-polyline',
+		key: 'polyline',
 		name: '折线',
 		category: 'demo',
-		getComponent: (onResult: any) => {
+		getComponent: () => {
 			const Test = lazy(() => import('../lib/test/TestPolylineBasic'))
 			return <Test />
 		},
 	},
 	{
-		key: 'scene-test-polyline-draw',
+		key: 'polyline-draw',
 		name: '折线绘制',
 		category: 'demo',
-		getComponent: (onResult: any) => {
+		getComponent: () => {
 			const Test = lazy(() => import('../lib/test/TestPolylineDraw'))
 			return <Test />
 		},
 	},
 	{
-		key: 'scene-test-polyline-draw-constrain',
+		key: 'polyline-draw-constrain',
 		name: '折线绘制(受限区)',
 		category: 'demo',
-		getComponent: (onResult: any) => {
+		getComponent: () => {
 			const Test = lazy(() => import('../lib/test/TestPolylineDrawConstrain'))
 			return <Test />
 		},
 	},
 	{
-		key: 'scene-test-polygon',
+		key: 'polygon',
 		name: '多边形编辑',
 		category: 'demo',
-		getComponent: (onResult: any) => {
+		getComponent: () => {
 			const Test = lazy(() => import('../lib/test/TestPolygonBasic'))
 			return <Test />
 		},
 	},
 	{
-		key: 'scene-test-polygon-draw',
+		key: 'polygon-draw',
 		name: '多边形绘制',
 		category: 'demo',
-		getComponent: (onResult: any) => {
+		getComponent: () => {
 			const Test = lazy(() => import('../lib/test/TestPolygonDraw'))
 			return <Test />
 		},
 	},
 	{
-		key: 'scene-test-path2d',
+		key: 'path2d',
 		name: 'Path2D',
 		category: 'demo',
-		getComponent: (onResult: any) => {
+		getComponent: () => {
 			const Test = lazy(() => import('../lib/test/TestPath2D'))
 			return <Test />
 		},
 	},
 	{
-		key: 'scene-test-svg',
+		key: 'svg',
 		name: 'SVG parser',
 		category: 'demo',
-		getComponent: (onResult: any) => {
+		getComponent: () => {
 			const Test = lazy(() => import('../lib/test/TestSVG'))
 			return <Test />
 		},
 	},
 	{
-		key: 'scene-test-max-fps',
+		key: 'max-fps',
 		name: 'FPS 限制',
 		category: 'demo',
-		getComponent: (onResult: any) => {
+		getComponent: () => {
 			const Test = lazy(() => import('../lib/test/TestMaxFPS'))
+			return <Test />
+		},
+	},
+	{
+		key: 'scene-graph',
+		name: '场景树',
+		category: 'demo',
+		getComponent: () => {
+			const Test = lazy(() => import('../lib/test/TestSceneGraph'))
 			return <Test />
 		},
 	},
@@ -140,11 +149,6 @@ function App() {
 	const [currentEntry, setCurrentEntry] = useState(defaultIndex as string)
 
 	// const [result, setResult] = useState<any>(null)
-
-	const onResult = (result: any) => {
-		// setResult(result)
-		console.log(result)
-	}
 
 	useEffect(() => {
 		// setResult(null)
@@ -192,7 +196,7 @@ function App() {
 				</div>
 				<main className={styles.main}>
 					<Suspense fallback={<Loading />}>
-						{entries.find((entry) => entry.key === currentEntry)?.getComponent(onResult)}
+						{entries.find((entry) => entry.key === currentEntry)?.getComponent()}
 					</Suspense>
 				</main>
 				<footer className={styles.footer}>

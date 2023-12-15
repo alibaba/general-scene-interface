@@ -17,7 +17,7 @@ export function parseSVG(
 			const styles = svgStyleToCanvasStyle(child)
 
 			const subGroup = parseSVG(child, styles, scale)
-			subGroup.shapes.forEach((shape) => group.add(shape))
+			subGroup.children.forEach((shape) => group.add(shape))
 		}
 	}
 

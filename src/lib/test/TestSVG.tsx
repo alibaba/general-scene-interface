@@ -22,7 +22,7 @@ export default function Test() {
 		autoFPS(scene, 5)
 
 		const group = parseSVG(svgRef.current!, undefined, 4)
-		group.shapes.forEach((shape) => {
+		group.children.forEach((shape) => {
 			shape.x += 0
 			shape.y += 100
 
@@ -39,7 +39,7 @@ export default function Test() {
 					const group = parseSVG(svgNode.documentElement as any, undefined, 1)
 					scene.add(group)
 
-					group.shapes.forEach((shape) => {
+					group.children.forEach((shape) => {
 						shape.x += 600
 						shape.y += 200
 					})

@@ -77,7 +77,7 @@ export function editPolygon(
 	) as ShapeGroup<PolylineShape | CircleShape>
 
 	controller.add(shadowPolyline)
-	controller.shapes.unshift(controller.shapes.pop() as PolylineShape)
+	controller.children.unshift(controller.children.pop() as PolylineShape)
 
 	draggable(
 		polygon,

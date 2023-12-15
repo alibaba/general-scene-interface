@@ -1,25 +1,31 @@
 import { EventDispatcher } from './EventDispatcher'
-import type { PointerEvents, SceneEvents, ShapeGroupEvents, ShapeLifeCycleEvents } from './events'
+import type { SceneEvents, ShapeEvents } from './events'
 import { CanvasStyles, ExtendedCanvasStyles, getAssignableStyles } from './styles'
 
 /**
  * 可绘制图形的虚基类
  */
-export abstract class Shape extends EventDispatcher<PointerEvents & ShapeLifeCycleEvents> {
+export abstract class Shape extends EventDispatcher<ShapeEvents> {
 	// 样式
 	readonly styles: Partial<ExtendedCanvasStyles> = { fillStyle: 'red' }
 	readonly hoverStyles: Partial<CanvasStyles> = {}
 	readonly activeStyles: Partial<CanvasStyles> = {}
 
+	readonly children: Shape[] = []
+
 	// 位置（局部坐标的原点，派生类中的坐标都为局部坐标）
 	x: number = 0
 	y: number = 0
+
+	scale = 1
 
 	visible = true
 
 	readonly userData = {} as any
 
 	// 以下为内部只读状态，渲染时由 renderer 指定，派生类应视为只读状态，每次 hit 或 draw 之前更新
+
+	_visible = true
 
 	_hover = false
 	_active = false
@@ -59,8 +65,10 @@ export abstract class Shape extends EventDispatcher<PointerEvents & ShapeLifeCyc
 	 */
 	localToView(x: number, y: number) {
 		return {
-			x: (x + this.x) * this._scale + this._translate.x,
-			y: (y + this.y) * this._scale + this._translate.y,
+			// x: (x + this.x) * this._scale + this._translate.x,
+			// y: (y + this.y) * this._scale + this._translate.y,
+			x: x * this._scale + this._translate.x,
+			y: y * this._scale + this._translate.y,
 		}
 	}
 
@@ -69,8 +77,38 @@ export abstract class Shape extends EventDispatcher<PointerEvents & ShapeLifeCyc
 	 */
 	viewToLocal(x: number, y: number) {
 		return {
-			x: (x - this._translate.x) / this._scale - this.x,
-			y: (y - this._translate.y) / this._scale - this.y,
+			// x: (x - this._translate.x) / this._scale - this.x,
+			// y: (y - this._translate.y) / this._scale - this.y,
+			x: (x - this._translate.x) / this._scale,
+			y: (y - this._translate.y) / this._scale,
+		}
+	}
+
+	add(shapes: Shape | Shape[]) {
+		if (Array.isArray(shapes)) {
+			for (const shape of shapes) {
+				this.add(shape)
+			}
+			return
+		} else {
+			this.children.push(shapes)
+			this.dispatchEvent({ type: 'add', target: shapes, currentTarget: this })
+		}
+	}
+
+	remove(shape: Shape) {
+		const index = this.children.indexOf(shape)
+
+		if (index !== -1) {
+			this.children.splice(index, 1)
+			this.dispatchEvent({ type: 'remove', target: shape, currentTarget: this })
+		}
+	}
+
+	traverse(fn: (shape: Shape, parent?: Shape) => void, parent?: Shape) {
+		fn(this, parent)
+		for (const shape of this.children) {
+			shape.traverse(fn, this)
 		}
 	}
 
@@ -80,38 +118,66 @@ export abstract class Shape extends EventDispatcher<PointerEvents & ShapeLifeCyc
 	 * 检测点是否命中形状
 	 * @return true | object 命中，false | undefined 未命中
 	 */
-	abstract hit(x: number, y: number, ctx: CanvasRenderingContext2D): boolean | undefined | object
+	abstract hit(x: number, y: number, ctx: CanvasRenderingContext2D): boolean | void | object
 	abstract draw(ctx: CanvasRenderingContext2D): void
 }
 
 /**
  * 形状组
  */
-export class ShapeGroup<T extends Shape = Shape> extends EventDispatcher<ShapeGroupEvents> {
-	constructor(public readonly shapes = [] as T[]) {
+// export class ShapeGroup<T extends Shape = Shape> extends Shape {
+// 	constructor(public readonly children = [] as (T | ShapeGroup)[]) {
+// 		super()
+// 	}
+
+// 	add(shapes: T | T[]) {
+// 		if (Array.isArray(shapes)) {
+// 			for (const shape of shapes) {
+// 				this.add(shape)
+// 			}
+// 			return
+// 		} else {
+// 			this.children.push(shapes)
+// 			this.dispatchEvent({ type: 'add', target: shapes, currentTarget: this })
+// 		}
+// 	}
+
+// 	remove(shape: T) {
+// 		const index = this.children.indexOf(shape)
+
+// 		if (index !== -1) {
+// 			this.children.splice(index, 1)
+// 			this.dispatchEvent({ type: 'remove', target: shape, currentTarget: this })
+// 		}
+// 	}
+
+// 	traverse(fn: (shape: Shape) => void) {
+// 		fn(this)
+// 		for (const shape of this.children) {
+// 			if (shape instanceof ShapeGroup) shape.traverse(fn)
+// 			else if (shape instanceof ShapeGroup) fn(shape)
+// 			else throw new Error('ShapeGroup::traverse: unknown child type')
+// 		}
+// 	}
+// }
+
+/**
+ * @deprecated
+ */
+export class ShapeGroup<T extends Shape = Shape> extends Shape {
+	constructor(children?: T[]) {
 		super()
+		if (children) this.add(children)
 	}
+
+	readonly children = [] as T[]
 
 	add(shapes: T | T[]) {
-		if (Array.isArray(shapes)) {
-			for (const shape of shapes) {
-				this.add(shape)
-			}
-			return
-		} else {
-			this.shapes.push(shapes)
-			this.dispatchEvent({ type: 'add', target: shapes, currentTarget: this })
-		}
+		super.add(shapes)
 	}
 
-	remove(shape: T) {
-		const index = this.shapes.indexOf(shape)
-
-		if (index !== -1) {
-			this.shapes.splice(index, 1)
-			this.dispatchEvent({ type: 'remove', target: shape, currentTarget: this })
-		}
-	}
+	hit() {}
+	draw() {}
 }
 
 /**
@@ -131,7 +197,7 @@ export class Scene extends EventDispatcher<SceneEvents> {
 	// 帧率限制
 	maxFPS = 60
 
-	private children: (Shape | ShapeGroup)[] = []
+	private children: Shape[] = []
 
 	/**
 	 * the shape that is currently being focused for pointer events
@@ -342,12 +408,12 @@ export class Scene extends EventDispatcher<SceneEvents> {
 		tick(null)
 	}
 
-	add(child: Shape | ShapeGroup) {
+	add(child: Shape) {
 		this.children.push(child)
 		this.dispatchEvent({ type: 'add', target: child, currentTarget: this })
 	}
 
-	remove(child: Shape | ShapeGroup) {
+	remove(child: Shape) {
 		const index = this.children.indexOf(child)
 
 		if (index !== -1) {
@@ -365,47 +431,43 @@ export class Scene extends EventDispatcher<SceneEvents> {
 	render() {
 		this.dispatchEvent({ type: 'beforeRender', target: this, currentTarget: this })
 
+		this.updateSceneGraph()
+
 		// 鼠标样式 reset
 		this.canvas.style.cursor = this.cursor
 
 		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
 
-		const shapes = this.getShapeList()
+		const shapes = this.getShapeList().filter((s) => s._visible)
 
 		for (const shape of shapes) {
 			// 描边填色 reset
 			shape._fill = true
 			shape._stroke = false
 
-			shape._scale = this.scale
-			shape._translate.x = this.translate.x
-			shape._translate.y = this.translate.y
+			if (shape.styles.fill !== undefined) shape._fill = shape.styles.fill
 
-			if (shape.visible) {
-				if (shape.styles.fill !== undefined) shape._fill = shape.styles.fill
+			if (shape.styles.stroke !== undefined) shape._stroke = shape.styles.stroke
 
-				if (shape.styles.stroke !== undefined) shape._stroke = shape.styles.stroke
-
-				if (this.hoveringShape === shape) {
-					shape._hover = true
-					if (shape.hoverStyles.cursor) this.canvas.style.cursor = shape.hoverStyles.cursor
-					if (shape.hoverStyles.fill !== undefined) shape._fill = shape.hoverStyles.fill
-					if (shape.hoverStyles.stroke !== undefined) shape._stroke = true
-				} else {
-					shape._hover = false
-				}
-
-				if (this.activeShape === shape) {
-					shape._active = true
-					if (shape.activeStyles.cursor) this.canvas.style.cursor = shape.activeStyles.cursor
-					if (shape.activeStyles.fill !== undefined) shape._fill = shape.activeStyles.fill
-					if (shape.activeStyles.stroke !== undefined) shape._stroke = shape.activeStyles.stroke
-				} else {
-					shape._active = false
-				}
-
-				shape._render(this.ctx)
+			if (this.hoveringShape === shape) {
+				shape._hover = true
+				if (shape.hoverStyles.cursor) this.canvas.style.cursor = shape.hoverStyles.cursor
+				if (shape.hoverStyles.fill !== undefined) shape._fill = shape.hoverStyles.fill
+				if (shape.hoverStyles.stroke !== undefined) shape._stroke = true
+			} else {
+				shape._hover = false
 			}
+
+			if (this.activeShape === shape) {
+				shape._active = true
+				if (shape.activeStyles.cursor) this.canvas.style.cursor = shape.activeStyles.cursor
+				if (shape.activeStyles.fill !== undefined) shape._fill = shape.activeStyles.fill
+				if (shape.activeStyles.stroke !== undefined) shape._stroke = shape.activeStyles.stroke
+			} else {
+				shape._active = false
+			}
+
+			shape._render(this.ctx)
 		}
 	}
 
@@ -413,13 +475,9 @@ export class Scene extends EventDispatcher<SceneEvents> {
 	 * 获取所有 shape 列表
 	 */
 	private getShapeList() {
-		const shapes = []
+		const shapes = [] as Shape[]
 		for (const shape of this.children) {
-			if (shape instanceof ShapeGroup) {
-				shapes.push(...shape.shapes)
-			} else {
-				shapes.push(shape)
-			}
+			shape.traverse((s) => shapes.push(s))
 		}
 
 		shapes.sort((a, b) => (a.styles.zIndex || 0) - (b.styles.zIndex || 0))
@@ -428,10 +486,54 @@ export class Scene extends EventDispatcher<SceneEvents> {
 	}
 
 	/**
+	 * 更新场景树中的所有节点，处理继承规则
+	 */
+	updateSceneGraph() {
+		for (const child of this.children) {
+			child.traverse((shape, parent) => {
+				// console.log(parent)
+				if (parent) {
+					shape._visible = shape.visible && parent._visible
+				} else {
+					shape._visible = shape.visible
+				}
+
+				if (!shape._visible) return
+
+				if (parent) {
+					/**
+					 * 场景树分层变换的叠加
+					 * - 0 local
+					 * x' = x * s + t
+					 * - 1 level parent
+					 * x' = (x * s + t) * sp + tp
+					 * 	  = x * sp * s + t * sp + tp
+					 *    = x * (sp * s) + (t * sp + tp)
+					 * - 2 level parent
+					 * x' = ((x * s + t) * sp + tp) * spp + tpp
+					 *    = x * spp * sp * s + t * spp * sp + tp * spp + tpp
+					 *    = x * (spp * sp * s) + (t * spp * sp + tp * spp + tpp)
+					 */
+
+					shape._scale = shape.scale * parent._scale
+
+					const xy = parent.localToView(shape.x, shape.y)
+					shape._translate.x = xy.x
+					shape._translate.y = xy.y
+				} else {
+					shape._scale = shape.scale * this.scale
+					shape._translate.x = shape.x * this.scale + this.translate.x
+					shape._translate.y = shape.y * this.scale + this.translate.y
+				}
+			})
+		}
+	}
+
+	/**
 	 * 确认保存引用的 shape 依然在场景中
 	 */
 	private checkShapeRef() {
-		const shapes = this.getShapeList()
+		const shapes = this.getShapeList().filter((s) => s._visible)
 
 		if (this.activeShape && !shapes.includes(this.activeShape)) {
 			this.activeShape = null
@@ -445,14 +547,15 @@ export class Scene extends EventDispatcher<SceneEvents> {
 	 * 查找碰撞图形
 	 */
 	private getHitShape(x: number, y: number) {
-		const shapes = this.getShapeList()
+		this.updateSceneGraph()
+
+		const shapes = this.getShapeList().filter((s) => s._visible)
 
 		// 逆向查找
 		for (let i = shapes.length - 1; i >= 0; i--) {
 			const shape = shapes[i]
 
-			const res =
-				shape.visible && shape.styles.pointerEvents !== 'none' && shape.hit(x, y, this.ctx)
+			const res = shape.styles.pointerEvents !== 'none' && shape.hit(x, y, this.ctx)
 
 			if (res) return { shape, res }
 		}

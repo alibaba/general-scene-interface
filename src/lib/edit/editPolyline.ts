@@ -54,6 +54,7 @@ export function editPolyline(
 		const controlPoint = new CircleShape(polyline.x + point.x, polyline.y + point.y, pointRadius)
 		controlPoint.fixedRadius = true
 		controlPoint.radius = pointRadius
+		// controlPoint.styles.zIndex = polyline.styles.zIndex ?? 0 + 1
 		Object.assign(controlPoint.styles, pointStyles)
 		Object.assign(controlPoint.hoverStyles, pointHoverStyles)
 		Object.assign(controlPoint.activeStyles, pointActiveStyles)
