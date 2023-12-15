@@ -12,6 +12,8 @@ type BeforeDragEvent = {
 	 * 新的 y，可以修改
 	 */
 	y: number
+	dx: number
+	dy: number
 	srcEvent: PointerEvent
 	target: Shape
 	currentTarget: Shape
@@ -39,6 +41,9 @@ export function draggable(
 	let startShapeX = 0
 	let startShapeY = 0
 
+	let lastShapeX = 0
+	let lastShapeY = 0
+
 	shape.hoverStyles.cursor = 'move'
 
 	function onPointerDown(e: PointerEvents['pointerdown']) {
@@ -48,11 +53,14 @@ export function draggable(
 		startPointerY = e.srcEvent.offsetY
 		startShapeX = shape.x
 		startShapeY = shape.y
+		lastShapeX = startShapeX
+		lastShapeY = startShapeY
 		isDragging = true
 	}
 
 	function onPointerMove(e: PointerEvents['pointermove']) {
 		if (isDragging) {
+			// 相对于 start
 			const dx = e.srcEvent.offsetX - startPointerX
 			const dy = e.srcEvent.offsetY - startPointerY
 
@@ -63,12 +71,18 @@ export function draggable(
 				type: 'drag',
 				x: newX,
 				y: newY,
+				// 相对于 last
+				dx: newX - lastShapeX,
+				dy: newY - lastShapeY,
 				srcEvent: e.srcEvent,
 				target: shape,
 				currentTarget: shape,
 			} as const
 
 			onDrag?.(event)
+
+			lastShapeX = newX
+			lastShapeY = newY
 
 			shape.x = event.x
 			shape.y = event.y
@@ -224,7 +238,7 @@ export function addAxis(scene: Scene): () => void {
 	xArrowDown.dx = -10
 	xArrowDown.dy = 10
 
-	xAxis.addEventListener('beforeDraw', (e) => {
+	scene.addEventListener('beforeRender', (e) => {
 		xAxis.dx = scene.canvas.width / scene.scale
 		xAxis.x = -scene.translate.x / scene.scale
 
@@ -258,7 +272,7 @@ export function addAxis(scene: Scene): () => void {
 	yArrowRight.dx = 10
 	yArrowRight.dy = -10
 
-	yAxis.addEventListener('beforeDraw', (e) => {
+	scene.addEventListener('beforeRender', (e) => {
 		yAxis.dy = scene.canvas.height / scene.scale
 		yAxis.y = -scene.translate.y / scene.scale
 
