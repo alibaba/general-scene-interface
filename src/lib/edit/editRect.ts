@@ -26,7 +26,7 @@ export function editRect(
 	pointStyles: Partial<ExtendedCanvasStyles> = {},
 	pointHoverStyles: Partial<CanvasStyles> = {},
 	pointActiveStyles: Partial<CanvasStyles> = {}
-): ShapeGroup {
+): () => void {
 	const rectEditEvent = Object.freeze({
 		type: 'rectEdit',
 		target: rect,
@@ -45,7 +45,7 @@ export function editRect(
 		onEdit?.(rectEditEvent)
 	}
 
-	const ltPoint = new CircleShape(rect.x, rect.y, pointRadius)
+	const ltPoint = new CircleShape(0, 0, pointRadius)
 	ltPoint.fixedRadius = true
 
 	// ltPoint.styles.zIndex = rect.styles.zIndex
@@ -56,16 +56,19 @@ export function editRect(
 	draggable(
 		ltPoint,
 		(e) => {
-			rect.width += rect.x - e.x
-			rect.height += rect.y - e.y
+			rect.x += e.dx
+			rect.y += e.dy
 
-			rect.x = e.x
-			rect.y = e.y
+			rect.width -= e.dx
+			rect.height -= e.dy
+
+			e.x = 0
+			e.y = 0
 		},
 		onChange
 	)
 
-	const rtPoint = new CircleShape(rect.x + rect.width, rect.y, pointRadius)
+	const rtPoint = new CircleShape(rect.width, 0, pointRadius)
 	rtPoint.fixedRadius = true
 
 	rtPoint.styles.zIndex = rect.styles.zIndex
@@ -76,15 +79,17 @@ export function editRect(
 	draggable(
 		rtPoint,
 		(e) => {
-			rect.width = e.x - rect.x
-			rect.height += rect.y - e.y
+			rect.width += e.dx
+			rect.height -= e.dy
 
-			rect.y = e.y
+			rect.y += e.dy
+
+			e.y = 0
 		},
 		onChange
 	)
 
-	const lbPoint = new CircleShape(rect.x, rect.y + rect.height, pointRadius)
+	const lbPoint = new CircleShape(0, rect.height, pointRadius)
 	lbPoint.fixedRadius = true
 
 	lbPoint.styles.zIndex = rect.styles.zIndex
@@ -95,15 +100,17 @@ export function editRect(
 	draggable(
 		lbPoint,
 		(e) => {
-			rect.width += rect.x - e.x
-			rect.height = e.y - rect.y
+			rect.width -= e.dx
+			rect.height += e.dy
 
-			rect.x = e.x
+			rect.x += e.dx
+
+			e.x = 0
 		},
 		onChange
 	)
 
-	const rbPoint = new CircleShape(rect.x + rect.width, rect.y + rect.height, pointRadius)
+	const rbPoint = new CircleShape(rect.width, rect.height, pointRadius)
 	rbPoint.fixedRadius = true
 
 	rbPoint.styles.zIndex = rect.styles.zIndex
@@ -114,8 +121,8 @@ export function editRect(
 	draggable(
 		rbPoint,
 		(e) => {
-			rect.width = e.x - rect.x
-			rect.height = e.y - rect.y
+			rect.width += e.dx
+			rect.height += e.dy
 		},
 		onChange
 	)
@@ -123,18 +130,25 @@ export function editRect(
 	draggable(rect, undefined, onChange)
 
 	rect.addEventListener('beforeDraw', (e) => {
-		ltPoint.x = rect.x
-		ltPoint.y = rect.y
+		ltPoint.x = 0
+		ltPoint.y = 0
 
-		rtPoint.x = rect.x + rect.width
-		rtPoint.y = rect.y
+		rtPoint.x = rect.width
+		rtPoint.y = 0
 
-		lbPoint.x = rect.x
-		lbPoint.y = rect.y + rect.height
+		lbPoint.x = 0
+		lbPoint.y = rect.height
 
-		rbPoint.x = rect.x + rect.width
-		rbPoint.y = rect.y + rect.height
+		rbPoint.x = rect.width
+		rbPoint.y = rect.height
 	})
 
-	return new ShapeGroup([ltPoint, rtPoint, lbPoint, rbPoint])
+	rect.add([ltPoint, rtPoint, lbPoint, rbPoint])
+
+	return () => {
+		rect.remove(ltPoint)
+		rect.remove(rtPoint)
+		rect.remove(lbPoint)
+		rect.remove(rbPoint)
+	}
 }

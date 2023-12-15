@@ -28,7 +28,7 @@ export function editPolygon(
 	pointStyles: Partial<ExtendedCanvasStyles> = {},
 	pointHoverStyles: Partial<CanvasStyles> = {},
 	pointActiveStyles: Partial<CanvasStyles> = {}
-): ShapeGroup<PolylineShape | CircleShape> {
+): () => void {
 	const PolygonEditEvent = Object.freeze({
 		type: 'polygonEdit',
 		target: polygon,
@@ -43,13 +43,6 @@ export function editPolygon(
 	shadowPolyline.styles.strokeOpacity = 0.5
 	shadowPolyline.closed = true
 	shadowPolyline.points = polygon.points
-	shadowPolyline.x = polygon.x
-	shadowPolyline.y = polygon.y
-
-	polygon.addEventListener('beforeDraw', (e) => {
-		polygon.x = shadowPolyline.x
-		polygon.y = shadowPolyline.y
-	})
 
 	const onChange = () => {
 		const event = {
@@ -60,13 +53,10 @@ export function editPolygon(
 
 		onBeforeEdit?.(event)
 
-		shadowPolyline.x = polygon.x
-		shadowPolyline.y = polygon.y
-
 		onEdit?.(PolygonEditEvent)
 	}
 
-	const controller = editPolyline(
+	const cancel = editPolyline(
 		shadowPolyline,
 		undefined,
 		onChange,
@@ -74,19 +64,13 @@ export function editPolygon(
 		pointStyles,
 		pointHoverStyles,
 		pointActiveStyles
-	) as ShapeGroup<PolylineShape | CircleShape>
-
-	controller.add(shadowPolyline)
-	controller.children.unshift(controller.children.pop() as PolylineShape)
-
-	draggable(
-		polygon,
-		(e) => {
-			shadowPolyline.x = e.x
-			shadowPolyline.y = e.y
-		},
-		onChange
 	)
 
-	return controller
+	polygon.add(shadowPolyline)
+
+	polygon.children.unshift(polygon.children.pop() as PolylineShape)
+
+	draggable(polygon, undefined, onChange)
+
+	return cancel
 }

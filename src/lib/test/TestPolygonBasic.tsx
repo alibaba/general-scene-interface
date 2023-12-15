@@ -36,10 +36,10 @@ export default function Test() {
 
 		scene.add(polygon)
 
-		const cp = editPolygon(polygon)
-		scene.add(cp)
+		const cancel = editPolygon(polygon)
 
 		return () => {
+			cancel()
 			scene.dispose()
 		}
 	}, [])

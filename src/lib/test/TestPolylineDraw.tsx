@@ -24,6 +24,8 @@ export default function Test() {
 		addAxis(scene)
 		autoFPS(scene, 5)
 
+		let cancelEdit: () => void
+
 		const cancel = drawPolyline(
 			scene,
 			(e) => {
@@ -36,8 +38,7 @@ export default function Test() {
 
 				polyline.hoverStyles.strokeStyle = 'red'
 
-				const controlPoints = editPolyline(polyline)
-				scene.add(controlPoints)
+				cancelEdit = editPolyline(polyline)
 			},
 			{},
 			{ fillStyle: 'green' }
@@ -45,6 +46,7 @@ export default function Test() {
 
 		return () => {
 			cancel()
+			cancelEdit?.()
 			scene.dispose()
 		}
 	}, [])

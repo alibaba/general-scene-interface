@@ -17,8 +17,8 @@ export type PolylineEditEvent = {
 
 /**
  * 生成两个控制点，编辑线段
+ * @return 取消函数
  */
-
 export function editPolyline(
 	polyline: PolylineShape,
 	onBeforeEdit?: (e: BeforePolylineEditEvent) => void,
@@ -28,7 +28,7 @@ export function editPolyline(
 	pointStyles: Partial<ExtendedCanvasStyles> = {},
 	pointHoverStyles: Partial<CanvasStyles> = {},
 	pointActiveStyles: Partial<CanvasStyles> = {}
-): ShapeGroup<CircleShape> {
+): () => void {
 	const PolylineEditEvent = Object.freeze({
 		type: 'polylineEdit',
 		target: polyline,
@@ -51,7 +51,7 @@ export function editPolyline(
 	const controlPointsMap = new WeakMap<{ x: number; y: number }, CircleShape>()
 
 	polyline.points.map((point) => {
-		const controlPoint = new CircleShape(polyline.x + point.x, polyline.y + point.y, pointRadius)
+		const controlPoint = new CircleShape(point.x, point.y, pointRadius)
 		controlPoint.fixedRadius = true
 		controlPoint.radius = pointRadius
 		// controlPoint.styles.zIndex = polyline.styles.zIndex ?? 0 + 1
@@ -64,8 +64,8 @@ export function editPolyline(
 		draggable(
 			controlPoint,
 			(e) => {
-				point.x = e.x - polyline.x
-				point.y = e.y - polyline.y
+				point.x = e.x
+				point.y = e.y
 			},
 			onChange
 		)
@@ -85,7 +85,7 @@ export function editPolyline(
 	})
 
 	// 	新增点
-	polyline.addEventListener('pointerdown', (e) => {
+	const onPointerDown = (e: any) => {
 		if (e.srcEvent.ctrlKey || e.srcEvent.metaKey) {
 			const hitResult = e.hitResult
 
@@ -107,11 +107,7 @@ export function editPolyline(
 
 			polyline.points.splice(index, 0, newPoint)
 
-			const controlPoint = new CircleShape(
-				polyline.x + newPoint.x,
-				polyline.y + newPoint.y,
-				pointRadius
-			)
+			const controlPoint = new CircleShape(newPoint.x, newPoint.y, pointRadius)
 			controlPoint.fixedRadius = true
 			controlPoint.radius = pointRadius
 			Object.assign(controlPoint.styles, pointStyles)
@@ -142,19 +138,29 @@ export function editPolyline(
 				}
 			})
 		}
-	})
+	}
+
+	polyline.addEventListener('pointerdown', onPointerDown)
 
 	// 对线的整体拖动
-	draggable(polyline, undefined, onChange)
+	const cancelDrag = draggable(polyline, undefined, onChange)
 
-	polyline.addEventListener('beforeDraw', (e) => {
+	const onBeforeDraw = (e: any) => {
 		polyline.points.forEach((point) => {
 			const controlPoint = controlPointsMap.get(point)!
 
-			controlPoint.x = polyline.x + point.x
-			controlPoint.y = polyline.y + point.y
+			controlPoint.x = point.x
+			controlPoint.y = point.y
 		})
-	})
+	}
+	polyline.addEventListener('beforeDraw', onBeforeDraw)
 
-	return controlPoints
+	polyline.add(controlPoints)
+
+	return () => {
+		cancelDrag()
+		polyline.removeEventListener('pointerdown', onPointerDown)
+		polyline.removeEventListener('beforeDraw', onBeforeDraw)
+		polyline.remove(controlPoints)
+	}
 }

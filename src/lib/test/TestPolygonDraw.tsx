@@ -23,6 +23,8 @@ export default function Test() {
 		addAxis(scene)
 		autoFPS(scene, 5)
 
+		let cancelEdit: () => void
+
 		const cancel = drawPolygon(
 			scene,
 			(e) => {
@@ -37,10 +39,9 @@ export default function Test() {
 
 				polygon.hoverStyles.strokeStyle = 'red'
 
-				const controlPoints = editPolygon(polygon, (e) => {
+				cancelEdit = editPolygon(polygon, (e) => {
 					constrainPoly(e.target, [100, 100, 700, 500])
 				})
-				scene.add(controlPoints)
 			},
 			{},
 			{ fillStyle: 'green' }
@@ -61,6 +62,7 @@ export default function Test() {
 
 		return () => {
 			cancel()
+			cancelEdit?.()
 			scene.dispose()
 		}
 	}, [])
