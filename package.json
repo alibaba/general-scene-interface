@@ -1,5 +1,6 @@
 {
   "name": "cubs.js",
+  "description": "A light-weight canvas graphic lib.",
   "version": "0.1.0",
   "type": "module",
   "files": [
