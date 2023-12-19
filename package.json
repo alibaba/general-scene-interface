@@ -1,13 +1,14 @@
 {
   "name": "cubs.js",
   "description": "A light-weight canvas graphic lib.",
-  "version": "0.1.1",
+  "version": "0.1.1-beta.0",
   "type": "module",
   "files": [
     "lib"
   ],
   "license": "MIT",
   "author": "Simon <https://github.com/gaomeng1900>",
+  "homepage": "https://gaomeng1900.github.io/cubs.js",
   "main": "./lib/cubs.umd.cjs",
   "module": "./lib/cubs.js",
   "types": "./lib/cubs.d.ts",
@@ -78,5 +79,5 @@
     "workbox-routing": "^7.0.0",
     "workbox-strategies": "^7.0.0"
   },
-  "repository": "https://github.com/alibaba/general-scene-interface.git"
+  "repository": "https://github.com/alibaba/general-scene-interface.git#cubs.js"
 }
