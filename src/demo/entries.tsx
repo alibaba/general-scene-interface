@@ -146,4 +146,14 @@ export const entries = [
 			return <Test />
 		},
 	},
+
+	{
+		key: 'svg',
+		name: 'SVG 解析器',
+		category: 'demo',
+		getComponent: () => {
+			const Test = lazy(() => import('../lib/test/svg.test.tsx'))
+			return <Test />
+		},
+	},
 ]
