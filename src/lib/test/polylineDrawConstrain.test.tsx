@@ -3,14 +3,18 @@ import { useEffect, useRef } from 'react'
 import { RectShape, autoFPS } from '..'
 import { useSize2 } from '../../demo/hooks'
 import { Scene } from '../core'
-import { drawRect } from '../draw/drawRect'
-import { editRect } from '../edit/editRect'
+import { drawPolyline } from '../draw/drawPolyline'
+import { editPolyline } from '../edit/editPolyline'
 import { addAxis, scenePointerControl } from '../extra'
-import { constrainRect, randomColor } from '../utils/misc'
+import { constrainPoly, randomColor } from '../utils/misc'
 import Info from './Info'
 
 import styles from './Test.module.css'
 
+/**
+ * @test_name 限制区域折线绘制
+ * @test_category demo
+ */
 export default function Test() {
 	const canvasRef = useRef<HTMLCanvasElement>(null!)
 
@@ -19,39 +23,33 @@ export default function Test() {
 
 		const scene = new Scene(canvas)
 
+		console.log(scene)
+
 		scenePointerControl(scene)
 		addAxis(scene)
 		autoFPS(scene, 5)
 
-		let cancelEdit = () => {}
-		const cancel = drawRect(scene, (e) => {
-			constrainRect(e.target, [100, 100, 700, 500])
+		let cancelEdit: () => void
 
-			const rect = e.target
+		const cancel = drawPolyline(
+			scene,
+			(e) => {
+				constrainPoly(e.target, [100, 100, 700, 500])
 
-			cancelEdit = editRect(
-				rect,
-				(e) => {
-					constrainRect(e.target, [100, 100, 700, 500])
-				},
-				undefined,
-				5,
-				{
-					stroke: true,
-					strokeStyle: 'white',
-				}
-			)
+				const polyline = e.target
 
-			const seed = Math.random()
+				polyline.styles.strokeStyle = randomColor()
+				polyline.styles.lineWidth = 10
+				polyline.styles.lineCap = 'round'
+				polyline.styles.lineJoin = 'round'
 
-			rect.styles.fillStyle = randomColor(0.5, seed)
-			rect.styles.stroke = true
-			rect.styles.lineWidth = 4
+				polyline.hoverStyles.strokeStyle = 'red'
 
-			rect.hoverStyles.fillStyle = randomColor(1, seed)
-
-			rect.activeStyles.strokeStyle = 'red'
-		})
+				cancelEdit = editPolyline(polyline, (e) => constrainPoly(e.target, [100, 100, 700, 500]))
+			},
+			{},
+			{ fillStyle: 'green' }
+		)
 
 		// constrain area
 		{
@@ -68,7 +66,7 @@ export default function Test() {
 
 		return () => {
 			cancel()
-			cancelEdit()
+			cancelEdit?.()
 			scene.dispose()
 		}
 	}, [])
@@ -81,16 +79,19 @@ export default function Test() {
 		<div className={styles.wrapper}>
 			<main className={styles.mainPaper} ref={mainRef}>
 				<canvas ref={canvasRef} className={styles.canvas} width={width} height={height} />
-
 				<Info>
 					<div style={{ fontSize: '1.1em', fontWeight: '500' }}> 📷 画布：</div>
 					<ul>
 						<li>右键拖动，滚轮缩放</li>
 					</ul>
-					<div style={{ fontSize: '1.1em', fontWeight: '500' }}> 🖌️ 绘制矩形：</div>
+					<div style={{ fontSize: '1.1em', fontWeight: '500' }}> 🖌️ 绘制折线：</div>
 					<ul>
-						<li>点击空白处并拖动，增加矩形</li>
-						<li>拖动矩形或顶点，调整矩形</li>
+						<li>开始绘制：点击空白处</li>
+						<li>结束绘制：点击尾点结束绘制，或者点击首点结束绘制并标记闭合</li>
+						<li>修改位置：拖动任意边</li>
+						<li>修改形状：拖动顶点</li>
+						<li>添加顶点：按住 meta 或 Ctrl 键，点击边</li>
+						<li>删除顶点：按住 meta 或 Ctrl 键，点击顶点</li>
 					</ul>
 				</Info>
 			</main>

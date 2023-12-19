@@ -11,6 +11,10 @@ import Info from './Info'
 
 import styles from './Test.module.css'
 
+/**
+ * @test_name 多边形绘制
+ * @test_category demo
+ */
 export default function Test() {
 	const canvasRef = useRef<HTMLCanvasElement>(null!)
 

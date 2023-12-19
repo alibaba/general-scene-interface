@@ -3,11 +3,15 @@ import { useEffect, useRef } from 'react'
 import { useSize2 } from '../../demo/hooks'
 import { Scene } from '../core'
 import { addAxis, autoFPS, draggable, scenePointerControl } from '../extra'
-import { PolylineShape } from '../shapes'
+import { SegmentShape } from '../shapes'
 import { randomColor } from '../utils/misc'
 
 import styles from './Test.module.css'
 
+/**
+ * @test_name 线段
+ * @test_category demo
+ */
 export default function Test() {
 	const canvasRef = useRef<HTMLCanvasElement>(null!)
 
@@ -20,23 +24,36 @@ export default function Test() {
 		addAxis(scene)
 		autoFPS(scene, 5)
 
-		const polyline = new PolylineShape(200, 200, [
-			{ x: 0, y: 0 },
-			{ x: 10, y: 100 },
-			{ x: 100, y: 10 },
-			{ x: 100, y: 100 },
-		])
-
-		polyline.styles.strokeStyle = randomColor()
-		polyline.styles.lineWidth = 10
-		polyline.styles.lineCap = 'round'
-		polyline.styles.lineJoin = 'round'
-
-		polyline.hoverStyles.strokeStyle = 'red'
-		polyline.hoverStyles.lineWidth = 12
-
-		draggable(polyline)
-		scene.add(polyline)
+		{
+			const seg = new SegmentShape(200, 200, -50, 0)
+			seg.styles.strokeStyle = randomColor()
+			seg.hoverStyles.strokeStyle = 'red'
+			seg.styles.lineWidth = 10
+			seg.hoverStyles.lineWidth = 12
+			seg.styles.lineCap = 'round'
+			draggable(seg)
+			scene.add(seg)
+		}
+		{
+			const seg = new SegmentShape(200, 200, 0, -50)
+			seg.styles.strokeStyle = randomColor()
+			seg.hoverStyles.strokeStyle = 'red'
+			seg.styles.lineWidth = 10
+			seg.hoverStyles.lineWidth = 12
+			seg.styles.lineCap = 'round'
+			draggable(seg)
+			scene.add(seg)
+		}
+		{
+			const seg = new SegmentShape(100, 100, 100, 100)
+			seg.styles.strokeStyle = randomColor()
+			seg.hoverStyles.strokeStyle = 'red'
+			seg.styles.lineWidth = 10
+			seg.hoverStyles.lineWidth = 12
+			seg.styles.lineCap = 'round'
+			draggable(seg)
+			scene.add(seg)
+		}
 
 		return () => {
 			scene.dispose()

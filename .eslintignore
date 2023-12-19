@@ -13,5 +13,6 @@ vite.config.ts
 vite.lib.config.ts
 vite.sw.config.ts
 sw.mjs
+updateEntries.mjs
 
 public

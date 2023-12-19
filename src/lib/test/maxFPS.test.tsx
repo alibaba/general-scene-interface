@@ -4,11 +4,15 @@ import { useSize2 } from '../../demo/hooks'
 import { Scene } from '../core'
 import { drawRect } from '../draw/drawRect'
 import { editRect } from '../edit/editRect'
-import { addAxis, autoFPS, scenePointerControl } from '../extra'
+import { addAxis, autoFPS, scenePointerControl, showFPS } from '../extra'
 import { randomColor } from '../utils/misc'
-import Info from './Info'
 
 import styles from './Test.module.css'
+
+/**
+ * @test_name FPS 限制
+ * @test_category demo
+ */
 
 export default function Test() {
 	const canvasRef = useRef<HTMLCanvasElement>(null!)
@@ -18,11 +22,13 @@ export default function Test() {
 
 		const scene = new Scene(canvas)
 
+		const cancelShowFPS = showFPS(scene)
+		autoFPS(scene, 5, 30)
+
 		scenePointerControl(scene)
 		addAxis(scene)
-		autoFPS(scene, 5)
 
-		let cancelEdit: () => void
+		let cancelEdit = () => {}
 		const cancel = drawRect(scene, (e) => {
 			const rect = e.target
 
@@ -44,7 +50,8 @@ export default function Test() {
 
 		return () => {
 			cancel()
-			cancelEdit?.()
+			cancelShowFPS()
+			cancelEdit()
 			scene.dispose()
 		}
 	}, [])
@@ -57,19 +64,12 @@ export default function Test() {
 		<div className={styles.wrapper}>
 			<main className={styles.mainPaper} ref={mainRef}>
 				<canvas ref={canvasRef} className={styles.canvas} width={width} height={height} />
-
-				<Info>
-					<div style={{ fontSize: '1.1em', fontWeight: '500' }}> 📷 画布：</div>
-					<ul>
-						<li>右键拖动，滚轮缩放</li>
-					</ul>
-					<div style={{ fontSize: '1.1em', fontWeight: '500' }}> 🖌️ 绘制矩形：</div>
-					<ul>
-						<li>点击空白处并拖动，增加矩形</li>
-						<li>拖动矩形或顶点，调整矩形</li>
-					</ul>
-				</Info>
 			</main>
+			<footer className={styles.footer}>
+				🔔
+				<div>绘制：空白区域按下左键开始绘制；松开左键结束绘制；左键拖动图形</div>
+				<div>画布：滚轮缩放；右键平移</div>
+			</footer>
 		</div>
 	)
 }

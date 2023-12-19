@@ -2,15 +2,18 @@ import { useEffect, useRef } from 'react'
 
 import { useSize2 } from '../../demo/hooks'
 import { Scene } from '../core'
-import { drawSegment } from '../draw/drawSegment'
-import { editSegment } from '../edit/editSegment'
+import { drawRect } from '../draw/drawRect'
+import { editRect } from '../edit/editRect'
 import { addAxis, autoFPS, scenePointerControl } from '../extra'
-import { RectShape } from '../shapes'
-import { constrainSegment, minmax, randomColor } from '../utils/misc'
+import { randomColor } from '../utils/misc'
 import Info from './Info'
 
 import styles from './Test.module.css'
 
+/**
+ * @test_name 矩形绘制
+ * @test_category demo
+ */
 export default function Test() {
 	const canvasRef = useRef<HTMLCanvasElement>(null!)
 
@@ -23,34 +26,29 @@ export default function Test() {
 		addAxis(scene)
 		autoFPS(scene, 5)
 
-		let cancelEdit = () => {}
-		const cancel = drawSegment(scene, (e) => {
-			constrainSegment(e.target, [100, 100, 1000, 500])
+		let cancelEdit: () => void
+		const cancel = drawRect(scene, (e) => {
+			const rect = e.target
 
-			const seg = e.target
-
-			seg.styles.lineCap = 'round'
-			seg.styles.lineWidth = 20
-			seg.styles.strokeStyle = randomColor()
-
-			cancelEdit = editSegment(seg, (e) => {
-				constrainSegment(e.target, [100, 100, 1000, 500])
+			cancelEdit = editRect(rect, undefined, undefined, 5, {
+				stroke: true,
+				strokeStyle: 'white',
 			})
-		})
 
-		const rect = new RectShape()
-		rect.styles.zIndex = -1
-		rect.styles.fillStyle = 'rgba(0, 0, 0, 0.1)'
-		rect.styles.pointerEvents = 'none'
-		rect.x = 100
-		rect.y = 100
-		rect.width = 900
-		rect.height = 400
-		scene.add(rect)
+			const seed = Math.random()
+
+			rect.styles.fillStyle = randomColor(0.5, seed)
+			rect.styles.stroke = true
+			rect.styles.lineWidth = 4
+
+			rect.hoverStyles.fillStyle = randomColor(1, seed)
+
+			rect.activeStyles.strokeStyle = 'red'
+		})
 
 		return () => {
 			cancel()
-			cancelEdit()
+			cancelEdit?.()
 			scene.dispose()
 		}
 	}, [])
@@ -69,10 +67,10 @@ export default function Test() {
 					<ul>
 						<li>右键拖动，滚轮缩放</li>
 					</ul>
-					<div style={{ fontSize: '1.1em', fontWeight: '500' }}> 🖌️ 绘制线段：</div>
+					<div style={{ fontSize: '1.1em', fontWeight: '500' }}> 🖌️ 绘制矩形：</div>
 					<ul>
-						<li>点击空白处并拖动，增加线段</li>
-						<li>拖动边或顶点，调整线段</li>
+						<li>点击空白处并拖动，增加矩形</li>
+						<li>拖动矩形或顶点，调整矩形</li>
 					</ul>
 				</Info>
 			</main>

@@ -2,14 +2,18 @@ import { useEffect, useRef } from 'react'
 
 import { useSize2 } from '../../demo/hooks'
 import { Scene } from '../core'
-import { drawPolyline } from '../draw/drawPolyline'
-import { editPolyline } from '../edit/editPolyline'
+import { drawSegment } from '../draw/drawSegment'
+import { editSegment } from '../edit/editSegment'
 import { addAxis, autoFPS, scenePointerControl } from '../extra'
 import { randomColor } from '../utils/misc'
 import Info from './Info'
 
 import styles from './Test.module.css'
 
+/**
+ * @test_name 线段绘制
+ * @test_category demo
+ */
 export default function Test() {
 	const canvasRef = useRef<HTMLCanvasElement>(null!)
 
@@ -18,35 +22,24 @@ export default function Test() {
 
 		const scene = new Scene(canvas)
 
-		console.log(scene)
-
 		scenePointerControl(scene)
 		addAxis(scene)
 		autoFPS(scene, 5)
 
-		let cancelEdit: () => void
+		let cancelEdit = () => {}
+		const cancel = drawSegment(scene, (e) => {
+			const seg = e.target
 
-		const cancel = drawPolyline(
-			scene,
-			(e) => {
-				const polyline = e.target
+			seg.styles.lineCap = 'round'
+			seg.styles.lineWidth = 20
+			seg.styles.strokeStyle = randomColor()
 
-				polyline.styles.strokeStyle = randomColor()
-				polyline.styles.lineWidth = 10
-				polyline.styles.lineCap = 'round'
-				polyline.styles.lineJoin = 'round'
-
-				polyline.hoverStyles.strokeStyle = 'red'
-
-				cancelEdit = editPolyline(polyline)
-			},
-			{},
-			{ fillStyle: 'green' }
-		)
+			cancelEdit = editSegment(seg)
+		})
 
 		return () => {
 			cancel()
-			cancelEdit?.()
+			cancelEdit()
 			scene.dispose()
 		}
 	}, [])
@@ -65,14 +58,10 @@ export default function Test() {
 					<ul>
 						<li>右键拖动，滚轮缩放</li>
 					</ul>
-					<div style={{ fontSize: '1.1em', fontWeight: '500' }}> 🖌️ 绘制折线：</div>
+					<div style={{ fontSize: '1.1em', fontWeight: '500' }}> 🖌️ 绘制线段：</div>
 					<ul>
-						<li>开始绘制：点击空白处</li>
-						<li>结束绘制：点击尾点结束绘制，或者点击首点结束绘制并标记闭合</li>
-						<li>修改位置：拖动任意边</li>
-						<li>修改形状：拖动顶点</li>
-						<li>添加顶点：按住 meta 或 Ctrl 键，点击边</li>
-						<li>删除顶点：按住 meta 或 Ctrl 键，点击顶点</li>
+						<li>点击空白处并拖动，增加线段</li>
+						<li>拖动边或顶点，调整线段</li>
 					</ul>
 				</Info>
 			</main>
