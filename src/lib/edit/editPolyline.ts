@@ -27,7 +27,8 @@ export function editPolyline(
 	pointRadius = 10,
 	pointStyles: Partial<ExtendedCanvasStyles> = {},
 	pointHoverStyles: Partial<CanvasStyles> = {},
-	pointActiveStyles: Partial<CanvasStyles> = {}
+	pointActiveStyles: Partial<CanvasStyles> = {},
+	disableDrag?: boolean
 ): () => void {
 	const PolylineEditEvent = Object.freeze({
 		type: 'polylineEdit',
@@ -143,7 +144,7 @@ export function editPolyline(
 	polyline.addEventListener('pointerdown', onPointerDown)
 
 	// 对线的整体拖动
-	const cancelDrag = draggable(polyline, undefined, onChange)
+	const cancelDrag = disableDrag ? () => {} : draggable(polyline, undefined, onChange)
 
 	const onBeforeRender = (e: any) => {
 		polyline.points.forEach((point) => {
@@ -157,10 +158,18 @@ export function editPolyline(
 
 	polyline.add(controlPoints)
 
-	return () => {
+	polyline.userData.__controllers = controlPoints
+
+	const cancel = () => {
 		cancelDrag()
 		polyline.removeEventListener('pointerdown', onPointerDown)
 		polyline.removeEventListener('beforeRender', onBeforeRender)
 		polyline.remove(controlPoints)
+
+		polyline.userData.__controllers = []
 	}
+
+	polyline.userData.__cancelEdit = cancel
+
+	return cancel
 }

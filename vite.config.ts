@@ -18,7 +18,7 @@ export default defineConfig({
 
 	clearScreen: false,
 	optimizeDeps: {
-		// force: true,
+		force: true, // npm link friendly
 		esbuildOptions: {
 			// splitting: false,
 			// external: 'workers/*',

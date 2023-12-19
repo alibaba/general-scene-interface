@@ -146,9 +146,17 @@ export function editRect(
 
 	rect.add([ltPoint, rtPoint, lbPoint, rbPoint])
 
-	return () => {
+	rect.userData.__controllers = [ltPoint, rtPoint, lbPoint, rbPoint]
+
+	const cancel = () => {
 		rect.remove([ltPoint, rtPoint, lbPoint, rbPoint])
 		rect.removeEventListener('beforeRender', onBeforeRender)
 		cancelDrag()
+
+		rect.userData.__controllers = []
 	}
+
+	rect.userData.__cancelEdit = cancel
+
+	return cancel
 }

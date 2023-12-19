@@ -62,7 +62,8 @@ export function editPolygon(
 		pointRadius,
 		pointStyles,
 		pointHoverStyles,
-		pointActiveStyles
+		pointActiveStyles,
+		true
 	)
 
 	polygon.add(shadowPolyline)
@@ -71,8 +72,15 @@ export function editPolygon(
 
 	draggable(polygon, undefined, onChange)
 
-	return () => {
+	polygon.userData.__controllers = [shadowPolyline, shadowPolyline.children]
+
+	const c = () => {
 		cancel()
 		polygon.remove(shadowPolyline)
+		polygon.userData.__controllers = []
 	}
+
+	polygon.userData.__cancelEdit = c
+
+	return c
 }

@@ -92,9 +92,17 @@ export function editSegment(
 
 	segment.add([startPoint, endPoint])
 
-	return () => {
+	segment.userData.__controllers = [startPoint, endPoint]
+
+	const cancel = () => {
 		cancelDrag()
 		segment.removeEventListener('beforeRender', onBeforeRender)
 		segment.remove([startPoint, endPoint])
+
+		segment.userData.__controllers = []
 	}
+
+	segment.userData.__cancelEdit = cancel
+
+	return cancel
 }
