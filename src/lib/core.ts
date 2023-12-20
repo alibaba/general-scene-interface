@@ -139,7 +139,7 @@ export class Scene extends Node<SceneEvents, Shape> {
 				this.dispatchEvent({
 					srcEvent: e,
 					type: 'pointerdown',
-					target: activeShape || this,
+					target: this,
 					currentTarget: this,
 				})
 			}

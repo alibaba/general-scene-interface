@@ -97,8 +97,6 @@ export function drawPolyline(
 			endPoint.styles.zIndex = 1003
 			scene.add(endPoint)
 		} else {
-			console.log('drawPolyline: click(add-point)')
-
 			let finished = false
 
 			if (event.target === startPoint) {

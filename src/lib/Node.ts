@@ -278,8 +278,8 @@ export class Node<
 		this.traverseUp((node) => {
 			node.dispatchEvent({
 				...(event as any),
-				target: node,
-				currentTarget: this,
+				target: this,
+				currentTarget: node,
 			})
 		})
 	}
