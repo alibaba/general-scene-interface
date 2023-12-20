@@ -16,6 +16,7 @@ module.exports = {
 			'warn',
 			{ vars: 'local', args: 'none', ignoreRestSiblings: false },
 		],
+		'@typescript-eslint/no-explicit-any': 'warn',
 	},
 	parserOptions: {
 		ecmaVersion: 'latest',

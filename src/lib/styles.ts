@@ -22,7 +22,7 @@ export type ExtendedCanvasStyles = CanvasStyles & {
 }
 
 export function getAssignableStyles(styles: Partial<ExtendedCanvasStyles>): Partial<CanvasStyles> {
-	const s = { ...styles } as any
+	const s = { ...styles }
 	delete s.fill
 	delete s.stroke
 	delete s.cursor
