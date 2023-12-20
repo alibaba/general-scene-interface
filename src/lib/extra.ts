@@ -1,5 +1,7 @@
-import { CircleShape, Scene, SegmentShape, Shape, TextShape, randomColor } from '.'
+import { Scene, Shape } from './core'
 import type { PointerEvents } from './events'
+import { CircleShape, SegmentShape, TextShape } from './shapes'
+import { randomColor } from './utils/misc'
 
 type BeforeDragEvent = {
 	type: 'drag'
@@ -180,7 +182,7 @@ export function scenePointerControl(scene: Scene) {
 		scene.translate.y += dy - dy * scale
 	}
 
-	const disableContextMenu = (e: any) => {
+	const disableContextMenu = (e: MouseEvent) => {
 		e.preventDefault()
 	}
 

@@ -1,11 +1,11 @@
 import { useEffect, useRef } from 'react'
 
-import { useSize2 } from '../../demo/hooks'
-import { Scene } from '../core'
-import { drawRect } from '../draw/drawRect'
-import { editRect } from '../edit/editRect'
-import { addAxis, autoFPS, scenePointerControl, showFPS } from '../extra'
-import { randomColor } from '../utils/misc'
+import { useSize2 } from '../demo/hooks'
+import { Scene } from '../lib/core'
+import { drawRect } from '../lib/draw/drawRect'
+import { editRect } from '../lib/edit/editRect'
+import { addAxis, autoFPS, scenePointerControl, showFPS } from '../lib/extra'
+import { randomColor } from '../lib/utils/misc'
 
 import styles from './Test.module.css'
 

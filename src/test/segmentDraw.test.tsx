@@ -1,16 +1,17 @@
 import { useEffect, useRef } from 'react'
 
-import { useSize2 } from '../../demo/hooks'
-import { Scene } from '../core'
-import { drawPoint } from '../draw/drawPoint'
-import { addAxis, autoFPS, draggable, scenePointerControl } from '../extra'
-import { randomColor } from '../utils/misc'
+import { useSize2 } from '../demo/hooks'
+import { Scene } from '../lib/core'
+import { drawSegment } from '../lib/draw/drawSegment'
+import { editSegment } from '../lib/edit/editSegment'
+import { addAxis, autoFPS, scenePointerControl } from '../lib/extra'
+import { randomColor } from '../lib/utils/misc'
 import Info from './Info'
 
 import styles from './Test.module.css'
 
 /**
- * @test_name 点绘制
+ * @test_name 线段绘制
  * @test_category demo
  */
 export default function Test() {
@@ -25,28 +26,20 @@ export default function Test() {
 		addAxis(scene)
 		autoFPS(scene, 5)
 
-		const cancel = drawPoint(
-			scene,
-			(e) => {
-				const point = e.target
+		let cancelEdit = () => {}
+		const cancel = drawSegment(scene, (e) => {
+			const seg = e.target
 
-				console.log(point)
+			seg.styles.lineCap = 'round'
+			seg.styles.lineWidth = 20
+			seg.styles.strokeStyle = randomColor()
 
-				const seed = Math.random()
-				point.styles.fillStyle = randomColor(0.5, seed)
-				point.styles.strokeStyle = randomColor(1, seed)
-				point.styles.lineWidth = 4
-				point.styles.stroke = true
-
-				point.radius = 10
-
-				draggable(point)
-			},
-			10
-		)
+			cancelEdit = editSegment(seg)
+		})
 
 		return () => {
 			cancel()
+			cancelEdit()
 			scene.dispose()
 		}
 	}, [])
@@ -65,10 +58,10 @@ export default function Test() {
 					<ul>
 						<li>右键拖动，滚轮缩放</li>
 					</ul>
-					<div style={{ fontSize: '1.1em', fontWeight: '500' }}> 🖌️ 绘制点：</div>
+					<div style={{ fontSize: '1.1em', fontWeight: '500' }}> 🖌️ 绘制线段：</div>
 					<ul>
-						<li>点击空白处增加点</li>
-						<li>拖动点可改变位置</li>
+						<li>点击空白处并拖动，增加线段</li>
+						<li>拖动边或顶点，调整线段</li>
 					</ul>
 				</Info>
 			</main>

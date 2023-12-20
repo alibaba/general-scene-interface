@@ -1,11 +1,11 @@
 import { useEffect, useRef } from 'react'
 
-import { useSize2 } from '../../demo/hooks'
-import { Scene } from '../core'
-import { editPolygon } from '../edit/editPolygon'
-import { addAxis, autoFPS, scenePointerControl } from '../extra'
-import { PolygonShape } from '../shapes'
-import { randomColor } from '../utils/misc'
+import { useSize2 } from '../demo/hooks'
+import { Scene } from '../lib/core'
+import { editPolygon } from '../lib/edit/editPolygon'
+import { addAxis, autoFPS, scenePointerControl } from '../lib/extra'
+import { PolygonShape } from '../lib/shapes'
+import { randomColor } from '../lib/utils/misc'
 
 import styles from './Test.module.css'
 

@@ -1,9 +1,9 @@
 import { useEffect, useRef } from 'react'
 
-import { useSize2 } from '../../demo/hooks'
-import { Scene } from '../core'
-import { addAxis, autoFPS, draggable, scenePointerControl } from '../extra'
-import { parseSVG } from '../svg/parseSVG'
+import { useSize2 } from '../demo/hooks'
+import { Scene } from '../lib/core'
+import { addAxis, autoFPS, draggable, scenePointerControl } from '../lib/extra'
+import { parseSVG } from '../lib/svg/parseSVG'
 
 import styles from './Test.module.css'
 
@@ -41,7 +41,7 @@ export default function Test() {
 				.then((res) => res.text())
 				.then((svgText) => {
 					const svgNode = new DOMParser().parseFromString(svgText, 'image/svg+xml')
-					const group = parseSVG(svgNode.documentElement as any, undefined, 1)
+					const group = parseSVG(svgNode.documentElement as unknown as SVGElement, undefined, 1)
 					scene.add(group)
 
 					group.children.forEach((shape) => {

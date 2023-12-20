@@ -1,12 +1,12 @@
 import { useEffect, useRef } from 'react'
 
 import { RectShape, autoFPS } from '..'
-import { useSize2 } from '../../demo/hooks'
-import { Scene } from '../core'
-import { drawPolyline } from '../draw/drawPolyline'
-import { editPolyline } from '../edit/editPolyline'
-import { addAxis, scenePointerControl } from '../extra'
-import { constrainPoly, randomColor } from '../utils/misc'
+import { useSize2 } from '../demo/hooks'
+import { Scene } from '../lib/core'
+import { drawPolyline } from '../lib/draw/drawPolyline'
+import { editPolyline } from '../lib/edit/editPolyline'
+import { addAxis, scenePointerControl } from '../lib/extra'
+import { constrainPoly, randomColor } from '../lib/utils/misc'
 import Info from './Info'
 
 import styles from './Test.module.css'

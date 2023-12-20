@@ -30,7 +30,7 @@ export default defineConfig({
 		copyPublicDir: false,
 		lib: {
 			// Could also be a dictionary or array of multiple entry points
-			entry: resolve(__dirname, 'src/lib/index.ts'),
+			entry: resolve(__dirname, 'src/index.ts'),
 			name: 'cubs',
 			// the proper extensions will be added
 			fileName: 'cubs',

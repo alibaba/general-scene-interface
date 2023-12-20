@@ -1,4 +1,4 @@
-import { Shape } from '..'
+import { Shape } from '../core'
 import { PathShape } from '../shapes'
 import { ExtendedCanvasStyles } from '../styles'
 

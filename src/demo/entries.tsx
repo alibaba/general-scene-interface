@@ -12,7 +12,7 @@ export const entries = [
 		name: 'FPS 限制',
 		category: 'demo',
 		getComponent: () => {
-			const Test = lazy(() => import('../lib/test/maxFPS.test.tsx'))
+			const Test = lazy(() => import('../test/maxFPS.test.tsx'))
 			return <Test />
 		},
 	},
@@ -22,7 +22,7 @@ export const entries = [
 		name: 'Path2D',
 		category: 'demo',
 		getComponent: () => {
-			const Test = lazy(() => import('../lib/test/path2D.test.tsx'))
+			const Test = lazy(() => import('../test/path2D.test.tsx'))
 			return <Test />
 		},
 	},
@@ -32,7 +32,7 @@ export const entries = [
 		name: '点绘制',
 		category: 'demo',
 		getComponent: () => {
-			const Test = lazy(() => import('../lib/test/point.test.tsx'))
+			const Test = lazy(() => import('../test/point.test.tsx'))
 			return <Test />
 		},
 	},
@@ -42,7 +42,7 @@ export const entries = [
 		name: '多边形',
 		category: 'demo',
 		getComponent: () => {
-			const Test = lazy(() => import('../lib/test/polygonBasic.test.tsx'))
+			const Test = lazy(() => import('../test/polygonBasic.test.tsx'))
 			return <Test />
 		},
 	},
@@ -52,7 +52,7 @@ export const entries = [
 		name: '多边形绘制',
 		category: 'demo',
 		getComponent: () => {
-			const Test = lazy(() => import('../lib/test/polygonDraw.test.tsx'))
+			const Test = lazy(() => import('../test/polygonDraw.test.tsx'))
 			return <Test />
 		},
 	},
@@ -62,7 +62,7 @@ export const entries = [
 		name: '折线',
 		category: 'demo',
 		getComponent: () => {
-			const Test = lazy(() => import('../lib/test/polylineBasic.test.tsx'))
+			const Test = lazy(() => import('../test/polylineBasic.test.tsx'))
 			return <Test />
 		},
 	},
@@ -72,7 +72,7 @@ export const entries = [
 		name: '折线绘制',
 		category: 'demo',
 		getComponent: () => {
-			const Test = lazy(() => import('../lib/test/polylineDraw.test.tsx'))
+			const Test = lazy(() => import('../test/polylineDraw.test.tsx'))
 			return <Test />
 		},
 	},
@@ -82,7 +82,7 @@ export const entries = [
 		name: '限制区域折线绘制',
 		category: 'demo',
 		getComponent: () => {
-			const Test = lazy(() => import('../lib/test/polylineDrawConstrain.test.tsx'))
+			const Test = lazy(() => import('../test/polylineDrawConstrain.test.tsx'))
 			return <Test />
 		},
 	},
@@ -92,7 +92,7 @@ export const entries = [
 		name: '矩形绘制',
 		category: 'demo',
 		getComponent: () => {
-			const Test = lazy(() => import('../lib/test/rect.test.tsx'))
+			const Test = lazy(() => import('../test/rect.test.tsx'))
 			return <Test />
 		},
 	},
@@ -102,7 +102,7 @@ export const entries = [
 		name: '限制区域矩形绘制',
 		category: 'demo',
 		getComponent: () => {
-			const Test = lazy(() => import('../lib/test/rectConstrain.test.tsx'))
+			const Test = lazy(() => import('../test/rectConstrain.test.tsx'))
 			return <Test />
 		},
 	},
@@ -112,7 +112,7 @@ export const entries = [
 		name: '场景树',
 		category: 'demo',
 		getComponent: () => {
-			const Test = lazy(() => import('../lib/test/sceneGraph.test.tsx'))
+			const Test = lazy(() => import('../test/sceneGraph.test.tsx'))
 			return <Test />
 		},
 	},
@@ -122,7 +122,7 @@ export const entries = [
 		name: '线段',
 		category: 'demo',
 		getComponent: () => {
-			const Test = lazy(() => import('../lib/test/segmentBasic.test.tsx'))
+			const Test = lazy(() => import('../test/segmentBasic.test.tsx'))
 			return <Test />
 		},
 	},
@@ -132,7 +132,7 @@ export const entries = [
 		name: '线段绘制',
 		category: 'demo',
 		getComponent: () => {
-			const Test = lazy(() => import('../lib/test/segmentDraw.test.tsx'))
+			const Test = lazy(() => import('../test/segmentDraw.test.tsx'))
 			return <Test />
 		},
 	},
@@ -142,7 +142,7 @@ export const entries = [
 		name: '限制区域线段绘制',
 		category: 'demo',
 		getComponent: () => {
-			const Test = lazy(() => import('../lib/test/segmentDrawConstrain.test.tsx'))
+			const Test = lazy(() => import('../test/segmentDrawConstrain.test.tsx'))
 			return <Test />
 		},
 	},
@@ -152,7 +152,7 @@ export const entries = [
 		name: 'SVG 解析器',
 		category: 'demo',
 		getComponent: () => {
-			const Test = lazy(() => import('../lib/test/svg.test.tsx'))
+			const Test = lazy(() => import('../test/svg.test.tsx'))
 			return <Test />
 		},
 	},

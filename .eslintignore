@@ -4,15 +4,16 @@ node_modules
 
 # don't lint build output (make sure it's set to your correct build folder name)
 
-dist
-lib
+/dist
+/lib
 
 commitlint.config.js
 postcss.config.js
 vite.config.ts
 vite.lib.config.ts
+vite.umd.config.ts
 vite.sw.config.ts
 sw.mjs
 updateEntries.mjs
 
-public
+/public

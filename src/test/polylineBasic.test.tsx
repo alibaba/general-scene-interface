@@ -1,10 +1,10 @@
 import { useEffect, useRef } from 'react'
 
-import { useSize2 } from '../../demo/hooks'
-import { Scene } from '../core'
-import { addAxis, autoFPS, draggable, scenePointerControl } from '../extra'
-import { PolylineShape } from '../shapes'
-import { randomColor } from '../utils/misc'
+import { useSize2 } from '../demo/hooks'
+import { Scene } from '../lib/core'
+import { addAxis, autoFPS, draggable, scenePointerControl } from '../lib/extra'
+import { PolylineShape } from '../lib/shapes'
+import { randomColor } from '../lib/utils/misc'
 
 import styles from './Test.module.css'
 

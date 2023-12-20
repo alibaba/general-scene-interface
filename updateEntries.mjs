@@ -35,7 +35,7 @@ export async function genEntries() {
 					name: '${name}',
 					category: '${category}',
 					getComponent: () => {
-						const Test = lazy(() => import('../lib/test/${filename}'))
+						const Test = lazy(() => import('../test/${filename}'))
 						return <Test />
 					}
 				},
@@ -55,7 +55,7 @@ export async function genEntries() {
 }
 
 export async function getEntries() {
-	const dir = resolve(__dirname, './src/lib/test')
+	const dir = resolve(__dirname, './src/test')
 	console.log('genEntries: dir', dir)
 	const files = await readdir(dir)
 	// console.log('genEntries: files', files)
