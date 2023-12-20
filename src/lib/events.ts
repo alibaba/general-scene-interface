@@ -4,38 +4,38 @@ import type { Scene, Shape } from './core'
 /**
  * 代理的鼠标事件
  */
-export type PointerEvents = {
+export type PointerEvents<TTarget extends EventDispatcher = EventDispatcher> = {
 	pointerdown: {
 		type: 'pointerdown'
-		target: EventDispatcher
-		currentTarget: EventDispatcher
+		target: TTarget
+		currentTarget: TTarget
 		srcEvent: PointerEvent
 		hitResult?: any // 碰撞检测方法的返回结果
 	}
 	pointerup: {
 		type: 'pointerup'
-		target: EventDispatcher
-		currentTarget: EventDispatcher
+		target: TTarget
+		currentTarget: TTarget
 		srcEvent: PointerEvent
 	}
 	pointermove: {
 		type: 'pointermove'
-		target: EventDispatcher
-		currentTarget: EventDispatcher
+		target: TTarget
+		currentTarget: TTarget
 		srcEvent: PointerEvent
 		hitResult?: any // 碰撞检测方法的返回结果
 	}
 	pointerenter: {
 		type: 'pointerenter'
-		target: EventDispatcher
-		currentTarget: EventDispatcher
+		target: TTarget
+		currentTarget: TTarget
 		srcEvent: PointerEvent
 		hitResult?: any // 碰撞检测方法的返回结果
 	}
 	pointerleave: {
 		type: 'pointerleave'
-		target: EventDispatcher
-		currentTarget: EventDispatcher
+		target: TTarget
+		currentTarget: TTarget
 		srcEvent: PointerEvent
 	}
 }
@@ -61,7 +61,7 @@ export type ShapeLifeCycleEvents = {
 	}
 }
 
-export type ShapeEvents = PointerEvents & ShapeLifeCycleEvents
+export type ShapeEvents = PointerEvents<Shape | Scene> & ShapeLifeCycleEvents
 
 export type SceneEvents = {
 	add: {
@@ -79,4 +79,9 @@ export type SceneEvents = {
 		target: Scene
 		currentTarget: Scene
 	}
-} & PointerEvents
+	dispose: {
+		type: 'dispose'
+		target: Scene
+		currentTarget: Scene
+	}
+} & PointerEvents<Scene | Scene>

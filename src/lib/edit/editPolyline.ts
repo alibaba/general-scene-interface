@@ -92,9 +92,6 @@ export function editPolyline(
 
 			if (!hitResult) return
 
-			e.srcEvent.preventDefault()
-			e.srcEvent.stopPropagation()
-
 			const t = hitResult.t as number
 			const index = hitResult.index as number
 

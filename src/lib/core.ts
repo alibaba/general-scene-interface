@@ -1,17 +1,15 @@
-import { EventDispatcher } from './EventDispatcher'
+import { Node } from './Node'
 import type { SceneEvents, ShapeEvents } from './events'
 import { CanvasStyles, ExtendedCanvasStyles, getAssignableStyles } from './styles'
 
 /**
  * 可绘制图形的虚基类
  */
-export class Shape extends EventDispatcher<ShapeEvents> {
+export class Shape extends Node<ShapeEvents, Shape> {
 	// 样式
 	readonly styles: Partial<ExtendedCanvasStyles> = { fillStyle: 'red' }
 	readonly hoverStyles: Partial<CanvasStyles> = {}
 	readonly activeStyles: Partial<CanvasStyles> = {}
-
-	readonly children: Shape[] = []
 
 	// 位置（局部坐标的原点，派生类中的坐标都为局部坐标）
 	x: number = 0
@@ -72,40 +70,6 @@ export class Shape extends EventDispatcher<ShapeEvents> {
 		}
 	}
 
-	add(shapes: Shape | Shape[]) {
-		if (Array.isArray(shapes)) {
-			for (const shape of shapes) {
-				this.add(shape)
-			}
-			return
-		} else {
-			this.children.push(shapes)
-			this.dispatchEvent({ type: 'add', target: shapes, currentTarget: this })
-		}
-	}
-
-	remove(shape: Shape | Shape[]) {
-		if (Array.isArray(shape)) {
-			for (const s of shape) {
-				this.remove(s)
-			}
-		} else {
-			const index = this.children.indexOf(shape)
-
-			if (index !== -1) {
-				this.children.splice(index, 1)
-				this.dispatchEvent({ type: 'remove', target: shape, currentTarget: this })
-			}
-		}
-	}
-
-	traverse(fn: (shape: Shape, parent?: Shape) => void, parent?: Shape) {
-		fn(this, parent)
-		for (const shape of this.children) {
-			shape.traverse(fn, this)
-		}
-	}
-
 	// 派生形状需实现以下两个接口
 
 	/**
@@ -119,7 +83,7 @@ export class Shape extends EventDispatcher<ShapeEvents> {
 /**
  * 场景
  */
-export class Scene extends EventDispatcher<SceneEvents> {
+export class Scene extends Node<SceneEvents, Shape> {
 	readonly canvas: HTMLCanvasElement
 	readonly ctx: CanvasRenderingContext2D
 
@@ -133,8 +97,6 @@ export class Scene extends EventDispatcher<SceneEvents> {
 	// 帧率限制
 	maxFPS = 60
 
-	private children: Shape[] = []
-
 	/**
 	 * the shape that is currently being focused for pointer events
 	 */
@@ -145,11 +107,6 @@ export class Scene extends EventDispatcher<SceneEvents> {
 	 * requestAnimationFrame id
 	 */
 	private rafID: number | null = null
-
-	/**
-	 * 保存 dom 事件监听器，用于 dispose 时移除
-	 */
-	private domListeners = new Set<readonly [HTMLElement, string, (e: any) => void]>()
 
 	readonly userData = {} as any
 
@@ -173,42 +130,31 @@ export class Scene extends EventDispatcher<SceneEvents> {
 
 			if (activeShape) {
 				this.activeShape = activeShape
-
-				activeShape.dispatchEvent({
+				activeShape.bubbleEvent({
 					srcEvent: e,
 					type: 'pointerdown',
-					target: activeShape,
-					currentTarget: activeShape,
 					hitResult,
 				})
-			}
-
-			// 冒泡
-			this.dispatchEvent({
-				srcEvent: e,
-				type: 'pointerdown',
-				target: activeShape || this,
-				currentTarget: this,
-			})
-		}
-		this.canvas.addEventListener('pointerdown', onPointerDown)
-		this.domListeners.add([this.canvas, 'pointerdown', onPointerDown])
-
-		const onPointerUp = (e: PointerEvent) => {
-			if (this.activeShape) {
-				this.activeShape.dispatchEvent({
-					srcEvent: e,
-					type: 'pointerup',
-					target: this.activeShape,
-					currentTarget: this.activeShape,
-				})
-
-				// 冒泡
+			} else {
 				this.dispatchEvent({
 					srcEvent: e,
-					type: 'pointerup',
-					target: this.activeShape,
+					type: 'pointerdown',
+					target: activeShape || this,
 					currentTarget: this,
+				})
+			}
+		}
+		this.canvas.addEventListener('pointerdown', onPointerDown)
+		this.addEventListener('dispose', () => {
+			this.canvas.removeEventListener('pointerdown', onPointerDown)
+		})
+
+		const onPointerUp = (e: PointerEvent) => {
+			const activeShape = this.activeShape
+			if (activeShape) {
+				activeShape.bubbleEvent({
+					srcEvent: e,
+					type: 'pointerup',
 				})
 
 				this.activeShape = null
@@ -224,7 +170,9 @@ export class Scene extends EventDispatcher<SceneEvents> {
 			}
 		}
 		this.canvas.addEventListener('pointerup', onPointerUp)
-		this.domListeners.add([this.canvas, 'pointerup', onPointerUp])
+		this.addEventListener('dispose', () => {
+			this.canvas.removeEventListener('pointerup', onPointerUp)
+		})
 
 		const onPointerMove = (e: PointerEvent) => {
 			// enter / leave
@@ -236,13 +184,15 @@ export class Scene extends EventDispatcher<SceneEvents> {
 			// activeShape 的周期在 mousedown mouseup 之间
 			// 有 activeShape 时不和其他 shape 交互（不检测其他shape的碰撞）
 
-			if (this.activeShape) {
-				this.activeShape.dispatchEvent({
-					srcEvent: e,
-					type: 'pointermove',
-					target: this.activeShape,
-					currentTarget: this.activeShape,
-					hitResult: this.activeShape.hit(x, y, this.ctx),
+			const activeShape = this.activeShape
+			if (activeShape) {
+				const hitResult = activeShape.hit(x, y, this.ctx)
+				activeShape.traverseUp((shape) => {
+					shape.bubbleEvent({
+						srcEvent: e,
+						type: 'pointermove',
+						hitResult,
+					})
 				})
 			} else {
 				const res = this.getHitShape(x, y)
@@ -251,18 +201,14 @@ export class Scene extends EventDispatcher<SceneEvents> {
 
 				// hover 变化时先触发 enter leave
 				if (hitShape !== this.hoveringShape) {
-					this.hoveringShape?.dispatchEvent({
+					this.hoveringShape?.bubbleEvent({
 						srcEvent: e,
 						type: 'pointerleave',
-						target: this.hoveringShape,
-						currentTarget: this.hoveringShape,
 					})
 
-					hitShape?.dispatchEvent({
+					hitShape?.bubbleEvent({
 						srcEvent: e,
 						type: 'pointerenter',
-						target: hitShape,
-						currentTarget: hitShape,
 						hitResult,
 					})
 
@@ -270,25 +216,26 @@ export class Scene extends EventDispatcher<SceneEvents> {
 				}
 
 				// 触发 hover 目标的 move
-				this.hoveringShape?.dispatchEvent({
-					srcEvent: e,
-					type: 'pointermove',
-					target: this.hoveringShape,
-					currentTarget: this.hoveringShape,
-					hitResult,
-				})
+				if (this.hoveringShape) {
+					this.hoveringShape.bubbleEvent({
+						srcEvent: e,
+						type: 'pointermove',
+						hitResult,
+					})
+				} else {
+					this.dispatchEvent({
+						srcEvent: e,
+						type: 'pointermove',
+						target: this,
+						currentTarget: this,
+					})
+				}
 			}
-
-			// 冒泡
-			this.dispatchEvent({
-				srcEvent: e,
-				type: 'pointermove',
-				target: this.activeShape || this.hoveringShape || this,
-				currentTarget: this,
-			})
 		}
 		this.canvas.addEventListener('pointermove', onPointerMove)
-		this.domListeners.add([this.canvas, 'pointermove', onPointerMove])
+		this.addEventListener('dispose', () => {
+			this.canvas.removeEventListener('pointermove', onPointerMove)
+		})
 
 		const onPointerEnter = (e: PointerEvent) => {
 			this.dispatchEvent({
@@ -299,7 +246,9 @@ export class Scene extends EventDispatcher<SceneEvents> {
 			})
 		}
 		this.canvas.addEventListener('pointerenter', onPointerEnter)
-		this.domListeners.add([this.canvas, 'pointerenter', onPointerEnter])
+		this.addEventListener('dispose', () => {
+			this.canvas.removeEventListener('pointerenter', onPointerEnter)
+		})
 
 		const onPointerLeave = (e: PointerEvent) => {
 			this.checkShapeRef()
@@ -323,7 +272,9 @@ export class Scene extends EventDispatcher<SceneEvents> {
 			})
 		}
 		this.canvas.addEventListener('pointerleave', onPointerLeave)
-		this.domListeners.add([this.canvas, 'pointerleave', onPointerLeave])
+		this.addEventListener('dispose', () => {
+			this.canvas.removeEventListener('pointerleave', onPointerLeave)
+		})
 
 		let currentTime: number | null = null
 		const tick = (t: number | null) => {
@@ -344,22 +295,8 @@ export class Scene extends EventDispatcher<SceneEvents> {
 		tick(null)
 	}
 
-	add(child: Shape) {
-		this.children.push(child)
-		this.dispatchEvent({ type: 'add', target: child, currentTarget: this })
-	}
-
-	remove(child: Shape) {
-		const index = this.children.indexOf(child)
-
-		if (index !== -1) {
-			this.children.splice(index, 1)
-			this.dispatchEvent({ type: 'remove', target: child, currentTarget: this })
-		}
-	}
-
 	reset() {
-		this.children = []
+		this.removeAll()
 		this.activeShape = null
 		this.hoveringShape = null
 	}
@@ -511,10 +448,8 @@ export class Scene extends EventDispatcher<SceneEvents> {
 			cancelAnimationFrame(this.rafID)
 			this.rafID = null
 		}
-		for (const [target, type, listener] of this.domListeners) {
-			target.removeEventListener(type, listener)
-		}
-		this.domListeners.clear()
+
+		this.dispatchEvent({ type: 'dispose', target: this, currentTarget: this })
 	}
 
 	fit(contentWidth: number, contentHeight: number, padding: number) {

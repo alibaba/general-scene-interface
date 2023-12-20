@@ -47,6 +47,7 @@ export function draggable(
 
 	function onPointerDown(e: PointerEvents['pointerdown']) {
 		if (e.srcEvent.button !== 0) return
+		if (e.target !== e.currentTarget) return
 
 		startPointerX = e.srcEvent.offsetX
 		startPointerY = e.srcEvent.offsetY
@@ -58,6 +59,8 @@ export function draggable(
 	}
 
 	function onPointerMove(e: PointerEvents['pointermove']) {
+		if (e.target !== e.currentTarget) return
+
 		if (isDragging) {
 			// 相对于 start
 			const dx = e.srcEvent.offsetX - startPointerX
@@ -89,6 +92,8 @@ export function draggable(
 	}
 
 	function onPointerUp(e: PointerEvents['pointerup']) {
+		if (e.target !== e.currentTarget) return
+
 		isDragging = false
 
 		onChange?.({
@@ -108,25 +113,6 @@ export function draggable(
 		shape.removeEventListener('pointermove', onPointerMove)
 		shape.removeEventListener('pointerup', onPointerUp)
 	}
-}
-
-/**
- * make a anchor(Drag Controller in the shape local origin) to drag the shape
- */
-export function draggableAnchor(shape: Shape, size = 20) {
-	const anchor = new CircleShape(0, 0, size * 0.5)
-	anchor.fixedRadius = true
-	anchor.styles.stroke = true
-	anchor.styles.fillStyle = randomColor()
-	anchor.styles.strokeStyle = randomColor()
-	anchor.styles.zIndex = 9999
-
-	draggable(anchor, (e) => {
-		shape.x = e.x
-		shape.y = e.y
-	})
-
-	return anchor
 }
 
 /**
@@ -446,4 +432,18 @@ export function showFPS(scene: Scene): () => void {
 		scene.removeEventListener('beforeRender', listener)
 		div.remove()
 	}
+}
+
+/**
+ * create a fixed size point with random color
+ */
+export function point(size = 20) {
+	const point = new CircleShape(0, 0, size * 0.5)
+	point.fixedRadius = true
+	point.styles.stroke = true
+	point.styles.fillStyle = randomColor()
+	point.styles.strokeStyle = randomColor()
+	point.styles.zIndex = 9999
+
+	return point
 }

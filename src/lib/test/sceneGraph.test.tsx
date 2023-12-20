@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 
-import { CircleShape, RectShape, SegmentShape, draggable, draggableAnchor, randomColor } from '..'
+import { CircleShape, RectShape, SegmentShape, draggable, randomColor } from '..'
 import { useSize2 } from '../../demo/hooks'
 import { Scene, Shape } from '../core'
 import { addAxis, scenePointerControl } from '../extra'

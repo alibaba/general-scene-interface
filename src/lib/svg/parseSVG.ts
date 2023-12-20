@@ -13,7 +13,7 @@ export function parseSVG(svg: SVGElement, style?: Partial<ExtendedCanvasStyles>,
 			const styles = svgStyleToCanvasStyle(child)
 
 			const subGroup = parseSVG(child, styles, scale)
-			subGroup.children.forEach((shape) => group.add(shape))
+			group.add(subGroup)
 		}
 	}
 
