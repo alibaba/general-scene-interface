@@ -98,8 +98,8 @@ export function editPolyline(
 			const t = hitResult.t as number
 			const index = hitResult.index as number
 
-			const lastPoint = polyline.points[index - 1] || { x: 0, y: 0 }
-			const nextPoint = polyline.points[index] || { x: 0, y: 0 }
+			const lastPoint = polyline.points[index - 1]
+			const nextPoint = polyline.points[index] || polyline.points[0]
 
 			const newPoint = {
 				x: lastPoint.x + (nextPoint?.x - lastPoint.x) * t,
@@ -120,8 +120,8 @@ export function editPolyline(
 			draggable(
 				controlPoint,
 				(e) => {
-					newPoint.x = e.x - polyline.x
-					newPoint.y = e.y - polyline.y
+					newPoint.x = e.x
+					newPoint.y = e.y
 				},
 				onChange
 			)

@@ -43,6 +43,8 @@ export function editPolygon(
 	shadowPolyline.closed = true
 	shadowPolyline.points = polygon.points
 
+	polygon.add(shadowPolyline)
+
 	const onChange = () => {
 		const event = {
 			type: 'beforePolygonEdit',
@@ -65,10 +67,6 @@ export function editPolygon(
 		pointActiveStyles,
 		true
 	)
-
-	polygon.add(shadowPolyline)
-
-	polygon.children.unshift(polygon.children.pop() as PolylineShape)
 
 	draggable(polygon, undefined, onChange)
 
