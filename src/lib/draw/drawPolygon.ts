@@ -29,7 +29,7 @@ export function drawPolygon(
 			polygon.points = e.target.points
 			polygon.x = e.target.x
 			polygon.y = e.target.y
-			Object.assign(polygon.styles, styles)
+			Object.assign(polygon.style, styles)
 			scene.add(polygon)
 
 			onAdd?.({

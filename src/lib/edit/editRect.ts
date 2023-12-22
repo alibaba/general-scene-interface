@@ -48,9 +48,9 @@ export function editRect(
 	ltPoint.fixedRadius = true
 
 	// ltPoint.styles.zIndex = rect.styles.zIndex
-	Object.assign(ltPoint.styles, pointStyles)
-	Object.assign(ltPoint.hoverStyles, pointHoverStyles)
-	Object.assign(ltPoint.activeStyles, pointActiveStyles)
+	Object.assign(ltPoint.style, pointStyles)
+	Object.assign(ltPoint.hoverStyle, pointHoverStyles)
+	Object.assign(ltPoint.activeStyle, pointActiveStyles)
 
 	draggable(
 		ltPoint,
@@ -70,10 +70,10 @@ export function editRect(
 	const rtPoint = new CircleShape(rect.width, 0, pointRadius)
 	rtPoint.fixedRadius = true
 
-	rtPoint.styles.zIndex = rect.styles.zIndex
-	Object.assign(rtPoint.styles, pointStyles)
-	Object.assign(rtPoint.hoverStyles, pointHoverStyles)
-	Object.assign(rtPoint.activeStyles, pointActiveStyles)
+	rtPoint.style.zIndex = rect.style.zIndex
+	Object.assign(rtPoint.style, pointStyles)
+	Object.assign(rtPoint.hoverStyle, pointHoverStyles)
+	Object.assign(rtPoint.activeStyle, pointActiveStyles)
 
 	draggable(
 		rtPoint,
@@ -91,10 +91,10 @@ export function editRect(
 	const lbPoint = new CircleShape(0, rect.height, pointRadius)
 	lbPoint.fixedRadius = true
 
-	lbPoint.styles.zIndex = rect.styles.zIndex
-	Object.assign(lbPoint.styles, pointStyles)
-	Object.assign(lbPoint.hoverStyles, pointHoverStyles)
-	Object.assign(lbPoint.activeStyles, pointActiveStyles)
+	lbPoint.style.zIndex = rect.style.zIndex
+	Object.assign(lbPoint.style, pointStyles)
+	Object.assign(lbPoint.hoverStyle, pointHoverStyles)
+	Object.assign(lbPoint.activeStyle, pointActiveStyles)
 
 	draggable(
 		lbPoint,
@@ -112,10 +112,10 @@ export function editRect(
 	const rbPoint = new CircleShape(rect.width, rect.height, pointRadius)
 	rbPoint.fixedRadius = true
 
-	rbPoint.styles.zIndex = rect.styles.zIndex
-	Object.assign(rbPoint.styles, pointStyles)
-	Object.assign(rbPoint.hoverStyles, pointHoverStyles)
-	Object.assign(rbPoint.activeStyles, pointActiveStyles)
+	rbPoint.style.zIndex = rect.style.zIndex
+	Object.assign(rbPoint.style, pointStyles)
+	Object.assign(rbPoint.hoverStyle, pointHoverStyles)
+	Object.assign(rbPoint.activeStyle, pointActiveStyles)
 
 	draggable(
 		rbPoint,

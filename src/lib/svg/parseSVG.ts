@@ -35,7 +35,7 @@ function svgPathToPathShape(
 
 	const shape = new PathShape(path2D)
 
-	Object.assign(shape.styles, svgStyleToCanvasStyle(path, styles))
+	Object.assign(shape.style, svgStyleToCanvasStyle(path, styles))
 
 	return shape
 }

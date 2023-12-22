@@ -28,9 +28,9 @@ export class RectShape extends Shape {
 
 		ctx.rect(left, top, right - left, bottom - top)
 
-		ctx.globalAlpha = this.styles.fillOpacity === undefined ? 1 : this.styles.fillOpacity
+		ctx.globalAlpha = this.style.fillOpacity === undefined ? 1 : this.style.fillOpacity
 		this._fill && ctx.fill()
-		ctx.globalAlpha = this.styles.strokeOpacity === undefined ? 1 : this.styles.strokeOpacity
+		ctx.globalAlpha = this.style.strokeOpacity === undefined ? 1 : this.style.strokeOpacity
 		this._stroke && ctx.stroke()
 	}
 }
@@ -71,9 +71,9 @@ export class CircleShape extends Shape {
 			2 * Math.PI
 		)
 
-		ctx.globalAlpha = this.styles.fillOpacity === undefined ? 1 : this.styles.fillOpacity
+		ctx.globalAlpha = this.style.fillOpacity === undefined ? 1 : this.style.fillOpacity
 		this._fill && ctx.fill()
-		ctx.globalAlpha = this.styles.strokeOpacity === undefined ? 1 : this.styles.strokeOpacity
+		ctx.globalAlpha = this.style.strokeOpacity === undefined ? 1 : this.style.strokeOpacity
 		this._stroke && ctx.stroke()
 	}
 }
@@ -102,8 +102,8 @@ export class SegmentShape extends Shape {
 	) {
 		super()
 
-		this.styles.fill = false
-		this.styles.stroke = true
+		this.style.fill = false
+		this.style.stroke = true
 	}
 
 	hit(x: number, y: number) {
@@ -111,10 +111,10 @@ export class SegmentShape extends Shape {
 
 		const distance = distancePointToSegmentVector(dPx, dPy, this.dx, this.dy)
 
-		let width = this.styles.lineWidth || 2
+		let width = this.style.lineWidth || 2
 
-		if (this._hover) width = this.hoverStyles.lineWidth ?? width
-		if (this._active) width = this.activeStyles.lineWidth ?? width
+		if (this._hover) width = this.hoverStyle.lineWidth ?? width
+		if (this._active) width = this.activeStyle.lineWidth ?? width
 
 		return distance <= width / this._scale / 2
 	}
@@ -125,7 +125,7 @@ export class SegmentShape extends Shape {
 
 		ctx.moveTo(viewX, viewY)
 		ctx.lineTo(viewDx, viewDy)
-		ctx.globalAlpha = this.styles.strokeOpacity === undefined ? 1 : this.styles.strokeOpacity
+		ctx.globalAlpha = this.style.strokeOpacity === undefined ? 1 : this.style.strokeOpacity
 		this._stroke && ctx.stroke()
 	}
 }
@@ -156,17 +156,17 @@ export class PolylineShape extends Shape {
 	) {
 		super()
 
-		this.styles.fill = false
-		this.styles.stroke = true
+		this.style.fill = false
+		this.style.stroke = true
 	}
 
 	hit(x: number, y: number) {
 		const { x: revX, y: revY } = this.viewToLocal(x, y)
 
-		let width = this.styles.lineWidth || 2
+		let width = this.style.lineWidth || 2
 
-		if (this._hover) width = this.hoverStyles.lineWidth ?? width
-		if (this._active) width = this.activeStyles.lineWidth ?? width
+		if (this._hover) width = this.hoverStyle.lineWidth ?? width
+		if (this._active) width = this.activeStyle.lineWidth ?? width
 
 		width = width / this._scale / 2
 
@@ -221,7 +221,7 @@ export class PolylineShape extends Shape {
 
 		if (this.closed) ctx.closePath()
 
-		ctx.globalAlpha = this.styles.strokeOpacity === undefined ? 1 : this.styles.strokeOpacity
+		ctx.globalAlpha = this.style.strokeOpacity === undefined ? 1 : this.style.strokeOpacity
 		this._stroke && ctx.stroke()
 	}
 }
@@ -287,9 +287,9 @@ export class PolygonShape extends Shape {
 
 		ctx.closePath()
 
-		ctx.globalAlpha = this.styles.fillOpacity === undefined ? 1 : this.styles.fillOpacity
+		ctx.globalAlpha = this.style.fillOpacity === undefined ? 1 : this.style.fillOpacity
 		this._fill && ctx.fill()
-		ctx.globalAlpha = this.styles.strokeOpacity === undefined ? 1 : this.styles.strokeOpacity
+		ctx.globalAlpha = this.style.strokeOpacity === undefined ? 1 : this.style.strokeOpacity
 		this._stroke && ctx.stroke()
 	}
 }
@@ -324,7 +324,7 @@ export class ImageShape extends RectShape {
  * - 用于全局遮罩或者覆盖鼠标事件
  */
 export class MaskShape extends Shape {
-	readonly styles: Partial<ExtendedCanvasStyles> = { fillStyle: 'white', fillOpacity: 0.5 }
+	readonly style: Partial<ExtendedCanvasStyles> = { fillStyle: 'white', fillOpacity: 0.5 }
 
 	hit(x: number, y: number) {
 		return true
@@ -335,9 +335,9 @@ export class MaskShape extends Shape {
 
 		ctx.rect(0, 0, width, height)
 
-		ctx.globalAlpha = this.styles.fillOpacity === undefined ? 1 : this.styles.fillOpacity
+		ctx.globalAlpha = this.style.fillOpacity === undefined ? 1 : this.style.fillOpacity
 		this._fill && ctx.fill()
-		ctx.globalAlpha = this.styles.strokeOpacity === undefined ? 1 : this.styles.strokeOpacity
+		ctx.globalAlpha = this.style.strokeOpacity === undefined ? 1 : this.style.strokeOpacity
 		this._stroke && ctx.stroke()
 	}
 }
@@ -360,9 +360,9 @@ export class PathShape extends Shape {
 		ctx.translate(this._translate.x, this._translate.y)
 		ctx.scale(this._scale, this._scale)
 
-		ctx.globalAlpha = this.styles.fillOpacity === undefined ? 1 : this.styles.fillOpacity
+		ctx.globalAlpha = this.style.fillOpacity === undefined ? 1 : this.style.fillOpacity
 		this._fill && ctx.fill(this.path)
-		ctx.globalAlpha = this.styles.strokeOpacity === undefined ? 1 : this.styles.strokeOpacity
+		ctx.globalAlpha = this.style.strokeOpacity === undefined ? 1 : this.style.strokeOpacity
 		this._stroke && ctx.stroke(this.path)
 	}
 }
@@ -375,7 +375,7 @@ export class TextShape extends Shape {
 		public maxWidth?: number
 	) {
 		super()
-		this.styles.font = '30px monospace'
+		this.style.font = '30px monospace'
 	}
 
 	fixedSize = false
@@ -403,9 +403,9 @@ export class TextShape extends Shape {
 		ctx.scale(this._scale, this._scale)
 		this.fixedSize && ctx.scale(1 / this._scale, 1 / this._scale)
 
-		ctx.globalAlpha = this.styles.fillOpacity === undefined ? 1 : this.styles.fillOpacity
+		ctx.globalAlpha = this.style.fillOpacity === undefined ? 1 : this.style.fillOpacity
 		this._fill && ctx.fillText(this.text, 0, 0, this.maxWidth)
-		ctx.globalAlpha = this.styles.strokeOpacity === undefined ? 1 : this.styles.strokeOpacity
+		ctx.globalAlpha = this.style.strokeOpacity === undefined ? 1 : this.style.strokeOpacity
 		this._stroke && ctx.strokeText(this.text, 0, 0, this.maxWidth)
 
 		this.textMetrics = ctx.measureText(this.text)

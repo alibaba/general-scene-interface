@@ -26,31 +26,31 @@ export default function Test() {
 
 		{
 			const seg = new SegmentShape(200, 200, -50, 0)
-			seg.styles.strokeStyle = randomColor()
-			seg.hoverStyles.strokeStyle = 'red'
-			seg.styles.lineWidth = 10
-			seg.hoverStyles.lineWidth = 12
-			seg.styles.lineCap = 'round'
+			seg.style.strokeStyle = randomColor()
+			seg.hoverStyle.strokeStyle = 'red'
+			seg.style.lineWidth = 10
+			seg.hoverStyle.lineWidth = 12
+			seg.style.lineCap = 'round'
 			draggable(seg)
 			scene.add(seg)
 		}
 		{
 			const seg = new SegmentShape(200, 200, 0, -50)
-			seg.styles.strokeStyle = randomColor()
-			seg.hoverStyles.strokeStyle = 'red'
-			seg.styles.lineWidth = 10
-			seg.hoverStyles.lineWidth = 12
-			seg.styles.lineCap = 'round'
+			seg.style.strokeStyle = randomColor()
+			seg.hoverStyle.strokeStyle = 'red'
+			seg.style.lineWidth = 10
+			seg.hoverStyle.lineWidth = 12
+			seg.style.lineCap = 'round'
 			draggable(seg)
 			scene.add(seg)
 		}
 		{
 			const seg = new SegmentShape(100, 100, 100, 100)
-			seg.styles.strokeStyle = randomColor()
-			seg.hoverStyles.strokeStyle = 'red'
-			seg.styles.lineWidth = 10
-			seg.hoverStyles.lineWidth = 12
-			seg.styles.lineCap = 'round'
+			seg.style.strokeStyle = randomColor()
+			seg.hoverStyle.strokeStyle = 'red'
+			seg.style.lineWidth = 10
+			seg.hoverStyle.lineWidth = 12
+			seg.style.lineCap = 'round'
 			draggable(seg)
 			scene.add(seg)
 		}

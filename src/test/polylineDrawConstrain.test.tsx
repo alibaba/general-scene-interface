@@ -38,12 +38,12 @@ export default function Test() {
 
 				const polyline = e.target
 
-				polyline.styles.strokeStyle = randomColor()
-				polyline.styles.lineWidth = 10
-				polyline.styles.lineCap = 'round'
-				polyline.styles.lineJoin = 'round'
+				polyline.style.strokeStyle = randomColor()
+				polyline.style.lineWidth = 10
+				polyline.style.lineCap = 'round'
+				polyline.style.lineJoin = 'round'
 
-				polyline.hoverStyles.strokeStyle = 'red'
+				polyline.hoverStyle.strokeStyle = 'red'
 
 				cancelEdit = editPolyline(polyline, (e) => constrainPoly(e.target, [100, 100, 700, 500]))
 			},
@@ -54,9 +54,9 @@ export default function Test() {
 		// constrain area
 		{
 			const rect = new RectShape()
-			rect.styles.zIndex = -1
-			rect.styles.fillStyle = 'rgba(0, 0, 0, 0.1)'
-			rect.styles.pointerEvents = 'none'
+			rect.style.zIndex = -1
+			rect.style.fillStyle = 'rgba(0, 0, 0, 0.1)'
+			rect.style.pointerEvents = 'none'
 			rect.x = 100
 			rect.y = 100
 			rect.width = 600

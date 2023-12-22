@@ -33,10 +33,10 @@ export default function Test() {
 				console.log(point)
 
 				const seed = Math.random()
-				point.styles.fillStyle = randomColor(0.5, seed)
-				point.styles.strokeStyle = randomColor(1, seed)
-				point.styles.lineWidth = 4
-				point.styles.stroke = true
+				point.style.fillStyle = randomColor(0.5, seed)
+				point.style.strokeStyle = randomColor(1, seed)
+				point.style.lineWidth = 4
+				point.style.stroke = true
 
 				point.radius = 10
 

@@ -31,13 +31,13 @@ export default function Test() {
 			{ x: 100, y: 100 },
 		])
 
-		polyline.styles.strokeStyle = randomColor()
-		polyline.styles.lineWidth = 10
-		polyline.styles.lineCap = 'round'
-		polyline.styles.lineJoin = 'round'
+		polyline.style.strokeStyle = randomColor()
+		polyline.style.lineWidth = 10
+		polyline.style.lineCap = 'round'
+		polyline.style.lineJoin = 'round'
 
-		polyline.hoverStyles.strokeStyle = 'red'
-		polyline.hoverStyles.lineWidth = 12
+		polyline.hoverStyle.strokeStyle = 'red'
+		polyline.hoverStyle.lineWidth = 12
 
 		draggable(polyline)
 		scene.add(polyline)

@@ -49,7 +49,7 @@ export function draggable(
 	let lastShapeX = 0
 	let lastShapeY = 0
 
-	shape.hoverStyles.cursor = 'move'
+	shape.hoverStyle.cursor = 'move'
 
 	function onPointerDown(e: PointerEvents['pointerdown']) {
 		if (e.srcEvent.button !== 0) return
@@ -210,22 +210,22 @@ export function addAxis(scene: Scene): () => void {
 
 	const xAxis = new SegmentShape()
 	group.add(xAxis)
-	xAxis.styles.strokeStyle = 'red'
-	xAxis.styles.lineWidth = 2
+	xAxis.style.strokeStyle = 'red'
+	xAxis.style.lineWidth = 2
 	xAxis.dx = 0
 	xAxis.dy = 0
 
 	const xArrowUp = new SegmentShape()
 	group.add(xArrowUp)
-	xArrowUp.styles.strokeStyle = 'red'
-	xArrowUp.styles.lineWidth = 2
+	xArrowUp.style.strokeStyle = 'red'
+	xArrowUp.style.lineWidth = 2
 	xArrowUp.dx = -10
 	xArrowUp.dy = -10
 
 	const xArrowDown = new SegmentShape()
 	group.add(xArrowDown)
-	xArrowDown.styles.strokeStyle = 'red'
-	xArrowDown.styles.lineWidth = 2
+	xArrowDown.style.strokeStyle = 'red'
+	xArrowDown.style.lineWidth = 2
 	xArrowDown.dx = -10
 	xArrowDown.dy = 10
 
@@ -244,22 +244,22 @@ export function addAxis(scene: Scene): () => void {
 
 	const yAxis = new SegmentShape()
 	group.add(yAxis)
-	yAxis.styles.strokeStyle = 'green'
-	yAxis.styles.lineWidth = 2
+	yAxis.style.strokeStyle = 'green'
+	yAxis.style.lineWidth = 2
 	yAxis.dx = 0
 	yAxis.dy = 0
 
 	const yArrowLeft = new SegmentShape()
 	group.add(yArrowLeft)
-	yArrowLeft.styles.strokeStyle = 'green'
-	yArrowLeft.styles.lineWidth = 2
+	yArrowLeft.style.strokeStyle = 'green'
+	yArrowLeft.style.lineWidth = 2
 	yArrowLeft.dx = -10
 	yArrowLeft.dy = -10
 
 	const yArrowRight = new SegmentShape()
 	group.add(yArrowRight)
-	yArrowRight.styles.strokeStyle = 'green'
-	yArrowRight.styles.lineWidth = 2
+	yArrowRight.style.strokeStyle = 'green'
+	yArrowRight.style.lineWidth = 2
 	yArrowRight.dx = 10
 	yArrowRight.dy = -10
 
@@ -278,34 +278,34 @@ export function addAxis(scene: Scene): () => void {
 
 	const pointerLineY = new SegmentShape()
 	group.add(pointerLineY)
-	pointerLineY.styles.strokeStyle = 'green'
-	pointerLineY.styles.strokeOpacity = 0.5
-	pointerLineY.styles.lineDash = [5, 5]
-	pointerLineY.styles.lineWidth = 2
+	pointerLineY.style.strokeStyle = 'green'
+	pointerLineY.style.strokeOpacity = 0.5
+	pointerLineY.style.lineDash = [5, 5]
+	pointerLineY.style.lineWidth = 2
 	pointerLineY.dx = 0
 	pointerLineY.dy = 0
 
 	const pointerLineX = new SegmentShape()
 	group.add(pointerLineX)
-	pointerLineX.styles.strokeStyle = 'red'
-	pointerLineX.styles.strokeOpacity = 0.5
-	pointerLineX.styles.lineDash = [5, 5]
-	pointerLineX.styles.lineWidth = 2
+	pointerLineX.style.strokeStyle = 'red'
+	pointerLineX.style.strokeOpacity = 0.5
+	pointerLineX.style.lineDash = [5, 5]
+	pointerLineX.style.lineWidth = 2
 	pointerLineX.dx = 0
 	pointerLineX.dy = 0
 
 	const textX = new TextShape()
 	group.add(textX)
-	textX.styles.fillStyle = 'red'
-	textX.styles.fillOpacity = 0.7
-	textX.styles.font = '15px monospace'
+	textX.style.fillStyle = 'red'
+	textX.style.fillOpacity = 0.7
+	textX.style.font = '15px monospace'
 	textX.fixedSize = true
 
 	const textY = new TextShape()
 	group.add(textY)
-	textY.styles.fillStyle = 'green'
-	textY.styles.fillOpacity = 0.7
-	textY.styles.font = '15px monospace'
+	textY.style.fillStyle = 'green'
+	textY.style.fillOpacity = 0.7
+	textY.style.font = '15px monospace'
 	textY.fixedSize = true
 
 	scene.addEventListener('pointermove', (e) => {
@@ -325,20 +325,20 @@ export function addAxis(scene: Scene): () => void {
 
 		textX.x = xWorld + margin
 		// textX.y = yWorld
-		textX.styles.textBaseline = yWorld > 0 ? 'top' : 'bottom'
+		textX.style.textBaseline = yWorld > 0 ? 'top' : 'bottom'
 		textX.y = yWorld > 0 ? margin : -margin
 		textX.text = xWorld.toFixed(2)
 
 		// textY.x = xWorld
 		textY.y = yWorld - margin
-		textY.styles.textAlign = xWorld > 0 ? 'left' : 'right'
+		textY.style.textAlign = xWorld > 0 ? 'left' : 'right'
 		textY.x = xWorld > 0 ? margin : -margin
 		textY.text = yWorld.toFixed(2)
 	})
 
 	group.children.forEach((shape) => {
-		shape.styles.pointerEvents = 'none'
-		shape.styles.zIndex = -1
+		shape.style.pointerEvents = 'none'
+		shape.style.zIndex = -1
 	})
 
 	scene.add(group)
@@ -446,10 +446,10 @@ export function showFPS(scene: Scene): () => void {
 export function point(size = 20) {
 	const point = new CircleShape(0, 0, size * 0.5)
 	point.fixedRadius = true
-	point.styles.stroke = true
-	point.styles.fillStyle = randomColor()
-	point.styles.strokeStyle = randomColor()
-	point.styles.zIndex = 9999
+	point.style.stroke = true
+	point.style.fillStyle = randomColor()
+	point.style.strokeStyle = randomColor()
+	point.style.zIndex = 9999
 
 	return point
 }

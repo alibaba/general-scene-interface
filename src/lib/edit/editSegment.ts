@@ -46,16 +46,16 @@ export function editSegment(
 	const startPoint = new CircleShape(0, 0, pointRadius)
 	startPoint.fixedRadius = true
 	startPoint.radius = pointRadius
-	Object.assign(startPoint.styles, pointStyles)
-	Object.assign(startPoint.hoverStyles, pointHoverStyles)
-	Object.assign(startPoint.activeStyles, pointActiveStyles)
+	Object.assign(startPoint.style, pointStyles)
+	Object.assign(startPoint.hoverStyle, pointHoverStyles)
+	Object.assign(startPoint.activeStyle, pointActiveStyles)
 
 	const endPoint = new CircleShape(segment.dx, segment.dy, pointRadius)
 	endPoint.fixedRadius = true
 	endPoint.radius = pointRadius
-	Object.assign(endPoint.styles, pointStyles)
-	Object.assign(endPoint.hoverStyles, pointHoverStyles)
-	Object.assign(endPoint.activeStyles, pointActiveStyles)
+	Object.assign(endPoint.style, pointStyles)
+	Object.assign(endPoint.hoverStyle, pointHoverStyles)
+	Object.assign(endPoint.activeStyle, pointActiveStyles)
 
 	draggable(
 		startPoint,

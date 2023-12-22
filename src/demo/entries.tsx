@@ -8,6 +8,16 @@ import { lazy } from 'react'
 
 export const entries = [
 	{
+		key: 'axis',
+		name: '坐标轴',
+		category: 'shapes',
+		getComponent: () => {
+			const Test = lazy(() => import('../test/axis.test.tsx'))
+			return <Test />
+		},
+	},
+
+	{
 		key: 'maxFPS',
 		name: 'FPS 限制',
 		category: 'utils',

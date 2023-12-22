@@ -56,9 +56,9 @@ export function editPolyline(
 		controlPoint.fixedRadius = true
 		controlPoint.radius = pointRadius
 		// controlPoint.styles.zIndex = polyline.styles.zIndex ?? 0 + 1
-		Object.assign(controlPoint.styles, pointStyles)
-		Object.assign(controlPoint.hoverStyles, pointHoverStyles)
-		Object.assign(controlPoint.activeStyles, pointActiveStyles)
+		Object.assign(controlPoint.style, pointStyles)
+		Object.assign(controlPoint.hoverStyle, pointHoverStyles)
+		Object.assign(controlPoint.activeStyle, pointActiveStyles)
 
 		controlPointsMap.set(point, controlPoint)
 
@@ -108,9 +108,9 @@ export function editPolyline(
 			const controlPoint = new CircleShape(newPoint.x, newPoint.y, pointRadius)
 			controlPoint.fixedRadius = true
 			controlPoint.radius = pointRadius
-			Object.assign(controlPoint.styles, pointStyles)
-			Object.assign(controlPoint.hoverStyles, pointHoverStyles)
-			Object.assign(controlPoint.activeStyles, pointActiveStyles)
+			Object.assign(controlPoint.style, pointStyles)
+			Object.assign(controlPoint.hoverStyle, pointHoverStyles)
+			Object.assign(controlPoint.activeStyle, pointActiveStyles)
 
 			controlPointsMap.set(newPoint, controlPoint)
 

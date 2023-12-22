@@ -30,17 +30,17 @@ export default function Test() {
 		root.x = 100
 		root.y = 30
 		root.fixedRadius = true
-		root.styles.zIndex = 10
+		root.style.zIndex = 10
 		root.radius = 10
-		root.styles.fillStyle = randomColor()
+		root.style.fillStyle = randomColor()
 		draggable(root)
 
 		// l1
 		const l1 = new CircleShape()
 		l1.fixedRadius = true
-		l1.styles.zIndex = 9
+		l1.style.zIndex = 9
 		l1.radius = 10
-		l1.styles.fillStyle = randomColor()
+		l1.style.fillStyle = randomColor()
 		l1.y = 50
 		root.add(l1)
 		draggable(l1)
@@ -55,9 +55,9 @@ export default function Test() {
 		for (let i = 1; i < 4; i++) {
 			const l1 = new CircleShape()
 			l1.fixedRadius = true
-			l1.styles.zIndex = 8
+			l1.style.zIndex = 8
 			l1.radius = 10
-			l1.styles.fillStyle = randomColor()
+			l1.style.fillStyle = randomColor()
 			l1.y = 50
 			l1.x = i * 30
 			root.add(l1)
@@ -74,9 +74,9 @@ export default function Test() {
 		// l2
 		const l2 = new CircleShape()
 		l2.fixedRadius = true
-		l2.styles.zIndex = 7
+		l2.style.zIndex = 7
 		l2.radius = 10
-		l2.styles.fillStyle = randomColor()
+		l2.style.fillStyle = randomColor()
 		l2.y = 50
 		l1.add(l2)
 		draggable(l2)
@@ -91,9 +91,9 @@ export default function Test() {
 		for (let i = 1; i < 4; i++) {
 			const l2 = new CircleShape()
 			l2.fixedRadius = true
-			l2.styles.zIndex = 6
+			l2.style.zIndex = 6
 			l2.radius = 10
-			l2.styles.fillStyle = randomColor()
+			l2.style.fillStyle = randomColor()
 			l2.y = 50
 			l2.x = i * 30
 			l1.add(l2)
@@ -111,9 +111,9 @@ export default function Test() {
 		const rect = new RectShape(0, 0, 100, 200)
 		const point = new CircleShape()
 		point.fixedRadius = true
-		point.styles.zIndex = 999
+		point.style.zIndex = 999
 		point.radius = 10
-		point.styles.fillStyle = 'blue'
+		point.style.fillStyle = 'blue'
 
 		point.x = 50
 		point.y = 100

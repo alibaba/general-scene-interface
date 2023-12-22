@@ -33,9 +33,9 @@ export default function Test() {
 
 			const seg = e.target
 
-			seg.styles.lineCap = 'round'
-			seg.styles.lineWidth = 20
-			seg.styles.strokeStyle = randomColor()
+			seg.style.lineCap = 'round'
+			seg.style.lineWidth = 20
+			seg.style.strokeStyle = randomColor()
 
 			cancelEdit = editSegment(seg, (e) => {
 				constrainSegment(e.target, [100, 100, 1000, 500])
@@ -43,9 +43,9 @@ export default function Test() {
 		})
 
 		const rect = new RectShape()
-		rect.styles.zIndex = -1
-		rect.styles.fillStyle = 'rgba(0, 0, 0, 0.1)'
-		rect.styles.pointerEvents = 'none'
+		rect.style.zIndex = -1
+		rect.style.fillStyle = 'rgba(0, 0, 0, 0.1)'
+		rect.style.pointerEvents = 'none'
 		rect.x = 100
 		rect.y = 100
 		rect.width = 900

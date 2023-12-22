@@ -48,21 +48,21 @@ export default function Test() {
 
 			const seed = Math.random()
 
-			rect.styles.fillStyle = randomColor(0.5, seed)
-			rect.styles.stroke = true
-			rect.styles.lineWidth = 4
+			rect.style.fillStyle = randomColor(0.5, seed)
+			rect.style.stroke = true
+			rect.style.lineWidth = 4
 
-			rect.hoverStyles.fillStyle = randomColor(1, seed)
+			rect.hoverStyle.fillStyle = randomColor(1, seed)
 
-			rect.activeStyles.strokeStyle = 'red'
+			rect.activeStyle.strokeStyle = 'red'
 		})
 
 		// constrain area
 		{
 			const rect = new RectShape()
-			rect.styles.zIndex = -1
-			rect.styles.fillStyle = 'rgba(0, 0, 0, 0.1)'
-			rect.styles.pointerEvents = 'none'
+			rect.style.zIndex = -1
+			rect.style.fillStyle = 'rgba(0, 0, 0, 0.1)'
+			rect.style.pointerEvents = 'none'
 			rect.x = 100
 			rect.y = 100
 			rect.width = 600

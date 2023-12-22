@@ -31,12 +31,12 @@ export default function Test() {
 		polygon.y = star[0].y
 		polygon.points = star.map((p) => ({ x: p.x - polygon.x, y: p.y - polygon.y }))
 
-		polygon.styles.fillStyle = randomColor(0.5)
-		polygon.styles.stroke = true
-		polygon.styles.strokeStyle = randomColor()
-		polygon.styles.lineWidth = 3
+		polygon.style.fillStyle = randomColor(0.5)
+		polygon.style.stroke = true
+		polygon.style.strokeStyle = randomColor()
+		polygon.style.lineWidth = 3
 
-		polygon.hoverStyles.fillStyle = randomColor()
+		polygon.hoverStyle.fillStyle = randomColor()
 
 		scene.add(polygon)
 

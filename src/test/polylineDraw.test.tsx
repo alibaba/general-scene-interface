@@ -35,12 +35,12 @@ export default function Test() {
 			(e) => {
 				const polyline = e.target
 
-				polyline.styles.strokeStyle = randomColor()
-				polyline.styles.lineWidth = 10
-				polyline.styles.lineCap = 'round'
-				polyline.styles.lineJoin = 'round'
+				polyline.style.strokeStyle = randomColor()
+				polyline.style.lineWidth = 10
+				polyline.style.lineCap = 'round'
+				polyline.style.lineJoin = 'round'
 
-				polyline.hoverStyles.strokeStyle = 'red'
+				polyline.hoverStyle.strokeStyle = 'red'
 
 				cancelEdit = editPolyline(polyline)
 			},

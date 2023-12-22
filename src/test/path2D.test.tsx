@@ -26,9 +26,9 @@ export default function Test() {
 
 		{
 			const shape = new PathShape(new Path2D(path1))
-			shape.styles.fillStyle = randomColor()
+			shape.style.fillStyle = randomColor()
 			// shape.styles.fill = false
-			shape.styles.stroke = true
+			shape.style.stroke = true
 			// shape.styles.lineWidth = 2
 
 			draggable(shape)
@@ -39,9 +39,9 @@ export default function Test() {
 		{
 			const shape = new PathShape(new Path2D(path2))
 			shape.x = 200
-			shape.styles.fillStyle = randomColor()
+			shape.style.fillStyle = randomColor()
 			// shape.styles.fill = false
-			shape.styles.stroke = true
+			shape.style.stroke = true
 			// shape.styles.lineWidth = 2
 
 			draggable(shape)

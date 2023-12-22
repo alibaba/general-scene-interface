@@ -36,10 +36,10 @@ export function editPolygon(
 
 	const shadowPolyline = new PolylineShape()
 	// shadowPolyline.styles.zIndex = 10
-	shadowPolyline.styles.lineWidth = 5
-	shadowPolyline.styles.lineDash = [10, 10]
-	shadowPolyline.styles.lineJoin = 'bevel'
-	shadowPolyline.styles.strokeOpacity = 0.5
+	shadowPolyline.style.lineWidth = 5
+	shadowPolyline.style.lineDash = [10, 10]
+	shadowPolyline.style.lineJoin = 'bevel'
+	shadowPolyline.style.strokeOpacity = 0.5
 	shadowPolyline.closed = true
 	shadowPolyline.points = polygon.points
 

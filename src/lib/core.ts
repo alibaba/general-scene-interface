@@ -7,9 +7,9 @@ import { CanvasStyles, ExtendedCanvasStyles, getAssignableStyles } from './style
  */
 export class Shape extends Node<ShapeEvents, Shape> {
 	// 样式
-	readonly styles: Partial<ExtendedCanvasStyles> = { fillStyle: 'red' }
-	readonly hoverStyles: Partial<CanvasStyles> = {}
-	readonly activeStyles: Partial<CanvasStyles> = {}
+	readonly style: Partial<ExtendedCanvasStyles> = { fillStyle: 'red' }
+	readonly hoverStyle: Partial<CanvasStyles> = {}
+	readonly activeStyle: Partial<CanvasStyles> = {}
 
 	// 位置（局部坐标的原点，派生类中的坐标都为局部坐标）
 	x: number = 0
@@ -38,12 +38,12 @@ export class Shape extends Node<ShapeEvents, Shape> {
 		ctx.save()
 		ctx.beginPath() // 必要，否则上一个物体的轮廓会影响下一个物体的绘制
 
-		Object.assign(ctx, getAssignableStyles(this.styles))
+		Object.assign(ctx, getAssignableStyles(this.style))
 
-		if (this._hover) Object.assign(ctx, getAssignableStyles(this.hoverStyles))
-		if (this._active) Object.assign(ctx, getAssignableStyles(this.activeStyles))
+		if (this._hover) Object.assign(ctx, getAssignableStyles(this.hoverStyle))
+		if (this._active) Object.assign(ctx, getAssignableStyles(this.activeStyle))
 
-		if (this.styles.lineDash) ctx.setLineDash(this.styles.lineDash)
+		if (this.style.lineDash) ctx.setLineDash(this.style.lineDash)
 
 		this.draw(ctx)
 
@@ -322,24 +322,24 @@ export class Scene extends Node<SceneEvents, Shape> {
 			shape._fill = true
 			shape._stroke = false
 
-			if (shape.styles.fill !== undefined) shape._fill = shape.styles.fill
+			if (shape.style.fill !== undefined) shape._fill = shape.style.fill
 
-			if (shape.styles.stroke !== undefined) shape._stroke = shape.styles.stroke
+			if (shape.style.stroke !== undefined) shape._stroke = shape.style.stroke
 
 			if (this.hoveringShape === shape) {
 				shape._hover = true
-				if (shape.hoverStyles.cursor) this.canvas.style.cursor = shape.hoverStyles.cursor
-				if (shape.hoverStyles.fill !== undefined) shape._fill = shape.hoverStyles.fill
-				if (shape.hoverStyles.stroke !== undefined) shape._stroke = true
+				if (shape.hoverStyle.cursor) this.canvas.style.cursor = shape.hoverStyle.cursor
+				if (shape.hoverStyle.fill !== undefined) shape._fill = shape.hoverStyle.fill
+				if (shape.hoverStyle.stroke !== undefined) shape._stroke = true
 			} else {
 				shape._hover = false
 			}
 
 			if (this.activeShape === shape) {
 				shape._active = true
-				if (shape.activeStyles.cursor) this.canvas.style.cursor = shape.activeStyles.cursor
-				if (shape.activeStyles.fill !== undefined) shape._fill = shape.activeStyles.fill
-				if (shape.activeStyles.stroke !== undefined) shape._stroke = shape.activeStyles.stroke
+				if (shape.activeStyle.cursor) this.canvas.style.cursor = shape.activeStyle.cursor
+				if (shape.activeStyle.fill !== undefined) shape._fill = shape.activeStyle.fill
+				if (shape.activeStyle.stroke !== undefined) shape._stroke = shape.activeStyle.stroke
 			} else {
 				shape._active = false
 			}
@@ -357,7 +357,7 @@ export class Scene extends Node<SceneEvents, Shape> {
 			shape.traverse((s) => shapes.push(s))
 		}
 
-		shapes.sort((a, b) => (a.styles.zIndex || 0) - (b.styles.zIndex || 0))
+		shapes.sort((a, b) => (a.style.zIndex || 0) - (b.style.zIndex || 0))
 
 		return shapes
 	}
@@ -432,7 +432,7 @@ export class Scene extends Node<SceneEvents, Shape> {
 		for (let i = shapes.length - 1; i >= 0; i--) {
 			const shape = shapes[i]
 
-			const res = shape.styles.pointerEvents !== 'none' && shape.hit(x, y, this.ctx)
+			const res = shape.style.pointerEvents !== 'none' && shape.hit(x, y, this.ctx)
 
 			if (res) return { shape, res }
 		}

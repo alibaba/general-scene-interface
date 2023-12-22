@@ -72,29 +72,29 @@ export function drawPolyline(
 			polyline.y = startY
 			polyline.points.push({ x: 0, y: 0 })
 
-			Object.assign(polyline.styles, styles)
+			Object.assign(polyline.style, styles)
 
 			// 增加 mask 盖住其他所有物体，来避免误操作
 			mask = new MaskShape()
-			mask.styles.fillStyle = 'blue'
-			mask.styles.fillOpacity = 0.1
+			mask.style.fillStyle = 'blue'
+			mask.style.fillOpacity = 0.1
 			scene.add(mask)
-			mask.styles.zIndex = 1000
+			mask.style.zIndex = 1000
 
-			polyline.styles.zIndex = 1001
+			polyline.style.zIndex = 1001
 
 			scene.add(polyline)
 
 			startPoint = new CircleShape(startX, startY, 5)
-			Object.assign(startPoint.styles, pointStyles)
+			Object.assign(startPoint.style, pointStyles)
 			startPoint.fixedRadius = true
-			startPoint.styles.zIndex = 1002
+			startPoint.style.zIndex = 1002
 			scene.add(startPoint)
 
 			endPoint = new CircleShape(startX, startY, 5)
-			Object.assign(endPoint.styles, pointStyles)
+			Object.assign(endPoint.style, pointStyles)
 			endPoint.fixedRadius = true
-			endPoint.styles.zIndex = 1003
+			endPoint.style.zIndex = 1003
 			scene.add(endPoint)
 		} else {
 			let finished = false
@@ -117,7 +117,7 @@ export function drawPolyline(
 				scene.remove(endPoint!)
 				scene.remove(mask!)
 
-				polyline!.styles.zIndex = styles.zIndex
+				polyline!.style.zIndex = styles.zIndex
 
 				startPoint = null
 				endPoint = null

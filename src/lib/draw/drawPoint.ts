@@ -40,7 +40,7 @@ export function drawPoint(
 		point.y = startY
 		point.radius = radius
 		point.fixedRadius = true // 圆形变为点
-		Object.assign(point.styles, styles)
+		Object.assign(point.style, styles)
 
 		scene.add(point)
 

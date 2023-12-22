@@ -30,9 +30,9 @@ export default function Test() {
 		const cancel = drawSegment(scene, (e) => {
 			const seg = e.target
 
-			seg.styles.lineCap = 'round'
-			seg.styles.lineWidth = 20
-			seg.styles.strokeStyle = randomColor()
+			seg.style.lineCap = 'round'
+			seg.style.lineWidth = 20
+			seg.style.strokeStyle = randomColor()
 
 			cancelEdit = editSegment(seg)
 		})

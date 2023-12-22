@@ -37,7 +37,7 @@ export function drawSegment(
 
 		segment.x = startX
 		segment.y = startY
-		Object.assign(segment.styles, styles)
+		Object.assign(segment.style, styles)
 
 		scene.add(segment)
 

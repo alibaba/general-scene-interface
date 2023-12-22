@@ -40,7 +40,7 @@ export function drawRect(
 		rect.y = startY
 		rect.width = 0
 		rect.height = 0
-		Object.assign(rect.styles, styles)
+		Object.assign(rect.style, styles)
 
 		scene.add(rect)
 
