@@ -18,8 +18,16 @@ export class RectShape extends Shape {
 	hit(x: number, y: number) {
 		const { x: left, y: top } = this.localToView(0, 0)
 		const { x: right, y: bottom } = this.localToView(this.width, this.height)
-
 		return x >= left && x <= right && y >= top && y <= bottom
+
+		// 正反两面都能 hit 的版本
+
+		// const minX = Math.min(left, right)
+		// const maxX = Math.max(left, right)
+		// const minY = Math.min(top, bottom)
+		// const maxY = Math.max(top, bottom)
+
+		// return x >= minX && x <= maxX && y >= minY && y <= maxY
 	}
 
 	draw(ctx: CanvasRenderingContext2D) {

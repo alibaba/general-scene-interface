@@ -8,11 +8,11 @@ import { lazy } from 'react'
 
 export const entries = [
 	{
-		key: 'axis',
-		name: '坐标轴',
+		key: 'chart',
+		name: '数据图表',
 		category: 'shapes',
 		getComponent: () => {
-			const Test = lazy(() => import('../test/axis.test.tsx'))
+			const Test = lazy(() => import('../test/chart.test.tsx'))
 			return <Test />
 		},
 	},
