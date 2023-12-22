@@ -49,7 +49,7 @@ export function drawPolyline(
 		const e = event.srcEvent
 
 		if (e.button !== 0) {
-			cancel()
+			inited && cancel()
 			return
 		}
 
