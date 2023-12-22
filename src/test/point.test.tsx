@@ -11,7 +11,7 @@ import styles from './Test.module.css'
 
 /**
  * @test_name 点绘制
- * @test_category demo
+ * @test_category drawer
  */
 export default function Test() {
 	const canvasRef = useRef<HTMLCanvasElement>(null!)

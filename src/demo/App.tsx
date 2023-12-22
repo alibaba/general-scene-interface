@@ -4,7 +4,11 @@ import { entries } from './entries'
 
 import styles from './App.module.css'
 
-const categories = [{ key: 'demo', name: 'Demo' }]
+const categories = [
+	{ key: 'shapes', name: 'Shapes' },
+	{ key: 'drawer', name: '绘制器' },
+	{ key: 'utils', name: 'Utilities' },
+]
 
 function App() {
 	const url = new URL(window.location.href)

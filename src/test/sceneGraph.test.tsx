@@ -10,7 +10,7 @@ import styles from './Test.module.css'
 
 /**
  * @test_name 场景树
- * @test_category demo
+ * @test_category shapes
  */
 export default function Test() {
 	const canvasRef = useRef<HTMLCanvasElement>(null!)

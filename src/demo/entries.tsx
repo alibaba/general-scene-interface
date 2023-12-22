@@ -10,7 +10,7 @@ export const entries = [
 	{
 		key: 'maxFPS',
 		name: 'FPS 限制',
-		category: 'demo',
+		category: 'utils',
 		getComponent: () => {
 			const Test = lazy(() => import('../test/maxFPS.test.tsx'))
 			return <Test />
@@ -20,7 +20,7 @@ export const entries = [
 	{
 		key: 'path2D',
 		name: 'Path2D',
-		category: 'demo',
+		category: 'shapes',
 		getComponent: () => {
 			const Test = lazy(() => import('../test/path2D.test.tsx'))
 			return <Test />
@@ -30,7 +30,7 @@ export const entries = [
 	{
 		key: 'point',
 		name: '点绘制',
-		category: 'demo',
+		category: 'drawer',
 		getComponent: () => {
 			const Test = lazy(() => import('../test/point.test.tsx'))
 			return <Test />
@@ -40,7 +40,7 @@ export const entries = [
 	{
 		key: 'polygonBasic',
 		name: '多边形',
-		category: 'demo',
+		category: 'shapes',
 		getComponent: () => {
 			const Test = lazy(() => import('../test/polygonBasic.test.tsx'))
 			return <Test />
@@ -50,7 +50,7 @@ export const entries = [
 	{
 		key: 'polygonDraw',
 		name: '多边形绘制',
-		category: 'demo',
+		category: 'drawer',
 		getComponent: () => {
 			const Test = lazy(() => import('../test/polygonDraw.test.tsx'))
 			return <Test />
@@ -60,7 +60,7 @@ export const entries = [
 	{
 		key: 'polylineBasic',
 		name: '折线',
-		category: 'demo',
+		category: 'shapes',
 		getComponent: () => {
 			const Test = lazy(() => import('../test/polylineBasic.test.tsx'))
 			return <Test />
@@ -70,7 +70,7 @@ export const entries = [
 	{
 		key: 'polylineDraw',
 		name: '折线绘制',
-		category: 'demo',
+		category: 'drawer',
 		getComponent: () => {
 			const Test = lazy(() => import('../test/polylineDraw.test.tsx'))
 			return <Test />
@@ -79,8 +79,8 @@ export const entries = [
 
 	{
 		key: 'polylineDrawConstrain',
-		name: '限制区域折线绘制',
-		category: 'demo',
+		name: '限制区域-折线',
+		category: 'utils',
 		getComponent: () => {
 			const Test = lazy(() => import('../test/polylineDrawConstrain.test.tsx'))
 			return <Test />
@@ -90,7 +90,7 @@ export const entries = [
 	{
 		key: 'rect',
 		name: '矩形绘制',
-		category: 'demo',
+		category: 'drawer',
 		getComponent: () => {
 			const Test = lazy(() => import('../test/rect.test.tsx'))
 			return <Test />
@@ -99,8 +99,8 @@ export const entries = [
 
 	{
 		key: 'rectConstrain',
-		name: '限制区域矩形绘制',
-		category: 'demo',
+		name: '限制区域-矩形',
+		category: 'utils',
 		getComponent: () => {
 			const Test = lazy(() => import('../test/rectConstrain.test.tsx'))
 			return <Test />
@@ -110,7 +110,7 @@ export const entries = [
 	{
 		key: 'sceneGraph',
 		name: '场景树',
-		category: 'demo',
+		category: 'shapes',
 		getComponent: () => {
 			const Test = lazy(() => import('../test/sceneGraph.test.tsx'))
 			return <Test />
@@ -120,7 +120,7 @@ export const entries = [
 	{
 		key: 'segmentBasic',
 		name: '线段',
-		category: 'demo',
+		category: 'shapes',
 		getComponent: () => {
 			const Test = lazy(() => import('../test/segmentBasic.test.tsx'))
 			return <Test />
@@ -130,7 +130,7 @@ export const entries = [
 	{
 		key: 'segmentDraw',
 		name: '线段绘制',
-		category: 'demo',
+		category: 'drawer',
 		getComponent: () => {
 			const Test = lazy(() => import('../test/segmentDraw.test.tsx'))
 			return <Test />
@@ -139,8 +139,8 @@ export const entries = [
 
 	{
 		key: 'segmentDrawConstrain',
-		name: '限制区域线段绘制',
-		category: 'demo',
+		name: '限制区域-线段',
+		category: 'utils',
 		getComponent: () => {
 			const Test = lazy(() => import('../test/segmentDrawConstrain.test.tsx'))
 			return <Test />
@@ -150,7 +150,7 @@ export const entries = [
 	{
 		key: 'svg',
 		name: 'SVG 解析器',
-		category: 'demo',
+		category: 'shapes',
 		getComponent: () => {
 			const Test = lazy(() => import('../test/svg.test.tsx'))
 			return <Test />

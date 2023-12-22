@@ -12,8 +12,8 @@ import Info from './Info'
 import styles from './Test.module.css'
 
 /**
- * @test_name 限制区域折线绘制
- * @test_category demo
+ * @test_name 限制区域-折线
+ * @test_category utils
  */
 export default function Test() {
 	const canvasRef = useRef<HTMLCanvasElement>(null!)

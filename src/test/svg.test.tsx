@@ -9,7 +9,7 @@ import styles from './Test.module.css'
 
 /**
  * @test_name SVG 解析器
- * @test_category demo
+ * @test_category shapes
  */
 export default function Test() {
 	const canvasRef = useRef<HTMLCanvasElement>(null!)
@@ -44,10 +44,10 @@ export default function Test() {
 					const group = parseSVG(svgNode.documentElement as unknown as SVGElement, undefined, 1)
 					scene.add(group)
 
-					group.children.forEach((shape) => {
-						shape.x += 600
-						shape.y += 200
-					})
+					group.x += 600
+					group.y += 200
+
+					draggable(group, undefined, undefined, false)
 				})
 		}
 
@@ -67,7 +67,7 @@ export default function Test() {
 			</main>
 			<footer className={styles.footer}>🔔 滚轮缩放；右键平移</footer>
 
-			<div className={styles.svgOuterWrapper}>
+			<div className={styles.svgOuterWrapper} style={{ display: 'none' }}>
 				<div className={styles.svgWrapper}>
 					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 104 97" ref={svgRef}>
 						<path d="M14,85l3,9h72c0,0,5-9,4-10c-2-2-79,0-79,1" fill="#7C4E32" />
@@ -92,7 +92,6 @@ export default function Test() {
 						/>
 					</svg>
 				</div>
-				<img className={styles.svgWrapper} src="./tiger.svg" />
 			</div>
 		</div>
 	)

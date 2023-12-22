@@ -10,7 +10,7 @@ import styles from './Test.module.css'
 
 /**
  * @test_name Path2D
- * @test_category demo
+ * @test_category shapes
  */
 
 export default function Test() {

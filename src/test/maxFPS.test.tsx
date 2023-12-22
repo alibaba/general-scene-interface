@@ -11,7 +11,7 @@ import styles from './Test.module.css'
 
 /**
  * @test_name FPS 限制
- * @test_category demo
+ * @test_category utils
  */
 
 export default function Test() {
