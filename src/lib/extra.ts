@@ -33,7 +33,11 @@ type AfterDragEvent = {
 export function draggable(
 	shape: Shape,
 	onDrag?: (e: BeforeDragEvent) => void,
-	onChange?: (e: AfterDragEvent) => void
+	onChange?: (e: AfterDragEvent) => void,
+	/**
+	 * 不监听子节点的事件
+	 */
+	ignoreChildren = true
 ) {
 	let startPointerX = 0
 	let startPointerY = 0
@@ -49,7 +53,7 @@ export function draggable(
 
 	function onPointerDown(e: PointerEvents['pointerdown']) {
 		if (e.srcEvent.button !== 0) return
-		if (e.target !== e.currentTarget) return
+		if (ignoreChildren && e.target !== e.currentTarget) return
 
 		startPointerX = e.srcEvent.offsetX
 		startPointerY = e.srcEvent.offsetY
@@ -61,7 +65,7 @@ export function draggable(
 	}
 
 	function onPointerMove(e: PointerEvents['pointermove']) {
-		if (e.target !== e.currentTarget) return
+		if (ignoreChildren && e.target !== e.currentTarget) return
 
 		if (isDragging) {
 			// 相对于 start
@@ -94,7 +98,7 @@ export function draggable(
 	}
 
 	function onPointerUp(e: PointerEvents['pointerup']) {
-		if (e.target !== e.currentTarget) return
+		if (ignoreChildren && e.target !== e.currentTarget) return
 
 		isDragging = false
 
