@@ -125,7 +125,12 @@ export function draggable(
  * 使用鼠标控制场景的缩放和平移，滚轮缩放，右键平移，缩放时以鼠标位置为中心
  * @return 取消监听函数
  */
-export function scenePointerControl(scene: Scene) {
+export function scenePointerControl(
+	scene: Scene,
+	options?: { lockX?: boolean; lockY?: boolean; lockScale?: boolean }
+) {
+	const { lockX = false, lockY = false, lockScale = false } = options || {}
+
 	const handlePointerDown = (event: PointerEvents['pointerdown']) => {
 		const e = event.srcEvent
 
@@ -149,8 +154,8 @@ export function scenePointerControl(scene: Scene) {
 			const x = e.clientX - left
 			const y = e.clientY - top
 
-			scene.translate.x = startTranslateX + x - startX
-			scene.translate.y = startTranslateY + y - startY
+			lockX || (scene.translate.x = startTranslateX + x - startX)
+			lockY || (scene.translate.y = startTranslateY + y - startY)
 		}
 
 		// @note: 只监听了 Pointer up，所以鼠标移出了 canvas 也会继续平移，如果需要处理移出页面需要额外逻辑
@@ -165,6 +170,8 @@ export function scenePointerControl(scene: Scene) {
 	}
 
 	const handleWheel = (e: WheelEvent) => {
+		if (lockScale) return
+
 		// 操作安全
 		if (e.buttons !== 0) return
 
