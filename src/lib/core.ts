@@ -426,13 +426,13 @@ export class Scene extends Node<SceneEvents, Shape> {
 	private getHitShape(x: number, y: number) {
 		this.updateSceneGraph()
 
-		const shapes = this.getShapeList().filter((s) => s._visible)
+		const shapes = this.getShapeList().filter((s) => s._visible && s.style.pointerEvents !== 'none')
 
 		// 逆向查找
 		for (let i = shapes.length - 1; i >= 0; i--) {
 			const shape = shapes[i]
 
-			const res = shape.style.pointerEvents !== 'none' && shape.hit(x, y, this.ctx)
+			const res = shape.hit(x, y, this.ctx)
 
 			if (res) return { shape, res }
 		}

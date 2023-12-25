@@ -8,9 +8,19 @@ import { lazy } from 'react'
 
 export const entries = [
 	{
+		key: 'audio',
+		name: '音频频谱',
+		category: 'chart',
+		getComponent: () => {
+			const Test = lazy(() => import('../test/audio.test.tsx'))
+			return <Test />
+		},
+	},
+
+	{
 		key: 'chart',
-		name: '数据图表',
-		category: 'shapes',
+		name: '点线柱',
+		category: 'chart',
 		getComponent: () => {
 			const Test = lazy(() => import('../test/chart.test.tsx'))
 			return <Test />

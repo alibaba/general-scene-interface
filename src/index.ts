@@ -16,3 +16,8 @@ export * from './lib/draw/drawRect'
 export * from './lib/draw/drawSegment'
 
 export * from './lib/utils/misc'
+export * from './lib/utils/audio'
+
+export * from './lib/charts/coordinate'
+export * from './lib/charts/plots'
+export * from './lib/charts/marker'

@@ -8,6 +8,7 @@ const categories = [
 	{ key: 'shapes', name: 'Shapes' },
 	{ key: 'drawer', name: '绘制器' },
 	{ key: 'utils', name: 'Utilities' },
+	{ key: 'chart', name: '图表' },
 ]
 
 function App() {
