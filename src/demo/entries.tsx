@@ -18,6 +18,16 @@ export const entries = [
 	},
 
 	{
+		key: 'chart.candle',
+		name: '蜡烛图',
+		category: 'chart',
+		getComponent: () => {
+			const Test = lazy(() => import('../test/chart.candle.test.tsx'))
+			return <Test />
+		},
+	},
+
+	{
 		key: 'chart',
 		name: '点线柱',
 		category: 'chart',

@@ -31,7 +31,7 @@ export async function genEntries() {
 				.map(
 					({ filename, name, category }) => `
 				{
-					key: '${filename.split('.')[0]}',
+					key: '${filename.split('.test.')[0]}',
 					name: '${name}',
 					category: '${category}',
 					getComponent: () => {

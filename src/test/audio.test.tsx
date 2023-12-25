@@ -80,7 +80,6 @@ export default function Test() {
 			const polylineData: { x: number; y: number }[] = []
 
 			if (xResolution < channelData.length) {
-				console.log('xResolution > channelData.length，重新采样')
 				for (let i = 0; i < xResolution; i++) {
 					const x = i / xResolution
 					const index = Math.floor(x * len)

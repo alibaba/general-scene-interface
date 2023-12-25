@@ -136,8 +136,6 @@ export function drawXRange(
 	const handlePointerDown = (event: PointerEvents['pointerdown']) => {
 		const e = event.srcEvent
 
-		console.log(event.target, event.currentTarget)
-
 		if (e.button !== 0) return
 		if (event.target !== event.currentTarget) return
 
