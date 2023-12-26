@@ -128,7 +128,7 @@ export function drawXRange(
 		draggable?: boolean
 		min?: number
 		max?: number
-		// onChange?: (xStart: number, xEnd: number) => void
+		onAdd?: (xRange: XRange) => void
 	}
 ) {
 	let temp: XRange | undefined
@@ -182,6 +182,8 @@ export function drawXRange(
 			result.xEnd = temp!.xEnd
 
 			scene.add(result)
+
+			if (config?.onAdd) config.onAdd(result)
 		}
 
 		scene.addEventListener('pointermove', handlePointerMove)

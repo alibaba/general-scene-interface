@@ -126,7 +126,7 @@ export default function Test() {
 					}
 				})
 
-				console.log('candleData', candleData)
+				// console.log('candleData', candleData)
 
 				const candle = candlestickPlot(coordinator, candleData, { barWidth: 0.8 })
 				scene.add(candle)

@@ -279,7 +279,11 @@ export class CartesianAxes extends Shape {
 export function tick(
 	coordinator: CartesianCoordinator,
 	config?: {
+		xColor?: string
+		yColor?: string
 		minDistance?: number
+		disableX?: boolean
+		disableY?: boolean
 		xToString?: (x: number) => string
 		yToString?: (y: number) => string
 	}
@@ -295,11 +299,10 @@ export function tick(
 	const update = () => {
 		group.removeAll()
 
-		const tickX = new Shape()
-		const tickY = new Shape()
-
 		// x
-		{
+		if (!config?.disableX) {
+			const tickX = new Shape()
+
 			// 计算一个合适的取整方案，使得刻度间距大于 minDistance
 			const pixelLen = coordinator.viewportWidth
 			const valueLen = coordinator.xEnd - coordinator.xStart
@@ -324,7 +327,7 @@ export function tick(
 
 			for (let x = startX; x <= coordinator.xEnd; x += valueGap) {
 				const tick = new SegmentShape()
-				tick.style.strokeStyle = 'red'
+				tick.style.strokeStyle = config?.xColor ?? 'red'
 				tick.style.lineWidth = 2
 				tick.dx = 0
 				tick.dy = 10
@@ -337,7 +340,7 @@ export function tick(
 
 				const text = new TextShape()
 				text.text = xToString(x)
-				text.style.fillStyle = 'red'
+				text.style.fillStyle = config?.xColor ?? 'red'
 				text.style.textAlign = 'center'
 				text.style.textBaseline = 'top'
 				text.style.font = '12px sans-serif'
@@ -345,10 +348,14 @@ export function tick(
 				text.y = coordinator.bottom + 20
 				tickX.add(text)
 			}
+
+			group.add(tickX)
 		}
 
 		// y
-		{
+		if (!config?.disableY) {
+			const tickY = new Shape()
+
 			// 计算一个合适的取整方案，使得刻度间距大于 minDistance
 			const pixelLen = coordinator.viewportHeight
 			const valueLen = coordinator.yEnd - coordinator.yStart
@@ -373,7 +380,7 @@ export function tick(
 
 			for (let y = startY; y <= coordinator.yEnd; y += valueGap) {
 				const tick = new SegmentShape()
-				tick.style.strokeStyle = 'green'
+				tick.style.strokeStyle = config?.yColor ?? 'green'
 				tick.style.lineWidth = 2
 				tick.dx = -10
 				tick.dy = 0
@@ -386,7 +393,7 @@ export function tick(
 
 				const text = new TextShape()
 				text.text = yToString(y)
-				text.style.fillStyle = 'green'
+				text.style.fillStyle = config?.yColor ?? 'green'
 				text.style.textAlign = 'right'
 				text.style.textBaseline = 'middle'
 				text.style.font = '12px sans-serif'
@@ -394,10 +401,9 @@ export function tick(
 				text.y = pos[1]
 				tickY.add(text)
 			}
-		}
 
-		group.add(tickX)
-		group.add(tickY)
+			group.add(tickY)
+		}
 	}
 
 	update()

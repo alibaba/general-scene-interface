@@ -97,6 +97,8 @@ export class Scene extends Node<SceneEvents, Shape> {
 	// 帧率限制
 	maxFPS = 60
 
+	disposed = false
+
 	/**
 	 * the shape that is currently being focused for pointer events
 	 */
@@ -444,6 +446,7 @@ export class Scene extends Node<SceneEvents, Shape> {
 	 */
 	dispose() {
 		this.reset()
+		this.disposed = true
 		if (this.rafID) {
 			cancelAnimationFrame(this.rafID)
 			this.rafID = null
