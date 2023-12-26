@@ -181,6 +181,12 @@ export function drawXRange(
 			result.xStart = temp!.xStart
 			result.xEnd = temp!.xEnd
 
+			if (result.xStart > result.xEnd) {
+				const x = result.xStart
+				result.xStart = result.xEnd
+				result.xEnd = x
+			}
+
 			scene.add(result)
 
 			if (config?.onAdd) config.onAdd(result)
