@@ -206,7 +206,7 @@ export default function Test() {
 				})
 			}
 
-			drawXRange(scene, coordinator, { draggable: true, min: 0, max: width })
+			drawXRange(scene, coordinator, { editable: true, min: 0, max: width })
 		})()
 
 		// ;(globalThis as any).scene = scene

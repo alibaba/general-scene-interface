@@ -57,7 +57,7 @@ export default function Test() {
 		const t = tick(coordinator)
 		scene.add(t)
 
-		const r = new XRange(coordinator, { draggable: true })
+		const r = new XRange(coordinator, { editable: true })
 		scene.add(r)
 
 		return () => {

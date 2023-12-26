@@ -14,16 +14,20 @@ export class XRange extends RectShape {
 		public coordinator: CartesianCoordinator,
 		public config?: {
 			color?: string
-			draggable?: boolean
+			borderColor?: string
+			borderHoverColor?: string
+			editable?: boolean
+			onEdit?: (xRange: XRange) => void
 			min?: number
 			max?: number
-			// onChange?: (xStart: number, xEnd: number) => void
 		}
 	) {
 		super()
 
 		const seed = Math.random()
 		const { color = randomColor(0.2, seed) } = config || {}
+		const { borderColor = randomColor(0.9, seed) } = config || {}
+		const { borderHoverColor } = config || {}
 		const { min = -Infinity, max = Infinity } = config || {}
 
 		this.style.fillStyle = color
@@ -31,15 +35,15 @@ export class XRange extends RectShape {
 		const startLine = new SegmentShape()
 		startLine.style.zIndex = 5
 		startLine.style.lineWidth = 5
-		startLine.style.strokeStyle = randomColor(0.9, seed)
-		startLine.hoverStyle.strokeStyle = randomColor(1, seed + 0.5)
+		startLine.style.strokeStyle = borderColor
+		borderHoverColor && (startLine.hoverStyle.strokeStyle = borderHoverColor)
 		this.add(startLine)
 
 		const endLine = new SegmentShape()
 		endLine.style.zIndex = 5
 		endLine.style.lineWidth = 5
-		endLine.style.strokeStyle = randomColor(0.9, seed)
-		endLine.hoverStyle.strokeStyle = randomColor(1, seed + 0.5)
+		endLine.style.strokeStyle = borderColor
+		borderHoverColor && (endLine.hoverStyle.strokeStyle = borderHoverColor)
 		this.add(endLine)
 
 		this.addEventListener('beforeRender', (e) => {
@@ -60,25 +64,29 @@ export class XRange extends RectShape {
 			endLine.dy = coordinator.viewportHeight
 		})
 
-		if (config?.draggable) {
-			draggable(this, (e) => {
-				this.xStart = coordinator.unproject(e.x, 0)[0]
-				this.xEnd = coordinator.unproject(e.x + this.width, 0)[0]
+		if (config?.editable) {
+			draggable(
+				this,
+				(e) => {
+					this.xStart = coordinator.unproject(e.x, 0)[0]
+					this.xEnd = coordinator.unproject(e.x + this.width, 0)[0]
 
-				if (this.xStart < min) {
-					const w = this.xEnd - this.xStart
-					this.xStart = min
-					this.xEnd = min + w
-					e.x = coordinator.project(min, 0)[0]
-				}
+					if (this.xStart < min) {
+						const w = this.xEnd - this.xStart
+						this.xStart = min
+						this.xEnd = min + w
+						e.x = coordinator.project(min, 0)[0]
+					}
 
-				if (this.xEnd > max) {
-					const w = this.xEnd - this.xStart
-					this.xEnd = max
-					this.xStart = max - w
-					e.x = coordinator.project(max, 0)[0]
-				}
-			})
+					if (this.xEnd > max) {
+						const w = this.xEnd - this.xStart
+						this.xEnd = max
+						this.xStart = max - w
+						e.x = coordinator.project(max, 0)[0]
+					}
+				},
+				(e) => config?.onEdit?.(this)
+			)
 
 			draggable(
 				startLine,
@@ -97,6 +105,8 @@ export class XRange extends RectShape {
 					this.xEnd = Math.min(Math.max(this.xEnd, min), max)
 					this.x = coordinator.project(this.xStart, 0)[0]
 					this.width = coordinator.project(this.xEnd, 0)[0] - this.x
+
+					config?.onEdit?.(this)
 				}
 			)
 
@@ -114,6 +124,8 @@ export class XRange extends RectShape {
 					this.xEnd = Math.min(Math.max(this.xEnd, min), max)
 					this.x = coordinator.project(this.xStart, 0)[0]
 					this.width = coordinator.project(this.xEnd, 0)[0] - this.x
+
+					config?.onEdit?.(this)
 				}
 			)
 		}
@@ -125,7 +137,10 @@ export function drawXRange(
 	coordinator: CartesianCoordinator,
 	config?: {
 		color?: string
-		draggable?: boolean
+		borderColor?: string
+		borderHoverColor?: string
+		editable?: boolean
+		onEdit?: (xRange: XRange) => void
 		min?: number
 		max?: number
 		onAdd?: (xRange: XRange) => void
@@ -154,7 +169,10 @@ export function drawXRange(
 		)
 			return
 
-		temp = new XRange(coordinator)
+		temp = new XRange(coordinator, {
+			...config,
+			editable: false,
+		})
 		scene.add(temp)
 
 		temp.xStart = coordinator.unproject(startX, 0)[0]
