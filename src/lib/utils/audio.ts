@@ -18,8 +18,8 @@ export async function loadAudio(src: string) {
 		audio.addEventListener('canplaythrough', () => {
 			resolve()
 		})
-		audio.addEventListener('error', () => {
-			reject()
+		audio.addEventListener('error', (e) => {
+			reject(e)
 		})
 	})
 
