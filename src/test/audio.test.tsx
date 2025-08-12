@@ -45,6 +45,8 @@ export default function Test() {
 			lockScale: false,
 			xStartMin: 0,
 			xEndMax: 100,
+			xRangeMin: 1,
+			// xRangeMax: 100,
 		})
 
 		//

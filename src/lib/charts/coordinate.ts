@@ -82,6 +82,11 @@ export function coordinatorPointerControl(
 		 */
 		xStartMin?: number
 		xEndMax?: number
+		/**
+		 * 缩放后的 x 轴最小显示范围（数据域长度）。
+		 * 用于限制最大放大倍率。
+		 */
+		xRangeMin?: number
 	}
 ) {
 	const { lockX = false, lockY = false, lockScale = false } = options || {}
@@ -169,10 +174,21 @@ export function coordinatorPointerControl(
 		const [xInView, yInView] = coordinator.unproject(x, y)
 
 		if (!lockX) {
-			coordinator.xStart = (coordinator.xStart - xInView) * scale + xInView
-			coordinator.xEnd = (coordinator.xEnd - xInView) * scale + xInView
-			coordinator.xStart = Math.max(coordinator.xStart, options?.xStartMin ?? -Infinity)
-			coordinator.xEnd = Math.min(coordinator.xEnd, options?.xEndMax ?? Infinity)
+			const currentRangeX = coordinator.xEnd - coordinator.xStart
+			const minRangeX = options?.xRangeMin ?? 0
+
+			const scaledRangeX = currentRangeX * scale
+			const clampedRangeX = Math.max(scaledRangeX, minRangeX)
+			const effectiveScaleX = clampedRangeX / currentRangeX
+
+			let newXStart = (coordinator.xStart - xInView) * effectiveScaleX + xInView
+			let newXEnd = (coordinator.xEnd - xInView) * effectiveScaleX + xInView
+
+			newXStart = Math.max(newXStart, xStartMin)
+			newXEnd = Math.min(newXEnd, xEndMax)
+
+			coordinator.xStart = newXStart
+			coordinator.xEnd = newXEnd
 		}
 		if (!lockY) {
 			coordinator.yStart = (coordinator.yStart - yInView) * scale + yInView
