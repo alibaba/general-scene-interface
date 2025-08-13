@@ -9,7 +9,9 @@
   "license": "MIT",
   "author": "Simon <https://github.com/gaomeng1900>",
   "homepage": "https://gaomeng1900.github.io/cubs.js",
-  "repository": "https://github.com/alibaba/general-scene-interface.git#cubs.js",
+  "repository": {
+    "url": "https://github.com/alibaba/general-scene-interface.git#cubs.js"
+  },
   "main": "./lib/cubs.umd.cjs",
   "module": "./lib/cubs.js",
   "types": "./lib/cubs.d.ts",
