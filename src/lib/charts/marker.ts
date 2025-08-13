@@ -185,6 +185,14 @@ export function drawXRange(
 
 			temp!.xEnd = coordinator.unproject(x, 0)[0]
 
+			// 检查 minmax，此时变化的是 end，只检查 end
+			if (config?.min !== undefined && temp!.xEnd < config.min) {
+				temp!.xEnd = config.min
+			}
+			if (config?.max !== undefined && temp!.xEnd > config.max) {
+				temp!.xEnd = config.max
+			}
+
 			coordinator.dispatchEvent({ type: 'update' })
 		}
 

@@ -123,15 +123,16 @@ export function coordinatorPointerControl(
 				const newXStart = initXStart - (x - startX) * coordinatorScaleX
 				const newXEnd = initXEnd - (x - startX) * coordinatorScaleX
 
+				coordinator.xStart = newXStart
+				coordinator.xEnd = newXEnd
+
 				if (newXStart < xStartMin) {
 					// -Infinity 不会进入这个分支
 					coordinator.xStart = xStartMin
-				} else if (newXEnd > xEndMax) {
+				}
+				if (newXEnd > xEndMax) {
 					// Infinity 不会进入这个分支
 					coordinator.xEnd = xEndMax
-				} else {
-					coordinator.xStart = newXStart
-					coordinator.xEnd = newXEnd
 				}
 			}
 
