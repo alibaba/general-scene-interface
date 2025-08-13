@@ -172,6 +172,15 @@ export function coordinatorPointerControl(
 		const x = e.clientX - left
 		const y = e.clientY - top
 
+		// 如果鼠标不在 viewport 内，不进行缩放
+		if (
+			coordinator.viewportX > x ||
+			coordinator.viewportX + coordinator.viewportWidth < x ||
+			coordinator.viewportY > y ||
+			coordinator.viewportY + coordinator.viewportHeight < y
+		)
+			return
+
 		const [xInView, yInView] = coordinator.unproject(x, y)
 
 		if (!lockX) {
