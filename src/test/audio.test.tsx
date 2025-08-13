@@ -45,7 +45,7 @@ export default function Test() {
 			lockScale: false,
 			xStartMin: 0,
 			xEndMax: 100,
-			xRangeMin: 1,
+			xRangeMin: 0.1,
 			// xRangeMax: 100,
 		})
 
@@ -113,12 +113,18 @@ export default function Test() {
 			polyline.style.pointerEvents = 'none'
 			scene.add(l)
 
-			// 事件轴刻度
+			// 时间轴刻度
+
+			const formatter = new Intl.NumberFormat('en-US', {
+				maximumFractionDigits: 3,
+				minimumFractionDigits: 0,
+				useGrouping: false,
+			})
 
 			const t = tick(coordinator, {
 				disableY: true,
 				xColor: '#000000',
-				xToString: (x) => `${((x / 100) * duration).toFixed(1)}s`,
+				xToString: (x) => `${formatter.format((x / 100) * duration)}s`,
 			})
 			scene.add(t)
 
