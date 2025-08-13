@@ -152,6 +152,8 @@ export class Scene extends Node<SceneEvents, Shape> {
 		})
 
 		const onPointerUp = (e: PointerEvent) => {
+			this.canvas.releasePointerCapture(e.pointerId)
+
 			const activeShape = this.activeShape
 			if (activeShape) {
 				activeShape.bubbleEvent({
@@ -160,7 +162,6 @@ export class Scene extends Node<SceneEvents, Shape> {
 				})
 
 				this.activeShape = null
-				this.canvas.releasePointerCapture(e.pointerId)
 			} else {
 				// 冒泡
 				this.dispatchEvent({
@@ -172,8 +173,10 @@ export class Scene extends Node<SceneEvents, Shape> {
 			}
 		}
 		this.canvas.addEventListener('pointerup', onPointerUp)
+		document.addEventListener('pointerleave', onPointerUp)
 		this.addEventListener('dispose', () => {
 			this.canvas.removeEventListener('pointerup', onPointerUp)
+			document.removeEventListener('pointerleave', onPointerUp)
 		})
 
 		const onPointerMove = (e: PointerEvent) => {
