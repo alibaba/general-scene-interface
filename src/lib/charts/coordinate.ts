@@ -172,18 +172,12 @@ export function coordinatorPointerControl(
 		const x = e.clientX - left
 		const y = e.clientY - top
 
-		// 如果鼠标不在 viewport 内，不进行缩放
-		if (
-			coordinator.viewportX > x ||
-			coordinator.viewportX + coordinator.viewportWidth < x ||
-			coordinator.viewportY > y ||
-			coordinator.viewportY + coordinator.viewportHeight < y
-		)
-			return
-
 		const [xInView, yInView] = coordinator.unproject(x, y)
 
 		if (!lockX) {
+			// 如果鼠标不在 viewport 内，不进行缩放
+			if (coordinator.viewportX > x || coordinator.viewportX + coordinator.viewportWidth < x) return
+
 			const currentRangeX = coordinator.xEnd - coordinator.xStart
 			const minRangeX = options?.xRangeMin ?? 0
 
@@ -201,6 +195,9 @@ export function coordinatorPointerControl(
 			coordinator.xEnd = newXEnd
 		}
 		if (!lockY) {
+			if (coordinator.viewportY > y || coordinator.viewportY + coordinator.viewportHeight < y)
+				return
+
 			coordinator.yStart = (coordinator.yStart - yInView) * scale + yInView
 			coordinator.yEnd = (coordinator.yEnd - yInView) * scale + yInView
 		}
