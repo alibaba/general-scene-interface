@@ -1,5 +1,5 @@
-export async function loadAudio(src: string) {
-	const blob = await fetch(src).then((res) => res.blob())
+export async function loadAudio(src: string, abortSignal?: AbortSignal) {
+	const blob = await fetch(src, { signal: abortSignal }).then((res) => res.blob())
 
 	const audio = new Audio()
 	audio.src = URL.createObjectURL(blob)
@@ -12,6 +12,13 @@ export async function loadAudio(src: string) {
 		})
 	})
 
+	if (abortSignal?.aborted) {
+		const error = new Error('Audio loading aborted')
+		error.name = 'AbortError'
+		URL.revokeObjectURL(audio.src)
+		throw error
+	}
+
 	audio.load()
 
 	await new Promise<void>((resolve, reject) => {
@@ -22,6 +29,13 @@ export async function loadAudio(src: string) {
 			reject(e)
 		})
 	})
+
+	if (abortSignal?.aborted) {
+		const error = new Error('Audio loading aborted')
+		error.name = 'AbortError'
+		URL.revokeObjectURL(audio.src)
+		throw error
+	}
 
 	return {
 		audio,
