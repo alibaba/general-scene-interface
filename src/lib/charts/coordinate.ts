@@ -369,6 +369,14 @@ export function tick(
 				text.style.font = '12px sans-serif'
 				text.x = pos[0]
 				text.y = coordinator.bottom + 20
+				if (text.x <= coordinator.left + 20) {
+					text.style.textAlign = 'left'
+					text.x = coordinator.left - 2 // 微调后看起来更对齐
+				}
+				if (text.x >= coordinator.right - 20) {
+					text.style.textAlign = 'right'
+					text.x = coordinator.right + 2 // 微调后看起来更对齐
+				}
 				tickX.add(text)
 			}
 
