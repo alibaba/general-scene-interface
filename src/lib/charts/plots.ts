@@ -85,6 +85,7 @@ export function barPlot(
 	ordered.map((item) => {
 		const bar = new RectShape()
 		bar.style.fillStyle = item.color ?? color
+		bar.style.pointerEvents = 'none'
 		plot.add(bar)
 		bars.set(item, bar)
 	})
@@ -98,9 +99,9 @@ export function barPlot(
 			const [right, bottom] = coordinator.project(item.x + barWidth / 2, item.y)
 
 			bar.x = left
-			bar.y = bottom
+			bar.y = top
 			bar.width = right - left
-			bar.height = top - bottom
+			bar.height = bottom - top
 		})
 	})
 
@@ -123,8 +124,10 @@ export function candlestickPlot(
 
 	ordered.map((item) => {
 		const bar = new RectShape()
+		bar.style.pointerEvents = 'none'
 		const shadow = new SegmentShape()
 		shadow.style.lineWidth = 2
+		shadow.style.pointerEvents = 'none'
 		if (item.open > item.close) {
 			bar.style.fillStyle = 'green'
 			shadow.style.strokeStyle = 'green'
@@ -159,9 +162,9 @@ export function candlestickPlot(
 			)
 
 			bar.x = left
-			bar.y = bottom
+			bar.y = top
 			bar.width = right - left
-			bar.height = top - bottom
+			bar.height = bottom - top
 
 			const shadowTop = coordinator.project(item.x, item.high)
 			const shadowBottom = coordinator.project(item.x, item.low)
