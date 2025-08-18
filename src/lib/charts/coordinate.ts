@@ -123,16 +123,18 @@ export function coordinatorPointerControl(
 				const newXStart = initXStart - (x - startX) * coordinatorScaleX
 				const newXEnd = initXEnd - (x - startX) * coordinatorScaleX
 
-				coordinator.xStart = newXStart
-				coordinator.xEnd = newXEnd
-
 				if (newXStart < xStartMin) {
-					// -Infinity 不会进入这个分支
+					// 对齐到边界
+					coordinator.xEnd = xStartMin + (coordinator.xEnd - coordinator.xStart)
 					coordinator.xStart = xStartMin
-				}
-				if (newXEnd > xEndMax) {
-					// Infinity 不会进入这个分支
+				} else if (newXEnd > xEndMax) {
+					// 对齐到边界
+					coordinator.xStart = xEndMax - (coordinator.xEnd - coordinator.xStart)
 					coordinator.xEnd = xEndMax
+				} else {
+					// 只在两端都可拖动的时候才执行拖动，来避免通过拖动来改变缩放
+					coordinator.xStart = newXStart
+					coordinator.xEnd = newXEnd
 				}
 			}
 
