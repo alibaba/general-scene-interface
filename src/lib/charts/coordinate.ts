@@ -306,6 +306,7 @@ export function tick(
 	config?: {
 		xColor?: string
 		yColor?: string
+		lineWidth?: number
 		minDistance?: number
 		disableX?: boolean
 		disableY?: boolean
@@ -353,7 +354,7 @@ export function tick(
 			for (let x = startX; x <= coordinator.xEnd; x += valueGap) {
 				const tick = new SegmentShape()
 				tick.style.strokeStyle = config?.xColor ?? 'red'
-				tick.style.lineWidth = 2
+				tick.style.lineWidth = config?.lineWidth ?? 1
 				tick.dx = 0
 				tick.dy = 10
 
@@ -414,7 +415,7 @@ export function tick(
 			for (let y = startY; y <= coordinator.yEnd; y += valueGap) {
 				const tick = new SegmentShape()
 				tick.style.strokeStyle = config?.yColor ?? 'green'
-				tick.style.lineWidth = 2
+				tick.style.lineWidth = config?.lineWidth ?? 1
 				tick.dx = -10
 				tick.dy = 0
 
